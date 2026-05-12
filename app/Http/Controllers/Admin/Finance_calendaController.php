@@ -13,7 +13,8 @@ class Finance_calendaController extends Controller
      */
     public function index()
     {
-        //
+        $finance_calendars = Finance_calendar::orderBy('finance_yr', 'desc')->paginate(PAGEINATION_COUNTER);
+        return view('admin.finance_calendar.index', compact('finance_calendars'));
     }
 
     /**
@@ -21,7 +22,7 @@ class Finance_calendaController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.finance_calendar.create');
     }
 
     /**

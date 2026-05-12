@@ -53,6 +53,11 @@
                 <button type="button" id="edit_enable_btn" class="btn btn-primary btn-sm" onclick="makeEditable()">
                     <i class="fas fa-edit"></i> تعديل البيانات
                 </button>
+                <a href="{{ route('admin.general-settings') }}"
+                    class="btn btn-sm btn-secondary shadow-sm d-none back-btn">
+                    <i class="fas fa-arrow-right"></i>
+                    رجوع
+                </a>
             </div>
         </div>
 
@@ -94,7 +99,7 @@
                             <input type="text" name="company_name"
                                 class="form-control editable-input {{ $errors->has('company_name') ? 'is-invalid' : '' }}"
                                 value="{{ old('company_name', $general_settings->company_name) }}" readonly>
-                            @include('admin.Admin_panel_setting.errors', ['value' => 'company_name'])
+                            @include('admin.errors.errors', ['value' => 'company_name'])
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -108,16 +113,16 @@
                                 <option value="0" {{ old('status', $general_settings->status) == 0 ? 'selected' : '' }}>
                                     معطل</option>
                             </select>
-                            @include('admin.Admin_panel_setting.errors', ['value' => 'status'])
+                            @include('admin.errors.errors', ['value' => 'status'])
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>البريد الإلكتروني</label>
-                            <input type="email" name="email"
+                            <input type="text" name="email"
                                 class="form-control editable-input {{ $errors->has('email') ? 'is-invalid' : '' }}"
                                 value="{{ old('email', $general_settings->email) }}" readonly>
-                            @include('admin.Admin_panel_setting.errors', ['value' => 'email'])
+                            @include('admin.errors.errors', ['value' => 'email'])
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -126,7 +131,7 @@
                             <input type="text" name="phone"
                                 class="form-control editable-input {{ $errors->has('phone') ? 'is-invalid' : '' }}"
                                 value="{{ old('phone', $general_settings->phone) }}" readonly>
-                            @include('admin.Admin_panel_setting.errors', ['value' => 'phone'])
+                            @include('admin.errors.errors', ['value' => 'phone'])
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -135,7 +140,7 @@
                             <input type="text" name="address"
                                 class="form-control editable-input {{ $errors->has('address') ? 'is-invalid' : '' }}"
                                 value="{{ old('address', $general_settings->address) }}" readonly>
-                            @include('admin.Admin_panel_setting.errors', ['value' => 'address'])
+                            @include('admin.errors.errors', ['value' => 'address'])
                         </div>
                     </div>
                 </div>
@@ -154,7 +159,7 @@
                                 class="form-control editable-input {{ $errors->has('after_minute_calculate_delay') ? 'is-invalid' : '' }}"
                                 value="{{ old('after_minute_calculate_delay', $general_settings->after_minute_calculate_delay) }}"
                                 readonly>
-                            @include('admin.Admin_panel_setting.errors', ['value' => 'after_minute_calculate_delay'])
+                            @include('admin.errors.errors', ['value' => 'after_minute_calculate_delay'])
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -164,7 +169,7 @@
                                 class="form-control editable-input {{ $errors->has('after_minute_calculate_early_departure') ? 'is-invalid' : '' }}"
                                 value="{{ old('after_minute_calculate_early_departure', $general_settings->after_minute_calculate_early_departure) }}"
                                 readonly>
-                            @include('admin.Admin_panel_setting.errors', ['value' => 'after_minute_calculate_early_departure'])
+                            @include('admin.errors.errors', ['value' => 'after_minute_calculate_early_departure'])
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -174,7 +179,7 @@
                                 class="form-control editable-input {{ $errors->has('after_minute_quarter_day_cut') ? 'is-invalid' : '' }}"
                                 value="{{ old('after_minute_quarter_day_cut', $general_settings->after_minute_quarter_day_cut) }}"
                                 readonly>
-                            @include('admin.Admin_panel_setting.errors', ['value' => 'after_minute_quarter_day_cut'])
+                            @include('admin.errors.errors', ['value' => 'after_minute_quarter_day_cut'])
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -184,7 +189,7 @@
                                 class="form-control editable-input {{ $errors->has('after_days_half_day_cut') ? 'is-invalid' : '' }}"
                                 value="{{ old('after_days_half_day_cut', $general_settings->after_days_half_day_cut) }}"
                                 readonly>
-                            @include('admin.Admin_panel_setting.errors', ['value' => 'after_days_half_day_cut'])
+                            @include('admin.errors.errors', ['value' => 'after_days_half_day_cut'])
                         </div>
                     </div>
                     <div class="col-md-4 ">
@@ -194,7 +199,7 @@
                                 class="form-control editable-input {{ $errors->has('after_days_allday_day_cut') ? 'is-invalid' : '' }}"
                                 value="{{ old('after_days_allday_day_cut', $general_settings->after_days_allday_day_cut) }}"
                                 readonly>
-                            @include('admin.Admin_panel_setting.errors', ['value' => 'after_days_allday_day_cut'])
+                            @include('admin.errors.errors', ['value' => 'after_days_allday_day_cut'])
                         </div>
                     </div>
                 </div>
@@ -213,7 +218,7 @@
                                 class="form-control editable-input {{ $errors->has('monthly_vacation_balance') ? 'is-invalid' : '' }}"
                                 value="{{ old('monthly_vacation_balance', $general_settings->monthly_vacation_balance) }}"
                                 readonly>
-                            @include('admin.Admin_panel_setting.errors', ['value' => 'monthly_vacation_balance'])
+                            @include('admin.errors.errors', ['value' => 'monthly_vacation_balance'])
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -223,7 +228,7 @@
                                 class="form-control editable-input {{ $errors->has('after_days_begin_vacation') ? 'is-invalid' : '' }}"
                                 value="{{ old('after_days_begin_vacation', $general_settings->after_days_begin_vacation) }}"
                                 readonly>
-                            @include('admin.Admin_panel_setting.errors', ['value' => 'after_days_begin_vacation'])
+                            @include('admin.errors.errors', ['value' => 'after_days_begin_vacation'])
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -233,7 +238,7 @@
                                 class="form-control editable-input {{ $errors->has('first_balance_begin_vacation') ? 'is-invalid' : '' }}"
                                 value="{{ old('first_balance_begin_vacation', $general_settings->first_balance_begin_vacation) }}"
                                 readonly>
-                            @include('admin.Admin_panel_setting.errors', ['value' => 'first_balance_begin_vacation'])
+                            @include('admin.errors.errors', ['value' => 'first_balance_begin_vacation'])
                         </div>
                     </div>
                 </div>
@@ -252,7 +257,7 @@
                                 class="form-control editable-input {{ $errors->has('sanctions_value_first_absence') ? 'is-invalid' : '' }}"
                                 value="{{ old('sanctions_value_first_absence', $general_settings->sanctions_value_first_absence) }}"
                                 readonly>
-                            @include('admin.Admin_panel_setting.errors', ['value' => 'sanctions_value_first_absence'])
+                            @include('admin.errors.errors', ['value' => 'sanctions_value_first_absence'])
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -262,7 +267,7 @@
                                 class="form-control editable-input {{ $errors->has('sanctions_value_second_absence') ? 'is-invalid' : '' }}"
                                 value="{{ old('sanctions_value_second_absence', $general_settings->sanctions_value_second_absence) }}"
                                 readonly>
-                            @include('admin.Admin_panel_setting.errors', ['value' => 'sanctions_value_second_absence'])
+                            @include('admin.errors.errors', ['value' => 'sanctions_value_second_absence'])
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -272,7 +277,7 @@
                                 class="form-control editable-input {{ $errors->has('sanctions_value_third_absence') ? 'is-invalid' : '' }}"
                                 value="{{ old('sanctions_value_third_absence', $general_settings->sanctions_value_third_absence) }}"
                                 readonly>
-                            @include('admin.Admin_panel_setting.errors', ['value' => 'sanctions_value_third_absence'])
+                            @include('admin.errors.errors', ['value' => 'sanctions_value_third_absence'])
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -282,7 +287,7 @@
                                 class="form-control editable-input {{ $errors->has('sanctions_value_fourth_absence') ? 'is-invalid' : '' }}"
                                 value="{{ old('sanctions_value_fourth_absence', $general_settings->sanctions_value_fourth_absence) }}"
                                 readonly>
-                            @include('admin.Admin_panel_setting.errors', ['value' => 'sanctions_value_fourth_absence'])
+                            @include('admin.errors.errors', ['value' => 'sanctions_value_fourth_absence'])
                         </div>
                     </div>
                 </div>
@@ -365,5 +370,15 @@
 
         // 5. تغيير عنوان الصفحة
         document.title = 'تعديل البيانات';
+
+        // 6. تعديل  edit-header
+        const editHeader = document.querySelector('.edit-header');
+
+        if (editHeader) {
+            editHeader.textContent = 'تعديل';
+        }
+        // 7. اظهار زر الرجوع
+
+        document.querySelector('.back-btn').classList.remove('d-none');
     }
 </script>

@@ -23,6 +23,7 @@ class Admin_panel_settingController extends Controller
      */
     public function update(Admin_panel_settingRequest $request, Admin_panel_setting $admin_panel_setting)
     {
+        dd($request->all());
         try {
             $validated = $request->validated();
             $validated['updated_by'] = auth()->user()->id;

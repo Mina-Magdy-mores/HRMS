@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\Finance_calendaController;
 use App\Http\Controllers\Admin\LoginController;
 use Illuminate\Support\Facades\Route;
 
+
+define('PAGEINATION_COUNTER', 11);
 // Admin
 Route::prefix('/admin')->name('admin.')->group(function () {
 
