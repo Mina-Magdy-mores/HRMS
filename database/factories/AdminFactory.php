@@ -1,0 +1,33 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\Admin;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<Admin>
+ */
+class AdminFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+          //`name`, `email`, `username`, `password`, `added_by`, `updated_by`, `status`, `date`, `company_id`
+            'name' => fake()->name(),
+            'email' => fake()->unique()->safeEmail(),
+            'username' => fake()->unique()->userName(),
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+            'added_by' => 1,
+            'updated_by' => 1,
+            'status' => 1,
+            'date' => now(),
+            'company_id' => 1
+        ];
+    }
+}
