@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Finance_calendarsRequest;
 use App\Models\Finance_calendar;
 use Illuminate\Http\Request;
 
@@ -28,9 +29,8 @@ class Finance_calendaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Finance_calendarsRequest $request)
     {
-        //
     }
 
     /**

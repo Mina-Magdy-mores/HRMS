@@ -100,8 +100,7 @@
 
             <div class="card-tools">
 
-                <a href="{{ route('admin.finance_calendars.index') }}"
-                    class="btn btn-sm btn-secondary shadow-sm">
+                <a href="{{ route('admin.finance_calendars.index') }}" class="btn btn-sm btn-secondary shadow-sm">
 
                     <i class="fas fa-arrow-right"></i>
 
@@ -113,8 +112,7 @@
 
         </div>
 
-        <form action="{{ route('admin.finance_calendars.store') }}"
-            method="POST">
+        <form action="{{ route('admin.finance_calendars.store') }}" method="POST">
 
             @csrf
 
@@ -165,11 +163,9 @@
 
                         <div class="form-group">
 
-                            <label>السنة المالية</label>
+                            <label>كود السنة المالية</label>
 
-                            <input type="text"
-                                name="finance_yr"
-                                value="{{ old('finance_yr') }}"
+                            <input type="text" name="finance_yr" value="{{ old('finance_yr') }}"
                                 class="form-control {{ $errors->has('finance_yr') ? 'is-invalid' : '' }}"
                                 placeholder="مثال : 2026">
 
@@ -180,73 +176,49 @@
                     </div>
 
                     <!-- الوصف -->
-                    <div class="col-md-8">
+                    <div class="col-md-4">
 
                         <div class="form-group">
 
                             <label>وصف السنة المالية</label>
 
-                            <input type="text"
-                                name="finance_yr_desc"
-                                value="{{ old('finance_yr_desc') }}"
+                            <input type="text" name="finance_yr_desc" value="{{ old('finance_yr_desc') }}"
                                 class="form-control {{ $errors->has('finance_yr_desc') ? 'is-invalid' : '' }}"
                                 placeholder="أدخل وصف السنة المالية">
 
-                            @error('finance_yr_desc')
-
-                                <span class="invalid-feedback d-block">
-                                    {{ $message }}
-                                </span>
-
-                            @enderror
+                            @include('admin.errors.errors', ['value' => 'finance_yr_desc'])
 
                         </div>
 
                     </div>
 
                     <!-- تاريخ البداية -->
-                    <div class="col-md-6">
+                    <div class="col-md-4">
 
                         <div class="form-group">
 
                             <label>تاريخ البداية</label>
 
-                            <input type="date"
-                                name="start_date"
-                                value="{{ old('start_date') }}"
+                            <input type="date" name="start_date" value="{{ old('start_date') }}"
                                 class="form-control {{ $errors->has('start_date') ? 'is-invalid' : '' }}">
 
-                            @error('start_date')
-
-                                <span class="invalid-feedback d-block">
-                                    {{ $message }}
-                                </span>
-
-                            @enderror
+                            @include('admin.errors.errors', ['value' => 'start_date'])
 
                         </div>
 
                     </div>
 
                     <!-- تاريخ النهاية -->
-                    <div class="col-md-6">
+                    <div class="col-md-4">
 
                         <div class="form-group">
 
                             <label>تاريخ النهاية</label>
 
-                            <input type="date"
-                                name="end_date"
-                                value="{{ old('end_date') }}"
+                            <input type="date" name="end_date" value="{{ old('end_date') }}"
                                 class="form-control {{ $errors->has('end_date') ? 'is-invalid' : '' }}">
 
-                            @error('end_date')
-
-                                <span class="invalid-feedback d-block">
-                                    {{ $message }}
-                                </span>
-
-                            @enderror
+                            @include('admin.errors.errors', ['value' => 'end_date'])
 
                         </div>
 
@@ -259,20 +231,17 @@
 
                             <label>الحالة</label>
 
-                            <select name="status"
-                                class="form-control {{ $errors->has('status') ? 'is-invalid' : '' }}">
+                            <select name="status" class="form-control {{ $errors->has('status') ? 'is-invalid' : '' }}">
 
-                                <option value="">اختر الحالة</option>
+                                <option disabled value="">اختر الحالة</option>
 
-                                <option value="1"
-                                    {{ old('status') == 1 ? 'selected' : '' }}>
+                                <option value="1" {{ old('status') == 1 ? 'selected' : '' }}>
 
                                     مفعل
 
                                 </option>
 
-                                <option value="0"
-                                    {{ old('status') == 0 ? 'selected' : '' }}>
+                                <option value="0" {{ old('status') == 0 ? 'selected' : '' }}>
 
                                     معطل
 
@@ -299,8 +268,7 @@
             <!-- Footer -->
             <div class="card-footer text-left">
 
-                <button type="submit"
-                    class="btn btn-success shadow px-4">
+                <button type="submit" class="btn btn-success shadow px-4">
 
                     <i class="fas fa-save"></i>
 
@@ -308,8 +276,7 @@
 
                 </button>
 
-                <a href="{{ route('admin.finance_calendars.index') }}"
-                    class="btn btn-danger shadow px-4">
+                <a href="{{ route('admin.finance_calendars.index') }}" class="btn btn-danger shadow px-4">
 
                     <i class="fas fa-times-circle"></i>
 
