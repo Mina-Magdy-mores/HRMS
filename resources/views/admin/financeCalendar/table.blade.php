@@ -193,7 +193,7 @@
                                             <i class="fas fa-eye"></i>
                                         </button>
                                         @if ($financeCalendar->status == 0)
-                                            <a href="{{ route('admin.financeCalendars.edit', $financeCalendar) }}"
+                                            <a href="{{ route('admin.financeCalendars.edit', $financeCalendar->id) }}"
                                                 class="btn btn-sm btn-warning m-1">
                                                 <i class="fas fa-edit"></i>
                                             </a>

@@ -7,15 +7,15 @@
             <div class="info-box shadow-sm">
 
                 <span class="info-box-icon bg-primary">
-                    <i class="fas fa-calendar-plus"></i>
+                    <i class="fas fa-edit"></i>
                 </span>
 
                 <div class="info-box-content">
 
-                    <span class="info-box-text">إضافة سنة مالية</span>
+                    <span class="info-box-text">تعديل السنة مالية</span>
 
                     <span class="info-box-number">
-                        Finance Year
+                        {{ $financeCalendar->finance_yr }}
                     </span>
 
                 </div>
@@ -25,17 +25,25 @@
 
         <div class="col-lg-3 col-md-6 col-12">
             <div class="info-box shadow-sm">
+                @if($financeCalendar->status == 1)
 
-                <span class="info-box-icon bg-success">
-                    <i class="fas fa-check-circle"></i>
-                </span>
+                    <span class="info-box-icon bg-success">
+                        <i class="fas fa-check-circle"></i>
+                    </span>
 
+                @else
+
+                    <span class="info-box-icon bg-danger">
+                        <i class="fas fa-times-circle"></i>
+                    </span>
+
+                @endif
                 <div class="info-box-content">
 
                     <span class="info-box-text">حالة الصفحة</span>
 
                     <span class="info-box-number">
-                        إنشاء جديد
+                        {{ $financeCalendar->status == 1 ? 'مفعل' : 'معطل' }}
                     </span>
 
                 </div>
@@ -94,8 +102,7 @@
 
                 <i class="fas fa-plus-circle"></i>
 
-                إضافة سنة مالية جديدة
-
+                تعديل سنة مالية
             </h3>
 
             <div class="card-tools">
@@ -112,10 +119,10 @@
 
         </div>
 
-        <form action="{{ route('admin.financeCalendars.store') }}" method="POST">
+        <form action="{{ route('admin.financeCalendars.update', $financeCalendar) }}" method="POST">
 
             @csrf
-
+            @method('PUT')
             <div class="card-body">
 
                 <!-- Validation Errors -->
@@ -175,9 +182,9 @@
 
                             <label>كود السنة المالية</label>
 
-                            <input type="number" name="finance_yr" value="{{ old('finance_yr') }}"
-                                class="form-control {{ $errors->has('finance_yr') ? 'is-invalid' : '' }}"
-                                placeholder="مثال : 2026">
+                            <input type="number" name="finance_yr"
+                                value="{{ old('finance_yr', $financeCalendar->finance_yr) }}"
+                                class="form-control {{ $errors->has('finance_yr') ? 'is-invalid' : '' }}">
 
                             @include('admin.errors.errors', ['value' => 'finance_yr'])
 
@@ -192,9 +199,9 @@
 
                             <label>وصف السنة المالية</label>
 
-                            <input type="text" name="finance_yr_desc" value="{{ old('finance_yr_desc') }}"
-                                class="form-control {{ $errors->has('finance_yr_desc') ? 'is-invalid' : '' }}"
-                                placeholder="أدخل وصف السنة المالية">
+                            <input type="text" name="finance_yr_desc"
+                                value="{{ old('finance_yr_desc', $financeCalendar->finance_yr_desc) }}"
+                                class="form-control {{ $errors->has('finance_yr_desc') ? 'is-invalid' : '' }}">
 
                             @include('admin.errors.errors', ['value' => 'finance_yr_desc'])
 
@@ -209,7 +216,8 @@
 
                             <label>تاريخ البداية</label>
 
-                            <input type="date" name="start_date" value="{{ old('start_date') }}"
+                            <input type="date" name="start_date"
+                                value="{{ old('start_date', $financeCalendar->start_date) }}"
                                 class="form-control {{ $errors->has('start_date') ? 'is-invalid' : '' }}">
 
                             @include('admin.errors.errors', ['value' => 'start_date'])
@@ -225,7 +233,7 @@
 
                             <label>تاريخ النهاية</label>
 
-                            <input type="date" name="end_date" value="{{ old('end_date') }}"
+                            <input type="date" name="end_date" value="{{ old('end_date', $financeCalendar->end_date) }}"
                                 class="form-control {{ $errors->has('end_date') ? 'is-invalid' : '' }}">
 
                             @include('admin.errors.errors', ['value' => 'end_date'])
@@ -233,6 +241,39 @@
                         </div>
 
                     </div>
+                    @if($checkCount == 0)
+                        <!-- الحالة -->
+                        <div class="col-md-4">
+
+                            <div class="form-group">
+
+                                <label>الحالة</label>
+
+                                <select name="status" class="form-control {{ $errors->has('status') ? 'is-invalid' : '' }}">
+
+                                    <option disabled value="">اختر الحالة</option>
+
+                                    <option value="1" {{ old('status', $financeCalendar->status) == 1 ? 'selected' : '' }}>
+
+                                        مفعل
+
+                                    </option>
+
+                                    <option value="0" {{ old('status', $financeCalendar->status) == 0 ? 'selected' : '' }}>
+
+                                        معطل
+
+                                    </option>
+
+                                </select>
+
+                                @include('admin.errors.errors', ['value' => 'status'])
+
+                            </div>
+
+                        </div>
+                    @endif
+
 
                 </div>
 

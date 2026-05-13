@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class FinanceCalendarsRequest extends FormRequest
+class FinanceCalendarRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,7 +27,6 @@ class FinanceCalendarsRequest extends FormRequest
             'finance_yr_desc' => 'required|string|max:255',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
-            'status' => 'required|integer|in:0,1',
         ];
     }
     public function messages()
@@ -45,9 +44,6 @@ class FinanceCalendarsRequest extends FormRequest
             'start_date.date' => 'تاريخ البداية يجب ان يكون تاريخ',
             'end_date.required' => 'تاريخ النهاية مطلوب',
             'end_date.date' => 'تاريخ النهاية يجب ان يكون تاريخ',
-            'status.required' => 'الحالة مطلوبة',
-            'status.integer' => 'الحالة يجب ان تكون مفعل او معطل',
-            'status.in' => 'الحالة يجب ان تكون مفعل او معطل',
         ];
     }
 }
