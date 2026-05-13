@@ -18,7 +18,6 @@ class AdminFactory extends Factory
     public function definition(): array
     {
         return [
-          //`name`, `email`, `username`, `password`, `added_by`, `updated_by`, `status`, `date`, `company_id`
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'username' => fake()->unique()->userName(),

@@ -341,44 +341,48 @@
 </div>
 
 <!-- JavaScript للتحكم في وضع التعديل -->
-<script>
-    // Check if there are validation errors - if yes, enable edit mode automatically
-    @if ($errors->any())
-        document.addEventListener('DOMContentLoaded', function () {
-            makeEditable();
-        });
-    @endif
 
-    function makeEditable() {
-        // 1. فك القفل عن كل المدخلات
-        const inputs = document.querySelectorAll('.editable-input');
-        inputs.forEach(input => {
-            input.removeAttribute('readonly');
-            input.removeAttribute('disabled');
-            input.style.border = "1px solid #28a745";
-            input.style.backgroundColor = "#fff";
-        });
+@section('js')
+    <script>
+        // Check if there are validation errors - if yes, enable edit mode automatically
+        @if ($errors->any())
+            document.addEventListener('DOMContentLoaded', function () {
+                makeEditable();
+            });
+        @endif
 
-        // 2. إظهار أزرار الحفظ والإلغاء
-        document.getElementById('action_buttons').style.display = 'block';
+        function makeEditable() {
+            // 1. فك القفل عن كل المدخلات
+            const inputs = document.querySelectorAll('.editable-input');
+            inputs.forEach(input => {
+                input.removeAttribute('readonly');
+                input.removeAttribute('disabled');
+                input.style.border = "1px solid #28a745";
+                input.style.backgroundColor = "#fff";
+            });
 
-        // 3. إخفاء زر التعديل العلوي
-        document.getElementById('edit_enable_btn').style.display = 'none';
+            // 2. إظهار أزرار الحفظ والإلغاء
+            document.getElementById('action_buttons').style.display = 'block';
 
-        // 4. تركيز المؤشر على أول حقل
-        if (inputs.length > 0) inputs[0].focus();
+            // 3. إخفاء زر التعديل العلوي
+            document.getElementById('edit_enable_btn').style.display = 'none';
 
-        // 5. تغيير عنوان الصفحة
-        document.title = 'تعديل البيانات';
+            // 4. تركيز المؤشر على أول حقل
+            if (inputs.length > 0) inputs[0].focus();
 
-        // 6. تعديل  edit-header
-        const editHeader = document.querySelector('.edit-header');
+            // 5. تغيير عنوان الصفحة
+            document.title = 'تعديل البيانات';
 
-        if (editHeader) {
-            editHeader.textContent = 'تعديل';
+            // 6. تعديل  edit-header
+            const editHeader = document.querySelector('.edit-header');
+
+            if (editHeader) {
+                editHeader.textContent = 'تعديل';
+            }
+            // 7. اظهار زر الرجوع
+
+            document.querySelector('.back-btn').classList.remove('d-none');
         }
-        // 7. اظهار زر الرجوع
+    </script>
+@endsection
 
-        document.querySelector('.back-btn').classList.remove('d-none');
-    }
-</script>

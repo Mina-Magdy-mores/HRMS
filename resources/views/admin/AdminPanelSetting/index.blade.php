@@ -2,8 +2,8 @@
 
 @section('title', 'الضبط العام للنظام')
 @section('contentHeader')
-                <i class="fas fa-cogs"></i>
-قائمة الضبط
+    <i class="fas fa-cogs"></i>
+    قائمة الضبط
 @endsection
 
 @section('contentHeaderActiveLink')
@@ -13,7 +13,7 @@
 
 @section('content')
 
-                @if (@isset($general_settings) && !@empty($general_settings))
-                    @include('admin.Admin_panel_setting.form', ['general_settings' => $general_settings])
-                @endif
+    @if (@isset($general_settings) && !@empty($general_settings))
+        @include('admin.AdminPanelSetting.form', ['general_settings' => $general_settings])
+    @endif
 @endsection

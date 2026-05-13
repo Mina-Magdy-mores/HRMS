@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Admin;
-use App\Models\Admin_panel_setting;
+use App\Models\AdminPanelSetting;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
             'added_by' => 1,
             'updated_by' => 1
         ]);
-        Admin_panel_setting::factory()->create([
+        AdminPanelSetting::factory()->create([
             'company_name' => 'company_name',
             'status' => 1,
             'image' => 'image',

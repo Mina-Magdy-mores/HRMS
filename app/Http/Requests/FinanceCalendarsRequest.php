@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class Finance_calendarsRequest extends FormRequest
+class FinanceCalendarsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +23,6 @@ class Finance_calendarsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //`finance_yr`, `finance_yr_desc`, `start_date`, `end_date`, `status`,
             'finance_yr' => 'required|integer|unique:finance_calendars|min:0|max:9999',
             'finance_yr_desc' => 'required|string|max:255',
             'start_date' => 'required|date',
@@ -33,7 +32,6 @@ class Finance_calendarsRequest extends FormRequest
     }
     public function messages()
     {
-        //كل الرسائل عربى
         return [
             'finance_yr.required' => 'سنة المالية مطلوبة',
             'finance_yr.integer' => 'سنة المالية يجب أن تكون عددًا صحيحًا',

@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class Admin_panel_settingRequest extends FormRequest
+class AdminPanelSettingRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

@@ -19,8 +19,15 @@ return new class extends Migration
             $table->date('end_date');
             $table->tinyInteger('status')->default(0)->comment('واحد مفعل - صفر معطل');
             $table->integer('company_id');
-            $table->integer('added_by');
-            $table->integer('updated_by');
+            $table->foreignId('added_by')
+                ->constrained('admins')
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
+            $table->foreignId('updated_by')
+                ->nullable()
+                ->constrained('admins')
+                ->cascadeOnUpdate()
+                ->nullOnDelete();
             $table->timestamps();
         });
     }

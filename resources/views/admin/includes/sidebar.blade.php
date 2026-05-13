@@ -34,13 +34,15 @@
                     </a>
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
-                            <a href="{{ route('admin.general-settings') }}" class="nav-link @if (request()->routeIs('admin.general-settings')) active @endif">
+                            <a href="{{ route('admin.general-settings') }}"
+                                class="nav-link @if (request()->routeIs('admin.general-settings')) active @endif">
                                 <i class="fas fa-cogs"></i>
                                 <p>الضبط العام</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('admin.finance_calendars.index') }}" class="nav-link @if (request()->routeIs('admin.finance_calendars.*')) active @endif">
+                            <a href="{{ route('admin.financeCalendars.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.financeCalendars.*')) active @endif">
                                 <i class="fas fa-calendar"></i>
                                 <p>السنوات المالية</p>
                             </a>

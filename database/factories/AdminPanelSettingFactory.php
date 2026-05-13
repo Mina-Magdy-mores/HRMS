@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\Admin_panel_setting;
+use App\Models\AdminPanelSetting;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Admin_panel_setting>
+ * @extends Factory<AdminPanelSetting>
  */
-class Admin_panel_settingFactory extends Factory
+class AdminPanelSettingFactory extends Factory
 {
     /**
      * Define the model's default state.

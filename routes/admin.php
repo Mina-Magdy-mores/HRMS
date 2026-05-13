@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\Admin\Admin_panel_settingController;
+use App\Http\Controllers\Admin\AdminPanelSettingController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\Finance_calendaController;
+use App\Http\Controllers\Admin\FinanceCalendarController;
 use App\Http\Controllers\Admin\LoginController;
 use Illuminate\Support\Facades\Route;
 
@@ -11,17 +11,17 @@ define('PAGEINATION_COUNTER', 11);
 // Admin
 Route::prefix('/admin')->name('admin.')->group(function () {
 
-// logged in routes
+    // logged in routes
     Route::middleware('auth:admin')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
         // general settings
-        Route::get('/general-settings', [Admin_panel_settingController::class, 'index'])->name('general-settings');
-        Route::put('/general-settings/{admin_panel_setting}', [Admin_panel_settingController::class, 'update'])->name('general-settings.update');
+        Route::get('/general-settings', [AdminPanelSettingController::class, 'index'])->name('general-settings');
+        Route::put('/general-settings/{adminPanelSetting}', [AdminPanelSettingController::class, 'update'])->name('general-settings.update');
 
         // finance calendar
-        Route::resource('finance_calendars', Finance_calendaController::class);
+        Route::resource('financeCalendars', FinanceCalendarController::class);
     });
 
     // guest routes

@@ -100,7 +100,7 @@
 
             <div class="card-tools">
 
-                <a href="{{ route('admin.finance_calendars.index') }}" class="btn btn-sm btn-secondary shadow-sm">
+                <a href="{{ route('admin.financeCalendars.index') }}" class="btn btn-sm btn-secondary shadow-sm">
 
                     <i class="fas fa-arrow-right"></i>
 
@@ -112,7 +112,7 @@
 
         </div>
 
-        <form action="{{ route('admin.finance_calendars.store') }}" method="POST">
+        <form action="{{ route('admin.financeCalendars.store') }}" method="POST">
 
             @csrf
 
@@ -141,7 +141,17 @@
                     </div>
 
                 @endif
+                @if (session('error'))
 
+                    <div class="alert alert-danger alert-dismissible fade show">
+
+                        <i class="fas fa-times-circle"></i>
+
+                        {{ session('error') }}
+
+                    </div>
+
+                @endif
 
                 <!-- بيانات السنة المالية -->
                 <div class="row">
@@ -165,7 +175,7 @@
 
                             <label>كود السنة المالية</label>
 
-                            <input type="text" name="finance_yr" value="{{ old('finance_yr') }}"
+                            <input type="number" name="finance_yr" value="{{ old('finance_yr') }}"
                                 class="form-control {{ $errors->has('finance_yr') ? 'is-invalid' : '' }}"
                                 placeholder="مثال : 2026">
 
@@ -276,7 +286,7 @@
 
                 </button>
 
-                <a href="{{ route('admin.finance_calendars.index') }}" class="btn btn-danger shadow px-4">
+                <a href="{{ route('admin.financeCalendars.index') }}" class="btn btn-danger shadow px-4">
 
                     <i class="fas fa-times-circle"></i>
 
