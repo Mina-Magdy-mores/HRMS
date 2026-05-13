@@ -22,6 +22,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
 
         // finance calendar
         Route::resource('financeCalendars', FinanceCalendarController::class);
+        Route::get('financeCalendars/{financeCalendar}/months', [FinanceCalendarController::class, 'showMonths'])->name('financeCalendars.months');
     });
 
     // guest routes

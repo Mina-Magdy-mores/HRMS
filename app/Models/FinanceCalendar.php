@@ -29,6 +29,6 @@ class FinanceCalendar extends Model
     }
     public function financeMonthlyCalendars()
     {
-        return $this->hasMany(FinanceMonthlyCalendar::class);
+        return $this->hasMany(FinanceMonthlyCalendar::class, 'financeCalendar_id');
     }
 }

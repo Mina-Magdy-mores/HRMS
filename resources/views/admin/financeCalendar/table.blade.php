@@ -129,22 +129,22 @@
                             <th>آخر تحديث بواسطة</th>
                             <th>تاريخ الإضافة</th>
                             <th>تاريخ التحديث</th>
-                            <th ">الإجراءات</th>
+                            <th>الإجراءات</th>
 
                         </tr>
 
                     </thead>
                     <tbody>
                         @forelse ($financeCalendars as $financeCalendar)
-                                                        <tr>
-                                                            <td>
-                                                                {{ $financeCalendar->id }}
-                                                            </td>
-                                                            <td>
-                                                                <span class=" badge badge-primary px-3 py-2">
-                                    {{ $financeCalendar->finance_yr }}
+                            <tr>
+                                <td>
+                                    {{ $financeCalendar->id }}
+                                </td>
+                                <td>
+                                    <span class=" badge badge-primary px-3 py-2">
+                                        {{ $financeCalendar->finance_yr }}
                                     </span>
-                                    </td>
+                                </td>
                                 <td>
                                     {{ $financeCalendar->finance_yr_desc }}
                                 </td>
@@ -220,7 +220,7 @@
                                 </td>
                             </tr>
                         @endforelse
-                        </tbody>
+                    </tbody>
                 </table>
 
             </div>
@@ -229,15 +229,61 @@
         </div>
     </div>
 </div>
-<!-- JavaScript للتحكم في وضع التعديل -->
 
-@section('js')
-    {{-- تفعيل زر عرض الشهور --}}
-    <script>
-        $(document).ready(function () {
-            $(document).on('click', '.show_year_monthes', function () {
-                alert($(this).data('id'));
-            })
-        });
-    </script>
-@endsection
+    <!-- Months Modal (EMPTY BODY) -->
+    <div class="modal fade " id="monthsModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+            <div class="modal-content shadow">
+
+                <!-- Header -->
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        الشهور المالية
+                    </h5>
+
+                    <button type="button" class="close text-white" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+
+                <!-- BODY = EMPTY -->
+                <div class="modal-body" id="months_modal_body">
+                    <!-- AJAX will inject everything here -->
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- JavaScript للتحكم في وضع التعديل -->
+
+    @section('js')
+        {{-- تفعيل زر عرض الشهور --}}
+        <script>
+            $(document).ready(function () {
+
+                $(document).on('click', '.show_year_monthes', function () {
+
+                    var id = $(this).data('id');
+
+                    $.ajax({
+                        url: `/admin/financeCalendars/${id}/months`,
+                        type: 'GET',
+                        dataType: 'html',
+                        cache: false,
+                        success: function (response) {
+                            $('#months_modal_body').html(response);
+                            $('#monthsModal').modal('show');
+                        },
+                        error: function (xhr) {
+                            alert('حدث خطأ');
+                        }
+                    });
+
+                });
+
+            });
+        </script>
+    @endsection

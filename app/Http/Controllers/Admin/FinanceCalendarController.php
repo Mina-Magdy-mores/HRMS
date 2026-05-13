@@ -134,4 +134,16 @@ class FinanceCalendarController extends Controller
                 ->with('error', 'حدث خطا ما برجاء المحاوله لاحقا' . $e->getMessage());
         }
     }
+    public function showMonths(Request $request, string $financeCalendar)
+    {
+        $financeCalendar = FinanceCalendar::find($financeCalendar);
+        if (!$financeCalendar) {
+            return redirect()
+                ->route('admin.financeCalendars.index')
+                ->with('error', 'حدث خطا ما برجاء المحاوله لاحقا');
+        }
+        $finanaceMonthlyCalendars = $financeCalendar->financeMonthlyCalendars;
+      return view('admin.financeCalendar.months', compact('finanaceMonthlyCalendars'));
+
+    }
 }

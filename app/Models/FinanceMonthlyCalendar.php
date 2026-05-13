@@ -33,7 +33,7 @@ class FinanceMonthlyCalendar extends Model
     }
     public function financeCalendar()
     {
-        return $this->belongsTo(FinanceCalendar::class);
+        return $this->belongsTo(FinanceCalendar::class, 'financeCalendar_id');
     }
     public function month()
     {
