@@ -22,7 +22,8 @@ class FinanceCalendarController extends Controller
      */
     public function index()
     {
-        $financeCalendars = FinanceCalendar::with(['addedBy', 'updatedBy'])->orderBy('finance_yr', 'desc')->paginate(PAGEINATION_COUNTER);
+        $company_id = Auth::user()->company_id;
+        $financeCalendars = getColsWhereP(FinanceCalendar::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id], 'finance_yr', 'desc', PAGEINATION_COUNTER);
         return view('admin.financeCalendar.index', compact('financeCalendars'));
     }
 

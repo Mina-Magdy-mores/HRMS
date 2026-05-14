@@ -16,7 +16,8 @@ class AdminPanelSettingController extends Controller
     public function index()
     {
         $company_id = Auth::user()->company_id;
-        $general_settings = AdminPanelSetting::where('company_id', $company_id)->first();
+        // $general_settings = AdminPanelSetting::where('company_id', $company_id)->first();
+        $general_settings = getColsWhere(AdminPanelSetting::class, [], ['*'], ['company_id' => $company_id], 'id', 'desc');
         return view('admin.AdminPanelSetting.index', compact('general_settings'));
     }
     /**

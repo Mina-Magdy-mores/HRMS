@@ -24,6 +24,15 @@ class Admin extends User
         ];
     }
 
+    public function addedAdminPanels()
+    {
+        return $this->hasMany(AdminPanelSetting::class, 'created_by');
+    }
+
+    public function updatedAdminPanels()
+    {
+        return $this->hasMany(AdminPanelSetting::class, 'updated_by');
+    }
     public function addedFinanceCalendars()
     {
         return $this->hasMany(FinanceCalendar::class, 'added_by');
@@ -41,5 +50,9 @@ class Admin extends User
     public function updatedFinanceMonthlyCalendars()
     {
         return $this->hasMany(FinanceMonthlyCalendar::class, 'updated_by');
+    }
+    public function branches()
+    {
+        return $this->hasMany(Branche::class, 'added_by');
     }
 }

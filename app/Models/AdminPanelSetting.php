@@ -32,4 +32,15 @@ use Illuminate\Database\Eloquent\Model;
 class AdminPanelSetting extends Model
 {
     use HasFactory;
+
+    public function addedBy()
+    {
+        return $this->belongsTo(Admin::class, 'created_by');
+    }
+
+    public function updatedBy()
+    {
+        return $this->belongsTo(Admin::class, 'updated_by');
+    }
+
 }
