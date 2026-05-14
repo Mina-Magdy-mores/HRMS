@@ -25,7 +25,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::resource('financeCalendars', FinanceCalendarController::class);
         Route::get('financeCalendars/{financeCalendar}/months', [FinanceCalendarController::class, 'showMonths'])->name('financeCalendars.months');
 
-        // branches
+        // branches routes
         Route::get('/branches', [BrancheController::class, 'index'])->name('branches.index');
         Route::get('/branches/create', [BrancheController::class, 'create'])->name('branches.create');
         Route::post('/branches', [BrancheController::class, 'store'])->name('branches.store');
