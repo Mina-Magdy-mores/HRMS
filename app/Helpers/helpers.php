@@ -63,7 +63,7 @@ function insert($model = null, $arrayToInsert = [], $returnData = false)
 {
     $flag = $model::create($arrayToInsert);
     if ($returnData) {
-        return getColsWhereRow($model, ['*'], $arra0yToInsert);
+        return getColsWhereRow($model, ['*'], $arrayToInsert);
     } else {
         return $flag;
     }

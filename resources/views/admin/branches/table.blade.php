@@ -127,18 +127,18 @@
                                 <td>{{ $branch->id }}</td>
 
                                 <td>
-                                        {{ $branch->name }}
+                                    {{ $branch->name }}
                                 </td>
 
                                 <td>{{ $branch->address }}</td>
 
                                 <td>
-                                        {{ $branch->phone }}
+                                    {{ $branch->phone }}
                                 </td>
 
                                 <td>
                                     @if($branch->email)
-                                            {{ $branch->email }}
+                                        {{ $branch->email }}
                                     @else
                                         <span class="text-muted">---</span>
                                     @endif
@@ -172,13 +172,11 @@
                                     <div class="d-flex justify-content-center align-items-center gap-1">
 
                                         <a href="{{ route('admin.branches.edit', $branch->id) }}"
-                                            class="btn btn-sm btn-warning m-1"
-                                            title="تعديل">
+                                            class="btn btn-sm btn-warning m-1" title="تعديل">
                                             <i class="fas fa-edit"></i>
                                         </a>
 
-                                        <form action="{{ route('admin.branches.destroy', $branch->id) }}"
-                                            method="POST">
+                                        <form action="{{ route('admin.branches.destroy', $branch->id) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-danger are_you_sure m-1"
