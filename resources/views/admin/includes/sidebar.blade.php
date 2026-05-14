@@ -47,6 +47,13 @@
                                 <p>السنوات المالية</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.branches.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.branches.*')) active @endif">
+                                <i class="fas fa-building"></i>
+                                <p>الفروع</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
             </ul>

@@ -25,12 +25,16 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property int $company_id
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AdminPanelSetting> $addedAdminPanels
+ * @property-read int|null $added_admin_panels_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FinanceCalendar> $addedFinanceCalendars
  * @property-read int|null $added_finance_calendars_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FinanceMonthlyCalendar> $addedFinanceMonthlyCalendars
  * @property-read int|null $added_finance_monthly_calendars_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AdminPanelSetting> $updatedAdminPanels
+ * @property-read int|null $updated_admin_panels_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FinanceCalendar> $updatedFinanceCalendars
  * @property-read int|null $updated_finance_calendars_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FinanceMonthlyCalendar> $updatedFinanceMonthlyCalendars
@@ -65,7 +69,7 @@ namespace App\Models{
  * @property string $address
  * @property string $email
  * @property int $created_by
- * @property int|null $updated_by
+ * @property int $updated_by
  * @property int $company_id
  * @property numeric $after_minute_calculate_delay بعد كم عدد دقيقة نحسب تاخير حضور
  * @property numeric $after_minute_calculate_early_departure بعد كم عدد دقيقة نحسب انصراف مبكر
@@ -81,6 +85,8 @@ namespace App\Models{
  * @property numeric $sanctions_value_fourth_absence قيمه خصم الايام بعد رابع مرة غياب بدون اذن
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $addedBy
+ * @property-read \App\Models\Admin $updatedBy
  * @method static \Database\Factories\AdminPanelSettingFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminPanelSetting newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminPanelSetting newQuery()
@@ -111,6 +117,37 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminPanelSetting whereUpdatedBy($value)
  */
 	class AdminPanelSetting extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $address
+ * @property string $phone
+ * @property string|null $email
+ * @property int $status
+ * @property int $created_by
+ * @property int $updated_by
+ * @property int $company_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche whereAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche wherePhone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche whereUpdatedBy($value)
+ */
+	class Branche extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -167,7 +204,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Admin $addedBy
- * @property-read \App\Models\FinanceCalendar|null $financeCalendar
+ * @property-read \App\Models\FinanceCalendar $financeCalendar
  * @property-read \App\Models\Month $month
  * @property-read \App\Models\Admin|null $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar newModelQuery()
