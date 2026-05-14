@@ -13,7 +13,7 @@
 
 @section('content')
 
-    @if (@isset($general_settings) && !@empty($general_settings))
+    @if (isset($general_settings) && !empty($general_settings))
         @include('admin.AdminPanelSetting.form', ['general_settings' => $general_settings])
     @endif
 @endsection

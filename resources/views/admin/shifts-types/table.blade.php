@@ -1,16 +1,24 @@
 <div class="container-fluid">
 
+    @php
+        $lastShiftType = $shiftsTypes->last();
+        $lastShiftTypeLabel = '---';
+        if ($lastShiftType) {
+            $lastShiftTypeLabel = $lastShiftType->type == 1 ? 'شفت نهاري' : ($lastShiftType->type == 2 ? 'شفت ليلي' : 'نوع غير معروف');
+        }
+    @endphp
+
     <!-- Info Boxes -->
     <div class="row mb-4">
 
         <div class="col-lg-3 col-md-6 col-12">
             <div class="info-box shadow-sm">
                 <span class="info-box-icon bg-primary">
-                    <i class="fas fa-code-branch"></i>
+                    <i class="fas fa-clock"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">عدد الفروع</span>
-                    <span class="info-box-number">{{ $branches->count() }}</span>
+                    <span class="info-box-text">عدد أنواع الشفتات</span>
+                    <span class="info-box-number">{{ $shiftsTypes->count() }}</span>
                 </div>
             </div>
         </div>
@@ -21,9 +29,9 @@
                     <i class="fas fa-check-circle"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">الفروع المفعلة</span>
+                    <span class="info-box-text">الشفتات المفعلة</span>
                     <span class="info-box-number">
-                        {{ $branches->where('status', 1)->count() }}
+                        {{ $shiftsTypes->where('status', 1)->count() }}
                     </span>
                 </div>
             </div>
@@ -35,9 +43,9 @@
                     <i class="fas fa-times-circle"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">الفروع المعطلة</span>
+                    <span class="info-box-text">الشفتات المعطلة</span>
                     <span class="info-box-number">
-                        {{ $branches->where('status', 0)->count() }}
+                        {{ $shiftsTypes->where('status', 0)->count() }}
                     </span>
                 </div>
             </div>
@@ -46,12 +54,12 @@
         <div class="col-lg-3 col-md-6 col-12">
             <div class="info-box shadow-sm">
                 <span class="info-box-icon bg-warning">
-                    <i class="fas fa-clock"></i>
+                    <i class="fas fa-history"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">آخر فرع تم إضافته</span>
+                    <span class="info-box-text">آخر شفت تم إضافته</span>
                     <span class="info-box-number">
-                        {{ optional($branches->last())->name ?? '---' }}
+                        {{ $lastShiftTypeLabel }}
                     </span>
                 </div>
             </div>
@@ -66,13 +74,13 @@
 
             <h3 class="card-title">
                 <i class="fas fa-table"></i>
-                جدول الفروع
+                جدول نوع الشفتات
             </h3>
 
             <div class="card-tools">
-                <a href="{{ route('admin.branches.create') }}" class="btn btn-primary btn-sm shadow-sm">
+                <a href="{{ route('admin.shifts-types.create') }}" class="btn btn-primary btn-sm shadow-sm">
                     <i class="fas fa-plus-circle"></i>
-                    إضافة فرع
+                    إضافة نوع شفت
                 </a>
             </div>
 
@@ -107,10 +115,10 @@
                     <thead class="bg-primary text-white">
                         <tr>
                             <th>#</th>
-                            <th>اسم الفرع</th>
-                            <th>العنوان</th>
-                            <th>الهاتف</th>
-                            <th>البريد الإلكتروني</th>
+                            <th>نوع الشفت</th>
+                            <th>وقت البداية</th>
+                            <th>وقت النهاية</th>
+                            <th>إجمالي الساعات</th>
                             <th>الحالة</th>
                             <th>رقم الشركة</th>
                             <th>أضيف بواسطة</th>
@@ -122,30 +130,34 @@
                     </thead>
 
                     <tbody>
-                        @forelse ($branches as $branch)
+                        @forelse ($shiftsTypes as $shiftsType)
                             <tr>
-                                <td>{{ $branch->id }}</td>
+                                <td>{{ $shiftsType->id }}</td>
 
                                 <td>
-                                    {{ $branch->name }}
-                                </td>
-
-                                <td>{{ $branch->address }}</td>
-
-                                <td>
-                                    {{ $branch->phone }}
-                                </td>
-
-                                <td>
-                                    @if($branch->email)
-                                        {{ $branch->email }}
+                                    @if($shiftsType->type == 1)
+                                        شفت نهاري
+                                    @elseif($shiftsType->type == 2)
+                                        شفت ليلي
                                     @else
-                                        <span class="text-muted">---</span>
+                                        نوع غير معروف
                                     @endif
                                 </td>
+                                @php
+                                    $start_time = new DateTime($shiftsType->start_time);
+                                    $start_time = $start_time->format('h:i A');
+                                @endphp
+                                <td>{{ $start_time }}</td>
+                                @php
+                                    $end_time = new DateTime($shiftsType->end_time);
+                                    $end_time = $end_time->format('h:i A');
+                                @endphp
+                                <td>{{ $end_time }}</td>
+
+                                <td>{{ $shiftsType->total_hours }}</td>
 
                                 <td>
-                                    @if($branch->status == 1)
+                                    @if($shiftsType->status == 1)
                                         <span class="badge badge-success px-3 py-2">
                                             <i class="fas fa-check-circle"></i>
                                             مفعل
@@ -158,25 +170,26 @@
                                     @endif
                                 </td>
 
-                                <td>{{ $branch->company_id }}</td>
+                                <td>{{ $shiftsType->company_id }}</td>
 
-                                <td>{{ optional($branch->createdBy)->name ?? '---' }}</td>
+                                <td>{{ optional($shiftsType->createdBy)->name ?? '---' }}</td>
 
-                                <td>{{ optional($branch->updatedBy)->name ?? '---' }}</td>
+                                <td>{{ optional($shiftsType->updatedBy)->name ?? '---' }}</td>
 
-                                <td>{{ $branch->created_at }}</td>
+                                <td>{{ $shiftsType->created_at }}</td>
 
-                                <td>{{ $branch->updated_at }}</td>
+                                <td>{{ $shiftsType->updated_at }}</td>
 
                                 <td>
                                     <div class="d-flex justify-content-center align-items-center gap-1">
 
-                                        <a href="{{ route('admin.branches.edit', $branch->id) }}"
+                                        <a href="{{ route('admin.shifts-types.edit', $shiftsType->id) }}"
                                             class="btn btn-sm btn-warning m-1" title="تعديل">
                                             <i class="fas fa-edit"></i>
                                         </a>
 
-                                        <form action="{{ route('admin.branches.destroy', $branch->id) }}" method="POST">
+                                        <form action="{{ route('admin.shifts-types.destroy', $shiftsType->id) }}"
+                                            method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-danger are_you_sure m-1"
@@ -193,7 +206,7 @@
                                 <td colspan="12">
                                     <div class="alert alert-warning mb-0">
                                         <i class="fas fa-exclamation-circle"></i>
-                                        لا توجد بيانات فروع حاليا
+                                        لا توجد بيانات أنواع شفتات حالياً
                                     </div>
                                 </td>
                             </tr>
@@ -205,7 +218,7 @@
             </div>
 
             {{-- Pagination --}}
-            {{ $branches->links() }}
+            {{ $shiftsTypes->links() }}
 
         </div>
     </div>

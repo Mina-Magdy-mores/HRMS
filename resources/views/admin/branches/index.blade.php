@@ -13,7 +13,5 @@
 
 @section('content')
 
-    @if (@isset($branches) && !@empty($branches))
         @include('admin.branches.table', ['branches' => $branches])
-    @endif
 @endsection

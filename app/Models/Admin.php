@@ -55,4 +55,16 @@ class Admin extends User
     {
         return $this->hasMany(Branche::class, 'added_by');
     }
+    public function updatedBranches()
+    {
+        return $this->hasMany(Branche::class, 'updated_by');
+    }
+    public function addedShiftsTypes()
+    {
+        return $this->hasMany(ShiftsType::class, 'added_by');
+    }
+    public function updatedShiftsTypes()
+    {
+        return $this->hasMany(ShiftsType::class, 'updated_by');
+    }
 }

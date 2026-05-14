@@ -13,7 +13,5 @@
 
 @section('content')
 
-    @if (@isset($financeCalendars) && !@empty($financeCalendars))
         @include('admin.financeCalendar.table', ['financeCalendars' => $financeCalendars])
-    @endif
 @endsection

@@ -12,6 +12,5 @@
 @section('contentHeaderActive', 'اضافة')
 
 @section('content')
-
     @include('admin.branches.form')
 @endsection

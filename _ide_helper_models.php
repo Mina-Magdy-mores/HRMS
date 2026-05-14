@@ -31,6 +31,8 @@ namespace App\Models{
  * @property-read int|null $added_finance_calendars_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FinanceMonthlyCalendar> $addedFinanceMonthlyCalendars
  * @property-read int|null $added_finance_monthly_calendars_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Branche> $branches
+ * @property-read int|null $branches_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AdminPanelSetting> $updatedAdminPanels
@@ -132,6 +134,8 @@ namespace App\Models{
  * @property int $company_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $createdBy
+ * @property-read \App\Models\Admin $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche query()
@@ -251,6 +255,37 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Month whereUpdatedAt($value)
  */
 	class Month extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property int|null $type 1: Day Shift, 2: Night Shift
+ * @property string $start_time
+ * @property string $end_time
+ * @property numeric $total_hours
+ * @property int $status
+ * @property int $company_id
+ * @property int $created_by
+ * @property int $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType whereEndTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType whereStartTime($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType whereTotalHours($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType whereUpdatedBy($value)
+ */
+	class ShiftsType extends \Eloquent {}
 }
 
 namespace App\Models{

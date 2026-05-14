@@ -54,6 +54,13 @@
                                 <p>الفروع</p>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.shifts-types.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.shifts-types.*')) active @endif">
+                                <i class="fas fa-clock"></i>
+                                <p>أنواع الشفتات</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
             </ul>
