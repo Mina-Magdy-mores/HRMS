@@ -67,4 +67,12 @@ class Admin extends User
     {
         return $this->hasMany(ShiftsType::class, 'updated_by');
     }
+    public function addedDepartments()
+    {
+        return $this->hasMany(Department::class, 'added_by');
+    }
+    public function updatedDepartments()
+    {
+        return $this->hasMany(Department::class, 'updated_by');
+    }
 }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminPanelSettingController;
 use App\Http\Controllers\Admin\BrancheController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\FinanceCalendarController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\ShiftsTypeController;
@@ -45,7 +46,13 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::delete('/shifts-types/{shiftsType}', [ShiftsTypeController::class, 'destroy'])->name('shifts-types.destroy');
         Route::post('/shifts-types/search', [ShiftsTypeController::class, 'search'])->name('shifts-types.search');
 
-
+        // departments routes
+        Route::get('/departments', [DepartmentController::class, 'index'])->name('departments.index');
+        Route::get('/departments/create', [DepartmentController::class, 'create'])->name('departments.create');
+        Route::post('/departments', [DepartmentController::class, 'store'])->name('departments.store');
+        Route::get('/departments/{shiftsType}/edit', [DepartmentController::class, 'edit'])->name('departments.edit');
+        Route::put('/departments/{shiftsType}', [DepartmentController::class, 'update'])->name('departments.update');
+        Route::delete('/departments/{shiftsType}', [DepartmentController::class, 'destroy'])->name('departments.destroy');
     });
 
     // guest routes

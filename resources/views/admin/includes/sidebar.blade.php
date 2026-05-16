@@ -26,11 +26,13 @@
                with font-awesome or any other icon font library -->
                 <li class="nav-item has-treeview  {{ request()->is('admin/general-settings*') ||
     request()->routeIs('admin.financeCalendars.*') ||
-    request()->routeIs('admin.branches.*') || request()->routeIs('admin.shifts-types.*') ? 'menu-open' : ''
+    request()->routeIs('admin.branches.*') || request()->routeIs('admin.shifts-types.*') ||
+    request()->routeIs('admin.departments.*') ? 'menu-open' : ''
                       }}">
                     <a href="#" class="nav-link {{ request()->is('admin/general-settings*') ||
     request()->routeIs('admin.financeCalendars.*') ||
-    request()->routeIs('admin.branches.*') || request()->routeIs('admin.shifts-types.*') ? 'active' : ''
+    request()->routeIs('admin.branches.*') || request()->routeIs('admin.shifts-types.*') ||
+    request()->routeIs('admin.departments.*') ? 'active' : ''
                       }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>
@@ -65,6 +67,13 @@
                                 class="nav-link @if (request()->routeIs('admin.shifts-types.*')) active @endif">
                                 <i class="fas fa-clock"></i>
                                 <p>أنواع الشفتات</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.departments.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.departments.*')) active @endif">
+                                <i class="fas fa-users"></i>
+                                <p>إدارات الموظفين</p>
                             </a>
                         </li>
                     </ul>
