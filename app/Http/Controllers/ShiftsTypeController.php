@@ -52,12 +52,48 @@ class ShiftsTypeController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(ShiftsType $shiftsType)
+    public function search(Request $request)
     {
-        //
+        if ($request->ajax()) {
+            $company_id = Auth::user()->company_id;
+            $type = $request->type;
+            $start_time = $request->start_time;
+            $end_time = $request->end_time;
+            if (empty($type)) {
+                $field1 = "status";
+                $operator1 = ">=";
+                $value1 = 0;
+            } else {
+                $field1 = "type";
+                $operator1 = "=";
+                $value1 = $type;
+            }
+            if (empty($start_time)) {
+                $field2 = "status";
+                $operator2 = ">=";
+                $value2 = 0;
+            } else {
+                $field2 = "start_time";
+                $operator2 = ">=";
+                $value2 = $start_time;
+            }
+            if (empty($end_time)) {
+                $field3 = "status";
+                $operator3 = ">=";
+                $value3 = 0;
+            }else {
+                $field3 = "end_time";
+                $operator3 = "<=";
+                $value3 = $end_time;
+            }
+            $where = [
+                [$field1, $operator1, $value1],
+                [$field2, $operator2, $value2],
+                [$field3, $operator3, $value3],
+            ];
+            $shiftsTypes = getColsWhereP(ShiftsType::class, ['createdBy', 'updatedBy'], ['*'], $where, 'id', 'asc', PAGEINATION_COUNTER);
+            return view('admin.shifts-types.ajaxSearch', compact('shiftsTypes'));
+        }
     }
 
     /**

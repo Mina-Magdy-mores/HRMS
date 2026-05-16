@@ -35,7 +35,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::delete('/branches/{branche}', [BrancheController::class, 'destroy'])->name('branches.destroy');
 
 
-        
+
         // shifts-types routes
         Route::get('/shifts-types', [ShiftsTypeController::class, 'index'])->name('shifts-types.index');
         Route::get('/shifts-types/create', [ShiftsTypeController::class, 'create'])->name('shifts-types.create');
@@ -43,6 +43,8 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::get('/shifts-types/{shiftsType}/edit', [ShiftsTypeController::class, 'edit'])->name('shifts-types.edit');
         Route::put('/shifts-types/{shiftsType}', [ShiftsTypeController::class, 'update'])->name('shifts-types.update');
         Route::delete('/shifts-types/{shiftsType}', [ShiftsTypeController::class, 'destroy'])->name('shifts-types.destroy');
+        Route::post('/shifts-types/search', [ShiftsTypeController::class, 'search'])->name('shifts-types.search');
+
 
     });
 

@@ -24,8 +24,14 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-                <li class="nav-item has-treeview menu-open">
-                    <a href="#" class="nav-link active">
+                <li class="nav-item has-treeview  {{ request()->is('admin/general-settings*') ||
+    request()->routeIs('admin.financeCalendars.*') ||
+    request()->routeIs('admin.branches.*') || request()->routeIs('admin.shifts-types.*') ? 'menu-open' : ''
+                      }}">
+                    <a href="#" class="nav-link {{ request()->is('admin/general-settings*') ||
+    request()->routeIs('admin.financeCalendars.*') ||
+    request()->routeIs('admin.branches.*') || request()->routeIs('admin.shifts-types.*') ? 'active' : ''
+                      }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>
                             قائمة الضبط
@@ -35,7 +41,7 @@
                     <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="{{ route('admin.general-settings') }}"
-                                class="nav-link @if (request()->routeIs('admin.general-settings')) active @endif">
+                                class="nav-link @if (request()->is('admin/general-settings*')) active @endif">
                                 <i class="fas fa-cogs"></i>
                                 <p>الضبط العام</p>
                             </a>

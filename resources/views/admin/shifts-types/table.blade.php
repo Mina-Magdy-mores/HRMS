@@ -108,8 +108,34 @@
                 </div>
             @endif
 
-            <div class="table-responsive">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>نوع الشفت</label>
+                        <select name="type-search" id="type-search" class="form-control">
+                            <option selected disabled value="null">اختر نوع الشفت</option>
+                            <option value="1">شفت نهاري</option>
+                            <option value="2">شفت ليلي</option>
+                        </select>
+                    </div>
+                </div>
 
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>من</label>
+                        <input type="time" name="start_time_search" id="start_time_search" class="form-control">
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>الى</label>
+                        <input type="time" name="end_time_search" id="end_time_search" class="form-control">
+                    </div>
+                </div>
+
+            </div>
+            <div class="table-responsive" id="ajax_responce_search">
                 <table class="table table-bordered table-hover text-center align-middle">
 
                     <thead class="bg-primary text-white">
@@ -214,12 +240,77 @@
                     </tbody>
 
                 </table>
-
+                {{-- Pagination --}}
+                <div>
+                    {{ $shiftsTypes->links() }}
+                </div>
             </div>
-
-            {{-- Pagination --}}
-            {{ $shiftsTypes->links() }}
-
         </div>
     </div>
 </div>
+
+
+@section('js')
+    <script>
+        $(document).ready(function () {
+            $(document).on('change', '#type-search', function () {
+                ajax_search();
+            })
+            $(document).on('input', '#start_time_search', function () {
+                ajax_search();
+            })
+            $(document).on('input', '#end_time_search', function () {
+                ajax_search();
+            })
+
+            function ajax_search() {
+                var type = $('#type-search').val();
+                var start_time = $('#start_time_search').val();
+                var end_time = $('#end_time_search').val();
+                $.ajax({
+                    url: '{{ route('admin.shifts-types.search') }}',
+                    type: 'POST',
+                    dataType: 'html',
+                    cache: false,
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        type: type,
+                        start_time: start_time,
+                        end_time: end_time
+                    },
+                    success: function (shiftsTypes) {
+                        $('#ajax_responce_search').html(shiftsTypes);
+                    },
+                    error: function (xhr) {
+                        alert('حدث خطأ');
+                    }
+                });
+                $(document).on('click', '#ajax-pagination a', function (e) {
+                    e.preventDefault();
+                    var type = $('#type-search').val();
+                    var start_time = $('#start_time_search').val();
+                    var end_time = $('#end_time_search').val();
+                    var url = $(this).attr('href');
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        dataType: 'html',
+                        cache: false,
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            type: type,
+                            start_time: start_time,
+                            end_time: end_time
+                        },
+                        success: function (shiftsTypes) {
+                            $('#ajax_responce_search').html(shiftsTypes);
+                        },
+                        error: function (xhr) {
+                            alert('حدث خطأ');
+                        }
+                    });
+                })
+            }
+        })
+    </script>
+@endsection

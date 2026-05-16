@@ -21,7 +21,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <link rel="stylesheet" href="{{ asset('assets/css/mycustomstyle.css') }}">
 
 </head>
-<body class="hold-transition sidebar-mini">
+<body class="hold-transition sidebar-mini @yield('bodyClass')" @yield('bodyStyle')>
 <div class="wrapper">
 
   <!-- Navbar -->

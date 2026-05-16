@@ -3,6 +3,8 @@
 function getColsWhereP($model = null, $with = [], $cols = [], $where = [], $orderBy = 'id', $orderType = 'asc', $paginate = 11)
 {
     return $model::with($with)->select($cols)->where($where)->orderBy($orderBy, $orderType)->paginate($paginate);
+//         $query = $model::select($cols)->with($with)->where($where)->orderBy($orderBy, $orderType);
+// $query->ddRawSql();
 }
 /*get some cols  table */
 function getColsWhere($model = null, $with = [], $cols = [], $where = [], $orderBy = 'id', $orderType = 'asc')
@@ -47,6 +49,7 @@ function get_cols($model = null, $columns_names = array(), $order_field = "id", 
 function getColsWhereRow($model = null, $columns_names = [], $where = [])
 {
     return $model::select($columns_names)->where($where)->first();
+
 }
 /*get some cols row table */
 function get_cols_where2_row($model = null, $columns_names = array(), $where = array(), $where2 = "")
