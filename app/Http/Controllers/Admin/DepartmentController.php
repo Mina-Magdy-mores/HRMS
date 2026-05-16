@@ -51,20 +51,15 @@ class DepartmentController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Department $department)
-    {
-        //
-    }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Department $department)
+    public function edit( $id)
     {
-        //
+    $company_id = Auth::user()->company_id;
+    $department = getColsWhereRow(Department::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
+    return view('admin.departments.edit', compact('department'));
     }
 
     /**
