@@ -5,6 +5,48 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int $financeCalendar_id
+ * @property int $number_of_days
+ * @property string $year_and_month
+ * @property int $finance_yr
+ * @property int $month_id
+ * @property string $start_date
+ * @property string $end_date
+ * @property int $status واحد مفعل - صفر معطل
+ * @property string $start_date_for_calculation
+ * @property string $end_date_for_calculation
+ * @property int $company_id
+ * @property int $added_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $addedBy
+ * @property-read \App\Models\FinanceCalendar $financeCalendar
+ * @property-read \App\Models\Month $month
+ * @property-read \App\Models\Admin|null $updatedBy
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereEndDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereEndDateForCalculation($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereFinanceCalendarId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereFinanceYr($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereMonthId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereNumberOfDays($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereStartDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereStartDateForCalculation($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereUpdatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereYearAndMonth($value)
+ * @mixin \Eloquent
+ */
 #[Fillable([
     'financeCalendar_id',
     'number_of_days',

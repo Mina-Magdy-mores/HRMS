@@ -27,20 +27,34 @@ namespace App\Models{
  * @property int $company_id
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AdminPanelSetting> $addedAdminPanels
  * @property-read int|null $added_admin_panels_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Department> $addedDepartments
+ * @property-read int|null $added_departments_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FinanceCalendar> $addedFinanceCalendars
  * @property-read int|null $added_finance_calendars_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FinanceMonthlyCalendar> $addedFinanceMonthlyCalendars
  * @property-read int|null $added_finance_monthly_calendars_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JobsCategory> $addedJobsCategoies
+ * @property-read int|null $added_jobs_categoies_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ShiftsType> $addedShiftsTypes
+ * @property-read int|null $added_shifts_types_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Branche> $branches
  * @property-read int|null $branches_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AdminPanelSetting> $updatedAdminPanels
  * @property-read int|null $updated_admin_panels_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Branche> $updatedBranches
+ * @property-read int|null $updated_branches_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Department> $updatedDepartments
+ * @property-read int|null $updated_departments_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FinanceCalendar> $updatedFinanceCalendars
  * @property-read int|null $updated_finance_calendars_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FinanceMonthlyCalendar> $updatedFinanceMonthlyCalendars
  * @property-read int|null $updated_finance_monthly_calendars_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JobsCategory> $updatedJobsCategoies
+ * @property-read int|null $updated_jobs_categoies_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ShiftsType> $updatedShiftsTypes
+ * @property-read int|null $updated_shifts_types_count
  * @method static \Database\Factories\AdminFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin newQuery()
@@ -57,6 +71,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereUpdatedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereUsername($value)
+ * @mixin \Eloquent
  */
 	class Admin extends \Eloquent {}
 }
@@ -117,6 +132,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminPanelSetting whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminPanelSetting whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminPanelSetting whereUpdatedBy($value)
+ * @mixin \Eloquent
  */
 	class AdminPanelSetting extends \Eloquent {}
 }
@@ -150,8 +166,41 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche whereUpdatedBy($value)
+ * @mixin \Eloquent
  */
 	class Branche extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $number
+ * @property string|null $description
+ * @property int $company_id
+ * @property int $status
+ * @property int $created_by
+ * @property int $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $createdBy
+ * @property-read \App\Models\Admin $updatedBy
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Department newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Department newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Department query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Department whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Department whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Department whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Department whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Department whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Department whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Department whereNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Department whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Department whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Department whereUpdatedBy($value)
+ * @mixin \Eloquent
+ */
+	class Department extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -185,6 +234,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceCalendar whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceCalendar whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceCalendar whereUpdatedBy($value)
+ * @mixin \Eloquent
  */
 	class FinanceCalendar extends \Eloquent {}
 }
@@ -230,6 +280,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereUpdatedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereYearAndMonth($value)
+ * @mixin \Eloquent
  */
 	class FinanceMonthlyCalendar extends \Eloquent {}
 }
@@ -253,8 +304,18 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Month whereNameEn($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Month whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Month whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 	class Month extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification query()
+ */
+	class Qualification extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -270,6 +331,8 @@ namespace App\Models{
  * @property int $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $createdBy
+ * @property-read \App\Models\Admin $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType query()
@@ -284,6 +347,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType whereUpdatedBy($value)
+ * @mixin \Eloquent
  */
 	class ShiftsType extends \Eloquent {}
 }
@@ -312,6 +376,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 	class User extends \Eloquent {}
 }

@@ -6,7 +6,9 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\FinanceCalendarController;
 use App\Http\Controllers\Admin\LoginController;
-use App\Http\Controllers\ShiftsTypeController;
+use App\Http\Controllers\Admin\JobsCategoryController;
+use App\Http\Controllers\Admin\QualificationController;
+use App\Http\Controllers\Admin\ShiftsTypeController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -35,8 +37,6 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::put('/branches/{branche}', [BrancheController::class, 'update'])->name('branches.update');
         Route::delete('/branches/{branche}', [BrancheController::class, 'destroy'])->name('branches.destroy');
 
-
-
         // shifts-types routes
         Route::get('/shifts-types', [ShiftsTypeController::class, 'index'])->name('shifts-types.index');
         Route::get('/shifts-types/create', [ShiftsTypeController::class, 'create'])->name('shifts-types.create');
@@ -53,6 +53,22 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::get('/departments/{shiftsType}/edit', [DepartmentController::class, 'edit'])->name('departments.edit');
         Route::put('/departments/{shiftsType}', [DepartmentController::class, 'update'])->name('departments.update');
         Route::delete('/departments/{shiftsType}', [DepartmentController::class, 'destroy'])->name('departments.destroy');
+
+        // jobCategories routes
+        Route::get('/jobCategories', [JobsCategoryController::class, 'index'])->name('jobCategories.index');
+        Route::get('/jobCategories/create', [JobsCategoryController::class, 'create'])->name('jobCategories.create');
+        Route::post('/jobCategories', [JobsCategoryController::class, 'store'])->name('jobCategories.store');
+        Route::get('/jobCategories/{id}/edit', [JobsCategoryController::class, 'edit'])->name('jobCategories.edit');
+        Route::put('/jobCategories/{id}', [JobsCategoryController::class, 'update'])->name('jobCategories.update');
+        Route::delete('/jobCategories/{id}', [JobsCategoryController::class, 'destroy'])->name('jobCategories.destroy');
+
+        // qualifications routes
+        Route::get('/qualifications', [QualificationController::class, 'index'])->name('qualifications.index');
+        Route::get('/qualifications/create', [QualificationController::class, 'create'])->name('qualifications.create');
+        Route::post('/qualifications', [QualificationController::class, 'store'])->name('qualifications.store');
+        Route::get('/qualifications/{id}/edit', [QualificationController::class, 'edit'])->name('qualifications.edit');
+        Route::put('/qualifications/{id}', [QualificationController::class, 'update'])->name('qualifications.update');
+        Route::delete('/qualifications/{id}', [QualificationController::class, 'destroy'])->name('qualifications.destroy');
     });
 
     // guest routes

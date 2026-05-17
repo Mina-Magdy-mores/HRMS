@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\ShiftTypeRequest;
 use App\Models\ShiftsType;
 use Auth;
@@ -16,7 +17,7 @@ class ShiftsTypeController extends Controller
     {
         $company_id = Auth::user()->company_id;
         $shiftsTypes = getColsWhereP(ShiftsType::class, ['createdBy', 'updatedBy'], ['*'], ['company_id' => $company_id], 'id', 'asc', PAGEINATION_COUNTER);
-        return view('admin.shifts-types.index', compact('shiftsTypes'));
+        return view('admin.shifts-types.index', ['shiftsTypes' => $shiftsTypes]);
     }
 
     /**

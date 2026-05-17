@@ -55,26 +55,56 @@ class DepartmentController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit( $id)
+    public function edit($id)
     {
-    $company_id = Auth::user()->company_id;
-    $department = getColsWhereRow(Department::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-    return view('admin.departments.edit', compact('department'));
+        $company_id = Auth::user()->company_id;
+        $department = getColsWhereRow(Department::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
+        if (!$department) {
+            return redirect()->route('admin.departments.index')->with('error', 'القسم غير موجود');
+        }
+        return view('admin.departments.update', compact('department'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Department $department)
+    public function update(DepartmentRequest $request, $id)
     {
-        //
+        try {
+            $company_id = Auth::user()->company_id;
+            $department = getColsWhereRow(Department::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
+            if (!$department) {
+                return redirect()->route('admin.departments.index')->with('error', 'القسم غير موجود');
+            }
+            $checkIfNameExists = Department::select('id')->where('company_id', $company_id)->where('name', $request->name)->where('id', '!=', $id)->first();
+            if ($checkIfNameExists) {
+                return redirect()->back()->with('error', 'اسم القسم مكرر')->withInput();
+            }
+            $validated = $request->validated();
+            $validated['updated_by'] = Auth::user()->id;
+            update($department, $validated);
+            return redirect()->route('admin.departments.index')->with('success', 'Department updated successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'حدث خطا ما برجاء المحاوله لاحقا ' . $e->getMessage())->withInput();
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Department $department)
+    public function destroy($id)
     {
-        //
-    }
+                try {
+        $company_id = Auth::user()->company_id;
+        $department = getColsWhereRow(Department::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
+        if (!$department) {
+            return redirect()->route('admin.departments.index')->with('error', 'القسم غير موجود');
+        }
+        destroy($department);
+        return redirect()->route('admin.departments.index')->with('success', 'Department deleted successfully');
+            } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'حدث خطا ما برجاء المحاوله لاحقا ' . $e->getMessage())->withInput();
+        }
+            }
+
 }

@@ -6,6 +6,67 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string|null $email
+ * @property string $username
+ * @property string $password
+ * @property string $added_by
+ * @property string $updated_by
+ * @property int $status
+ * @property string $date
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int $company_id
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AdminPanelSetting> $addedAdminPanels
+ * @property-read int|null $added_admin_panels_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Department> $addedDepartments
+ * @property-read int|null $added_departments_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FinanceCalendar> $addedFinanceCalendars
+ * @property-read int|null $added_finance_calendars_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FinanceMonthlyCalendar> $addedFinanceMonthlyCalendars
+ * @property-read int|null $added_finance_monthly_calendars_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JobsCategory> $addedJobsCategoies
+ * @property-read int|null $added_jobs_categoies_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ShiftsType> $addedShiftsTypes
+ * @property-read int|null $added_shifts_types_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Branche> $branches
+ * @property-read int|null $branches_count
+ * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
+ * @property-read int|null $notifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AdminPanelSetting> $updatedAdminPanels
+ * @property-read int|null $updated_admin_panels_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Branche> $updatedBranches
+ * @property-read int|null $updated_branches_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Department> $updatedDepartments
+ * @property-read int|null $updated_departments_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FinanceCalendar> $updatedFinanceCalendars
+ * @property-read int|null $updated_finance_calendars_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FinanceMonthlyCalendar> $updatedFinanceMonthlyCalendars
+ * @property-read int|null $updated_finance_monthly_calendars_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JobsCategory> $updatedJobsCategoies
+ * @property-read int|null $updated_jobs_categoies_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ShiftsType> $updatedShiftsTypes
+ * @property-read int|null $updated_shifts_types_count
+ * @method static \Database\Factories\AdminFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin wherePassword($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereUpdatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereUsername($value)
+ * @mixin \Eloquent
+ */
 #[Fillable(['name', 'email', 'username', 'password', 'added_by', 'updated_by', 'status', 'date', 'created_at', 'updated_at', 'company_id'])]
 #[Hidden(['password', 'remember_token'])]
 class Admin extends User
@@ -74,5 +135,13 @@ class Admin extends User
     public function updatedDepartments()
     {
         return $this->hasMany(Department::class, 'updated_by');
+    }
+    public function addedJobsCategoies()
+    {
+        return $this->hasMany(JobsCategory::class, 'added_by');
+    }
+    public function updatedJobsCategoies()
+    {
+        return $this->hasMany(JobsCategory::class, 'updated_by');
     }
 }

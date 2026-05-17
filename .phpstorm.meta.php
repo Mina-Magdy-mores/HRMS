@@ -2142,7 +2142,7 @@ namespace PHPSTORM_META {
     override(\optional(0), type(0));
 
             registerArgumentsSet('auth', );
-        registerArgumentsSet('configs',
+        registerArgumentsSet('configs', 
 'broadcasting.default','broadcasting.connections.reverb.driver','broadcasting.connections.reverb.key','broadcasting.connections.reverb.secret','broadcasting.connections.reverb.app_id',
 'broadcasting.connections.reverb.options.host','broadcasting.connections.reverb.options.port','broadcasting.connections.reverb.options.scheme','broadcasting.connections.reverb.options.useTLS','broadcasting.connections.reverb.client_options',
 'broadcasting.connections.pusher.driver','broadcasting.connections.pusher.key','broadcasting.connections.pusher.secret','broadcasting.connections.pusher.app_id','broadcasting.connections.pusher.options.cluster',
@@ -2231,31 +2231,42 @@ namespace PHPSTORM_META {
 'ide-helper.type_overrides.integer','ide-helper.type_overrides.boolean','ide-helper.include_class_docblocks','ide-helper.force_fqn','ide-helper.use_generics_annotations',
 'ide-helper.macro_default_return_types.Illuminate\\Http\\Client\\Factory','ide-helper.additional_relation_types','ide-helper.additional_relation_return_types','ide-helper.enforce_nullable_relationships','ide-helper.soft_deletes_force_nullable',
 'ide-helper.post_migrate','tinker.commands','tinker.alias','tinker.dont_alias','tinker.trust_project',);
-        registerArgumentsSet('middleware',
+        registerArgumentsSet('middleware', 
 'web','api','auth','auth.basic','auth.session',
 'cache.headers','can','guest','password.confirm','precognitive',
 'signed','throttle','verified','admin',);
         registerArgumentsSet('routes', 'admin.dashboard','admin.logout','admin.general-settings',
-'admin.general-settings.update','admin.FinanceCalendars.index','admin.FinanceCalendars.create','admin.FinanceCalendars.store','admin.FinanceCalendars.show',
-'admin.FinanceCalendars.edit','admin.FinanceCalendars.update','admin.FinanceCalendars.destroy','admin.index','admin.login','storage.local','storage.local.upload',);
-        registerArgumentsSet('views',
-'admin.AdminPanelSetting.form','admin.AdminPanelSetting.index','admin.auth.login','admin.dashboard','admin.errors.404',
-'admin.errors.errors','admin.FinanceCalendar.create','admin.FinanceCalendar.form','admin.FinanceCalendar.index','admin.FinanceCalendar.table',
-'admin.includes.content','admin.includes.footer','admin.includes.navbar','admin.includes.sidebar','admin.layouts.admin',
-'welcome','laravel-exceptions-renderer::components.badge','laravel-exceptions-renderer::components.empty-state','laravel-exceptions-renderer::components.file-with-line','laravel-exceptions-renderer::components.formatted-source',
-'laravel-exceptions-renderer::components.frame','laravel-exceptions-renderer::components.frame-code','laravel-exceptions-renderer::components.header','laravel-exceptions-renderer::components.http-method','laravel-exceptions-renderer::components.icons.alert',
-'laravel-exceptions-renderer::components.icons.check','laravel-exceptions-renderer::components.icons.chevron-left','laravel-exceptions-renderer::components.icons.chevron-right','laravel-exceptions-renderer::components.icons.chevrons-down-up','laravel-exceptions-renderer::components.icons.chevrons-left',
-'laravel-exceptions-renderer::components.icons.chevrons-right','laravel-exceptions-renderer::components.icons.chevrons-up-down','laravel-exceptions-renderer::components.icons.copy','laravel-exceptions-renderer::components.icons.database','laravel-exceptions-renderer::components.icons.folder',
-'laravel-exceptions-renderer::components.icons.folder-open','laravel-exceptions-renderer::components.icons.globe','laravel-exceptions-renderer::components.icons.info','laravel-exceptions-renderer::components.icons.laravel-ascii','laravel-exceptions-renderer::components.laravel-ascii-spotlight',
-'laravel-exceptions-renderer::components.layout','laravel-exceptions-renderer::components.previous-exceptions','laravel-exceptions-renderer::components.query','laravel-exceptions-renderer::components.request-body','laravel-exceptions-renderer::components.request-header',
-'laravel-exceptions-renderer::components.request-url','laravel-exceptions-renderer::components.routing','laravel-exceptions-renderer::components.routing-parameter','laravel-exceptions-renderer::components.section-container','laravel-exceptions-renderer::components.separator',
-'laravel-exceptions-renderer::components.syntax-highlight','laravel-exceptions-renderer::components.topbar','laravel-exceptions-renderer::components.trace','laravel-exceptions-renderer::components.vendor-frame','laravel-exceptions-renderer::components.vendor-frames',
-'laravel-exceptions-renderer::markdown','laravel-exceptions-renderer::show','laravel-exceptions::401','laravel-exceptions::402','laravel-exceptions::403',
-'laravel-exceptions::404','laravel-exceptions::419','laravel-exceptions::429','laravel-exceptions::500','laravel-exceptions::503',
-'laravel-exceptions::layout','laravel-exceptions::minimal','notifications::email','pagination::bootstrap-3','pagination::bootstrap-4',
-'pagination::bootstrap-5','pagination::semantic-ui','pagination::simple-bootstrap-3','pagination::simple-bootstrap-4','pagination::simple-bootstrap-5',
-'pagination::simple-tailwind','pagination::tailwind',);
-        registerArgumentsSet('translations',
+'admin.general-settings.update','admin.financeCalendars.index','admin.financeCalendars.create','admin.financeCalendars.store','admin.financeCalendars.show',
+'admin.financeCalendars.edit','admin.financeCalendars.update','admin.financeCalendars.destroy','admin.financeCalendars.months','admin.branches.index',
+'admin.branches.create','admin.branches.store','admin.branches.edit','admin.branches.update','admin.branches.destroy',
+'admin.shifts-types.index','admin.shifts-types.create','admin.shifts-types.store','admin.shifts-types.edit','admin.shifts-types.update',
+'admin.shifts-types.destroy','admin.shifts-types.search','admin.departments.index','admin.departments.create','admin.departments.store',
+'admin.departments.edit','admin.departments.update','admin.departments.destroy','admin.jobCategories.index','admin.jobCategories.create',
+'admin.jobCategories.store','admin.jobCategories.edit','admin.jobCategories.update','admin.jobCategories.destroy','admin.index',
+'admin.login','storage.local','storage.local.upload',);
+        registerArgumentsSet('views', 
+'admin.AdminPanelSetting.form','admin.AdminPanelSetting.index','admin.JobsCategories.create','admin.JobsCategories.form','admin.JobsCategories.index',
+'admin.JobsCategories.table','admin.JobsCategories.update','admin.JobsCategories.updateForm','admin.auth.login','admin.branches.create',
+'admin.branches.form','admin.branches.index','admin.branches.table','admin.branches.update','admin.branches.updateForm',
+'admin.dashboard','admin.departments.create','admin.departments.form','admin.departments.index','admin.departments.table',
+'admin.departments.update','admin.departments.updateForm','admin.errors.404','admin.errors.errors','admin.financeCalendar.create',
+'admin.financeCalendar.form','admin.financeCalendar.index','admin.financeCalendar.months','admin.financeCalendar.table','admin.financeCalendar.update',
+'admin.financeCalendar.updateForm','admin.includes.content','admin.includes.footer','admin.includes.navbar','admin.includes.sidebar',
+'admin.layouts.admin','admin.shifts-types.ajaxSearch','admin.shifts-types.create','admin.shifts-types.form','admin.shifts-types.index',
+'admin.shifts-types.table','admin.shifts-types.update','admin.shifts-types.updateForm','welcome','laravel-exceptions-renderer::components.badge',
+'laravel-exceptions-renderer::components.empty-state','laravel-exceptions-renderer::components.file-with-line','laravel-exceptions-renderer::components.formatted-source','laravel-exceptions-renderer::components.frame','laravel-exceptions-renderer::components.frame-code',
+'laravel-exceptions-renderer::components.header','laravel-exceptions-renderer::components.http-method','laravel-exceptions-renderer::components.icons.alert','laravel-exceptions-renderer::components.icons.check','laravel-exceptions-renderer::components.icons.chevron-left',
+'laravel-exceptions-renderer::components.icons.chevron-right','laravel-exceptions-renderer::components.icons.chevrons-down-up','laravel-exceptions-renderer::components.icons.chevrons-left','laravel-exceptions-renderer::components.icons.chevrons-right','laravel-exceptions-renderer::components.icons.chevrons-up-down',
+'laravel-exceptions-renderer::components.icons.copy','laravel-exceptions-renderer::components.icons.database','laravel-exceptions-renderer::components.icons.folder','laravel-exceptions-renderer::components.icons.folder-open','laravel-exceptions-renderer::components.icons.globe',
+'laravel-exceptions-renderer::components.icons.info','laravel-exceptions-renderer::components.icons.laravel-ascii','laravel-exceptions-renderer::components.laravel-ascii-spotlight','laravel-exceptions-renderer::components.layout','laravel-exceptions-renderer::components.previous-exceptions',
+'laravel-exceptions-renderer::components.query','laravel-exceptions-renderer::components.request-body','laravel-exceptions-renderer::components.request-header','laravel-exceptions-renderer::components.request-url','laravel-exceptions-renderer::components.routing',
+'laravel-exceptions-renderer::components.routing-parameter','laravel-exceptions-renderer::components.section-container','laravel-exceptions-renderer::components.separator','laravel-exceptions-renderer::components.syntax-highlight','laravel-exceptions-renderer::components.topbar',
+'laravel-exceptions-renderer::components.trace','laravel-exceptions-renderer::components.vendor-frame','laravel-exceptions-renderer::components.vendor-frames','laravel-exceptions-renderer::markdown','laravel-exceptions-renderer::show',
+'laravel-exceptions::401','laravel-exceptions::402','laravel-exceptions::403','laravel-exceptions::404','laravel-exceptions::419',
+'laravel-exceptions::429','laravel-exceptions::500','laravel-exceptions::503','laravel-exceptions::layout','laravel-exceptions::minimal',
+'notifications::email','pagination::bootstrap-3','pagination::bootstrap-4','pagination::bootstrap-5','pagination::semantic-ui',
+'pagination::simple-bootstrap-3','pagination::simple-bootstrap-4','pagination::simple-bootstrap-5','pagination::simple-tailwind','pagination::tailwind',);
+        registerArgumentsSet('translations', 
 'C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.auth.failed','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.auth.password','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.auth.throttle','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.pagination.previous','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.pagination.next',
 'C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.passwords.reset','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.passwords.sent','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.passwords.throttled','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.passwords.token','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.passwords.user',
 'C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.accepted','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.accepted_if','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.active_url','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.after','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.after_or_equal',
@@ -2286,7 +2297,7 @@ namespace PHPSTORM_META {
 'C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.size.string','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.starts_with','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.string','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.timezone','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.unique',
 'C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.uploaded','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.uppercase','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.url','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.ulid','C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.uuid',
 'C:.xampp.htdocs.HRMS.vendor.laravel.framework.src.Illuminate.Translation.lang.en.validation.custom.attribute-name.rule-name',);
-        registerArgumentsSet('env',
+        registerArgumentsSet('env', 
 'APP_NAME','APP_ENV','APP_KEY','APP_DEBUG','APP_URL',
 'APP_LOCALE','APP_FALLBACK_LOCALE','APP_FAKER_LOCALE','APP_MAINTENANCE_DRIVER','BCRYPT_ROUNDS',
 'LOG_CHANNEL','LOG_STACK','LOG_DEPRECATIONS_CHANNEL','LOG_LEVEL','DB_CONNECTION',
@@ -2297,7 +2308,7 @@ namespace PHPSTORM_META {
 'MAIL_SCHEME','MAIL_HOST','MAIL_PORT','MAIL_USERNAME','MAIL_PASSWORD',
 'MAIL_FROM_ADDRESS','MAIL_FROM_NAME','AWS_ACCESS_KEY_ID','AWS_SECRET_ACCESS_KEY','AWS_DEFAULT_REGION',
 'AWS_BUCKET','AWS_USE_PATH_STYLE_ENDPOINT','VITE_APP_NAME',);
-
+        
                 expectedArguments(\Illuminate\Support\Facades\Gate::has(), 0, argumentsSet('auth'));
     expectedArguments(\Illuminate\Support\Facades\Gate::allows(), 0, argumentsSet('auth'));
     expectedArguments(\Illuminate\Support\Facades\Gate::denies(), 0, argumentsSet('auth'));
@@ -2361,5 +2372,5 @@ namespace PHPSTORM_META {
                 expectedArguments(\Illuminate\Contracts\Translation\Translator::get(), 0, argumentsSet('translations'));
                 expectedArguments(\env(), 0, argumentsSet('env'));
                 expectedArguments(\Illuminate\Support\Env::get(), 0, argumentsSet('env'));
-
+            
 }
