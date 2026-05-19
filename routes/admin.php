@@ -7,8 +7,10 @@ use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\FinanceCalendarController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\JobsCategoryController;
+use App\Http\Controllers\Admin\NationalityController;
 use App\Http\Controllers\Admin\OccasionController;
 use App\Http\Controllers\Admin\QualificationController;
+use App\Http\Controllers\Admin\ResignationController;
 use App\Http\Controllers\Admin\ShiftsTypeController;
 use Illuminate\Support\Facades\Route;
 
@@ -78,6 +80,22 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::get('/occasions/{id}/edit', [OccasionController::class, 'edit'])->name('occasions.edit');
         Route::put('/occasions/{id}', [OccasionController::class, 'update'])->name('occasions.update');
         Route::delete('/occasions/{id}', [OccasionController::class, 'destroy'])->name('occasions.destroy');
+
+        // Resignations routes
+        Route::get('/resignations', [ResignationController::class, 'index'])->name('resignations.index');
+        Route::get('/resignations/create', [ResignationController::class, 'create'])->name('resignations.create');
+        Route::post('/resignations', [ResignationController::class, 'store'])->name('resignations.store');
+        Route::get('/resignations/{id}/edit', [ResignationController::class, 'edit'])->name('resignations.edit');
+        Route::put('/resignations/{id}', [ResignationController::class, 'update'])->name('resignations.update');
+        Route::delete('/resignations/{id}', [ResignationController::class, 'destroy'])->name('resignations.destroy');
+
+        // nationalities routes
+        Route::get('/nationalities', [NationalityController::class, 'index'])->name('nationalities.index');
+        Route::get('/nationalities/create', [NationalityController::class, 'create'])->name('nationalities.create');
+        Route::post('/nationalities', [NationalityController::class, 'store'])->name('nationalities.store');
+        Route::get('/nationalities/{id}/edit', [NationalityController::class, 'edit'])->name('nationalities.edit');
+        Route::put('/nationalities/{id}', [NationalityController::class, 'update'])->name('nationalities.update');
+        Route::delete('/nationalities/{id}', [NationalityController::class, 'destroy'])->name('nationalities.destroy');
     });
 
     // guest routes

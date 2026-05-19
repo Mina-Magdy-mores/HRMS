@@ -36,7 +36,7 @@ class ShiftsTypeController extends Controller
         try {
 
             $validated = $request->validated();
-
+    
             $validated['company_id'] = Auth::user()->company_id;
             unset($validated['status']);
             $checkIfExist = getColsWhereRow(ShiftsType::class, ['id'], $validated);

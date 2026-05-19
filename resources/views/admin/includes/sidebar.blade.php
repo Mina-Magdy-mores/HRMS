@@ -31,7 +31,9 @@
                     request()->routeIs('admin.departments.*') ||
                     request()->routeIs('admin.jobCategories.*') ||
                     request()->routeIs('admin.qualifications.*') ||
-                    request()->routeIs('admin.occasions.*')
+                    request()->routeIs('admin.occasions.*') ||
+                    request()->routeIs('admin.resignations.*') ||
+                    request()->routeIs('admin.nationalities.*')
                         ? 'menu-open'
                         : '' }}">
                     <a href="#" class="nav-link {{ request()->is('admin/general-settings*') ||
@@ -41,7 +43,9 @@
                         request()->routeIs('admin.departments.*') ||
                         request()->routeIs('admin.jobCategories.*') ||
                         request()->routeIs('admin.qualifications.*') ||
-                        request()->routeIs('admin.occasions.*')
+                        request()->routeIs('admin.occasions.*') ||
+                        request()->routeIs('admin.resignations.*') ||
+                        request()->routeIs('admin.nationalities.*')
                             ? 'active'
                             : '' }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -89,18 +93,28 @@
                         <li class="nav-item">
                             <a href="{{ route('admin.jobCategories.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.jobCategories.*')) active @endif">
-                                <i class="fas fa-users"></i>
+                                <i class="fas fa-briefcase"></i>
                                 <p>تصنيفات الوظائف</p>
                             </a>
                             <a href="{{ route('admin.qualifications.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.qualifications.*')) active @endif">
-                                <i class="fas fa-users"></i>
+                                <i class="fas fa-graduation-cap"></i>
                                 <p>مؤهلات الموظفين</p>
                             </a>
                             <a href="{{ route('admin.occasions.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.occasions.*')) active @endif">
-                                <i class="fas fa-users"></i>
+                                <i class="fas fa-calendar"></i>
                                 <p>المناسبات الرسمية</p>
+                            </a>
+                            <a href="{{ route('admin.resignations.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.resignations.*')) active @endif">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <p>انواع استقالات الموظفين</p>
+                            </a>
+                            <a href="{{ route('admin.nationalities.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.nationalities.*')) active @endif">
+                                <i class="fas fa-flag"></i>
+                                <p>الجنسية</p>
                             </a>
 
                         </li>

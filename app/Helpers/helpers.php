@@ -1,6 +1,6 @@
 <?php
 /*get some cols by pagination table */
-function getColsWhereP($model = null, $with = [], $cols = [], $where = [], $orderBy = 'id', $orderType = 'asc', $paginate = 11)
+function getColsWhereP($model = null, $with = [], $cols = [], $where = [], $orderBy = 'id', $orderType = 'asc', $paginate = PAGEINATION_COUNTER)
 {
     return $model::with($with)->select($cols)->where($where)->orderBy($orderBy, $orderType)->paginate($paginate);
 //         $query = $model::select($cols)->with($with)->where($where)->orderBy($orderBy, $orderType);

@@ -168,5 +168,22 @@ class Admin extends User
     {
         return $this->hasMany(Occasion::class, 'updated_by');
     }
+    public function addedResignation()
+    {
+        return $this->hasMany(Resignation::class, 'added_by');
+    }
+    public function updatedResignation()
+    {
+        return $this->hasMany(Resignation::class, 'updated_by');
+    }
+    public function addedNationality()
+    {
+        return $this->hasMany(Nationality::class, 'added_by');
+    }
+    public function updatedNationality()
+    {
+        return $this->hasMany(Nationality::class, 'updated_by');
+    }
+
 
 }

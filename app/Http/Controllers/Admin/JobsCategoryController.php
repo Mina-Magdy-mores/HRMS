@@ -16,7 +16,7 @@ class JobsCategoryController extends Controller
     public function index()
     {
         $company_id = Auth::user()->company_id;
-        $jobCategories = getColsWhereP(JobsCategory::class, [], ['*'], ['company_id' => $company_id]);
+        $jobCategories = getColsWhereP(JobsCategory::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id]);
         return view('admin.JobsCategories.index', ['jobCategories' => $jobCategories]);
     }
 

@@ -35,6 +35,10 @@ namespace App\Models{
  * @property-read int|null $added_finance_monthly_calendars_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JobsCategory> $addedJobsCategoies
  * @property-read int|null $added_jobs_categoies_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Occasion> $addedOccasions
+ * @property-read int|null $added_occasions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Qualification> $addedQualifications
+ * @property-read int|null $added_qualifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ShiftsType> $addedShiftsTypes
  * @property-read int|null $added_shifts_types_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Branche> $branches
@@ -53,6 +57,10 @@ namespace App\Models{
  * @property-read int|null $updated_finance_monthly_calendars_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JobsCategory> $updatedJobsCategoies
  * @property-read int|null $updated_jobs_categoies_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Occasion> $updatedOccasions
+ * @property-read int|null $updated_occasions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Qualification> $updatedQualifications
+ * @property-read int|null $updated_qualifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ShiftsType> $updatedShiftsTypes
  * @property-read int|null $updated_shifts_types_count
  * @method static \Database\Factories\AdminFactory factory($count = null, $state = [])
@@ -72,14 +80,10 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereUpdatedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereUsername($value)
  * @mixin \Eloquent
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Occasion> $addedOccasions
- * @property-read int|null $added_occasions_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Qualification> $addedQualifications
- * @property-read int|null $added_qualifications_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Occasion> $updatedOccasions
- * @property-read int|null $updated_occasions_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Qualification> $updatedQualifications
- * @property-read int|null $updated_qualifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Resignation> $addedResignation
+ * @property-read int|null $added_resignation_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Resignation> $updatedResignation
+ * @property-read int|null $updated_resignation_count
  */
 	class Admin extends \Eloquent {}
 }
@@ -347,6 +351,15 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Nationality newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Nationality newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Nationality query()
+ */
+	class Nationality extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * @property int $id
  * @property string $name
  * @property string $from_date
@@ -374,6 +387,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion whereToDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion whereUpdatedBy($value)
+ * @mixin \Eloquent
  */
 	class Occasion extends \Eloquent {}
 }
@@ -388,8 +402,8 @@ namespace App\Models{
  * @property int $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Admin $addedBy
- * @property-read \App\Models\Admin $updatedBy
+ * @property-read Admin $addedBy
+ * @property-read Admin $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification query()
@@ -401,8 +415,36 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification whereStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification whereUpdatedBy($value)
+ * @mixin \Eloquent
  */
 	class Qualification extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property string $name
+ * @property int $status
+ * @property int $company_id
+ * @property int $added_by
+ * @property int $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $addedBy
+ * @property-read \App\Models\Admin $updatedBy
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Resignation newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Resignation newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Resignation query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Resignation whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Resignation whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Resignation whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Resignation whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Resignation whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Resignation whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Resignation whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Resignation whereUpdatedBy($value)
+ */
+	class Resignation extends \Eloquent {}
 }
 
 namespace App\Models{

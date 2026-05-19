@@ -15,7 +15,7 @@ class QualificationController extends Controller
     public function index()
     {
         $company_id = Auth::user()->company_id;
-        $qualifications = getColsWhereP(Qualification::class, [], ['*'], ['company_id' => $company_id]);
+        $qualifications = getColsWhereP(Qualification::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id]);
         return view('admin.qualification.index', ['qualifications' => $qualifications]);
     }
 
@@ -36,7 +36,7 @@ class QualificationController extends Controller
             $company_id = Auth::user()->company_id;
             $checkIf = getColsWhereRow(Qualification::class, ['id'], ['company_id' => $company_id, 'name' => $request->name]);
             if ($checkIf) {
-                return redirect()->back()->with('error', 'المؤهل موجود بالفعل');
+                return redirect()->back()->with('error', 'المؤهل موجود بالفعل')->withInput();
             }
 
             $validated = $request->validated();
@@ -47,7 +47,7 @@ class QualificationController extends Controller
 
             return redirect()->route('admin.qualifications.index')->with('success', 'تم إنشاء المؤهل بنجاح');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'حدث خطأ أثناء إنشاء المؤهل ' . $e->getMessage());
+            return redirect()->back()->with('error', 'حدث خطأ أثناء إنشاء المؤهل ' . $e->getMessage())->withInput();
         }
     }
     /**
@@ -80,7 +80,7 @@ class QualificationController extends Controller
                 ->where('id', '!=', $id)
                 ->first();
             if ($checkIf) {
-                return redirect()->back()->with('error', 'المؤهل موجود بالفعل');
+                return redirect()->back()->with('error', 'المؤهل موجود بالفعل')->withInput();
             }
 
             $validated = $request->validated();
@@ -90,7 +90,7 @@ class QualificationController extends Controller
 
             return redirect()->route('admin.qualifications.index')->with('success', 'تم تحديث المؤهل بنجاح');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث المؤهل ' . $e->getMessage());
+            return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث المؤهل ' . $e->getMessage())->withInput();
         }
     }
 

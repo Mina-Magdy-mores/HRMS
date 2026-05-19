@@ -13,7 +13,7 @@ class OccasionController extends Controller
     public function index()
     {
         $company_id = Auth::user()->company_id;
-        $occasions = getColsWhereP(Occasion::class, [], ['*'], ['company_id' => $company_id]);
+        $occasions = getColsWhereP(Occasion::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id]);
         return view('admin.occasion.index', ['occasions' => $occasions]);
     }
 

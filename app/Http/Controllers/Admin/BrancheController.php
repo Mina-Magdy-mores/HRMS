@@ -14,7 +14,7 @@ class BrancheController extends Controller
     {
         $company_id = Auth::user()->company_id;
 
-        $branches = getColsWhereP(Branche::class, ['createdBy'], ['*'], ['company_id' => $company_id], 'id', 'asc', PAGEINATION_COUNTER);
+        $branches = getColsWhereP(Branche::class, ['updatedBy', 'createdBy'], ['*'], ['company_id' => $company_id], 'id', 'asc', PAGEINATION_COUNTER);
         return view('admin.branches.index', compact('branches'));
     }
     public function create()
@@ -48,12 +48,19 @@ class BrancheController extends Controller
         }
         return view('admin.branches.update', compact('branche'));
     }
-    public function update(BrancheRequest $request,  $branche)
+    public function update(BrancheRequest $request, $id)
     {
         $company_id = Auth::user()->company_id;
-        $branche = getColsWhereRow(Branche::class, ['*'], ['id' => $branche, 'company_id' => $company_id]);
+        $branche = getColsWhereRow(Branche::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
         if (empty($branche)) {
             return redirect()->route('admin.branches.index')->with('error', 'هذا الفرع غير موجود');
+        }
+        $checkIfExist = Branche::select('id')
+            ->where(['company_id' => $company_id, 'name' => $request->name])
+            ->where('id', '!=', $id)
+            ->first();
+        if ($checkIfExist) {
+            return redirect()->back()->with('error', 'اسم الفرع موجود مسبقا')->withInput();
         }
         try {
             $validated = $request->validated();
