@@ -10,8 +10,8 @@
                 </span>
                 <div class="info-box-content">
                     <span class="info-box-text">تعديل نوع شفت</span>
-                    <span
-                        class="info-box-number">{{ $shiftsType->type == 1 ? 'شفت نهاري' : ($shiftsType->type == 2 ? 'شفت ليلي' : 'نوع غير معروف') }}</span>
+                    <span class="info-box-number">{{ $shiftsType->type == 1 ? 'شفت نهاري' : ($shiftsType->type == 2 ?
+                        'شفت ليلي' : 'نوع غير معروف') }}</span>
                 </div>
             </div>
         </div>
@@ -19,13 +19,13 @@
         <div class="col-lg-3 col-md-6 col-12">
             <div class="info-box shadow-sm">
                 @if($shiftsType->status == 1)
-                    <span class="info-box-icon bg-success">
-                        <i class="fas fa-check-circle"></i>
-                    </span>
+                <span class="info-box-icon bg-success">
+                    <i class="fas fa-check-circle"></i>
+                </span>
                 @else
-                    <span class="info-box-icon bg-danger">
-                        <i class="fas fa-times-circle"></i>
-                    </span>
+                <span class="info-box-icon bg-danger">
+                    <i class="fas fa-times-circle"></i>
+                </span>
                 @endif
                 <div class="info-box-content">
                     <span class="info-box-text">حالة الصفحة</span>
@@ -52,7 +52,7 @@
                     <i class="fas fa-building"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">رقم الشركة</span>
+                    <span class="info-box-text">كود الشركه</span>
                     <span class="info-box-number">{{ auth()->user()->company_id }}</span>
                 </div>
             </div>
@@ -81,23 +81,23 @@
             @method('PUT')
             <div class="card-body">
                 @if ($errors->any())
-                    <div class="alert alert-danger alert-dismissible fade show">
-                        <h5>
-                            <i class="fas fa-exclamation-circle"></i>
-                            يوجد أخطاء في البيانات
-                        </h5>
-                        <ul class="mb-0 mt-2">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <h5>
+                        <i class="fas fa-exclamation-circle"></i>
+                        يوجد أخطاء في البيانات
+                    </h5>
+                    <ul class="mb-0 mt-2">
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
                 @endif
                 @if (session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show">
-                        <i class="fas fa-times-circle"></i>
-                        {{ session('error') }}
-                    </div>
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <i class="fas fa-times-circle"></i>
+                    {{ session('error') }}
+                </div>
                 @endif
 
                 <div class="row">
@@ -122,14 +122,13 @@
                         </div>
                     </div>
                     @php
-                        $start_time = date('H:i', strtotime($shiftsType->start_time));
-                        $end_time = date('H:i', strtotime($shiftsType->end_time));
+                    $start_time = date('H:i', strtotime($shiftsType->start_time));
+                    $end_time = date('H:i', strtotime($shiftsType->end_time));
                     @endphp
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>وقت البداية</label>
-                            <input type="time" name="start_time"
-                                value="{{ old('start_time', $start_time) }}"
+                            <input type="time" name="start_time" value="{{ old('start_time', $start_time) }}"
                                 class="form-control {{ $errors->has('start_time') ? 'is-invalid' : '' }}">
                             @include('admin.errors.errors', ['value' => 'start_time'])
                         </div>

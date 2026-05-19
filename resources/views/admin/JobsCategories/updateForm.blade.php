@@ -51,8 +51,8 @@
                     <i class="fas fa-id-badge"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">المستخدم المحدث</span>
-                    <span class="info-box-number">{{ auth()->user()->name }}</span>
+                    <span class="info-box-text">كود الشركه</span>
+                    <span class="info-box-number">{{ auth()->user()->company_id}}</span>
                 </div>
             </div>
         </div>

@@ -45,8 +45,8 @@
                     <i class="fas fa-id-badge"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">المستخدم المضاف</span>
-                    <span class="info-box-number">{{ auth()->user()->name }}</span>
+                    <span class="info-box-text">كود الشركه</span>
+                    <span class="info-box-number">{{ auth()->user()->company_id}}</span>
                 </div>
             </div>
         </div>
@@ -77,7 +77,7 @@
                         <h5>
                             <i class="fas fa-exclamation-circle"></i>
                             يوجد أخطاء في البيانات
-                        </h5>   
+                        </h5>
                         <ul class="mb-0 mt-2">
                             @foreach ($errors->all() as $error)
                                 <li>{{ $error }}</li>

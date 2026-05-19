@@ -27,15 +27,15 @@
             <div class="info-box shadow-sm">
                 @if($branche->status == 1)
 
-                    <span class="info-box-icon bg-success">
-                        <i class="fas fa-check-circle"></i>
-                    </span>
+                <span class="info-box-icon bg-success">
+                    <i class="fas fa-check-circle"></i>
+                </span>
 
                 @else
 
-                    <span class="info-box-icon bg-danger">
-                        <i class="fas fa-times-circle"></i>
-                    </span>
+                <span class="info-box-icon bg-danger">
+                    <i class="fas fa-times-circle"></i>
+                </span>
 
                 @endif
                 <div class="info-box-content">
@@ -80,7 +80,7 @@
 
                 <div class="info-box-content">
 
-                    <span class="info-box-text">رقم الشركة</span>
+                    <span class="info-box-text">كود الشركه</span>
 
                     <span class="info-box-number">
                         {{ auth()->user()->company_id }}
@@ -128,35 +128,35 @@
                 <!-- Validation Errors -->
                 @if ($errors->any())
 
-                    <div class="alert alert-danger alert-dismissible fade show">
+                <div class="alert alert-danger alert-dismissible fade show">
 
-                        <h5>
-                            <i class="fas fa-exclamation-circle"></i>
-                            يوجد أخطاء في البيانات
-                        </h5>
+                    <h5>
+                        <i class="fas fa-exclamation-circle"></i>
+                        يوجد أخطاء في البيانات
+                    </h5>
 
-                        <ul class="mb-0 mt-2">
+                    <ul class="mb-0 mt-2">
 
-                            @foreach ($errors->all() as $error)
+                        @foreach ($errors->all() as $error)
 
-                                <li>{{ $error }}</li>
+                        <li>{{ $error }}</li>
 
-                            @endforeach
+                        @endforeach
 
-                        </ul>
+                    </ul>
 
-                    </div>
+                </div>
 
                 @endif
                 @if (session('error'))
 
-                    <div class="alert alert-danger alert-dismissible fade show">
+                <div class="alert alert-danger alert-dismissible fade show">
 
-                        <i class="fas fa-times-circle"></i>
+                    <i class="fas fa-times-circle"></i>
 
-                        {{ session('error') }}
+                    {{ session('error') }}
 
-                    </div>
+                </div>
 
                 @endif
 
@@ -227,23 +227,23 @@
                         </div>
                     </div>
 
-                        <!-- حالة الفرع -->
-                        <div class="col-md-4">
+                    <!-- حالة الفرع -->
+                    <div class="col-md-4">
 
-                            <div class="form-group">
-                                <label>حالة الفرع</label>
-                                <select name="status" class="form-control {{ $errors->has('status') ? 'is-invalid' : '' }}">
-                                    <option disabled value="">اختر الحالة</option>
-                                    <option value="1" {{ old('status', $branche->status) == 1 ? 'selected' : '' }}>
-                                        مفعل
-                                    </option>
-                                    <option value="0" {{ old('status', $branche->status) == 0 ? 'selected' : '' }}>
-                                        معطل
-                                    </option>
-                                </select>
-                                @include('admin.errors.errors', ['value' => 'status'])
-                            </div>
+                        <div class="form-group">
+                            <label>حالة الفرع</label>
+                            <select name="status" class="form-control {{ $errors->has('status') ? 'is-invalid' : '' }}">
+                                <option disabled value="">اختر الحالة</option>
+                                <option value="1" {{ old('status', $branche->status) == 1 ? 'selected' : '' }}>
+                                    مفعل
+                                </option>
+                                <option value="0" {{ old('status', $branche->status) == 0 ? 'selected' : '' }}>
+                                    معطل
+                                </option>
+                            </select>
+                            @include('admin.errors.errors', ['value' => 'status'])
                         </div>
+                    </div>
 
 
                 </div>

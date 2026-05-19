@@ -72,6 +72,14 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereUpdatedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereUsername($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Occasion> $addedOccasions
+ * @property-read int|null $added_occasions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Qualification> $addedQualifications
+ * @property-read int|null $added_qualifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Occasion> $updatedOccasions
+ * @property-read int|null $updated_occasions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Qualification> $updatedQualifications
+ * @property-read int|null $updated_qualifications_count
  */
 	class Admin extends \Eloquent {}
 }
@@ -289,6 +297,34 @@ namespace App\Models{
 /**
  * @property int $id
  * @property string $name
+ * @property int $status
+ * @property int $company_id
+ * @property int $added_by
+ * @property int $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $addedBy
+ * @property-read \App\Models\Admin $updatedBy
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|JobsCategory newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|JobsCategory newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|JobsCategory query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|JobsCategory whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|JobsCategory whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|JobsCategory whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|JobsCategory whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|JobsCategory whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|JobsCategory whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|JobsCategory whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|JobsCategory whereUpdatedBy($value)
+ * @mixin \Eloquent
+ */
+	class JobsCategory extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property string $name
  * @property string $name_en
  * @property int $status
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -311,9 +347,60 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * @property int $id
+ * @property string $name
+ * @property string $from_date
+ * @property string $to_date
+ * @property numeric $days_count
+ * @property int $status
+ * @property int $company_id
+ * @property int $added_by
+ * @property int $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $addedBy
+ * @property-read \App\Models\Admin $updatedBy
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion whereDaysCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion whereFromDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion whereToDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion whereUpdatedBy($value)
+ */
+	class Occasion extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property string $name
+ * @property int $status
+ * @property int $company_id
+ * @property int $added_by
+ * @property int $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $addedBy
+ * @property-read \App\Models\Admin $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification whereUpdatedBy($value)
  */
 	class Qualification extends \Eloquent {}
 }

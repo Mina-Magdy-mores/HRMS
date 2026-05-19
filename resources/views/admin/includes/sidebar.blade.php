@@ -30,7 +30,8 @@
                     request()->routeIs('admin.shifts-types.*') ||
                     request()->routeIs('admin.departments.*') ||
                     request()->routeIs('admin.jobCategories.*') ||
-                    request()->routeIs('admin.qualifications.*')
+                    request()->routeIs('admin.qualifications.*') ||
+                    request()->routeIs('admin.occasions.*')
                         ? 'menu-open'
                         : '' }}">
                     <a href="#" class="nav-link {{ request()->is('admin/general-settings*') ||
@@ -39,7 +40,8 @@
                         request()->routeIs('admin.shifts-types.*') ||
                         request()->routeIs('admin.departments.*') ||
                         request()->routeIs('admin.jobCategories.*') ||
-                        request()->routeIs('admin.qualifications.*')
+                        request()->routeIs('admin.qualifications.*') ||
+                        request()->routeIs('admin.occasions.*')
                             ? 'active'
                             : '' }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -95,6 +97,12 @@
                                 <i class="fas fa-users"></i>
                                 <p>مؤهلات الموظفين</p>
                             </a>
+                            <a href="{{ route('admin.occasions.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.occasions.*')) active @endif">
+                                <i class="fas fa-users"></i>
+                                <p>المناسبات الرسمية</p>
+                            </a>
+
                         </li>
                     </ul>
                 </li>

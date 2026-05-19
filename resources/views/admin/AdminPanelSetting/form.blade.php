@@ -64,24 +64,24 @@
         <div class="card-body">
             <!-- عرض رسائل الخطأ إن وجدت -->
             @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <h4 class="alert-heading"><i class="fas fa-exclamation-circle"></i> خطأ في البيانات</h4>
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <h4 class="alert-heading"><i class="fas fa-exclamation-circle"></i> خطأ في البيانات</h4>
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
             @endif
 
             @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle"></i>
-                    {{ session('success') }}
-                    <button type="button" class="close text-white text-right" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle"></i>
+                {{ session('success') }}
+                <button type="button" class="close text-white text-right" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
             @endif
             <!-- الفورم يوجه لروت التحديث الذي ستنشئه -->
             <form action="{{ route('admin.general-settings.update', $general_settings) }}" method="POST"
@@ -306,7 +306,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label>رقم الشركة</label>
+                            <label>كود الشركه</label>
                             <span class="form-control bg-secondary ">{{ $general_settings->company_id }}</span>
                         </div>
                     </div>
@@ -343,8 +343,8 @@
 <!-- JavaScript للتحكم في وضع التعديل -->
 
 @section('js')
-    <script>
-        // Check if there are validation errors - if yes, enable edit mode automatically
+<script>
+    // Check if there are validation errors - if yes, enable edit mode automatically
         @if ($errors->any())
             document.addEventListener('DOMContentLoaded', function () {
                 makeEditable();
@@ -383,6 +383,5 @@
 
             document.querySelector('.back-btn').classList.remove('d-none');
         }
-    </script>
+</script>
 @endsection
-

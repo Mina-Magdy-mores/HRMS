@@ -1,16 +1,21 @@
 <div class="container-fluid">
 
+    @php
+    $lastOccasion = $occasions->last();
+    $lastOccasionLabel = $lastOccasion ? $lastOccasion->name : '---';
+    @endphp
+
     <!-- Info Boxes -->
     <div class="row mb-4">
 
         <div class="col-lg-3 col-md-6 col-12">
             <div class="info-box shadow-sm">
                 <span class="info-box-icon bg-primary">
-                    <i class="fas fa-code-branch"></i>
+                    <i class="fas fa-flag"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">عدد الفروع</span>
-                    <span class="info-box-number">{{ $branches->count() }}</span>
+                    <span class="info-box-text">عدد المناسبات</span>
+                    <span class="info-box-number">{{ $occasions->count() }}</span>
                 </div>
             </div>
         </div>
@@ -21,10 +26,8 @@
                     <i class="fas fa-check-circle"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">الفروع المفعلة</span>
-                    <span class="info-box-number">
-                        {{ $branches->where('status', 1)->count() }}
-                    </span>
+                    <span class="info-box-text">المناسبات المفعلة</span>
+                    <span class="info-box-number">{{ $occasions->where('status', 1)->count() }}</span>
                 </div>
             </div>
         </div>
@@ -35,10 +38,8 @@
                     <i class="fas fa-times-circle"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">الفروع المعطلة</span>
-                    <span class="info-box-number">
-                        {{ $branches->where('status', 0)->count() }}
-                    </span>
+                    <span class="info-box-text">المناسبات المعطلة</span>
+                    <span class="info-box-number">{{ $occasions->where('status', 0)->count() }}</span>
                 </div>
             </div>
         </div>
@@ -46,13 +47,11 @@
         <div class="col-lg-3 col-md-6 col-12">
             <div class="info-box shadow-sm">
                 <span class="info-box-icon bg-warning">
-                    <i class="fas fa-clock"></i>
+                    <i class="fas fa-history"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">آخر فرع تم إضافته</span>
-                    <span class="info-box-number">
-                        {{ optional($branches->last())->name ?? '---' }}
-                    </span>
+                    <span class="info-box-text">آخر مناسبة تمت إضافتها</span>
+                    <span class="info-box-number">{{ $lastOccasionLabel }}</span>
                 </div>
             </div>
         </div>
@@ -66,13 +65,13 @@
 
             <h3 class="card-title">
                 <i class="fas fa-table"></i>
-                جدول الفروع
+                جدول المناسبات
             </h3>
 
             <div class="card-tools">
-                <a href="{{ route('admin.branches.create') }}" class="btn btn-primary btn-sm shadow-sm">
+                <a href="{{ route('admin.occasions.create') }}" class="btn btn-primary btn-sm shadow-sm">
                     <i class="fas fa-plus-circle"></i>
-                    إضافة فرع
+                    إضافة مناسبة
                 </a>
             </div>
 
@@ -101,18 +100,16 @@
             @endif
 
             <div class="table-responsive">
-
                 <table class="table table-bordered table-hover text-center align-middle">
 
                     <thead class="bg-primary text-white">
                         <tr>
                             <th>#</th>
-                            <th>اسم الفرع</th>
-                            <th>العنوان</th>
-                            <th>الهاتف</th>
-                            <th>البريد الإلكتروني</th>
+                            <th>الإسم</th>
+                            <th>تاريخ البداية</th>
+                            <th>تاريخ النهاية</th>
+                            <th>عدد الأيام</th>
                             <th>الحالة</th>
-                            <th>كود الشركه</th>
                             <th>أضيف بواسطة</th>
                             <th>آخر تحديث بواسطة</th>
                             <th>تاريخ الإضافة</th>
@@ -122,30 +119,15 @@
                     </thead>
 
                     <tbody>
-                        @forelse ($branches as $branch)
+                        @forelse ($occasions as $occasion)
                         <tr>
-                            <td>{{ $branch->id }}</td>
-
+                            <td>{{ $occasion->id }}</td>
+                            <td>{{ $occasion->name }}</td>
+                            <td>{{ $occasion->from_date }}</td>
+                            <td>{{ $occasion->to_date }}</td>
+                            <td>{{ $occasion->days_count }}</td>
                             <td>
-                                {{ $branch->name }}
-                            </td>
-
-                            <td>{{ $branch->address }}</td>
-
-                            <td>
-                                {{ $branch->phone }}
-                            </td>
-
-                            <td>
-                                @if($branch->email)
-                                {{ $branch->email }}
-                                @else
-                                <span class="text-muted">---</span>
-                                @endif
-                            </td>
-
-                            <td>
-                                @if($branch->status == 1)
+                                @if($occasion->status == 1)
                                 <span class="badge badge-success px-3 py-2">
                                     <i class="fas fa-check-circle"></i>
                                     مفعل
@@ -157,26 +139,19 @@
                                 </span>
                                 @endif
                             </td>
-
-                            <td>{{ $branch->company_id }}</td>
-
-                            <td>{{ optional($branch->createdBy)->name ?? '---' }}</td>
-
-                            <td>{{ optional($branch->updatedBy)->name ?? '---' }}</td>
-
-                            <td>{{ $branch->created_at }}</td>
-
-                            <td>{{ $branch->updated_at }}</td>
-
+                            <td>{{ optional($occasion->addedBy)->name ?? '---' }}</td>
+                            <td>{{ optional($occasion->updatedBy)->name ?? '---' }}</td>
+                            <td>{{ $occasion->created_at }}</td>
+                            <td>{{ $occasion->updated_at }}</td>
                             <td>
                                 <div class="d-flex justify-content-center align-items-center gap-1">
 
-                                    <a href="{{ route('admin.branches.edit', $branch->id) }}"
+                                    <a href="{{ route('admin.occasions.edit', $occasion->id) }}"
                                         class="btn btn-sm btn-warning m-1" title="تعديل">
                                         <i class="fas fa-edit"></i>
                                     </a>
 
-                                    <form action="{{ route('admin.branches.destroy', $branch->id) }}" method="POST">
+                                    <form action="{{ route('admin.occasions.destroy', $occasion->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-danger are_you_sure m-1"
@@ -190,10 +165,10 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="12">
+                            <td colspan="11">
                                 <div class="alert alert-warning mb-0">
                                     <i class="fas fa-exclamation-circle"></i>
-                                    لا توجد بيانات فروع حاليا
+                                    لا توجد بيانات مناسبات حالياً
                                 </div>
                             </td>
                         </tr>
@@ -201,12 +176,15 @@
                     </tbody>
 
                 </table>
-
+                {{-- Pagination --}}
+                <div>
+                    {{ $occasions->links() }}
+                </div>
             </div>
-
-            {{-- Pagination --}}
-            {{ $branches->links() }}
-
         </div>
     </div>
 </div>
+
+
+@section('js')
+@endsection

@@ -29,6 +29,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property-read int|null $added_finance_monthly_calendars_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JobsCategory> $addedJobsCategoies
  * @property-read int|null $added_jobs_categoies_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Occasion> $addedOccasions
+ * @property-read int|null $added_occasions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Qualification> $addedQualifications
+ * @property-read int|null $added_qualifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ShiftsType> $addedShiftsTypes
  * @property-read int|null $added_shifts_types_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Branche> $branches
@@ -47,6 +51,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property-read int|null $updated_finance_monthly_calendars_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JobsCategory> $updatedJobsCategoies
  * @property-read int|null $updated_jobs_categoies_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Occasion> $updatedOccasions
+ * @property-read int|null $updated_occasions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Qualification> $updatedQualifications
+ * @property-read int|null $updated_qualifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ShiftsType> $updatedShiftsTypes
  * @property-read int|null $updated_shifts_types_count
  * @method static \Database\Factories\AdminFactory factory($count = null, $state = [])
@@ -144,4 +152,21 @@ class Admin extends User
     {
         return $this->hasMany(JobsCategory::class, 'updated_by');
     }
+    public function addedQualifications()
+    {
+        return $this->hasMany(Qualification::class, 'added_by');
+    }
+    public function updatedQualifications()
+    {
+        return $this->hasMany(Qualification::class, 'updated_by');
+    }
+    public function addedOccasions()
+    {
+        return $this->hasMany(Occasion::class, 'added_by');
+    }
+    public function updatedOccasions()
+    {
+        return $this->hasMany(Occasion::class, 'updated_by');
+    }
+
 }

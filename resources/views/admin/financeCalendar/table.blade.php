@@ -84,30 +84,30 @@
 
             @if(session('success'))
 
-                <div class="alert alert-success alert-dismissible fade show">
+            <div class="alert alert-success alert-dismissible fade show">
 
-                    <i class="fas fa-check-circle"></i>
+                <i class="fas fa-check-circle"></i>
 
-                    {{ session('success') }}
+                {{ session('success') }}
 
-                    <button type="button" class="close text-white text-right" data-dismiss="alert">
+                <button type="button" class="close text-white text-right" data-dismiss="alert">
 
-                        <span>&times;</span>
+                    <span>&times;</span>
 
-                    </button>
+                </button>
 
-                </div>
+            </div>
 
             @endif
             @if (session('error'))
 
-                <div class="alert alert-danger alert-dismissible fade show">
+            <div class="alert alert-danger alert-dismissible fade show">
 
-                    <i class="fas fa-times-circle"></i>
+                <i class="fas fa-times-circle"></i>
 
-                    {{ session('error') }}
+                {{ session('error') }}
 
-                </div>
+            </div>
 
             @endif
             <div class="table-responsive">
@@ -124,7 +124,7 @@
                             <th>بداية السنة</th>
                             <th>نهاية السنة</th>
                             <th>الحالة</th>
-                            <th>رقم الشركة</th>
+                            <th>كود الشركه</th>
                             <th>أضيف بواسطة</th>
                             <th>آخر تحديث بواسطة</th>
                             <th>تاريخ الإضافة</th>
@@ -136,89 +136,89 @@
                     </thead>
                     <tbody>
                         @forelse ($financeCalendars as $financeCalendar)
-                            <tr>
-                                <td>
-                                    {{ $financeCalendar->id }}
-                                </td>
-                                <td>
-                                    <span class=" badge badge-primary px-3 py-2">
-                                        {{ $financeCalendar->finance_yr }}
-                                    </span>
-                                </td>
-                                <td>
-                                    {{ $financeCalendar->finance_yr_desc }}
-                                </td>
-                                <td>
-                                    <span class="badge badge-success px-3 py-2">
-                                        {{ $financeCalendar->start_date }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge badge-danger px-3 py-2">
-                                        {{ $financeCalendar->end_date }}
-                                    </span>
-                                </td>
-                                <td>
-                                    @if ($financeCalendar->status == 1)
-                                        <span class="badge badge-success px-3 py-2">
-                                            <i class="fas fa-check-circle"></i>
-                                            مفعل
-                                        </span>
-                                    @else
-                                        <span class="badge badge-danger px-3 py-2">
-                                            <i class="fas fa-times-circle"></i>
-                                            معطل
-                                        </span>
+                        <tr>
+                            <td>
+                                {{ $financeCalendar->id }}
+                            </td>
+                            <td>
+                                <span class=" badge badge-primary px-3 py-2">
+                                    {{ $financeCalendar->finance_yr }}
+                                </span>
+                            </td>
+                            <td>
+                                {{ $financeCalendar->finance_yr_desc }}
+                            </td>
+                            <td>
+                                <span class="badge badge-success px-3 py-2">
+                                    {{ $financeCalendar->start_date }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge badge-danger px-3 py-2">
+                                    {{ $financeCalendar->end_date }}
+                                </span>
+                            </td>
+                            <td>
+                                @if ($financeCalendar->status == 1)
+                                <span class="badge badge-success px-3 py-2">
+                                    <i class="fas fa-check-circle"></i>
+                                    مفعل
+                                </span>
+                                @else
+                                <span class="badge badge-danger px-3 py-2">
+                                    <i class="fas fa-times-circle"></i>
+                                    معطل
+                                </span>
+                                @endif
+                            </td>
+                            <td>
+                                {{ $financeCalendar->company_id }}
+                            </td>
+                            <td>
+                                {{ $financeCalendar->addedBy->name }}
+                            </td>
+                            <td>
+                                {{ $financeCalendar->updatedBy->name }}
+                            </td>
+                            <td>
+                                {{ $financeCalendar->created_at }}
+                            </td>
+                            <td>
+                                {{ $financeCalendar->updated_at }}
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center align-items-center gap-1">
+                                    <button type="button" class="btn btn-sm btn-primary m-1 show_year_monthes"
+                                        data-id="{{ $financeCalendar->id }}">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    @if ($financeCalendar->status == 0)
+                                    <a href="{{ route('admin.financeCalendars.edit', $financeCalendar->id) }}"
+                                        class="btn btn-sm btn-warning m-1">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
                                     @endif
-                                </td>
-                                <td>
-                                    {{ $financeCalendar->company_id }}
-                                </td>
-                                <td>
-                                    {{ $financeCalendar->addedBy->name }}
-                                </td>
-                                <td>
-                                    {{ $financeCalendar->updatedBy->name }}
-                                </td>
-                                <td>
-                                    {{ $financeCalendar->created_at }}
-                                </td>
-                                <td>
-                                    {{ $financeCalendar->updated_at }}
-                                </td>
-                                <td>
-                                    <div class="d-flex justify-content-center align-items-center gap-1">
-                                        <button type="button" class="btn btn-sm btn-primary m-1 show_year_monthes"
-                                            data-id="{{ $financeCalendar->id }}">
-                                            <i class="fas fa-eye"></i>
+                                    <form action="{{ route('admin.financeCalendars.destroy', $financeCalendar) }}"
+                                        method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger are_you_sure m-1">
+                                            <i class="fas fa-trash"></i>
                                         </button>
-                                        @if ($financeCalendar->status == 0)
-                                            <a href="{{ route('admin.financeCalendars.edit', $financeCalendar->id) }}"
-                                                class="btn btn-sm btn-warning m-1">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                        @endif
-                                        <form action="{{ route('admin.financeCalendars.destroy', $financeCalendar) }}"
-                                            method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger are_you_sure m-1">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                    </form>
 
-                                    </div>
-                                </td>
-                            </tr>
+                                </div>
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="12">
-                                    <div class="alert alert-warning mb-0">
-                                        <i class="fas fa-exclamation-circle"></i>
-                                        لا توجد بيانات سنوات مالية حاليا
-                                    </div>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td colspan="12">
+                                <div class="alert alert-warning mb-0">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    لا توجد بيانات سنوات مالية حاليا
+                                </div>
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -230,39 +230,39 @@
     </div>
 </div>
 
-    <!-- Months Modal (EMPTY BODY) -->
-    <div class="modal fade " id="monthsModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-            <div class="modal-content shadow">
+<!-- Months Modal (EMPTY BODY) -->
+<div class="modal fade " id="monthsModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content shadow">
 
-                <!-- Header -->
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">
-                        <i class="fas fa-calendar-alt"></i>
-                        الشهور المالية
-                    </h5>
+            <!-- Header -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-calendar-alt"></i>
+                    الشهور المالية
+                </h5>
 
-                    <button type="button" class="close text-white" data-dismiss="modal">
-                        <span>&times;</span>
-                    </button>
-                </div>
-
-                <!-- BODY = EMPTY -->
-                <div class="modal-body" id="months_modal_body">
-                    <!-- AJAX will inject everything here -->
-                </div>
-
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
             </div>
+
+            <!-- BODY = EMPTY -->
+            <div class="modal-body" id="months_modal_body">
+                <!-- AJAX will inject everything here -->
+            </div>
+
         </div>
     </div>
+</div>
 
 
-    <!-- JavaScript للتحكم في وضع التعديل -->
+<!-- JavaScript للتحكم في وضع التعديل -->
 
-    @section('js')
-        {{-- تفعيل زر عرض الشهور --}}
-        <script>
-            $(document).ready(function () {
+@section('js')
+{{-- تفعيل زر عرض الشهور --}}
+<script>
+    $(document).ready(function () {
 
                 $(document).on('click', '.show_year_monthes', function () {
 
@@ -285,5 +285,5 @@
                 });
 
             });
-        </script>
-    @endsection
+</script>
+@endsection

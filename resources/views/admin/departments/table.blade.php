@@ -1,8 +1,8 @@
 <div class="container-fluid">
 
     @php
-        $lastDepartment = $departments->last();
-        $lastDepartmentLabel = $lastDepartment ? $lastDepartment->name : '---';
+    $lastDepartment = $departments->last();
+    $lastDepartmentLabel = $lastDepartment ? $lastDepartment->name : '---';
     @endphp
 
     <!-- Info Boxes -->
@@ -80,23 +80,23 @@
         <div class="card-body">
 
             @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show">
-                    <i class="fas fa-check-circle"></i>
-                    {{ session('success') }}
-                    <button type="button" class="close text-white text-right" data-dismiss="alert">
-                        <span>&times;</span>
-                    </button>
-                </div>
+            <div class="alert alert-success alert-dismissible fade show">
+                <i class="fas fa-check-circle"></i>
+                {{ session('success') }}
+                <button type="button" class="close text-white text-right" data-dismiss="alert">
+                    <span>&times;</span>
+                </button>
+            </div>
             @endif
 
             @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show">
-                    <i class="fas fa-times-circle"></i>
-                    {{ session('error') }}
-                    <button type="button" class="close text-white text-right" data-dismiss="alert">
-                        <span>&times;</span>
-                    </button>
-                </div>
+            <div class="alert alert-danger alert-dismissible fade show">
+                <i class="fas fa-times-circle"></i>
+                {{ session('error') }}
+                <button type="button" class="close text-white text-right" data-dismiss="alert">
+                    <span>&times;</span>
+                </button>
+            </div>
             @endif
 
             <div class="table-responsive">
@@ -108,7 +108,7 @@
                             <th>الإسم</th>
                             <th>الرقم</th>
                             <th>الوصف</th>
-                            <th>رقم الشركة</th>
+                            <th>كود الشركه</th>
                             <th>الحالة</th>
                             <th>أضيف بواسطة</th>
                             <th>آخر تحديث بواسطة</th>
@@ -120,64 +120,64 @@
 
                     <tbody>
                         @forelse ($departments as $department)
-                            <tr>
-                                <td>{{ $department->id }}</td>
-                                <td>{{ $department->name }}</td>
-                                <td>{{ $department->number }}</td>
-                                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                                    {{ $department->description ?? '---' }}</td>
-                                <td>{{ $department->company_id }}</td>
+                        <tr>
+                            <td>{{ $department->id }}</td>
+                            <td>{{ $department->name }}</td>
+                            <td>{{ $department->number }}</td>
+                            <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+                                {{ $department->description ?? '---' }}</td>
+                            <td>{{ $department->company_id }}</td>
 
-                                <td>
-                                    @if($department->status == 1)
-                                        <span class="badge badge-success px-3 py-2">
-                                            <i class="fas fa-check-circle"></i>
-                                            مفعل
-                                        </span>
-                                    @else
-                                        <span class="badge badge-danger px-3 py-2">
-                                            <i class="fas fa-times-circle"></i>
-                                            معطل
-                                        </span>
-                                    @endif
-                                </td>
+                            <td>
+                                @if($department->status == 1)
+                                <span class="badge badge-success px-3 py-2">
+                                    <i class="fas fa-check-circle"></i>
+                                    مفعل
+                                </span>
+                                @else
+                                <span class="badge badge-danger px-3 py-2">
+                                    <i class="fas fa-times-circle"></i>
+                                    معطل
+                                </span>
+                                @endif
+                            </td>
 
-                                <td>{{ optional($department->createdBy)->name ?? '---' }}</td>
-                                <td>{{ optional($department->updatedBy)->name ?? '---' }}</td>
+                            <td>{{ optional($department->createdBy)->name ?? '---' }}</td>
+                            <td>{{ optional($department->updatedBy)->name ?? '---' }}</td>
 
-                                <td>{{ $department->created_at }}</td>
-                                <td>{{ $department->updated_at }}</td>
+                            <td>{{ $department->created_at }}</td>
+                            <td>{{ $department->updated_at }}</td>
 
-                                <td>
-                                    <div class="d-flex justify-content-center align-items-center gap-1">
+                            <td>
+                                <div class="d-flex justify-content-center align-items-center gap-1">
 
-                                        <a href="{{ route('admin.departments.edit', $department->id) }}"
-                                            class="btn btn-sm btn-warning m-1" title="تعديل">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
+                                    <a href="{{ route('admin.departments.edit', $department->id) }}"
+                                        class="btn btn-sm btn-warning m-1" title="تعديل">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
 
-                                        <form action="{{ route('admin.departments.destroy', $department->id) }}"
-                                            method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger are_you_sure m-1"
-                                                title="حذف">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                    <form action="{{ route('admin.departments.destroy', $department->id) }}"
+                                        method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger are_you_sure m-1"
+                                            title="حذف">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
 
-                                    </div>
-                                </td>
-                            </tr>
+                                </div>
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="12">
-                                    <div class="alert alert-warning mb-0">
-                                        <i class="fas fa-exclamation-circle"></i>
-                                        لا توجد بيانات إدارات حالياً
-                                    </div>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td colspan="12">
+                                <div class="alert alert-warning mb-0">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    لا توجد بيانات إدارات حالياً
+                                </div>
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
 

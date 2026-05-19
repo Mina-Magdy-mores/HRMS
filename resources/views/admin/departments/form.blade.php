@@ -45,7 +45,7 @@
                     <i class="fas fa-id-badge"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">رقم الشركة</span>
+                    <span class="info-box-text">كود الشركه</span>
                     <span class="info-box-number">{{ auth()->user()->company_id }}</span>
                 </div>
             </div>
@@ -73,23 +73,23 @@
             @csrf
             <div class="card-body">
                 @if ($errors->any())
-                    <div class="alert alert-danger alert-dismissible fade show">
-                        <h5>
-                            <i class="fas fa-exclamation-circle"></i>
-                            يوجد أخطاء في البيانات
-                        </h5>
-                        <ul class="mb-0 mt-2">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <h5>
+                        <i class="fas fa-exclamation-circle"></i>
+                        يوجد أخطاء في البيانات
+                    </h5>
+                    <ul class="mb-0 mt-2">
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
                 @endif
                 @if (session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show">
-                        <i class="fas fa-times-circle"></i>
-                        {{ session('error') }}
-                    </div>
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <i class="fas fa-times-circle"></i>
+                    {{ session('error') }}
+                </div>
                 @endif
 
                 <div class="row">
@@ -133,8 +133,8 @@
                         <div class="form-group">
                             <label>الحالة</label>
                             <select name="status" class="form-control {{ $errors->has('status') ? 'is-invalid' : '' }}">
-                                <option value="1" {{ old('status') == 1 ? 'selected' : '' }}>مفعل</option>
-                                <option value="0" {{ old('status') == 0 ? 'selected' : '' }}>معطل</option>
+                                <option value="1" {{ old('status')==1 ? 'selected' : '' }}>مفعل</option>
+                                <option value="0" {{ old('status')==0 ? 'selected' : '' }}>معطل</option>
                             </select>
                             @include('admin.errors.errors', ['value' => 'status'])
                         </div>

@@ -18,13 +18,13 @@
         <div class="col-lg-3 col-md-6 col-12">
             <div class="info-box shadow-sm">
                 @if($department->status == 1)
-                    <span class="info-box-icon bg-success">
-                        <i class="fas fa-check-circle"></i>
-                    </span>
+                <span class="info-box-icon bg-success">
+                    <i class="fas fa-check-circle"></i>
+                </span>
                 @else
-                    <span class="info-box-icon bg-danger">
-                        <i class="fas fa-times-circle"></i>
-                    </span>
+                <span class="info-box-icon bg-danger">
+                    <i class="fas fa-times-circle"></i>
+                </span>
                 @endif
                 <div class="info-box-content">
                     <span class="info-box-text">حالة الصفحة</span>
@@ -51,7 +51,7 @@
                     <i class="fas fa-id-badge"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">رقم الشركة</span>
+                    <span class="info-box-text">كود الشركه</span>
                     <span class="info-box-number">{{ auth()->user()->company_id }}</span>
                 </div>
             </div>
@@ -80,23 +80,23 @@
             @method('PUT')
             <div class="card-body">
                 @if ($errors->any())
-                    <div class="alert alert-danger alert-dismissible fade show">
-                        <h5>
-                            <i class="fas fa-exclamation-circle"></i>
-                            يوجد أخطاء في البيانات
-                        </h5>
-                        <ul class="mb-0 mt-2">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <h5>
+                        <i class="fas fa-exclamation-circle"></i>
+                        يوجد أخطاء في البيانات
+                    </h5>
+                    <ul class="mb-0 mt-2">
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
                 @endif
                 @if (session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show">
-                        <i class="fas fa-times-circle"></i>
-                        {{ session('error') }}
-                    </div>
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <i class="fas fa-times-circle"></i>
+                    {{ session('error') }}
+                </div>
                 @endif
 
                 <div class="row">

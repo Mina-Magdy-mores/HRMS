@@ -72,7 +72,7 @@
 
                 <div class="info-box-content">
 
-                    <span class="info-box-text">رقم الشركة</span>
+                    <span class="info-box-text">كود الشركه</span>
 
                     <span class="info-box-number">
                         {{ auth()->user()->company_id }}
@@ -121,35 +121,35 @@
                 <!-- Validation Errors -->
                 @if ($errors->any())
 
-                    <div class="alert alert-danger alert-dismissible fade show">
+                <div class="alert alert-danger alert-dismissible fade show">
 
-                        <h5>
-                            <i class="fas fa-exclamation-circle"></i>
-                            يوجد أخطاء في البيانات
-                        </h5>
+                    <h5>
+                        <i class="fas fa-exclamation-circle"></i>
+                        يوجد أخطاء في البيانات
+                    </h5>
 
-                        <ul class="mb-0 mt-2">
+                    <ul class="mb-0 mt-2">
 
-                            @foreach ($errors->all() as $error)
+                        @foreach ($errors->all() as $error)
 
-                                <li>{{ $error }}</li>
+                        <li>{{ $error }}</li>
 
-                            @endforeach
+                        @endforeach
 
-                        </ul>
+                    </ul>
 
-                    </div>
+                </div>
 
                 @endif
                 @if (session('error'))
 
-                    <div class="alert alert-danger alert-dismissible fade show">
+                <div class="alert alert-danger alert-dismissible fade show">
 
-                        <i class="fas fa-times-circle"></i>
+                    <i class="fas fa-times-circle"></i>
 
-                        {{ session('error') }}
+                    {{ session('error') }}
 
-                    </div>
+                </div>
 
                 @endif
 
