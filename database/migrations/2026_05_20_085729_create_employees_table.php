@@ -38,7 +38,7 @@ return new class extends Migration {
             $table->foreignId('religion_id')->nullable()->constrained('religions')->cascadeOnUpdate();
             $table->foreignId('qualifications_id')->nullable()->constrained('qualifications')->cascadeOnUpdate();
             $table->string('qualification_year')->nullable();
-            $table->tinyInteger('graduation_grade')->nullable()->comment('1: Excellent, 2: Good, 3: Fair, 4: Poor');
+            $table->tinyInteger('graduation_grade')->nullable()->comment('1: Excellent, 2: Very Good, 3: Good, 4: Fair, 5: Poor');
             $table->string('graduation_specialization')->nullable();
             $table->date('hire_date')->nullable();
             $table->date('hire_date_day_month_year')->nullable();

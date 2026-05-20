@@ -1,10 +1,15 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminPanelSettingController;
+use App\Http\Controllers\Admin\BloodGroupController;
 use App\Http\Controllers\Admin\BrancheController;
+use App\Http\Controllers\Admin\CityController;
+use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DepartmentController;
+use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\FinanceCalendarController;
+use App\Http\Controllers\Admin\GovernorateController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\JobsCategoryController;
 use App\Http\Controllers\Admin\NationalityController;
@@ -105,6 +110,46 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::get('/religions/{id}/edit', [ReligionController::class, 'edit'])->name('religions.edit');
         Route::put('/religions/{id}', [ReligionController::class, 'update'])->name('religions.update');
         Route::delete('/religions/{id}', [ReligionController::class, 'destroy'])->name('religions.destroy');
+
+        // blood-groups routes
+        Route::get('/blood-groups', [BloodGroupController::class, 'index'])->name('blood-groups.index');
+        Route::get('/blood-groups/create', [BloodGroupController::class, 'create'])->name('blood-groups.create');
+        Route::post('/blood-groups', [BloodGroupController::class, 'store'])->name('blood-groups.store');
+        Route::get('/blood-groups/{id}/edit', [BloodGroupController::class, 'edit'])->name('blood-groups.edit');
+        Route::put('/blood-groups/{id}', [BloodGroupController::class, 'update'])->name('blood-groups.update');
+        Route::delete('/blood-groups/{id}', [BloodGroupController::class, 'destroy'])->name('blood-groups.destroy');
+
+        // countries routes
+        Route::get('/countries', [CountryController::class, 'index'])->name('countries.index');
+        Route::get('/countries/create', [CountryController::class, 'create'])->name('countries.create');
+        Route::post('/countries', [CountryController::class, 'store'])->name('countries.store');
+        Route::get('/countries/{id}/edit', [CountryController::class, 'edit'])->name('countries.edit');
+        Route::put('/countries/{id}', [CountryController::class, 'update'])->name('countries.update');
+        Route::delete('/countries/{id}', [CountryController::class, 'destroy'])->name('countries.destroy');
+
+        // governorates routes
+        Route::get('/governorates', [GovernorateController::class, 'index'])->name('governorates.index');
+        Route::get('/governorates/create', [GovernorateController::class, 'create'])->name('governorates.create');
+        Route::post('/governorates', [GovernorateController::class, 'store'])->name('governorates.store');
+        Route::get('/governorates/{id}/edit', [GovernorateController::class, 'edit'])->name('governorates.edit');
+        Route::put('/governorates/{id}', [GovernorateController::class, 'update'])->name('governorates.update');
+        Route::delete('/governorates/{id}', [GovernorateController::class, 'destroy'])->name('governorates.destroy');
+
+        // cities routes
+        Route::get('/cities', [CityController::class, 'index'])->name('cities.index');
+        Route::get('/cities/create', [CityController::class, 'create'])->name('cities.create');
+        Route::post('/cities', [CityController::class, 'store'])->name('cities.store');
+        Route::get('/cities/{id}/edit', [CityController::class, 'edit'])->name('cities.edit');
+        Route::put('/cities/{id}', [CityController::class, 'update'])->name('cities.update');
+        Route::delete('/cities/{id}', [CityController::class, 'destroy'])->name('cities.destroy');
+
+        //employees routs
+        Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
+        Route::get('/employees/create', [EmployeeController::class, 'create'])->name('employees.create');
+        Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
+        Route::get('/employees/{id}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
+        Route::put('/employees/{id}', [EmployeeController::class, 'update'])->name('employees.update');
+        Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
     });
 
     // guest routes

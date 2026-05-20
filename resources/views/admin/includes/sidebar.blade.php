@@ -34,7 +34,11 @@
                     request()->routeIs('admin.occasions.*') ||
                     request()->routeIs('admin.resignations.*') ||
                     request()->routeIs('admin.nationalities.*') ||
-                    request()->routeIs('admin.religions.*')
+                    request()->routeIs('admin.religions.*') ||
+                    request()->routeIs('admin.blood-groups.*') ||
+                    request()->routeIs('admin.countries.*') ||
+                    request()->routeIs('admin.governorates.*') ||
+                    request()->routeIs('admin.cities.*')
                         ? 'menu-open'
                         : '' }}">
                     <a href="#" class="nav-link {{ request()->is('admin/general-settings*') ||
@@ -47,7 +51,11 @@
                         request()->routeIs('admin.occasions.*') ||
                         request()->routeIs('admin.resignations.*') ||
                         request()->routeIs('admin.nationalities.*') ||
-                        request()->routeIs('admin.religions.*')
+                        request()->routeIs('admin.religions.*') ||
+                        request()->routeIs('admin.blood-groups.*') ||
+                        request()->routeIs('admin.countries.*') ||
+                        request()->routeIs('admin.governorates.*') ||
+                        request()->routeIs('admin.cities.*')
                             ? 'active'
                             : '' }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -98,35 +106,132 @@
                                 <i class="fas fa-briefcase"></i>
                                 <p>تصنيفات الوظائف</p>
                             </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{{ route('admin.qualifications.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.qualifications.*')) active @endif">
                                 <i class="fas fa-graduation-cap"></i>
                                 <p>مؤهلات الموظفين</p>
                             </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{{ route('admin.occasions.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.occasions.*')) active @endif">
                                 <i class="fas fa-calendar"></i>
                                 <p>المناسبات الرسمية</p>
                             </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{{ route('admin.resignations.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.resignations.*')) active @endif">
                                 <i class="fas fa-sign-out-alt"></i>
                                 <p>انواع استقالات الموظفين</p>
                             </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{{ route('admin.nationalities.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.nationalities.*')) active @endif">
                                 <i class="fas fa-flag"></i>
                                 <p>الجنسية</p>
                             </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{{ route('admin.religions.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.religions.*')) active @endif">
                                 <i class="fas fa-pray"></i>
                                 <p>الأديان</p>
                             </a>
-
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.blood-groups.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.blood-groups.*')) active @endif">
+                                <i class="fas fa-tint"></i>
+                                <p>فصائل الدم</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.countries.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.countries.*')) active @endif">
+                                <i class="fas fa-globe"></i>
+                                <p>الدول</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.governorates.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.governorates.*')) active @endif">
+                                <i class="fas fa-map"></i>
+                                <p>المحافظات</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.cities.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.cities.*')) active @endif">
+                                <i class="fas fa-city"></i>
+                                <p>المدن</p>
+                            </a>
                         </li>
                     </ul>
                 </li>
+                <li class="nav-item has-treeview  {{
+                    request()->routeIs('admin.employees.*')
+                        ? 'menu-open'
+                        : '' }}">
+                    <a href="#" class="nav-link {{
+                        request()->routeIs('admin.employees.*')
+                            ? 'active'
+                            : '' }}">
+                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <p>
+                            قائمة ِشئون الموظفين
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.employees.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.employees.*')) active @endif ">
+                                <i class="fas fa-calendar"></i>
+                                <p>بيانات الموظفين</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.financeCalendars.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.financeCalendars.*')) active @endif">
+                                <i class="fas fa-calendar"></i>
+                                <p>بيانات موظفين الإدارة</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.financeCalendars.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.financeCalendars.*')) active @endif">
+                                <i class="fas fa-calendar"></i>
+                                <p>انواع الإضافى للراتب</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.financeCalendars.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.financeCalendars.*')) active @endif">
+                                <i class="fas fa-calendar"></i>
+                                <p>انواع الخصم للراتب</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.financeCalendars.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.financeCalendars.*')) active @endif">
+                                <i class="fas fa-calendar"></i>
+                                <p>انواع البدلات</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.financeCalendars.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.financeCalendars.*')) active @endif">
+                                <i class="fas fa-calendar"></i>
+                                <p>هواتف الموظفين</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

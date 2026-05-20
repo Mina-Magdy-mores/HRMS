@@ -80,12 +80,32 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereUpdatedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereUsername($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\City> $addedCities
+ * @property-read int|null $added_cities_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Country> $addedCountries
+ * @property-read int|null $added_countries_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $addedEmployees
+ * @property-read int|null $added_employees_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Governorate> $addedGovernorates
+ * @property-read int|null $added_governorates_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Nationality> $addedNationality
  * @property-read int|null $added_nationality_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Religion> $addedReligion
+ * @property-read int|null $added_religion_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Resignation> $addedResignation
  * @property-read int|null $added_resignation_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\City> $updatedCities
+ * @property-read int|null $updated_cities_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Country> $updatedCountries
+ * @property-read int|null $updated_countries_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $updatedEmployees
+ * @property-read int|null $updated_employees_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Governorate> $updatedGovernorates
+ * @property-read int|null $updated_governorates_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Nationality> $updatedNationality
  * @property-read int|null $updated_nationality_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Religion> $updatedReligion
+ * @property-read int|null $updated_religion_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Resignation> $updatedResignation
  * @property-read int|null $updated_resignation_count
  */
@@ -157,6 +177,31 @@ namespace App\Models{
 /**
  * @property int $id
  * @property string $name
+ * @property int $status
+ * @property int $company_id
+ * @property int $added_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BloodGroup newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BloodGroup newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BloodGroup query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BloodGroup whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BloodGroup whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BloodGroup whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BloodGroup whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BloodGroup whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BloodGroup whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BloodGroup whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|BloodGroup whereUpdatedBy($value)
+ */
+	class BloodGroup extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property string $name
  * @property string $address
  * @property string $phone
  * @property string|null $email
@@ -191,6 +236,66 @@ namespace App\Models{
 /**
  * @property int $id
  * @property string $name
+ * @property int $status
+ * @property int $company_id
+ * @property int $governorate_id
+ * @property int $added_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin|null $createdBy
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Governorate> $governorates
+ * @property-read int|null $governorates_count
+ * @property-read \App\Models\Admin|null $updatedBy
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|City newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|City newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|City query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|City whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|City whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|City whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|City whereGovernorateId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|City whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|City whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|City whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|City whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|City whereUpdatedBy($value)
+ */
+	class City extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property string $name
+ * @property int $status
+ * @property int $company_id
+ * @property int $added_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin|null $createdBy
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Governorate> $governorates
+ * @property-read int|null $governorates_count
+ * @property-read \App\Models\Admin|null $updatedBy
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereUpdatedBy($value)
+ */
+	class Country extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property string $name
  * @property string $number
  * @property string|null $description
  * @property int $company_id
@@ -215,8 +320,182 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Department whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Department whereUpdatedBy($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
+ * @property-read int|null $employees_count
  */
 	class Department extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property int $employee_code Employee Code unique identifier
+ * @property string $fingerprint_code Fingerprint Code unique identifier
+ * @property string $name
+ * @property string|null $birth_date
+ * @property string|null $email
+ * @property string|null $home_telephone
+ * @property string|null $work_telephone
+ * @property int|null $blood_group_id
+ * @property string|null $stable_address
+ * @property int|null $country_id
+ * @property int|null $governorate_id
+ * @property int|null $city_id
+ * @property int $children_count
+ * @property int|null $gender
+ * @property int|null $marital_status 1: Single, 2: Married, 3: engaged , 4: Widowed , 5: Divorced
+ * @property int|null $military_status 1: Active, 2: Resigned, 3: Discharged
+ * @property string|null $military_start_date
+ * @property string|null $military_end_date
+ * @property string|null $military_weapon
+ * @property string|null $military_exemption_date
+ * @property string|null $military_exemption_reason
+ * @property int $driving_license 1: Yes, 0: No
+ * @property string|null $driving_license_number
+ * @property int|null $religion_id
+ * @property int|null $qualifications_id
+ * @property string|null $qualification_year
+ * @property int|null $graduation_grade 1: Excellent, 2: Very Good, 3: Good, 4: Fair, 5: Poor
+ * @property string|null $graduation_specialization
+ * @property string|null $hire_date
+ * @property string|null $hire_date_day_month_year
+ * @property int $employment_status 1: Active, 0: Inactive
+ * @property int|null $resignation_id
+ * @property string|null $resignation_date
+ * @property string|null $resignation_reason
+ * @property int|null $motivation_type 0: None, 1: Fixed, 2: Variable
+ * @property numeric|null $motivation_amount
+ * @property int|null $payment_method 1: Cash, 2: Bank Transfer, 3: Check
+ * @property string|null $bank_account_number
+ * @property int|null $has_disability 1: Yes, 0: No
+ * @property string|null $disability_description
+ * @property int|null $has_relative 1: Yes, 0: No
+ * @property string|null $relative_description
+ * @property string|null $urgent_contact_details
+ * @property numeric|null $daily_work_hours
+ * @property int $job_id
+ * @property int $department_id
+ * @property int $nationality_id
+ * @property string|null $nationality_number
+ * @property string|null $nationality_expiry_date
+ * @property string|null $nationality_place_of_issue
+ * @property string|null $sponsor_name
+ * @property string|null $passport_number
+ * @property string|null $passport_expiry_date
+ * @property string|null $passport_place_of_issue
+ * @property string|null $image
+ * @property numeric|null $salary
+ * @property int|null $lang_id
+ * @property int $company_id
+ * @property int $added_by
+ * @property int|null $updated_by
+ * @property int $fixed_shift
+ * @property int|null $shift_type_id
+ * @property numeric|null $payment_per_day
+ * @property int|null $has_social_insurance 1: Yes, 0: No
+ * @property numeric|null $social_insurance_amount
+ * @property string|null $social_insurance_number
+ * @property int|null $has_medical_insurance 1: Yes, 0: No
+ * @property numeric|null $medical_insurance_amount
+ * @property int $fixed_allowance
+ * @property int $has_attendance 1: Yes, 0: No
+ * @property int $vacation_formula
+ * @property int $active_for_vacation
+ * @property int $has_sensitive_data
+ * @property int $branch_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $addedBy
+ * @property-read \App\Models\Department $department
+ * @property-read \App\Models\JobsCategory $job
+ * @property-read \App\Models\Nationality $nationality
+ * @property-read \App\Models\Qualification|null $qualification
+ * @property-read \App\Models\Religion|null $religion
+ * @property-read \App\Models\Resignation|null $resignation
+ * @property-read \App\Models\ShiftsType|null $shiftType
+ * @property-read \App\Models\Admin|null $updatedBy
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereActiveForVacation($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereBankAccountNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereBirthDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereBloodGroupId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereBranchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereChildrenCount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereCityId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereCountryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDailyWorkHours($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDepartmentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDisabilityDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDrivingLicense($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDrivingLicenseNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereEmployeeCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereEmploymentStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereFingerprintCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereFixedAllowance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereFixedShift($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereGender($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereGovernorateId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereGraduationGrade($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereGraduationSpecialization($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereHasAttendance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereHasDisability($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereHasMedicalInsurance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereHasRelative($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereHasSensitiveData($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereHasSocialInsurance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereHireDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereHireDateDayMonthYear($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereHomeTelephone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereImage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereJobId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereLangId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereMaritalStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereMedicalInsuranceAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereMilitaryEndDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereMilitaryExemptionDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereMilitaryExemptionReason($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereMilitaryStartDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereMilitaryStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereMilitaryWeapon($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereMotivationAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereMotivationType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereNationalityExpiryDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereNationalityId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereNationalityNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereNationalityPlaceOfIssue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee wherePassportExpiryDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee wherePassportNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee wherePassportPlaceOfIssue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee wherePaymentMethod($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee wherePaymentPerDay($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereQualificationYear($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereQualificationsId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereRelativeDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereReligionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereResignationDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereResignationId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereResignationReason($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereSalary($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereShiftTypeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereSocialInsuranceAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereSocialInsuranceNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereSponsorName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereStableAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereUpdatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereUrgentContactDetails($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereVacationFormula($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereWorkTelephone($value)
+ */
+	class Employee extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -307,6 +586,38 @@ namespace App\Models{
  * @property string $name
  * @property int $status
  * @property int $company_id
+ * @property int $country_id
+ * @property int $added_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\City> $cities
+ * @property-read int|null $cities_count
+ * @property-read \App\Models\Country $country
+ * @property-read \App\Models\Admin|null $createdBy
+ * @property-read \App\Models\Admin|null $updatedBy
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Governorate newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Governorate newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Governorate query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Governorate whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Governorate whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Governorate whereCountryId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Governorate whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Governorate whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Governorate whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Governorate whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Governorate whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Governorate whereUpdatedBy($value)
+ */
+	class Governorate extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property string $name
+ * @property int $status
+ * @property int $company_id
  * @property int $added_by
  * @property int $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -325,6 +636,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JobsCategory whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|JobsCategory whereUpdatedBy($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
+ * @property-read int|null $employees_count
  */
 	class JobsCategory extends \Eloquent {}
 }
@@ -360,11 +673,13 @@ namespace App\Models{
  * @property int $status
  * @property int $company_id
  * @property int $added_by
- * @property int $updated_by
+ * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Admin $addedBy
- * @property-read \App\Models\Admin $updatedBy
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
+ * @property-read int|null $employees_count
+ * @property-read \App\Models\Admin|null $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Nationality newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Nationality newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Nationality query()
@@ -438,17 +753,37 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification whereUpdatedBy($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
+ * @property-read int|null $employees_count
  */
 	class Qualification extends \Eloquent {}
 }
 
 namespace App\Models{
 /**
- * @property-read \App\Models\Admin|null $addedBy
+ * @property int $id
+ * @property string $name
+ * @property int $status
+ * @property int $company_id
+ * @property int $added_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $addedBy
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
+ * @property-read int|null $employees_count
  * @property-read \App\Models\Admin|null $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Religion newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Religion newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Religion query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Religion whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Religion whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Religion whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Religion whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Religion whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Religion whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Religion whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Religion whereUpdatedBy($value)
  */
 	class Religion extends \Eloquent {}
 }
@@ -460,11 +795,13 @@ namespace App\Models{
  * @property int $status
  * @property int $company_id
  * @property int $added_by
- * @property int $updated_by
+ * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Admin $addedBy
- * @property-read \App\Models\Admin $updatedBy
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
+ * @property-read int|null $employees_count
+ * @property-read \App\Models\Admin|null $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Resignation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Resignation newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Resignation query()
@@ -510,6 +847,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType whereUpdatedBy($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
+ * @property-read int|null $employees_count
  */
 	class ShiftsType extends \Eloquent {}
 }

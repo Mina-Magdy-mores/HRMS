@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 #[Guarded([])]
 class Nationality extends Model
 {
-        public function addedBy()
+    public function addedBy()
     {
         return $this->belongsTo(Admin::class, 'added_by');
     }
@@ -16,5 +16,10 @@ class Nationality extends Model
     public function updatedBy()
     {
         return $this->belongsTo(Admin::class, 'updated_by');
+    }
+
+    public function employees()
+    {
+        return $this->hasMany(Employee::class, 'nationality_id');
     }
 }

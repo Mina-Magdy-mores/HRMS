@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Model;
 
 #[Guarded([])]
-class Religion extends Model
+class BloodGroup extends Model
 {
     public function addedBy()
     {
@@ -17,9 +17,9 @@ class Religion extends Model
     {
         return $this->belongsTo(Admin::class, 'updated_by');
     }
-
-    public function employees()
+        public function employees()
     {
-        return $this->hasMany(Employee::class, 'religion_id');
+        return $this->hasMany(Employee::class, 'qualifications_id');
     }
+
 }

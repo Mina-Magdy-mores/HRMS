@@ -192,6 +192,44 @@ class Admin extends User
     {
         return $this->hasMany(Religion::class, 'updated_by');
     }
-
-
+    public function addedEmployees()
+    {
+        return $this->hasMany(Employee::class, 'added_by');
+    }
+    public function updatedEmployees()
+    {
+        return $this->hasMany(Employee::class, 'updated_by');
+    }
+    public function addedCountries()
+    {
+        return $this->hasMany(Country::class, 'added_by');
+    }
+    public function updatedCountries()
+    {
+        return $this->hasMany(Country::class, 'updated_by');
+    }
+    public function addedGovernorates()
+    {
+        return $this->hasMany(Governorate::class, 'added_by');
+    }
+    public function updatedGovernorates()
+    {
+        return $this->hasMany(Governorate::class, 'updated_by');
+    }
+    public function addedCities()
+    {
+        return $this->hasMany(City::class, 'added_by');
+    }
+    public function updatedCities()
+    {
+        return $this->hasMany(City::class, 'updated_by');
+    }
+    public function addedBloodGroup()
+    {
+        return $this->hasMany(BloodGroup::class, 'added_by');
+    }
+    public function updatedBloodGroup()
+    {
+        return $this->hasMany(BloodGroup::class, 'updated_by');
+    }
 }
