@@ -15,6 +15,7 @@ use App\Models\Nationality;
 use App\Models\Qualification;
 use App\Models\Religion;
 use App\Models\Resignation;
+use App\Http\Requests\EmployeeRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -89,7 +90,7 @@ class EmployeeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(EmployeeRequest $request)
     {
         //
     }

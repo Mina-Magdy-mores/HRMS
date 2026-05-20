@@ -338,9 +338,16 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label>الدولة</label>
-                                            <input type="number" name="country_id" value="{{ old('country_id') }}"
-                                                class="form-control {{ $errors->has('country_id') ? 'is-invalid' : '' }}"
-                                                placeholder="أدخل معرف الدولة">
+                                            <select name="country_id"
+                                                class="form-control select2 {{ $errors->has('country_id') ? 'is-invalid' : '' }}">
+                                                <option value="">اختر الدولة</option>
+                                                @foreach($countries as $country)
+                                                <option value="{{ $country->id }}" {{ old('country_id')==$country->id ?
+                                                    'selected' : '' }}>
+                                                    {{ $country->name }}
+                                                </option>
+                                                @endforeach
+                                            </select>
                                             @include('admin.errors.errors', ['value' => 'country_id'])
                                         </div>
                                     </div>
@@ -348,10 +355,16 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label>المحافظة</label>
-                                            <input type="number" name="governorate_id"
-                                                value="{{ old('governorate_id') }}"
-                                                class="form-control {{ $errors->has('governorate_id') ? 'is-invalid' : '' }}"
-                                                placeholder="أدخل معرف المحافظة">
+                                            <select name="governorate_id"
+                                                class="form-control select2 {{ $errors->has('governorate_id') ? 'is-invalid' : '' }}">
+                                                <option value="">اختر المحافظة</option>
+                                                @foreach($governorates as $governorate)
+                                                <option value="{{ $governorate->id }}" {{
+                                                    old('governorate_id')==$governorate->id ? 'selected' : '' }}>
+                                                    {{ $governorate->name }}
+                                                </option>
+                                                @endforeach
+                                            </select>
                                             @include('admin.errors.errors', ['value' => 'governorate_id'])
                                         </div>
                                     </div>
@@ -359,10 +372,34 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label>المدينة</label>
-                                            <input type="number" name="city_id" value="{{ old('city_id') }}"
-                                                class="form-control {{ $errors->has('city_id') ? 'is-invalid' : '' }}"
-                                                placeholder="أدخل معرف المدينة">
+                                            <select name="city_id"
+                                                class="form-control select2 {{ $errors->has('city_id') ? 'is-invalid' : '' }}">
+                                                <option value="">اختر المدينة</option>
+                                                @foreach($cities as $city)
+                                                <option value="{{ $city->id }}" {{ old('city_id')==$city->id ?
+                                                    'selected' : '' }}>
+                                                    {{ $city->name }}
+                                                </option>
+                                                @endforeach
+                                            </select>
                                             @include('admin.errors.errors', ['value' => 'city_id'])
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>فصيلة الدم</label>
+                                            <select name="blood_group_id"
+                                                class="form-control select2 {{ $errors->has('blood_group_id') ? 'is-invalid' : '' }}">
+                                                <option value="">اختر فصيلة الدم</option>
+                                                @foreach($bloodGroups as $bloodGroup)
+                                                <option value="{{ $bloodGroup->id }}" {{
+                                                    old('blood_group_id')==$bloodGroup->id ? 'selected' : '' }}>
+                                                    {{ $bloodGroup->name }}
+                                                </option>
+                                                @endforeach
+                                            </select>
+                                            @include('admin.errors.errors', ['value' => 'blood_group_id'])
                                         </div>
                                     </div>
 
@@ -388,16 +425,6 @@
                                                 class="form-control {{ $errors->has('driving_license_number') ? 'is-invalid' : '' }}"
                                                 placeholder="أدخل رقم رخصة القيادة">
                                             @include('admin.errors.errors', ['value' => 'driving_license_number'])
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>فصيلة الدم</label>
-                                            <input type="number" name="blood_group_id"
-                                                value="{{ old('blood_group_id') }}"
-                                                class="form-control {{ $errors->has('blood_group_id') ? 'is-invalid' : '' }}"
-                                                placeholder="أدخل فصيلة الدم">
-                                            @include('admin.errors.errors', ['value' => 'blood_group_id'])
                                         </div>
                                     </div>
                                 </div>
@@ -840,6 +867,17 @@
                                                 </option>
                                             </select>
                                             @include('admin.errors.errors', ['value' => 'has_attendance'])
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>صيغة الإجازة</label>
+                                            <input type="number" name="vacation_formula"
+                                                value="{{ old('vacation_formula') }}"
+                                                class="form-control {{ $errors->has('vacation_formula') ? 'is-invalid' : '' }}"
+                                                placeholder="أدخل صيغة الإجازة">
+                                            @include('admin.errors.errors', ['value' => 'vacation_formula'])
                                         </div>
                                     </div>
 

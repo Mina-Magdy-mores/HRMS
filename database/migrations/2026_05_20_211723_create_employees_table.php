@@ -19,11 +19,11 @@ return new class extends Migration {
             $table->string('email')->unique()->nullable();
             $table->string('home_telephone')->nullable();
             $table->string('work_telephone')->nullable();
-            $table->integer('blood_group_id')->nullable();
+            $table->foreignId('blood_group_id')->nullable()->constrained('blood_groups')->cascadeOnUpdate();
             $table->string('stable_address')->nullable();
-            $table->integer('country_id')->nullable();
-            $table->integer('governorate_id')->nullable();
-            $table->integer('city_id')->nullable();
+            $table->foreignId('country_id')->nullable()->constrained('countries')->cascadeOnUpdate();
+            $table->foreignId('governorate_id')->nullable()->constrained('governorates')->cascadeOnUpdate();
+            $table->foreignId('city_id')->nullable()->constrained('cities')->cascadeOnUpdate();
             $table->integer('children_count')->default(0);
             $table->tinyInteger('gender')->nullable();
             $table->integer('marital_status')->nullable()->comment('1: Single, 2: Married, 3: engaged , 4: Widowed , 5: Divorced');
@@ -85,7 +85,7 @@ return new class extends Migration {
             $table->tinyInteger('vacation_formula')->default(0);
             $table->tinyInteger('active_for_vacation')->default(0);
             $table->tinyInteger('has_sensitive_data')->default(0);
-            $table->bigInteger('branch_id')->default(1);
+            $table->foreignId('branch_id')->default(1)->constrained('branches')->cascadeOnUpdate();
             $table->timestamps();
         });
     }
