@@ -53,6 +53,27 @@ class EmployeeController extends Controller
         );
         return view('admin.employees.index', compact('employees'));
     }
+    public function getDetails($id)
+    {
+        $employee = Employee::with([
+            'bloodGroup',
+            'country',
+            'governorate',
+            'city',
+            'religion',
+            'qualification',
+            'job',
+            'department',
+            'nationality',
+            'shiftType',
+            'branch',
+            'resignation',
+            'addedBy',
+            'updatedBy'
+        ])->findOrFail($id);
+
+        return view('admin.employees.modal_details', compact('employee'));
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -60,17 +81,17 @@ class EmployeeController extends Controller
     public function create()
     {
         $company_id = Auth::user()->company_id;
-        $religions = get_cols_where(Religion::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1]);
-        $qualifications = get_cols_where(Qualification::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1]);
-        $resignations = get_cols_where(Resignation::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1]);
-        $jobs = get_cols_where(JobsCategory::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1]);
-        $departments = get_cols_where(Department::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1]);
-        $nationalities = get_cols_where(Nationality::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1]);
-        $branches = get_cols_where(Branche::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1]);
-        $bloodGroups = get_cols_where(BloodGroup::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1]);
-        $countries = get_cols_where(Country::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1]);
-        $governorates = get_cols_where(Governorate::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1]);
-        $cities = get_cols_where(City::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1]);
+        $religions = get_cols_where(Religion::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $qualifications = get_cols_where(Qualification::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $resignations = get_cols_where(Resignation::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $jobs = get_cols_where(JobsCategory::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $departments = get_cols_where(Department::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $nationalities = get_cols_where(Nationality::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $branches = get_cols_where(Branche::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $bloodGroups = get_cols_where(BloodGroup::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $countries = get_cols_where(Country::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $governorates = get_cols_where(Governorate::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $cities = get_cols_where(City::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
 
         return view('admin.employees.create', compact(
             'religions',

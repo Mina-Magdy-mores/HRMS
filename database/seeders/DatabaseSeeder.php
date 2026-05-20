@@ -1,13 +1,8 @@
 <?php
 
 namespace Database\Seeders;
-
-use App\Models\Admin;
-use App\Models\AdminPanelSetting;
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -25,39 +20,36 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        Admin::factory()->create([
-            'name' => 'admin',
-            'email' => 'admin@admin.com',
-            'username' => 'admin',
-            'password' => Hash::make('admin'), // password
-            'status' => 1,
-            'date' => date('Y-m-d H:i:s'),
-            'company_id' => 1,
-            'added_by' => 1,
-            'updated_by' => 1
+        $this->call([
+                // 1. الأول المدير (عشان added_by يبقى موجود)
+            AdminSeeder::class,
+
+                // 2. البيانات الأساسية (اللي عنده foreign key للمدير)
+            BloodGroupSeeder::class,
+            NationalitySeeder::class,
+            ReligionSeeder::class,
+            CountrySeeder::class,
+            GovernorateSeeder::class,
+            CitySeeder::class,
+
+                // 3. باقي البيانات
+            AdminPanelSettingSeeder::class,
+            BranchSeeder::class,
+            DepartmentSeeder::class,
+            JobsCategorySeeder::class,
+            QualificationSeeder::class,
+            ShiftsTypeSeeder::class,
+            FinanceCalendarSeeder::class,
+            MonthSeeder::class,
+            FinanceMonthlyCalendarSeeder::class,
+            OccasionSeeder::class,
+            ResignationSeeder::class,
+            
+                //4. بيانات الموظفين
+            EmployeeSeeder::class,
+
         ]);
-        AdminPanelSetting::factory()->create([
-            'company_name' => 'company_name',
-            'status' => 1,
-            'image' => 'image',
-            'phone' => 'phone',
-            'address' => 'address',
-            'email' => 'email',
-            'created_by' => 1,
-            'updated_by' => 1,
-            'company_id' => 1,
-            'after_minute_calculate_delay' => 1,
-            'after_minute_calculate_early_departure' => 1,
-            'after_minute_quarter_day_cut' => 1,
-            'after_days_half_day_cut' => 1,
-            'after_days_allday_day_cut' => 1,
-            'monthly_vacation_balance' => 1,
-            'after_days_begin_vacation' => 1,
-            'first_balance_begin_vacation' => 1,
-            'sanctions_value_first_absence' => 1,
-            'sanctions_value_second_absence' => 1,
-            'sanctions_value_third_absence' => 1,
-            'sanctions_value_fourth_absence' => 1
-        ]);
+
+        $this->command->info('✅ All seeders completed successfully!');
     }
 }

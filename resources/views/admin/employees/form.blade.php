@@ -210,10 +210,10 @@
 
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>دين</label>
+                                            <label>الديانة</label>
                                             <select name="religion_id"
                                                 class="form-control select2 {{ $errors->has('religion_id') ? 'is-invalid' : '' }}">
-                                                <option value="">اختر الدين</option>
+                                                <option value="">اختر الديانة</option>
                                                 @foreach($religions as $religion)
                                                 <option value="{{ $religion->id }}" {{ old('religion_id')==$religion->id
                                                     ? 'selected' : '' }}>

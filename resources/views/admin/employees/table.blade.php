@@ -2,496 +2,242 @@
 
     @php
     $genderLabels = [1 => 'ذكر', 2 => 'أنثى'];
-    $maritalStatusLabels = [1 => 'أعزب', 2 => 'متزوج', 3 => 'مخطوب', 4 => 'أرمل', 5 => 'مطلق'];
-    $militaryStatusLabels = [1 => 'نشط', 2 => 'مستقيل', 3 => 'مُنهي الخدمة'];
-    $graduationGradeLabels = [1 => 'ممتاز', 2 => 'جيد', 3 => 'مقبول', 4 => 'ضعيف'];
-    $motivationTypeLabels = [0 => 'لا يوجد', 1 => 'ثابت', 2 => 'متغير'];
-    $paymentMethodLabels = [1 => 'كاش', 2 => 'تحويل بنكي', 3 => 'شيك'];
-    $yesNoLabels = [0 => 'لا', 1 => 'نعم'];
-    $employmentStatusLabels = [1 => 'نشط', 0 => 'غير نشط'];
+    $employmentStatusLabels = [1 => '<span class="badge badge-success px-3 py-2"><i class="fas fa-check-circle"></i> نشط</span>', 0 => '<span class="badge badge-danger px-3 py-2"><i class="fas fa-times-circle"></i> غير نشط</span>'];
+    $yesNoLabels = [0 => '<span class="badge badge-secondary">لا</span>', 1 => '<span class="badge badge-success">نعم</span>'];
     @endphp
 
-    @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show">
-        <i class="fas fa-check-circle"></i>
-        {{ session('success') }}
-        <button type="button" class="close text-white text-right" data-dismiss="alert">
-            <span>&times;</span>
-        </button>
-    </div>
-    @endif
-
-    @if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show">
-        <i class="fas fa-times-circle"></i>
-        {{ session('error') }}
-        <button type="button" class="close text-white text-right" data-dismiss="alert">
-            <span>&times;</span>
-        </button>
-    </div>
-    @endif
-
+    <!-- Info Boxes -->
     <div class="row mb-4">
-        <div class="col-12">
-            <div class="card card-primary card-outline shadow">
-                <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <div>
-                        <h3 class="card-title mb-0">
-                            <i class="fas fa-users"></i>
-                            قائمة الموظفين
-                        </h3>
-                        <p class="text-muted mb-0">عرض جميع الموظفين بتنسيق منظم ومقسّم حسب نوع البيانات.</p>
-                    </div>
-                    <div class="text-right">
-                        <span class="badge badge-primary px-4 py-2">
-                            عدد الموظفين: {{ $employees->total() ?? $employees->count() }}
-                        </span>
-                    </div>
+
+        <div class="col-lg-3 col-md-6 col-12">
+            <div class="info-box shadow-sm">
+                <span class="info-box-icon bg-primary">
+                    <i class="fas fa-users"></i>
+                </span>
+                <div class="info-box-content">
+                    <span class="info-box-text">عدد الموظفين</span>
+                    <span class="info-box-number">{{ $employees->total() ?? $employees->count() }}</span>
                 </div>
             </div>
         </div>
+
+        <div class="col-lg-3 col-md-6 col-12">
+            <div class="info-box shadow-sm">
+                <span class="info-box-icon bg-success">
+                    <i class="fas fa-user-check"></i>
+                </span>
+                <div class="info-box-content">
+                    <span class="info-box-text">الموظفين النشطين</span>
+                    <span class="info-box-number">{{ $employees->where('employment_status', 1)->count() }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 col-12">
+            <div class="info-box shadow-sm">
+                <span class="info-box-icon bg-danger">
+                    <i class="fas fa-user-times"></i>
+                </span>
+                <div class="info-box-content">
+                    <span class="info-box-text">الموظفين غير النشطين</span>
+                    <span class="info-box-number">{{ $employees->where('employment_status', 0)->count() }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 col-12">
+            <div class="info-box shadow-sm">
+                <span class="info-box-icon bg-warning">
+                    <i class="fas fa-venus-mars"></i>
+                </span>
+                <div class="info-box-content">
+                    <span class="info-box-text">الذكور / الإناث</span>
+                    <span class="info-box-number">{{ $employees->where('gender', 1)->count() }} / {{ $employees->where('gender', 2)->count() }}</span>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    @forelse ($employees as $employee)
-    <div class="card card-outline shadow mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <div>
-                <h3 class="card-title mb-0">
-                    <i class="fas fa-id-card"></i>
-                    {{ $employee->name ?? 'بدون اسم' }}
-                </h3>
-                <small class="text-muted">رقم الموظف: {{ $employee->employee_code ?? '---' }} | معرف البصمة: {{
-                    $employee->fingerprint_code ?? '---' }}</small>
-            </div>
-            <div class="d-flex gap-2">
-                <a href="{{ route('admin.employees.edit', $employee->id) }}" class="btn btn-sm btn-warning shadow-sm">
-                    <i class="fas fa-edit"></i>
-                    تعديل
+    <!-- Main Card -->
+    <div class="card card-primary card-outline shadow">
+
+        <div class="card-header">
+
+            <h3 class="card-title">
+                <i class="fas fa-table"></i>
+                جدول الموظفين
+            </h3>
+
+            <div class="card-tools">
+                <a href="{{ route('admin.employees.create') }}" class="btn btn-primary btn-sm shadow-sm">
+                    <i class="fas fa-plus-circle"></i>
+                    إضافة موظف
                 </a>
-                <form action="{{ route('admin.employees.destroy', $employee->id) }}" method="POST" class="m-0">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-sm btn-danger are_you_sure shadow-sm">
-                        <i class="fas fa-trash"></i>
-                        حذف
-                    </button>
-                </form>
             </div>
+
         </div>
 
         <div class="card-body">
 
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h5 class="mb-3 text-primary">
-                        <i class="fas fa-info-circle"></i>
-                        البيانات الأساسية
-                    </h5>
-                </div>
-
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">الإسم</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->name ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">كود الموظف</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->employee_code ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">كود البصمة</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->fingerprint_code ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">تاريخ الميلاد</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->birth_date ?
-                        \Carbon\Carbon::parse($employee->birth_date)->format('Y-m-d') : '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">الجنس</label>
-                    <p class="form-control-plaintext mb-0">{{ $genderLabels[$employee->gender] ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">الحالة الاجتماعية</label>
-                    <p class="form-control-plaintext mb-0">{{ $maritalStatusLabels[$employee->marital_status] ?? '---'
-                        }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">معرف الموظف</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->id ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">عدد الأطفال</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->children_count ?? 0 }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">رخصة قيادة</label>
-                    <p class="form-control-plaintext mb-0">{{ $yesNoLabels[$employee->driving_license] ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">رقم رخصة القيادة</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->driving_license_number ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">فئة الدم</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->blood_group_id ?? '---' }}</p>
-                </div>
-                <div class="col-lg-6 col-md-8 col-12 mb-3">
-                    <label class="font-weight-bold">العنوان الثابت</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->stable_address ?? '---' }}</p>
-                </div>
+            @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show">
+                <i class="fas fa-check-circle"></i>
+                {{ session('success') }}
+                <button type="button" class="close text-white text-right" data-dismiss="alert">
+                    <span>&times;</span>
+                </button>
             </div>
+            @endif
 
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h5 class="mb-3 text-primary">
-                        <i class="fas fa-phone"></i>
-                        بيانات الاتصال والعنوان
-                    </h5>
-                </div>
-
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">البريد الإلكتروني</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->email ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">هاتف المنزل</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->home_telephone ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">هاتف العمل</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->work_telephone ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">تفاصيل الاتصال الطارئ</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->urgent_contact_details ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">الدولة</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->country_id ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">المحافظة</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->governorate_id ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">المدينة</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->city_id ?? '---' }}</p>
-                </div>
+            @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show">
+                <i class="fas fa-times-circle"></i>
+                {{ session('error') }}
+                <button type="button" class="close text-white text-right" data-dismiss="alert">
+                    <span>&times;</span>
+                </button>
             </div>
+            @endif
 
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h5 class="mb-3 text-primary">
-                        <i class="fas fa-shield-alt"></i>
-                        الحالة العسكرية
-                    </h5>
-                </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover text-center align-middle">
 
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">الحالة العسكرية</label>
-                    <p class="form-control-plaintext mb-0">{{ $militaryStatusLabels[$employee->military_status] ?? '---'
-                        }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">تاريخ بداية الخدمة</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->military_start_date ?
-                        \Carbon\Carbon::parse($employee->military_start_date)->format('Y-m-d') : '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">تاريخ إنهاء الخدمة</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->military_end_date ?
-                        \Carbon\Carbon::parse($employee->military_end_date)->format('Y-m-d') : '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">السلاح</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->military_weapon ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">تاريخ الإعفاء</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->military_exemption_date ?
-                        \Carbon\Carbon::parse($employee->military_exemption_date)->format('Y-m-d') : '---' }}</p>
-                </div>
-                <div class="col-lg-9 col-md-8 col-12 mb-3">
-                    <label class="font-weight-bold">سبب الإعفاء</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->military_exemption_reason ?? '---' }}</p>
-                </div>
-            </div>
+                    <thead class="bg-primary text-white">
+                        <tr>
+                            <th>#</th>
+                            <th>كود الموظف</th>
+                            <th>كود البصمة</th>
+                            <th>الإسم</th>
+                            <th>الجنس</th>
+                            <th>القسم</th>
+                            <th>الوظيفة</th>
+                            <th>الهاتف</th>
+                            <th>الراتب</th>
+                            <th>الحالة الوظيفية</th>
+                            <th>تاريخ التعيين</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
 
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h5 class="mb-3 text-primary">
-                        <i class="fas fa-graduation-cap"></i>
-                        المؤهل والوثائق
-                    </h5>
-                </div>
+                    <tbody>
+                        @forelse ($employees as $employee)
+                        <tr>
+                            <td>{{ $employee->id }}</td>
+                            <td>{{ $employee->employee_code ?? '---' }}</td>
+                            <td>{{ $employee->fingerprint_code ?? '---' }}</td>
+                            <td class="text-right">{{ $employee->name ?? '---' }}</td>
+                            <td>{{ $genderLabels[$employee->gender] ?? '---' }}</td>
+                            <td>{{ optional($employee->department)->name ?? '---' }}</td>
+                            <td>{{ optional($employee->job)->name ?? '---' }}</td>
+                            <td>{{ $employee->work_telephone ?? $employee->home_telephone ?? '---' }}</td>
+                            <td>{{ $employee->salary !== null ? number_format($employee->salary, 2) : '---' }}</td>
+                            <td>{!! $employmentStatusLabels[$employee->employment_status] ?? '---' !!}</td>
+                            <td>{{ $employee->hire_date ? \Carbon\Carbon::parse($employee->hire_date)->format('Y-m-d') : '---' }}</td>
+                            <td>
+                                <div class="d-flex justify-content-center align-items-center gap-1">
+                                    <button type="button" class="btn btn-sm btn-info m-1 show_employee_details" data-id="{{ $employee->id }}" title="عرض">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <a href="{{ route('admin.employees.edit', $employee->id) }}" class="btn btn-sm btn-warning m-1" title="تعديل">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form action="{{ route('admin.employees.destroy', $employee->id) }}" method="POST" class="m-0">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger are_you_sure m-1" title="حذف">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="12">
+                                <div class="alert alert-warning mb-0">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    لا توجد بيانات موظفين حالياً
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
 
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">الديانة</label>
-                    <p class="form-control-plaintext mb-0">{{ optional($employee->religion)->name ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">المؤهل</label>
-                    <p class="form-control-plaintext mb-0">{{ optional($employee->qualification)->name ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">سنة التخرج</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->qualification_year ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">تقدير التخرج</label>
-                    <p class="form-control-plaintext mb-0">{{ $graduationGradeLabels[$employee->graduation_grade] ??
-                        '---' }}</p>
-                </div>
-                <div class="col-lg-6 col-md-8 col-12 mb-3">
-                    <label class="font-weight-bold">تخصص التخرج</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->graduation_specialization ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">اسم الوظيفة</label>
-                    <p class="form-control-plaintext mb-0">{{ optional($employee->job)->name ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">القسم</label>
-                    <p class="form-control-plaintext mb-0">{{ optional($employee->department)->name ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">الجنسية</label>
-                    <p class="form-control-plaintext mb-0">{{ optional($employee->nationality)->name ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">رقم الهوية</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->nationality_number ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">تاريخ انتهاء الهوية</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->nationality_expiry_date ?
-                        \Carbon\Carbon::parse($employee->nationality_expiry_date)->format('Y-m-d') : '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">مكان إصدار الهوية</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->nationality_place_of_issue ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">اسم الكفيل</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->sponsor_name ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">رقم الجواز</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->passport_number ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">تاريخ انتهاء الجواز</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->passport_expiry_date ?
-                        \Carbon\Carbon::parse($employee->passport_expiry_date)->format('Y-m-d') : '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">مكان إصدار الجواز</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->passport_place_of_issue ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">الصورة</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->image ?? '---' }}</p>
-                </div>
-            </div>
-
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h5 class="mb-3 text-primary">
-                        <i class="fas fa-briefcase"></i>
-                        بيانات العمل والراتب
-                    </h5>
-                </div>
-
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">تاريخ التعيين</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->hire_date ?
-                        \Carbon\Carbon::parse($employee->hire_date)->format('Y-m-d') : '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">تاريخ التعيين (يوم/شهر/سنة)</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->hire_date_day_month_year ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">حالة التوظيف</label>
-                    <p class="form-control-plaintext mb-0">{{ $employmentStatusLabels[$employee->employment_status] ??
-                        '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">نوع التحفيز</label>
-                    <p class="form-control-plaintext mb-0">{{ $motivationTypeLabels[$employee->motivation_type] ?? '---'
-                        }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">قيمة التحفيز</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->motivation_amount ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">طريقة الدفع</label>
-                    <p class="form-control-plaintext mb-0">{{ $paymentMethodLabels[$employee->payment_method] ?? '---'
-                        }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">رقم الحساب البنكي</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->bank_account_number ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">الراتب</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->salary !== null ?
-                        number_format($employee->salary, 2) : '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">الدفع اليومي</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->payment_per_day ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">ثابت المرتب</label>
-                    <p class="form-control-plaintext mb-0">{{ $yesNoLabels[$employee->fixed_allowance] ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">معاش اجتماعي</label>
-                    <p class="form-control-plaintext mb-0">{{ $yesNoLabels[$employee->has_social_insurance] ?? '---' }}
-                    </p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">قيمة التأمين الاجتماعي</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->social_insurance_amount ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">رقم التأمين الاجتماعي</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->social_insurance_number ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">تأمين طبي</label>
-                    <p class="form-control-plaintext mb-0">{{ $yesNoLabels[$employee->has_medical_insurance] ?? '---' }}
-                    </p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">قيمة التأمين الطبي</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->medical_insurance_amount ?? '---' }}</p>
-                </div>
-            </div>
-
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h5 class="mb-3 text-primary">
-                        <i class="fas fa-cogs"></i>
-                        إعدادات العمل الإضافية
-                    </h5>
-                </div>
-
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">ورشة ثابتة</label>
-                    <p class="form-control-plaintext mb-0">{{ $yesNoLabels[$employee->fixed_shift] ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">نوع الورشة</label>
-                    <p class="form-control-plaintext mb-0">{{ optional($employee->shiftType)->name ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">يحتسب حضور</label>
-                    <p class="form-control-plaintext mb-0">{{ $yesNoLabels[$employee->has_attendance] ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">معادلة الإجازة</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->vacation_formula ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">نشط للإجازة</label>
-                    <p class="form-control-plaintext mb-0">{{ $yesNoLabels[$employee->active_for_vacation] ?? '---' }}
-                    </p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">إعاقة</label>
-                    <p class="form-control-plaintext mb-0">{{ $yesNoLabels[$employee->has_disability] ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">وصف الإعاقة</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->disability_description ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">أحد الأقارب</label>
-                    <p class="form-control-plaintext mb-0">{{ $yesNoLabels[$employee->has_relative] ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">تفاصيل الأقارب</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->relative_description ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">ساعات العمل اليومية</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->daily_work_hours ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">بيانات حساسة</label>
-                    <p class="form-control-plaintext mb-0">{{ $yesNoLabels[$employee->has_sensitive_data] ?? '---' }}
-                    </p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">رقم الفرع</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->branch_id ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">رقم الشركة</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->company_id ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">اللغة</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->lang_id ?? '---' }}</p>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-12">
-                    <h5 class="mb-3 text-primary">
-                        <i class="fas fa-history"></i>
-                        معلومات الإدارة والتواريخ
-                    </h5>
-                </div>
-
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">أضيف بواسطة</label>
-                    <p class="form-control-plaintext mb-0">{{ optional($employee->addedBy)->name ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">آخر تحديث بواسطة</label>
-                    <p class="form-control-plaintext mb-0">{{ optional($employee->updatedBy)->name ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">تاريخ الإضافة</label>
-                    <p class="form-control-plaintext mb-0">{{ optional($employee->created_at)->format('Y-m-d H:i') ??
-                        '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">تاريخ التحديث</label>
-                    <p class="form-control-plaintext mb-0">{{ optional($employee->updated_at)->format('Y-m-d H:i') ??
-                        '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">سبب الاستقالة</label>
-                    <p class="form-control-plaintext mb-0">{{ optional($employee->resignation)->name ?? '---' }}</p>
-                </div>
-                <div class="col-lg-3 col-md-4 col-12 mb-3">
-                    <label class="font-weight-bold">تاريخ الاستقالة</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->resignation_date ?
-                        \Carbon\Carbon::parse($employee->resignation_date)->format('Y-m-d') : '---' }}</p>
-                </div>
-                <div class="col-lg-6 col-md-8 col-12 mb-3">
-                    <label class="font-weight-bold">تفاصيل الاستقالة</label>
-                    <p class="form-control-plaintext mb-0">{{ $employee->resignation_reason ?? '---' }}</p>
+                </table>
+                {{-- Pagination --}}
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $employees->links() }}
                 </div>
             </div>
         </div>
     </div>
-    @empty
-    <div class="alert alert-warning">
-        <i class="fas fa-exclamation-circle"></i>
-        لا توجد بيانات موظفين حالياً
-    </div>
-    @endforelse
+</div>
 
-    <div class="d-flex justify-content-center">
-        {{ $employees->links() }}
+<!-- Employee Details Modal -->
+<div class="modal fade" id="employeeDetailsModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content shadow">
+
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-user-circle"></i>
+                    بيانات الموظف
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" id="employee_details_modal_body" style="max-height: 80vh; overflow-y: auto;">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">جاري التحميل...</span>
+                    </div>
+                    <p class="mt-2">جاري تحميل البيانات...</p>
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>
 
 @section('js')
+<script>
+    $(document).ready(function() {
+        $(document).on('click', '.show_employee_details', function() {
+            var id = $(this).data('id');
+
+            $('#employee_details_modal_body').html(`
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">جاري التحميل...</span>
+                    </div>
+                    <p class="mt-2">جاري تحميل البيانات...</p>
+                </div>
+            `);
+
+            $.ajax({
+                url: `/admin/employees/${id}/details`,
+                type: 'GET',
+                dataType: 'html',
+                cache: false,
+                success: function(response) {
+                    $('#employee_details_modal_body').html(response);
+                    $('#employeeDetailsModal').modal('show');
+                },
+                error: function(xhr) {
+                    $('#employee_details_modal_body').html(`
+                        <div class="alert alert-danger text-center m-3">
+                            <i class="fas fa-exclamation-circle fa-2x mb-2 d-block"></i>
+                            <strong>حدث خطأ!</strong><br>
+                            ${xhr.responseText || 'لم يتم تحميل البيانات'}
+                        </div>
+                    `);
+                    $('#employeeDetailsModal').modal('show');
+                }
+            });
+        });
+    });
+</script>
 @endsection

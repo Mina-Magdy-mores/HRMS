@@ -19,20 +19,6 @@ return new class extends Migration
             $table->tinyInteger('status')->default(1);
             $table->timestamps();
         });
-        DB::table('months')->insert([
-            ['name' => 'يناير', 'name_en' => 'January'],
-            ['name' => 'فبراير', 'name_en' => 'February'],
-            ['name' => 'مارس', 'name_en' => 'March'],
-            ['name' => 'أبريل', 'name_en' => 'April'],
-            ['name' => 'مايو', 'name_en' => 'May'],
-            ['name' => 'يونيو', 'name_en' => 'June'],
-            ['name' => 'يوليو', 'name_en' => 'July'],
-            ['name' => 'أغسطس', 'name_en' => 'August'],
-            ['name' => 'سبتمبر', 'name_en' => 'September'],
-            ['name' => 'أكتوبر', 'name_en' => 'October'],
-            ['name' => 'نوفمبر', 'name_en' => 'November'],
-            ['name' => 'ديسمبر', 'name_en' => 'December']
-        ]);
     }
 
     /**

@@ -20,7 +20,6 @@ return new class extends Migration {
             $table->foreignId('created_by')->constrained('admins')->cascadeOnUpdate();
             $table->foreignId('updated_by')->nullable()->constrained('admins')->cascadeOnUpdate();
             $table->integer('company_id');
-
             $table->timestamps();
         });
     }

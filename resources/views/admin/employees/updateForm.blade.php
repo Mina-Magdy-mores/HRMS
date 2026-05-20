@@ -416,11 +416,11 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>الدين</label>
+                                            <label>الديانة</label>
                                             <input type="number" name="religion_id"
                                                 value="{{ old('religion_id', $employee->religion_id) }}"
                                                 class="form-control {{ $errors->has('religion_id') ? 'is-invalid' : '' }}"
-                                                placeholder="أدخل معرف الدين">
+                                                placeholder="أختر الديانة">
                                             @include('admin.errors.errors', ['value' => 'religion_id'])
                                         </div>
                                     </div>

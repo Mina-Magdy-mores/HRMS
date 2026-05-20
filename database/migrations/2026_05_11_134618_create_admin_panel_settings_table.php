@@ -33,13 +33,6 @@ return new class extends Migration {
             $table->decimal('sanctions_value_second_absence', 10, 2)->default(0)->comment('قيمه خصم الايام بعد ثاني مرة غياب بدون اذن');
             $table->decimal('sanctions_value_third_absence', 10, 2)->default(0)->comment('قيمه خصم الايام بعد ثالث مرة غياب بدون اذن');
             $table->decimal('sanctions_value_fourth_absence', 10, 2)->default(0)->comment('قيمه خصم الايام بعد رابع مرة غياب بدون اذن');
-
-
-
-
-
-
-
             $table->timestamps();
         });
     }
