@@ -184,6 +184,14 @@ class Admin extends User
     {
         return $this->hasMany(Nationality::class, 'updated_by');
     }
+    public function addedReligion()
+    {
+        return $this->hasMany(Religion::class, 'added_by');
+    }
+    public function updatedReligion()
+    {
+        return $this->hasMany(Religion::class, 'updated_by');
+    }
 
 
 }

@@ -80,8 +80,12 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereUpdatedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereUsername($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Nationality> $addedNationality
+ * @property-read int|null $added_nationality_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Resignation> $addedResignation
  * @property-read int|null $added_resignation_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Nationality> $updatedNationality
+ * @property-read int|null $updated_nationality_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Resignation> $updatedResignation
  * @property-read int|null $updated_resignation_count
  */
@@ -351,9 +355,27 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * @property int $id
+ * @property string $name
+ * @property int $status
+ * @property int $company_id
+ * @property int $added_by
+ * @property int $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $addedBy
+ * @property-read \App\Models\Admin $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Nationality newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Nationality newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Nationality query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Nationality whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Nationality whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Nationality whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Nationality whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Nationality whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Nationality whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Nationality whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Nationality whereUpdatedBy($value)
  */
 	class Nationality extends \Eloquent {}
 }
@@ -418,6 +440,17 @@ namespace App\Models{
  * @mixin \Eloquent
  */
 	class Qualification extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property-read \App\Models\Admin|null $addedBy
+ * @property-read \App\Models\Admin|null $updatedBy
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Religion newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Religion newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Religion query()
+ */
+	class Religion extends \Eloquent {}
 }
 
 namespace App\Models{

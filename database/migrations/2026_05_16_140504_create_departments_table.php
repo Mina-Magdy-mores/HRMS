@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -18,8 +17,8 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->integer('company_id');
             $table->tinyInteger('status')->default(1);
-            $table->foreignId('created_by')->constrained('admins')->cascadeOnDelete()->cascadeOnUpdate();
-            $table->foreignId('updated_by')->constrained('admins')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('created_by')->constrained('admins')->cascadeOnUpdate();
+            $table->foreignId('updated_by')->nullable()->constrained('admins')->cascadeOnUpdate();
             $table->timestamps();
         });
     }

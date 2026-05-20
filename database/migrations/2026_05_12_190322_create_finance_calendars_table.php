@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -21,13 +20,11 @@ return new class extends Migration
             $table->integer('company_id');
             $table->foreignId('added_by')
                 ->constrained('admins')
-                ->cascadeOnUpdate()
-                ->cascadeOnDelete();
-            $table->foreignId('updated_by')
+                ->cascadeOnUpdate();
+            $table->foreignId('updated_by')->nullable()
                 ->nullable()
                 ->constrained('admins')
-                ->cascadeOnUpdate()
-                ->nullOnDelete();
+                ->cascadeOnUpdate();
             $table->timestamps();
         });
     }

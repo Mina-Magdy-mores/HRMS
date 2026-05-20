@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\JobsCategoryController;
 use App\Http\Controllers\Admin\NationalityController;
 use App\Http\Controllers\Admin\OccasionController;
 use App\Http\Controllers\Admin\QualificationController;
+use App\Http\Controllers\Admin\ReligionController;
 use App\Http\Controllers\Admin\ResignationController;
 use App\Http\Controllers\Admin\ShiftsTypeController;
 use Illuminate\Support\Facades\Route;
@@ -96,6 +97,14 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::get('/nationalities/{id}/edit', [NationalityController::class, 'edit'])->name('nationalities.edit');
         Route::put('/nationalities/{id}', [NationalityController::class, 'update'])->name('nationalities.update');
         Route::delete('/nationalities/{id}', [NationalityController::class, 'destroy'])->name('nationalities.destroy');
+
+        // religions routes
+        Route::get('/religions', [ReligionController::class, 'index'])->name('religions.index');
+        Route::get('/religions/create', [ReligionController::class, 'create'])->name('religions.create');
+        Route::post('/religions', [ReligionController::class, 'store'])->name('religions.store');
+        Route::get('/religions/{id}/edit', [ReligionController::class, 'edit'])->name('religions.edit');
+        Route::put('/religions/{id}', [ReligionController::class, 'update'])->name('religions.update');
+        Route::delete('/religions/{id}', [ReligionController::class, 'destroy'])->name('religions.destroy');
     });
 
     // guest routes

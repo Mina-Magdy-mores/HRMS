@@ -33,7 +33,8 @@
                     request()->routeIs('admin.qualifications.*') ||
                     request()->routeIs('admin.occasions.*') ||
                     request()->routeIs('admin.resignations.*') ||
-                    request()->routeIs('admin.nationalities.*')
+                    request()->routeIs('admin.nationalities.*') ||
+                    request()->routeIs('admin.religions.*')
                         ? 'menu-open'
                         : '' }}">
                     <a href="#" class="nav-link {{ request()->is('admin/general-settings*') ||
@@ -45,7 +46,8 @@
                         request()->routeIs('admin.qualifications.*') ||
                         request()->routeIs('admin.occasions.*') ||
                         request()->routeIs('admin.resignations.*') ||
-                        request()->routeIs('admin.nationalities.*')
+                        request()->routeIs('admin.nationalities.*') ||
+                        request()->routeIs('admin.religions.*')
                             ? 'active'
                             : '' }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -115,6 +117,11 @@
                                 class="nav-link @if (request()->routeIs('admin.nationalities.*')) active @endif">
                                 <i class="fas fa-flag"></i>
                                 <p>الجنسية</p>
+                            </a>
+                            <a href="{{ route('admin.religions.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.religions.*')) active @endif">
+                                <i class="fas fa-pray"></i>
+                                <p>الأديان</p>
                             </a>
 
                         </li>

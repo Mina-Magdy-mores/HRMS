@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,11 +12,11 @@ return new class extends Migration
     {
         Schema::create('finance_monthly_calendars', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('financeCalendar_id')->constrained('finance_calendars')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('financeCalendar_id')->constrained('finance_calendars')->cascadeOnUpdate();
             $table->integer('number_of_days');
             $table->string('year_and_month');
             $table->integer('finance_yr');
-            $table->foreignId('month_id')->constrained('months')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('month_id')->constrained('months')->cascadeOnUpdate();
             $table->date('start_date');
             $table->date('end_date');
             $table->tinyInteger('status')->default(0)->comment('واحد مفعل - صفر معطل');
@@ -26,13 +25,11 @@ return new class extends Migration
             $table->integer('company_id');
             $table->foreignId('added_by')
                 ->constrained('admins')
-                ->cascadeOnUpdate()
-                ->cascadeOnDelete();
-            $table->foreignId('updated_by')
+                ->cascadeOnUpdate();
+            $table->foreignId('updated_by')->nullable()
                 ->nullable()
                 ->constrained('admins')
-                ->cascadeOnUpdate()
-                ->nullOnDelete();
+                ->cascadeOnUpdate();
             $table->timestamps();
         });
     }
