@@ -26,11 +26,13 @@ class DatabaseSeeder extends Seeder
 
                 // 2. البيانات الأساسية (اللي عنده foreign key للمدير)
             BloodGroupSeeder::class,
+            MilitaryStatusSeeder::class,
             NationalitySeeder::class,
             ReligionSeeder::class,
             CountrySeeder::class,
             GovernorateSeeder::class,
             CitySeeder::class,
+            DrivingLicenseTypeSeeder::class,
 
                 // 3. باقي البيانات
             AdminPanelSettingSeeder::class,
@@ -44,7 +46,7 @@ class DatabaseSeeder extends Seeder
             FinanceMonthlyCalendarSeeder::class,
             OccasionSeeder::class,
             ResignationSeeder::class,
-            
+
                 //4. بيانات الموظفين
             EmployeeSeeder::class,
 

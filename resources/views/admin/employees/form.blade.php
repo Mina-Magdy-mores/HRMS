@@ -326,7 +326,7 @@
 
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>العنوان الثابت</label>
+                                            <label>عنوان الأقامه الحالى</label>
                                             <input type="text" name="stable_address" value="{{ old('stable_address') }}"
                                                 class="form-control {{ $errors->has('stable_address') ? 'is-invalid' : '' }}"
                                                 placeholder="أدخل العنوان الثابت">
@@ -406,8 +406,9 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label>رخصة القيادة</label>
-                                            <select name="driving_license"
+                                            <select name="driving_license" id="driving_license"
                                                 class="form-control select2 {{ $errors->has('driving_license') ? 'is-invalid' : '' }}">
+                                                <option value="">اختر الحالة</option>
                                                 <option value="0" {{ old('driving_license')=='0' ? 'selected' : '' }}>لا
                                                 </option>
                                                 <option value="1" {{ old('driving_license')=='1' ? 'selected' : '' }}>
@@ -417,8 +418,27 @@
                                         </div>
                                     </div>
 
+
                                     <div class="col-md-4">
-                                        <div class="form-group">
+                                        <div class="form-group" id="drivingLicenseTypeGroup" style="display: none;">
+                                            <label>نوع رخصة القيادة</label>
+                                            <select name="driving_license_type_id"
+                                                class="form-control select2 {{ $errors->has('driving_license_type_id') ? 'is-invalid' : '' }}">
+                                                <option value="">اختر نوع رخصة القيادة</option>
+                                                @foreach($driving_license_types as $driving_license_type)
+                                                <option value="{{ $driving_license_type->id }}" {{
+                                                    old('driving_license_type_id')==$driving_license_type->id ?
+                                                    'selected' : '' }}>
+                                                    {{ $driving_license_type->name }}
+                                                </option>
+                                                @endforeach
+                                            </select>
+                                            @include('admin.errors.errors', ['value' => 'driving_license_type_id'])
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group" id="drivingLicenseNumberGroup" style="display: none;">
                                             <label>رقم رخصة القيادة</label>
                                             <input type="text" name="driving_license_number"
                                                 value="{{ old('driving_license_number') }}"
@@ -436,22 +456,22 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label>الحالة العسكرية</label>
-                                            <select name="military_status"
+                                            <select name="military_status" id="military_status"
                                                 class="form-control select2 {{ $errors->has('military_status') ? 'is-invalid' : '' }}">
                                                 <option value="">اختر الحالة</option>
-                                                <option value="1" {{ old('military_status')=='1' ? 'selected' : '' }}>
-                                                    نشط</option>
-                                                <option value="2" {{ old('military_status')=='2' ? 'selected' : '' }}>
-                                                    استقال</option>
-                                                <option value="3" {{ old('military_status')=='3' ? 'selected' : '' }}>
-                                                    مسرح</option>
+                                                @foreach($military_statuses as $military_status)
+                                                <option value="{{ $military_status->id }}" {{
+                                                    old('military_status')==$military_status->id ? 'selected' : '' }}>
+                                                    {{ $military_status->name }}
+                                                </option>
+                                                @endforeach
                                             </select>
                                             @include('admin.errors.errors', ['value' => 'military_status'])
                                         </div>
                                     </div>
 
                                     <div class="col-md-4">
-                                        <div class="form-group">
+                                        <div class="form-group" id="military_start_date" style="display: none;">
                                             <label>بداية الخدمة العسكرية</label>
                                             <input type="date" name="military_start_date"
                                                 value="{{ old('military_start_date') }}"
@@ -461,7 +481,7 @@
                                     </div>
 
                                     <div class="col-md-4">
-                                        <div class="form-group">
+                                        <div class="form-group" id="military_end_date" style="display: none;">
                                             <label>نهاية الخدمة العسكرية</label>
                                             <input type="date" name="military_end_date"
                                                 value="{{ old('military_end_date') }}"
@@ -471,7 +491,7 @@
                                     </div>
 
                                     <div class="col-md-4">
-                                        <div class="form-group">
+                                        <div class="form-group" id="military_weapon" style="display: none;">
                                             <label>سلاح الخدمة</label>
                                             <input type="text" name="military_weapon"
                                                 value="{{ old('military_weapon') }}"
@@ -482,7 +502,7 @@
                                     </div>
 
                                     <div class="col-md-4">
-                                        <div class="form-group">
+                                        <div class="form-group" id="military_exemption_date" style="display: none;">
                                             <label>تاريخ الإعفاء</label>
                                             <input type="date" name="military_exemption_date"
                                                 value="{{ old('military_exemption_date') }}"
@@ -492,13 +512,25 @@
                                     </div>
 
                                     <div class="col-md-4">
-                                        <div class="form-group">
+                                        <div class="form-group" id="military_exemption_reason" style="display: none;">
                                             <label>سبب الإعفاء</label>
                                             <input type="text" name="military_exemption_reason"
+                                                id="military_exemption_reason"
                                                 value="{{ old('military_exemption_reason') }}"
                                                 class="form-control {{ $errors->has('military_exemption_reason') ? 'is-invalid' : '' }}"
                                                 placeholder="أدخل سبب الإعفاء">
                                             @include('admin.errors.errors', ['value' => 'military_exemption_reason'])
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group" id="postponement_reason" style="display: none;">
+                                            <label>سبب التأجيل</label>
+                                            <input type="text" name="postponement_reason" id="postponement_reason"
+                                                value="{{ old('postponement_reason') }}"
+                                                class="form-control {{ $errors->has('postponement_reason') ? 'is-invalid' : '' }}"
+                                                placeholder="أدخل سبب التأجيل">
+                                            @include('admin.errors.errors', ['value' => 'postponement_reason'])
                                         </div>
                                     </div>
 
@@ -990,7 +1022,7 @@
 
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>لديه إعاقة</label>
+                                            <label>لديه إعاقة \ عمليات سابقة</label>
                                             <select name="has_disability"
                                                 class="form-control select2 {{ $errors->has('has_disability') ? 'is-invalid' : '' }}">
                                                 <option value="">اختر</option>
@@ -1005,7 +1037,7 @@
 
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>وصف الإعاقة</label>
+                                            <label>وصف الإعاقة \ العمليات السابقة</label>
                                             <input type="text" name="disability_description"
                                                 value="{{ old('disability_description') }}"
                                                 class="form-control {{ $errors->has('disability_description') ? 'is-invalid' : '' }}"
@@ -1047,6 +1079,15 @@
                                                 class="form-control {{ $errors->has('urgent_contact_details') ? 'is-invalid' : '' }}"
                                                 placeholder="أدخل تفاصيل الاتصال العاجلة">{{ old('urgent_contact_details') }}</textarea>
                                             @include('admin.errors.errors', ['value' => 'urgent_contact_details'])
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>ملاحظات إضافية</label>
+                                            <textarea name="notes" rows="3"
+                                                class="form-control {{ $errors->has('notes') ? 'is-invalid' : '' }}"
+                                                placeholder="أدخل ملاحظات إضافية">{{ old('notes') }}</textarea>
+                                            @include('admin.errors.errors', ['value' => 'notes'])
                                         </div>
                                     </div>
                                 </div>

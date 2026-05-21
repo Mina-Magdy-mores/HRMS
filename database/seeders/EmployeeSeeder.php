@@ -15,6 +15,8 @@ use App\Models\Department;
 use App\Models\Nationality;
 use App\Models\ShiftsType;
 use App\Models\Branche;
+use App\Models\DrivingLicenseType;
+use App\Models\MilitaryStatus;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -419,6 +421,8 @@ class EmployeeSeeder extends Seeder
         $nationalities = Nationality::where('company_id', 1)->pluck('id', 'name')->toArray();
         $shifts = ShiftsType::where('company_id', 1)->pluck('id', 'type')->toArray();
         $branches = Branche::where('company_id', 1)->pluck('id', 'name')->toArray();
+        $military_statuses = MilitaryStatus::where('company_id', 1)->pluck('id', 'name')->toArray();
+        $driving_license_types = DrivingLicenseType::where('company_id', 1)->pluck('id', 'name')->toArray();
 
         foreach ($employees as $index => $employee) {
             Employee::updateOrCreate(
@@ -438,9 +442,10 @@ class EmployeeSeeder extends Seeder
                     'children_count' => $employee['children_count'],
                     'gender' => $employee['gender'],
                     'marital_status' => $employee['marital_status'],
-                    'military_status' => $employee['military_status'] ?? null,
+                    'military_status' =>  $employee['military_status'] ?? null,
                     'driving_license' => $employee['driving_license'],
                     'driving_license_number' => $employee['driving_license_number'] ?? null,
+                    'driving_license_type_id' => $driving_license_types['سيارة خاصة'] ?? null,
                     'religion_id' => $religions['الإسلام'] ?? null,
                     'qualifications_id' => $qualifications['بكالوريوس طب وجراحة'] ?? null,
                     'qualification_year' => $employee['qualification_year'],

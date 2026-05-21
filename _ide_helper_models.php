@@ -80,6 +80,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereUpdatedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereUsername($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BloodGroup> $addedBloodGroup
+ * @property-read int|null $added_blood_group_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\City> $addedCities
  * @property-read int|null $added_cities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Country> $addedCountries
@@ -94,6 +96,8 @@ namespace App\Models{
  * @property-read int|null $added_religion_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Resignation> $addedResignation
  * @property-read int|null $added_resignation_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BloodGroup> $updatedBloodGroup
+ * @property-read int|null $updated_blood_group_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\City> $updatedCities
  * @property-read int|null $updated_cities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Country> $updatedCountries
@@ -183,6 +187,10 @@ namespace App\Models{
  * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $addedBy
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
+ * @property-read int|null $employees_count
+ * @property-read \App\Models\Admin|null $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BloodGroup newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BloodGroup newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BloodGroup query()
@@ -228,6 +236,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche whereUpdatedBy($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
+ * @property-read int|null $employees_count
  */
 	class Branche extends \Eloquent {}
 }
@@ -243,9 +253,10 @@ namespace App\Models{
  * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Admin|null $createdBy
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Governorate> $governorates
- * @property-read int|null $governorates_count
+ * @property-read \App\Models\Admin $addedBy
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
+ * @property-read int|null $employees_count
+ * @property-read \App\Models\Governorate $governorate
  * @property-read \App\Models\Admin|null $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|City newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|City newQuery()
@@ -273,7 +284,9 @@ namespace App\Models{
  * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Admin|null $createdBy
+ * @property-read \App\Models\Admin $addedBy
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
+ * @property-read int|null $employees_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Governorate> $governorates
  * @property-read int|null $governorates_count
  * @property-read \App\Models\Admin|null $updatedBy
@@ -329,6 +342,31 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
+ * @property string $name
+ * @property int $status
+ * @property int $company_id
+ * @property int $added_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DrivingLicenseType newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DrivingLicenseType newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DrivingLicenseType query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DrivingLicenseType whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DrivingLicenseType whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DrivingLicenseType whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DrivingLicenseType whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DrivingLicenseType whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DrivingLicenseType whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DrivingLicenseType whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DrivingLicenseType whereUpdatedBy($value)
+ */
+	class DrivingLicenseType extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
  * @property int $employee_code Employee Code unique identifier
  * @property string $fingerprint_code Fingerprint Code unique identifier
  * @property string $name
@@ -344,14 +382,16 @@ namespace App\Models{
  * @property int $children_count
  * @property int|null $gender
  * @property int|null $marital_status 1: Single, 2: Married, 3: engaged , 4: Widowed , 5: Divorced
- * @property int|null $military_status 1: Active, 2: Resigned, 3: Discharged
+ * @property int|null $military_status
  * @property string|null $military_start_date
  * @property string|null $military_end_date
  * @property string|null $military_weapon
  * @property string|null $military_exemption_date
  * @property string|null $military_exemption_reason
+ * @property string|null $postponement_reason
  * @property int $driving_license 1: Yes, 0: No
  * @property string|null $driving_license_number
+ * @property string|null $driving_license_type
  * @property int|null $religion_id
  * @property int|null $qualifications_id
  * @property string|null $qualification_year
@@ -406,8 +446,14 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Admin $addedBy
+ * @property-read \App\Models\BloodGroup|null $bloodGroup
+ * @property-read \App\Models\Branche $branch
+ * @property-read \App\Models\City|null $city
+ * @property-read \App\Models\Country|null $country
  * @property-read \App\Models\Department $department
+ * @property-read \App\Models\Governorate|null $governorate
  * @property-read \App\Models\JobsCategory $job
+ * @property-read \App\Models\MilitaryStatus|null $militaryStatus
  * @property-read \App\Models\Nationality $nationality
  * @property-read \App\Models\Qualification|null $qualification
  * @property-read \App\Models\Religion|null $religion
@@ -433,6 +479,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDisabilityDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDrivingLicense($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDrivingLicenseNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDrivingLicenseType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereEmployeeCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereEmploymentStatus($value)
@@ -476,6 +523,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee wherePassportPlaceOfIssue($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee wherePaymentMethod($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee wherePaymentPerDay($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee wherePostponementReason($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereQualificationYear($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereQualificationsId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereRelativeDescription($value)
@@ -591,10 +639,12 @@ namespace App\Models{
  * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $addedBy
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\City> $cities
  * @property-read int|null $cities_count
  * @property-read \App\Models\Country $country
- * @property-read \App\Models\Admin|null $createdBy
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
+ * @property-read int|null $employees_count
  * @property-read \App\Models\Admin|null $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Governorate newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Governorate newQuery()
@@ -640,6 +690,33 @@ namespace App\Models{
  * @property-read int|null $employees_count
  */
 	class JobsCategory extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property string $name
+ * @property int $status
+ * @property int $company_id
+ * @property int $added_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
+ * @property-read int|null $employees_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MilitaryStatus newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MilitaryStatus newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MilitaryStatus query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MilitaryStatus whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MilitaryStatus whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MilitaryStatus whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MilitaryStatus whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MilitaryStatus whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MilitaryStatus whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MilitaryStatus whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MilitaryStatus whereUpdatedBy($value)
+ */
+	class MilitaryStatus extends \Eloquent {}
 }
 
 namespace App\Models{

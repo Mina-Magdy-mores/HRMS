@@ -73,6 +73,12 @@ class Employee extends Model
     {
         return $this->belongsTo(City::class, 'city_id');
     }
-
-
+    public function militaryStatus()
+    {
+        return $this->belongsTo(MilitaryStatus::class, 'military_status_id');
+    }
+    public function drivingLicenseType()
+    {
+        return $this->belongsTo(DrivingLicenseType::class, 'driving_license_type_id');
+    }
 }

@@ -16,6 +16,8 @@ use App\Models\Qualification;
 use App\Models\Religion;
 use App\Models\Resignation;
 use App\Http\Requests\EmployeeRequest;
+use App\Models\DrivingLicenseType;
+use App\Models\MilitaryStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -67,9 +69,11 @@ class EmployeeController extends Controller
             'nationality',
             'shiftType',
             'branch',
+            'militaryStatus',
             'resignation',
             'addedBy',
-            'updatedBy'
+            'updatedBy',
+            'drivingLicenseType'
         ])->findOrFail($id);
 
         return view('admin.employees.modal_details', compact('employee'));
@@ -92,6 +96,8 @@ class EmployeeController extends Controller
         $countries = get_cols_where(Country::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
         $governorates = get_cols_where(Governorate::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
         $cities = get_cols_where(City::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $military_statuses = get_cols_where(MilitaryStatus::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $driving_license_types = get_cols_where(DrivingLicenseType::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
 
         return view('admin.employees.create', compact(
             'religions',
@@ -104,7 +110,10 @@ class EmployeeController extends Controller
             'bloodGroups',
             'countries',
             'governorates',
-            'cities'
+            'cities',
+            'military_statuses',
+            'driving_license_types'
+
         ));
     }
 
@@ -150,13 +159,17 @@ class EmployeeController extends Controller
 
     public function getGovernorateList(Request $request)
     {
-        $governorates = get_cols_where(Governorate::class, ['id', 'name'], ['country_id' => $request->country_id, 'status' => 1], 'id', 'asc');
-        return view('admin.employees.governorate_list', compact('governorates'));
+        if ($request->ajax()) {
+            $governorates = get_cols_where(Governorate::class, ['id', 'name'], ['country_id' => $request->country_id, 'status' => 1], 'id', 'asc');
+            return view('admin.employees.governorate_list', compact('governorates'));
+        }
     }
     public function getCitiesList(Request $request)
     {
-        $cities = get_cols_where(City::class, ['id', 'name'], ['governorate_id' => $request->governorate_id, 'status' => 1], 'id', 'asc');
-        return view('admin.employees.cities_list', compact('cities'));
+        if ($request->ajax()) {
+            $cities = get_cols_where(City::class, ['id', 'name'], ['governorate_id' => $request->governorate_id, 'status' => 1], 'id', 'asc');
+            return view('admin.employees.cities_list', compact('cities'));
+        }
     }
 
 }

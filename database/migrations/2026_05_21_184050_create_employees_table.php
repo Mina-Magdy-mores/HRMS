@@ -27,14 +27,16 @@ return new class extends Migration {
             $table->integer('children_count')->default(0);
             $table->tinyInteger('gender')->nullable();
             $table->integer('marital_status')->nullable()->comment('1: Single, 2: Married, 3: engaged , 4: Widowed , 5: Divorced');
-            $table->integer('military_status')->nullable()->comment('1: Active, 2: Resigned, 3: Discharged');
+            $table->foreignId('military_status')->nullable()->constrained('military_statuses')->cascadeOnUpdate();
             $table->date('military_start_date')->nullable();
             $table->date('military_end_date')->nullable();
             $table->string('military_weapon')->nullable();
             $table->date('military_exemption_date')->nullable();
             $table->string('military_exemption_reason')->nullable();
+             $table->string('postponement_reason')->nullable();
             $table->tinyInteger('driving_license')->default(0)->comment('1: Yes, 0: No');
             $table->string('driving_license_number')->nullable();
+            $table->foreignId('driving_license_type_id')->constrained('driving_license_types')->cascadeOnUpdate()->nullable();
             $table->foreignId('religion_id')->nullable()->constrained('religions')->cascadeOnUpdate();
             $table->foreignId('qualifications_id')->nullable()->constrained('qualifications')->cascadeOnUpdate();
             $table->string('qualification_year')->nullable();

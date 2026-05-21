@@ -32,7 +32,9 @@
             });
         }
         $(document).ready(function () {
+
             initSelect2();
+
             $(document).on('change', '#country_id', function () {
                 getGovernorate();
             })
@@ -57,10 +59,13 @@
                     }
                 });
             }
+
             initSelect2();
+
             $(document).on('change', '#governorate_id', function () {
                 getCities();
             })
+
             function getCities() {
                 var governorate_id = $('#governorate_id').val();
                 $.ajax({
@@ -81,6 +86,49 @@
                     }
                 });
             }
+
+
+             $(document).on('change', '#military_status', function () {
+                var emp_military_id = $(this).val();
+                if (emp_military_id == 1) {
+                    $('#military_start_date').show()
+                    $('#military_end_date').show()
+                    $('#military_weapon').show()
+                    $('#military_exemption_date').hide()
+                    $('#military_exemption_reason').hide()
+                } else if (emp_military_id == 2) {
+                    $('#military_exemption_date').show()
+                    $('#military_exemption_reason').show()
+                    $('#military_start_date').hide()
+                    $('#military_end_date').hide()
+                    $('#military_weapon').hide()
+                }else if(emp_military_id == 3){
+                    $('#military_start_date').hide()
+                    $('#military_end_date').hide()
+                    $('#military_weapon').hide()
+                    $('#military_exemption_date').hide()
+                    $('#military_exemption_reason').hide()
+                    $('#postponement_reason').show()
+                }else{
+                    $('#military_start_date').hide()
+                    $('#military_end_date').hide()
+                    $('#military_weapon').hide()
+                    $('#military_exemption_date').hide()
+                    $('#military_exemption_reason').hide()
+                                        $('#postponement_reason').hide()
+
+                }
+            })
+             $(document).on('change', '#driving_license', function () {
+                var driving_license = $(this).val();
+                if (driving_license == 1) {
+                    $('#drivingLicenseTypeGroup').show()
+                    $('#drivingLicenseNumberGroup').show()
+                }else{
+                    $('#drivingLicenseTypeGroup').hide()
+                    $('#drivingLicenseNumberGroup').hide()
+                }
+            })
         })
 </script>
 @endsection
