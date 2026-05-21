@@ -338,7 +338,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label>الدولة</label>
-                                            <select name="country_id"
+                                            <select name="country_id" id="country_id"
                                                 class="form-control select2 {{ $errors->has('country_id') ? 'is-invalid' : '' }}">
                                                 <option value="">اختر الدولة</option>
                                                 @foreach($countries as $country)
@@ -353,9 +353,9 @@
                                     </div>
 
                                     <div class="col-md-4">
-                                        <div class="form-group">
+                                        <div class="form-group" id="ajax_responce_for_governorate_list">
                                             <label>المحافظة</label>
-                                            <select name="governorate_id"
+                                            <select name="governorate_id" id="governorate_id"
                                                 class="form-control select2 {{ $errors->has('governorate_id') ? 'is-invalid' : '' }}">
                                                 <option value="">اختر المحافظة</option>
                                                 @foreach($governorates as $governorate)
@@ -370,9 +370,9 @@
                                     </div>
 
                                     <div class="col-md-4">
-                                        <div class="form-group">
+                                        <div class="form-group" id="ajax_responce_for_cities_list">
                                             <label>المدينة</label>
-                                            <select name="city_id"
+                                            <select name="city_id" id="city_id"
                                                 class="form-control select2 {{ $errors->has('city_id') ? 'is-invalid' : '' }}">
                                                 <option value="">اختر المدينة</option>
                                                 @foreach($cities as $city)

@@ -147,4 +147,16 @@ class EmployeeController extends Controller
     {
         //
     }
+
+    public function getGovernorateList(Request $request)
+    {
+        $governorates = get_cols_where(Governorate::class, ['id', 'name'], ['country_id' => $request->country_id, 'status' => 1], 'id', 'asc');
+        return view('admin.employees.governorate_list', compact('governorates'));
+    }
+    public function getCitiesList(Request $request)
+    {
+        $cities = get_cols_where(City::class, ['id', 'name'], ['governorate_id' => $request->governorate_id, 'status' => 1], 'id', 'asc');
+        return view('admin.employees.cities_list', compact('cities'));
+    }
+
 }

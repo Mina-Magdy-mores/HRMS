@@ -151,6 +151,8 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::get('/employees/{id}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
         Route::put('/employees/{id}', [EmployeeController::class, 'update'])->name('employees.update');
         Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
+        Route::post('/employees/governorate-list', [EmployeeController::class, 'getGovernorateList'])->name('employees.governorate-list');
+        Route::post('/employees/cities-list', [EmployeeController::class, 'getCitiesList'])->name('employees.cities-list');
     });
 
     // guest routes
