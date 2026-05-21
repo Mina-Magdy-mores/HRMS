@@ -10,15 +10,12 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('shifts_types', function (Blueprint $table) {
+        Schema::create('languages', function (Blueprint $table) {
             $table->id();
-            $table->tinyInteger('type')->nullable()->comment('1: Day Shift, 2: Night Shift, 3: Full day Shift');
-            $table->time('start_time');
-            $table->time('end_time');
-            $table->decimal('total_hours', 10, 2);
+            $table->string('name');
             $table->tinyInteger('status')->default(1);
             $table->integer('company_id');
-            $table->foreignId('created_by')->constrained('admins')->cascadeOnUpdate();
+            $table->foreignId('added_by')->constrained('admins')->cascadeOnUpdate();
             $table->foreignId('updated_by')->nullable()->constrained('admins')->cascadeOnUpdate();
             $table->timestamps();
         });
@@ -29,6 +26,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('shifts_types');
+        Schema::dropIfExists('languages');
     }
 };

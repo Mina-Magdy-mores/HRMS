@@ -117,6 +117,8 @@
                                 </option>
                                 <option value="2" {{ old('type', $shiftsType->type) == 2 ? 'selected' : '' }}>شفت ليلي
                                 </option>
+                                <option value="3" {{ old('type', $shiftsType->type) == 3 ? 'selected' : '' }}>شفت كامل اليوم
+                                </option>
                             </select>
                             @include('admin.errors.errors', ['value' => 'type'])
                         </div>

@@ -17,7 +17,9 @@ use App\Models\Religion;
 use App\Models\Resignation;
 use App\Http\Requests\EmployeeRequest;
 use App\Models\DrivingLicenseType;
+use App\Models\Language;
 use App\Models\MilitaryStatus;
+use App\Models\ShiftsType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -73,7 +75,8 @@ class EmployeeController extends Controller
             'resignation',
             'addedBy',
             'updatedBy',
-            'drivingLicenseType'
+            'drivingLicenseType',
+            'language'
         ])->findOrFail($id);
 
         return view('admin.employees.modal_details', compact('employee'));
@@ -98,6 +101,8 @@ class EmployeeController extends Controller
         $cities = get_cols_where(City::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
         $military_statuses = get_cols_where(MilitaryStatus::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
         $driving_license_types = get_cols_where(DrivingLicenseType::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $shiftTypes = get_cols_where(ShiftsType::class, ['id', 'type', 'start_time', 'end_time','total_hours'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $languages = get_cols_where(Language::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
 
         return view('admin.employees.create', compact(
             'religions',
@@ -112,7 +117,9 @@ class EmployeeController extends Controller
             'governorates',
             'cities',
             'military_statuses',
-            'driving_license_types'
+            'driving_license_types',
+            'shiftTypes',
+            'languages'
 
         ));
     }

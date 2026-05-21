@@ -81,4 +81,8 @@ class Employee extends Model
     {
         return $this->belongsTo(DrivingLicenseType::class, 'driving_license_type_id');
     }
+    public function language()
+    {
+        return $this->belongsTo(Language::class, 'language_id');
+    }
 }

@@ -349,6 +349,8 @@ namespace App\Models{
  * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
+ * @property-read int|null $employees_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|DrivingLicenseType newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|DrivingLicenseType newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|DrivingLicenseType query()
@@ -391,7 +393,7 @@ namespace App\Models{
  * @property string|null $postponement_reason
  * @property int $driving_license 1: Yes, 0: No
  * @property string|null $driving_license_number
- * @property string|null $driving_license_type
+ * @property int $driving_license_type_id
  * @property int|null $religion_id
  * @property int|null $qualifications_id
  * @property string|null $qualification_year
@@ -428,8 +430,8 @@ namespace App\Models{
  * @property int|null $lang_id
  * @property int $company_id
  * @property int $added_by
- * @property int|null $updated_by
- * @property int $fixed_shift
+ * @property int $updated_by
+ * @property int|null $fixed_shift
  * @property int|null $shift_type_id
  * @property numeric|null $payment_per_day
  * @property int|null $has_social_insurance 1: Yes, 0: No
@@ -437,6 +439,7 @@ namespace App\Models{
  * @property string|null $social_insurance_number
  * @property int|null $has_medical_insurance 1: Yes, 0: No
  * @property numeric|null $medical_insurance_amount
+ * @property string|null $medical_insurance_number
  * @property int $fixed_allowance
  * @property int $has_attendance 1: Yes, 0: No
  * @property int $vacation_formula
@@ -445,12 +448,14 @@ namespace App\Models{
  * @property int $branch_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $notes
  * @property-read \App\Models\Admin $addedBy
  * @property-read \App\Models\BloodGroup|null $bloodGroup
  * @property-read \App\Models\Branche $branch
  * @property-read \App\Models\City|null $city
  * @property-read \App\Models\Country|null $country
  * @property-read \App\Models\Department $department
+ * @property-read \App\Models\DrivingLicenseType $drivingLicenseType
  * @property-read \App\Models\Governorate|null $governorate
  * @property-read \App\Models\JobsCategory $job
  * @property-read \App\Models\MilitaryStatus|null $militaryStatus
@@ -459,7 +464,7 @@ namespace App\Models{
  * @property-read \App\Models\Religion|null $religion
  * @property-read \App\Models\Resignation|null $resignation
  * @property-read \App\Models\ShiftsType|null $shiftType
- * @property-read \App\Models\Admin|null $updatedBy
+ * @property-read \App\Models\Admin $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee query()
@@ -479,7 +484,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDisabilityDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDrivingLicense($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDrivingLicenseNumber($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDrivingLicenseType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDrivingLicenseTypeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereEmployeeCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereEmploymentStatus($value)
@@ -505,6 +510,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereLangId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereMaritalStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereMedicalInsuranceAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereMedicalInsuranceNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereMilitaryEndDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereMilitaryExemptionDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereMilitaryExemptionReason($value)
@@ -518,6 +524,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereNationalityId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereNationalityNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereNationalityPlaceOfIssue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereNotes($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee wherePassportExpiryDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee wherePassportNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee wherePassportPlaceOfIssue($value)
@@ -690,6 +697,15 @@ namespace App\Models{
  * @property-read int|null $employees_count
  */
 	class JobsCategory extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Language newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Language newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Language query()
+ */
+	class Language extends \Eloquent {}
 }
 
 namespace App\Models{

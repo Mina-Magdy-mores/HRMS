@@ -107,6 +107,7 @@
                                 <option value="">اختر نوع الشفت</option>
                                 <option value="1" {{ old('type')==1 ? 'selected' : '' }}>شفت نهاري</option>
                                 <option value="2" {{ old('type')==2 ? 'selected' : '' }}>شفت ليلي</option>
+                                <option value="3" {{ old('type')==3 ? 'selected' : '' }}>شفت كامل اليوم</option>
                             </select>
                             @include('admin.errors.errors', ['value' => 'type'])
                         </div>

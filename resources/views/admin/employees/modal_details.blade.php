@@ -265,7 +265,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <strong>نوع الوردية:</strong>
-                    <p class="mb-0 mt-1">{{ optional($employee->shiftType)->name ?? '---' }}</p>
+                    <p class="mb-0 mt-1">{{ optional($employee->shiftType)->type ?? '---' }}</p>
                 </div>
                 <div class="col-md-3 mb-3">
                     <strong>رخصة قيادة:</strong>

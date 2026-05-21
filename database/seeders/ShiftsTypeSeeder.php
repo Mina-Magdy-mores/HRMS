@@ -80,6 +80,18 @@ class ShiftsTypeSeeder extends Seeder
                 'end_time' => '22:00:00',
                 'total_hours' => 8.00,
             ],
+            [
+                'type' => 3,  // Full Day Shift
+                'start_time' => '00:00:00',
+                'end_time' => '00:00:00',
+                'total_hours' => 24.00,
+            ],
+            [
+                'type' => 3,  // Full Day Shift (alternative)
+                'start_time' => '09:00:00',
+                'end_time' => '21:00:00',
+                'total_hours' => 12.00,
+            ],
         ];
 
         foreach ($shifts as $shift) {
