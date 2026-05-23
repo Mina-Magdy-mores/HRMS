@@ -3,7 +3,7 @@
 function getColsWhereP($model = null, $with = [], $cols = [], $where = [], $orderBy = 'id', $orderType = 'asc', $paginate = PAGEINATION_COUNTER)
 {
     return $model::with($with)->select($cols)->where($where)->orderBy($orderBy, $orderType)->paginate($paginate);
-//         $query = $model::select($cols)->with($with)->where($where)->orderBy($orderBy, $orderType);
+    //         $query = $model::select($cols)->with($with)->where($where)->orderBy($orderBy, $orderType);
 // $query->ddRawSql();
 }
 /*get some cols  table */
@@ -14,11 +14,16 @@ function getColsWhere($model = null, $with = [], $cols = [], $where = [], $order
 
 function uploadImage($folder, $image)
 {
-    $extension = strtolower($image->extension());
-    $filename = time() . rand(100, 999) . '.' . $extension;
-    $image->getClientOriginalName = $filename;
-    $image->move($folder, $filename);
-    return $filename;
+    $imageName = pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME);
+    $imageName = Str::slug($imageName);
+    $extension = $image->getClientOriginalExtension();
+    $filename = $imageName . '_' . time() . '_' . uniqid() . '.' . $extension;
+    $path = $image->storeAs($folder, $filename, 'public');
+    if (!$path) {
+        throw new \Exception('فشل في رفع الملف');
+    }
+    return $path;
+
 }
 /*get some cols by pagination table where 2 */
 function get_cols_where2_p($model = null, $columns_names = array(), $where = array(), $where2field = null, $where2operator = null, $where2value = null, $order_field = "id", $order_type = "DESC", $pagination_counter = 13)

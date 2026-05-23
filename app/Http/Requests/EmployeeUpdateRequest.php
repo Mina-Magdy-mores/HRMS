@@ -3,8 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class EmployeeRequest extends FormRequest
+class EmployeeUpdateRequest extends FormRequest
 {
     public function authorize()
     {
@@ -13,9 +14,16 @@ class EmployeeRequest extends FormRequest
 
     public function rules()
     {
+        $employeeId = $this->route('id');
+
         return [
             // ==================== بيانات الموظف الرئيسية ====================
-            'fingerprint_code' => 'nullable|string|max:255|unique:employees,fingerprint_code',
+            'fingerprint_code' => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::unique('employees', 'fingerprint_code')->ignore($employeeId)
+            ],
             'name' => 'required|string|max:255',
             'birth_date' => 'nullable|date',
             'nationality_id' => 'required|exists:nationalities,id',
@@ -24,7 +32,12 @@ class EmployeeRequest extends FormRequest
             'nationality_number' => 'nullable|string|max:255',
             'nationality_expiry_date' => 'nullable|date',
             'nationality_place_of_issue' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255|unique:employees,email',
+            'email' => [
+                'nullable',
+                'email',
+                'max:255',
+                Rule::unique('employees', 'email')->ignore($employeeId)
+            ],
             'home_telephone' => 'nullable|string|max:50',
             'work_telephone' => 'nullable|string|max:50',
             'marital_status' => 'nullable|in:1,2,3,4,5',
@@ -103,6 +116,7 @@ class EmployeeRequest extends FormRequest
             'relative_description' => 'nullable|string|max:500',
             'urgent_contact_details' => 'nullable|string|max:1000',
             'notes' => 'nullable|string|max:1000',
+
         ];
     }
 
@@ -110,7 +124,6 @@ class EmployeeRequest extends FormRequest
     {
         return [
             // ==================== بيانات الموظف الرئيسية ====================
-
             'fingerprint_code.string' => 'معرف البصمة يجب أن يكون نص',
             'fingerprint_code.max' => 'معرف البصمة لا يجب أن يتجاوز 255 حرف',
             'fingerprint_code.unique' => 'معرف البصمة مستخدم من قبل',
@@ -126,11 +139,14 @@ class EmployeeRequest extends FormRequest
 
             'gender.required' => 'الجنس مطلوب',
             'gender.in' => 'الجنس المختار غير صحيح',
+
             'religion_id.exists' => 'الديانة المختارة غير موجودة',
 
             'nationality_number.string' => 'رقم البطاقة يجب أن يكون نص',
             'nationality_number.max' => 'رقم البطاقة لا يجب أن يتجاوز 255 حرف',
+
             'nationality_expiry_date.date' => 'تاريخ انتهاء البطاقة غير صحيح',
+
             'nationality_place_of_issue.string' => 'مكان إصدار البطاقة يجب أن يكون نص',
             'nationality_place_of_issue.max' => 'مكان إصدار البطاقة طويل جداً',
 
@@ -140,10 +156,12 @@ class EmployeeRequest extends FormRequest
 
             'home_telephone.string' => 'هاتف المنزل يجب أن يكون نص',
             'home_telephone.max' => 'هاتف المنزل لا يجب أن يتجاوز 50 حرف',
+
             'work_telephone.string' => 'هاتف العمل يجب أن يكون نص',
             'work_telephone.max' => 'هاتف العمل لا يجب أن يتجاوز 50 حرف',
 
             'marital_status.in' => 'الحالة الاجتماعية المختارة غير صحيحة',
+
             'children_count.integer' => 'عدد الأطفال يجب أن يكون رقم',
             'children_count.min' => 'عدد الأطفال لا يمكن أن يكون أقل من 0',
 
@@ -187,8 +205,10 @@ class EmployeeRequest extends FormRequest
 
             'job_id.required' => 'الوظيفة مطلوبة',
             'job_id.exists' => 'الوظيفة المختارة غير موجودة',
+
             'department_id.required' => 'الإدارة مطلوبة',
             'department_id.exists' => 'الإدارة المختارة غير موجودة',
+
             'branch_id.required' => 'الفرع مطلوب',
             'branch_id.exists' => 'الفرع المختار غير موجود',
 
@@ -242,17 +262,20 @@ class EmployeeRequest extends FormRequest
             // ==================== بيانات إضافية ====================
             'sponsor_name.string' => 'اسم الكفيل يجب أن يكون نص',
             'sponsor_name.max' => 'اسم الكفيل طويل جداً',
+
             'passport_number.string' => 'رقم الجواز يجب أن يكون نص',
             'passport_number.max' => 'رقم الجواز طويل جداً',
+
             'passport_expiry_date.date' => 'تاريخ انتهاء الجواز غير صحيح',
+
             'passport_place_of_issue.string' => 'مكان إصدار الجواز يجب أن يكون نص',
             'passport_place_of_issue.max' => 'مكان إصدار الجواز طويل جداً',
 
             'image.image' => 'الملف المرفق يجب أن يكون صورة',
             'image.max' => 'حجم الصورة لا يجب أن يتجاوز 5 ميجا',
 
-            'cv.image' => 'الملف المرفق يجب أن يكون صورة',
-            'cv.mimes' => 'الملف المرفق يجب أن يكون من نوع pdf, doc, docx, zip, rar',
+            'cv.file' => 'الملف المرفق غير صحيح',
+            'cv.mimes' => 'الملف المرفق يجب أن يكون من نوع pdf, doc, docx, zip, rar, jpg, png, jpeg',
             'cv.max' => 'حجم السيرة الذاتية لا يجب أن يتجاوز 5 ميجا',
 
             'language_id.exists' => 'اللغة المختارة غير موجودة',
@@ -270,7 +293,6 @@ class EmployeeRequest extends FormRequest
 
             'notes.string' => 'الملاحظات يجب أن تكون نص',
             'notes.max' => 'الملاحظات طويلة جداً',
-
         ];
     }
 }

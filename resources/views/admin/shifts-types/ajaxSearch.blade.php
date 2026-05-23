@@ -27,6 +27,8 @@
                 شفت نهاري
                 @elseif($shiftsType->type == 2)
                 شفت ليلي
+                @elseif($shiftsType->type == 3)
+                شفت كامل
                 @else
                 نوع غير معروف
                 @endif

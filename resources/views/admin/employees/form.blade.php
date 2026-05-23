@@ -71,8 +71,6 @@
 
         <form action="{{ route('admin.employees.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <input type="hidden" name="company_id" value="{{ auth()->user()->company_id }}">
-            <input type="hidden" name="added_by" value="{{ auth()->id() }}">
 
             <div class="card-body">
                 @if ($errors->any())
@@ -132,16 +130,6 @@
                             <div class="tab-pane fade show active" id="tab-basic" role="tabpanel"
                                 aria-labelledby="tab-basic-tab">
                                 <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>كود الموظف</label>
-                                            <input autofocus type="number" name="employee_code"
-                                                value="{{ old('employee_code') }}"
-                                                class="form-control {{ $errors->has('employee_code') ? 'is-invalid' : '' }}"
-                                                placeholder="أدخل كود الموظف">
-                                            @include('admin.errors.errors', ['value' => 'employee_code'])
-                                        </div>
-                                    </div>
 
                                     <div class="col-md-4">
                                         <div class="form-group">
@@ -156,7 +144,7 @@
 
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>اسم الموظف</label>
+                                            <label>اسم الموظف</label><span class="text-danger h4">*</span>
                                             <input type="text" name="name" value="{{ old('name') }}"
                                                 class="form-control {{ $errors->has('name') ? 'is-invalid' : '' }}"
                                                 placeholder="أدخل اسم الموظف">
@@ -175,7 +163,7 @@
 
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>الجنسية</label>
+                                            <label>الجنسية </label><span class="text-danger h4">*</span>
                                             <select name="nationality_id"
                                                 class="form-control select2 {{ $errors->has('nationality_id') ? 'is-invalid' : '' }}">
                                                 <option value="">اختر الجنسية</option>
@@ -193,7 +181,7 @@
 
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>الجنس</label>
+                                            <label>الجنس</label><span class="text-danger h4">*</span>
                                             <select name="gender"
                                                 class="form-control select2 {{ $errors->has('gender') ? 'is-invalid' : '' }}">
                                                 <option value="">اختر الجنس</option>
@@ -428,7 +416,8 @@
                                     </div>
 
 
-                                    <div class="col-md-4" id="drivingLicenseTypeGroup" style="display: none;">
+                                    <div class="col-md-4" id="drivingLicenseTypeGroup" @if (old('driving_license') != 1)
+                                        style="display: none;" @endif>
                                         <div class="form-group">
                                             <label>نوع رخصة القيادة</label>
                                             <select name="driving_license_type_id"
@@ -446,7 +435,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4" id="drivingLicenseNumberGroup" style="display: none;">
+                                    <div class="col-md-4" id="drivingLicenseNumberGroup" @if (old('driving_license') != 1)
+                                        style="display: none;" @endif>
                                         <div class="form-group">
                                             <label>رقم رخصة القيادة</label>
                                             <input type="text" name="driving_license_number"
@@ -479,7 +469,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4" id="military_start_date" style="display: none;">
+                                    <div class="col-md-4" id="military_start_date" @if (old('military_status') !=1)
+                                        style="display: none;" @endif>
                                         <div class="form-group">
                                             <label>بداية الخدمة العسكرية</label>
                                             <input type="date" name="military_start_date"
@@ -489,7 +480,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4" id="military_end_date" style="display: none;">
+                                    <div class="col-md-4" id="military_end_date" @if (old('military_status') !=1)
+                                        style="display: none;" @endif>
                                         <div class="form-group">
                                             <label>نهاية الخدمة العسكرية</label>
                                             <input type="date" name="military_end_date"
@@ -499,7 +491,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4" id="military_weapon" style="display: none;">
+                                    <div class="col-md-4" id="military_weapon" @if (old('military_status') !=1)
+                                        style="display: none;" @endif>
                                         <div class="form-group">
                                             <label>سلاح الخدمة</label>
                                             <input type="text" name="military_weapon"
@@ -510,7 +503,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4" id="military_exemption_date" style="display: none;">
+                                    <div class="col-md-4" id="military_exemption_date" @if (old('military_status') !=2)
+                                        style="display: none;" @endif>
                                         <div class="form-group">
                                             <label>تاريخ الإعفاء</label>
                                             <input type="date" name="military_exemption_date"
@@ -520,7 +514,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4" id="military_exemption_reason" style="display: none;">
+                                    <div class="col-md-4" id="military_exemption_reason" @if (old('military_status') !=2)
+                                        style="display: none;" @endif>
                                         <div class="form-group">
                                             <label>سبب الإعفاء</label>
                                             <input type="text" name="military_exemption_reason"
@@ -532,7 +527,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4" id="postponement_reason" style="display: none;">
+                                    <div class="col-md-4" id="postponement_reason" @if (old('military_status') !=3)
+                                        style="display: none;" @endif>
                                         <div class="form-group">
                                             <label>سبب التأجيل</label>
                                             <input type="text" name="postponement_reason" id="postponement_reason"
@@ -613,13 +609,12 @@
 
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>الوظيفة</label>
+                                            <label>الوظيفة</label><span class="text-danger h4">*</span>
                                             <select name="job_id"
                                                 class="form-control select2 {{ $errors->has('job_id') ? 'is-invalid' : '' }}">
                                                 <option value="">اختر الوظيفة</option>
                                                 @foreach($jobs as $job)
-                                                <option value="{{ $job->id }}" {{ old('job_id')==$job->id ? 'selected' :
-                                                    '' }}>
+                                                <option value="{{ $job->id }}" {{ old('job_id') == $job->id ? 'selected' : '' }}>
                                                     {{ $job->name }}
                                                 </option>
                                                 @endforeach
@@ -630,13 +625,13 @@
 
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>الإدارة</label>
+                                            <label>الإدارة</label><span class="text-danger h4">*</span>
                                             <select name="department_id"
                                                 class="form-control select2 {{ $errors->has('department_id') ? 'is-invalid' : '' }}">
                                                 <option value="">اختر الإدارة</option>
                                                 @foreach($departments as $department)
                                                 <option value="{{ $department->id }}" {{
-                                                    old('department_id')==$department->id ? 'selected' : '' }}>
+                                                    old('department_id') == $department->id ? 'selected' : '' }}>
                                                     {{ $department->name }}
                                                 </option>
                                                 @endforeach
@@ -647,14 +642,13 @@
 
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>الفرع</label>
+                                            <label>الفرع</label><span class="text-danger h4">*</span>
                                             <select name="branch_id"
                                                 class="form-control select2 {{ $errors->has('branch_id') ? 'is-invalid' : '' }}">
                                                 <option value="">اختر الفرع</option>
                                                 @foreach($branches as $branch)
-                                                <option value="{{ $branch->id }}" {{ old('branch_id')==$branch->id ?
-                                                    'selected' : '' }}>
-                                                    {{ $branch->name }}
+                                                <option value="{{ $branch->id }}" {{ old('branch_id') == $branch->id ? 'selected' : '' }}>
+                                                     {{ $branch->name }}
                                                 </option>
                                                 @endforeach
                                             </select>
@@ -674,7 +668,7 @@
 
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>حالة التوظيف</label>
+                                            <label>حالة التوظيف</label><span class="text-danger h4">*</span>
                                             <select name="employment_status"
                                                 class="form-control select2 {{ $errors->has('employment_status') ? 'is-invalid' : '' }}">
                                                 <option value="">اختر حالة التوظيف</option>
@@ -703,15 +697,16 @@
                                             @include('admin.errors.errors', ['value' => 'fixed_shift'])
                                         </div>
                                     </div>
-                                    <div class="col-md-4" id="shift_type_id" style="display: none;">
+                                    <div class="col-md-4" id="shift_type_id" @if (old('fixed_shift') != 1)
+                                        style="display: none;" @endif>
                                         <div class="form-group">
                                             <label>نوع الشيفت الثابت</label>
-                                            <select name="shift_type_id "
+                                            <select name="shift_type_id"
                                                 class="form-control select2 {{ $errors->has('shift_type_id') ? 'is-invalid' : '' }}">
                                                 <option value="">اختر نوع الشيفت</option>
                                                 @foreach ($shiftTypes as $shiftType)
                                                 <option value="{{ $shiftType->id }}" {{
-                                                    old('shift_type_id')==$shiftType->id ? 'selected' : '' }}>
+                                                    old('shift_type_id') == $shiftType->id ? 'selected' : '' }}>
                                                     @if($shiftType->type == 1)
                                                     شفت نهاري
                                                     @elseif($shiftType->type == 2)
@@ -759,7 +754,7 @@
                                                 <option selected value="">اختر حالة الاستقالة</option>
                                                 @foreach($resignations as $resignation)
                                                 <option value="{{ $resignation->id }}" {{
-                                                    old('resignation_id')==$resignation->id and old('resignation_id')
+                                                    old('resignation_id')==$resignation->id && old('resignation_id')
                                                     !== '' ? 'selected' : '' }}>
                                                     {{ $resignation->name }}
                                                 </option>
@@ -769,7 +764,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4" id="resignation_date_group" style="display: none;">
+                                    <div class="col-md-4" id="resignation_date_group" @if (old('resignation_id') == "" || old('resignation_id') === null)
+                                        style="display: none;" @endif>
                                         <div class="form-group">
                                             <label>تاريخ الاستقالة</label>
                                             <input type="date" name="resignation_date"
@@ -779,7 +775,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4" id="resignation_reason_group" style="display: none;">
+                                    <div class="col-md-4" id="resignation_reason_group" @if (old('resignation_id') == "" || old('resignation_id') === null)
+                                        style="display: none;" @endif>
                                         <div class="form-group">
                                             <label>سبب الاستقالة</label>
                                             <input type="text" name="resignation_reason"
@@ -827,7 +824,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4" id="motivation_amount_group" style="display: none;">
+                                    <div class="col-md-4" id="motivation_amount_group"  @if (old('motivation_type') !=1)
+                                        style="display: none;" @endif>
                                         <div class="form-group">
                                             <label>مبلغ الحافز</label>
                                             <input type="number" step="0.01" name="motivation_amount"
@@ -855,7 +853,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4" id="bank_account_number_group" style="display: none;">
+                                    <div class="col-md-4" id="bank_account_number_group" @if (old('payment_method') !=2)
+                                        style="display: none;" @endif>
                                         <div class="form-group">
                                             <label>رقم الحساب البنكي</label>
                                             <input type="text" name="bank_account_number"
@@ -863,17 +862,6 @@
                                                 class="form-control {{ $errors->has('bank_account_number') ? 'is-invalid' : '' }}"
                                                 placeholder="أدخل رقم الحساب البنكي">
                                             @include('admin.errors.errors', ['value' => 'bank_account_number'])
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>الدفع لكل يوم</label>
-                                            <input type="number" step="0.01" name="payment_per_day"
-                                                value="{{ old('payment_per_day') }}"
-                                                class="form-control {{ $errors->has('payment_per_day') ? 'is-invalid' : '' }}"
-                                                placeholder="أدخل مبلغ اليوم الواحد">
-                                            @include('admin.errors.errors', ['value' => 'payment_per_day'])
                                         </div>
                                     </div>
 
@@ -892,7 +880,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4" id="social_insurance_amount_group" style="display: none;">
+                                    <div class="col-md-4" id="social_insurance_amount_group" @if (old('has_social_insurance') != 1)
+                                        style="display: none;" @endif>
                                         <div class="form-group">
                                             <label>مبلغ التأمين الاجتماعي</label>
                                             <input type="number" step="0.01" name="social_insurance_amount"
@@ -903,7 +892,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4" id="social_insurance_number_group" style="display: none;">
+                                    <div class="col-md-4" id="social_insurance_number_group" @if (old('has_social_insurance') != 1)
+                                        style="display: none;" @endif>
                                         <div class="form-group">
                                             <label>رقم التأمين الاجتماعي</label>
                                             <input type="text" name="social_insurance_number"
@@ -928,7 +918,8 @@
                                             @include('admin.errors.errors', ['value' => 'has_medical_insurance'])
                                         </div>
                                     </div>
-                                    <div class="col-md-4" id="medical_insurance_number_group" style="display: none;">
+                                    <div class="col-md-4" id="medical_insurance_number_group" @if (old('has_medical_insurance') != 1)
+                                        style="display: none;" @endif>
                                         <div class="form-group">
                                             <label>رقم التأمين الطبي</label>
                                             <input type="text" name="medical_insurance_number"
@@ -938,7 +929,8 @@
                                             @include('admin.errors.errors', ['value' => 'medical_insurance_number'])
                                         </div>
                                     </div>
-                                    <div class="col-md-4" id="medical_insurance_amount_group" style="display: none;">
+                                    <div class="col-md-4" id="medical_insurance_amount_group" @if (old('has_medical_insurance') != 1)
+                                        style="display: none;" @endif>
                                         <div class="form-group">
                                             <label>مبلغ التأمين الطبي</label>
                                             <input type="number" step="0.01" name="medical_insurance_amount"
@@ -974,17 +966,6 @@
                                                 </option>
                                             </select>
                                             @include('admin.errors.errors', ['value' => 'has_attendance'])
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>صيغة الإجازة</label>
-                                            <input type="number" name="vacation_formula"
-                                                value="{{ old('vacation_formula') }}"
-                                                class="form-control {{ $errors->has('vacation_formula') ? 'is-invalid' : '' }}"
-                                                placeholder="أدخل صيغة الإجازة">
-                                            @include('admin.errors.errors', ['value' => 'vacation_formula'])
                                         </div>
                                     </div>
 
@@ -1117,7 +1098,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4" id="disability_description_group" style="display: none;">
+                                    <div class="col-md-4" id="disability_description_group" @if (old('has_disability') != 1)
+                                        style="display: none;" @endif>
                                         <div class="form-group">
                                             <label>وصف الإعاقة \ العمليات السابقة</label>
                                             <input type="text" name="disability_description"
@@ -1143,7 +1125,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-4" id="relative_description_group" style="display: none;">
+                                    <div class="col-md-4" id="relative_description_group" @if (old('has_relative') != 1)
+                                        style="display: none;" @endif>
                                         <div class="form-group">
                                             <label>وصف القريب</label>
                                             <input type="text" name="relative_description"

@@ -16,10 +16,12 @@ use App\Models\Qualification;
 use App\Models\Religion;
 use App\Models\Resignation;
 use App\Http\Requests\EmployeeRequest;
+use App\Http\Requests\EmployeeUpdateRequest;
 use App\Models\DrivingLicenseType;
 use App\Models\Language;
 use App\Models\MilitaryStatus;
 use App\Models\ShiftsType;
+use Date;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -101,7 +103,7 @@ class EmployeeController extends Controller
         $cities = get_cols_where(City::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
         $military_statuses = get_cols_where(MilitaryStatus::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
         $driving_license_types = get_cols_where(DrivingLicenseType::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
-        $shiftTypes = get_cols_where(ShiftsType::class, ['id', 'type', 'start_time', 'end_time','total_hours'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $shiftTypes = get_cols_where(ShiftsType::class, ['id', 'type', 'start_time', 'end_time', 'total_hours'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
         $languages = get_cols_where(Language::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
 
         return view('admin.employees.create', compact(
@@ -129,39 +131,144 @@ class EmployeeController extends Controller
      */
     public function store(EmployeeRequest $request)
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Employee $employee)
-    {
-        //
+        try {
+            $company_id = Auth::user()->company_id;
+            $checkIfExist = getColsWhereRow(Employee::class, ['id'], ['company_id' => $company_id, 'name' => $request->name]);
+            if (!empty($checkIfExist)) {
+                return redirect()->back()->with(['error' => 'هذا الموظف موجود بالفعل'])->withInput();
+            }
+            $last_employee = get_cols_where_row_orderby(Employee::class, ['employee_code'], ['company_id' => $company_id], 'id', 'desc');
+            if (!empty($last_employee)) {
+                $employee_code = $last_employee->employee_code + 1;
+            } else {
+                $employee_code = 1;
+            }
+            $validatedData = $request->validated();
+            if (!empty($request->salary)) {
+                $validatedData['payment_per_day'] = $request->salary / 30; // Assuming 30 days in a month
+            }
+            if ($request->has('image')) {
+                $validatedData['image'] = uploadImage('employees/profile', $request->file('image'));
+            }
+            if ($request->has('cv')) {
+                $validatedData['cv'] = uploadImage('employees/cv', $request->file('cv'));
+            }
+            $validatedData['hire_date_day_month_year'] = date('d/m/Y', strtotime($request->hire_date));
+            $validatedData['employee_code'] = $employee_code;
+            $validatedData['company_id'] = $company_id;
+            $validatedData['added_by'] = Auth::id();
+            dd($validatedData);
+            $flag = insert(Employee::class, $validatedData);
+            if ($flag) {
+                return redirect()->route('admin.employees.index')->with(['success' => 'تم إضافة الموظف بنجاح']);
+            }
+            return redirect()->back()->with(['error' => 'حدث خطأ أثناء إضافة الموظف'])->withInput();
+        } catch (\Exception $e) {
+            return redirect()->back()->with(['error' => 'عفوا حدث خطأ ما ' . $e->getMessage()])->withInput();
+        }
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Employee $employee)
+    public function edit($id)
     {
-        //
+        $company_id = Auth::user()->company_id;
+        $employee = getColsWhereRow(Employee::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
+        if (!$employee) {
+            return redirect()->route('admin.employees.index')->with(['error' => 'الموظف غير موجود']);
+        }
+        $religions = get_cols_where(Religion::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $qualifications = get_cols_where(Qualification::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $resignations = get_cols_where(Resignation::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $jobs = get_cols_where(JobsCategory::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $departments = get_cols_where(Department::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $nationalities = get_cols_where(Nationality::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $branches = get_cols_where(Branche::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $bloodGroups = get_cols_where(BloodGroup::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $countries = get_cols_where(Country::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $governorates = get_cols_where(Governorate::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $cities = get_cols_where(City::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $military_statuses = get_cols_where(MilitaryStatus::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $driving_license_types = get_cols_where(DrivingLicenseType::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $shiftTypes = get_cols_where(ShiftsType::class, ['id', 'type', 'start_time', 'end_time', 'total_hours'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $languages = get_cols_where(Language::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+
+        return view('admin.employees.update', compact(
+            'employee',
+            'religions',
+            'qualifications',
+            'resignations',
+            'jobs',
+            'departments',
+            'nationalities',
+            'branches',
+            'bloodGroups',
+            'countries',
+            'governorates',
+            'cities',
+            'military_statuses',
+            'driving_license_types',
+            'shiftTypes',
+            'languages'
+
+        ));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Employee $employee)
+    public function update(EmployeeUpdateRequest $request, $id)
     {
-        //
+        try {
+            $company_id = Auth::user()->company_id;
+            $employee = getColsWhereRow(Employee::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
+            if (!$employee) {
+                return redirect()->route('admin.employees.index')->with(['error' => 'الموظف غير موجود']);
+            }
+            $validatedData = $request->validated();
+            $validatedData['company_id'] = $company_id;
+            $validatedData['updated_by'] = Auth::id();
+            if (!empty($request->salary) && $request->salary != $employee->salary) {
+                $validatedData['payment_per_day'] = $request->salary / 30; // Assuming 30 days in a month
+            }
+            if ($request->hasFile('image')) {
+                if ($employee->image && file_exists(public_path($employee->image))) {
+                    unlink(public_path($employee->image));
+                }
+                $validatedData['image'] =uploadImage('employees/profile', $request->file('image'));
+
+            }
+            if ($request->hasFile('cv')) {
+                if ($employee->cv && file_exists(public_path($employee->cv))) {
+                    unlink(public_path($employee->cv));
+                }
+                $validatedData['cv'] = uploadImage('employees/cv', $request->file('cv'));
+            }
+
+            $employee->update($validatedData);
+            return redirect()->route('admin.employees.index')->with(['success' => 'تم تحديث بيانات الموظف بنجاح']);
+        } catch (\Exception $e) {
+            return redirect()->route('admin.employees.edit', $id)->with(['error' => 'حدث خطأ أثناء تحديث بيانات الموظف ' . $e->getMessage()])->withInput();
+        }
+
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Employee $employee)
+    public function destroy( $id)
     {
-        //
+        $company_id = Auth::user()->company_id;
+        $employee = getColsWhereRow(Employee::class, ['id', 'employment_status'], ['id' => $id, 'company_id' => $company_id]);
+        if (!$employee) {
+            return redirect()->route('admin.employees.index')->with(['error' => 'الموظف غير موجود']);
+        }
+        if($employee->employment_status == 1) {
+        return redirect()->route('admin.employees.index')->with(['error' => 'لا يمكن حذف الموظف لأنه لديه حالة توظيف نشطة']);
+        }
+        $employee->delete();
+        return redirect()->route('admin.employees.index')->with(['success' => 'تم حذف الموظف بنجاح']);
     }
 
     public function getGovernorateList(Request $request)

@@ -38,8 +38,16 @@
                     <p class="mb-0 mt-1">{{ $employee->birth_date ?? '---' }}</p>
                 </div>
                 <div class="col-md-3 mb-3">
+                    <strong>الجنسية:</strong>
+                    <p class="mb-0 mt-1">{{ optional($employee->nationality)->name ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
                     <strong>الجنس:</strong>
                     <p class="mb-0 mt-1">{{ $genderLabels[$employee->gender] ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>الديانة:</strong>
+                    <p class="mb-0 mt-1">{{ optional($employee->religion)->name ?? '---' }}</p>
                 </div>
                 <div class="col-md-3 mb-3">
                     <strong>الحالة الاجتماعية:</strong>
@@ -56,6 +64,14 @@
                 <div class="col-md-6 mb-3">
                     <strong>العنوان الثابت:</strong>
                     <p class="mb-0 mt-1">{{ $employee->stable_address ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>صلاحية الجنسية:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->nationality_expiry_date ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>جهة إصدار الجنسية:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->nationality_place_of_issue ?? '---' }}</p>
                 </div>
             </div>
         </div>
@@ -99,6 +115,10 @@
                     <strong>المدينة:</strong>
                     <p class="mb-0 mt-1">{{ optional($employee->city)->name ?? '---' }}</p>
                 </div>
+                <div class="col-md-3 mb-3">
+                    <strong>العنوان السكني:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->home_address ?? '---' }}</p>
+                </div>
             </div>
         </div>
     </div>
@@ -113,10 +133,7 @@
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-md-3 mb-3">
-                    <strong>الديانة:</strong>
-                    <p class="mb-0 mt-1">{{ optional($employee->religion)->name ?? '---' }}</p>
-                </div>
+
                 <div class="col-md-3 mb-3">
                     <strong>المؤهل:</strong>
                     <p class="mb-0 mt-1">{{ optional($employee->qualification)->name ?? '---' }}</p>
@@ -129,9 +146,13 @@
                     <strong>تقدير التخرج:</strong>
                     <p class="mb-0 mt-1">{{ $graduationGradeLabels[$employee->graduation_grade] ?? '---' }}</p>
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-md-3 mb-3">
                     <strong>تخصص التخرج:</strong>
                     <p class="mb-0 mt-1">{{ $employee->graduation_specialization ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>اللغة:</strong>
+                    <p class="mb-0 mt-1">{{ optional($employee->language)->name ?? '---' }}</p>
                 </div>
             </div>
         </div>
@@ -150,6 +171,10 @@
                 <div class="col-md-3 mb-3">
                     <strong>تاريخ التعيين:</strong>
                     <p class="mb-0 mt-1">{{ $employee->hire_date ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>تاريخ التعيين (اليوم/الشهر/السنة):</strong>
+                    <p class="mb-0 mt-1">{{ $employee->hire_date_day_month_year ?? '---' }}</p>
                 </div>
                 <div class="col-md-3 mb-3">
                     <strong>القسم:</strong>
@@ -171,13 +196,18 @@
                     <strong>الدفع اليومي:</strong>
                     <p class="mb-0 mt-1">{{ $employee->payment_per_day ?? '---' }}</p>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <strong>الجنسية:</strong>
-                    <p class="mb-0 mt-1">{{ optional($employee->nationality)->name ?? '---' }}</p>
-                </div>
+
                 <div class="col-md-3 mb-3">
                     <strong>رقم الهوية:</strong>
                     <p class="mb-0 mt-1">{{ $employee->nationality_number ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>نوع الوردية الثابتة:</strong>
+                    <p class="mb-0 mt-1">{{ $yesNoLabels[$employee->fixed_shift] ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>عدد ساعات العمل اليومية:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->daily_work_hours ?? '---' }}</p>
                 </div>
             </div>
         </div>
@@ -209,6 +239,18 @@
                 <div class="col-md-3 mb-3">
                     <strong>السلاح:</strong>
                     <p class="mb-0 mt-1">{{ $employee->military_weapon ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>تاريخ الإعفاء:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->military_exemption_date ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>سبب الإعفاء:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->military_exemption_reason ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>سبب التأجيل:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->postponement_reason ?? '---' }}</p>
                 </div>
             </div>
         </div>
@@ -245,35 +287,127 @@
                     <strong>قيمة التأمين الطبي:</strong>
                     <p class="mb-0 mt-1">{{ $employee->medical_insurance_amount ?? '---' }}</p>
                 </div>
+                <div class="col-md-3 mb-3">
+                    <strong>رقم التأمين الطبي:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->medical_insurance_number ?? '---' }}</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- معلومات إضافية -->
-    <div class="card card-outline card-dark shadow-sm mb-3">
-        <div class="card-header bg-dark text-white">
+    <!-- معلومات الدفع والمحفزات -->
+    <div class="card card-outline card-primary shadow-sm mb-3">
+        <div class="card-header bg-primary text-white">
             <h5 class="card-title mb-0">
-                <i class="fas fa-info-circle"></i>
-                معلومات إضافية
+                <i class="fas fa-money-bill-wave"></i>
+                الدفع والمحفزات
             </h5>
         </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-md-3 mb-3">
-                    <strong>الفرع:</strong>
-                    <p class="mb-0 mt-1">{{ optional($employee->branch)->name ?? '---' }}</p>
+                    <strong>نوع المحفز:</strong>
+                    <p class="mb-0 mt-1">{{ $motivationTypeLabels[$employee->motivation_type] ?? '---' }}</p>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <strong>نوع الوردية:</strong>
-                    <p class="mb-0 mt-1">{{ optional($employee->shiftType)->type ?? '---' }}</p>
+                    <strong>قيمة المحفز:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->motivation_amount ?? '---' }}</p>
                 </div>
+                <div class="col-md-3 mb-3">
+                    <strong>طريقة الدفع:</strong>
+                    <p class="mb-0 mt-1">{{ $paymentMethodLabels[$employee->payment_method] ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>رقم الحساب البنكي:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->bank_account_number ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>بدل ثابت:</strong>
+                    <p class="mb-0 mt-1">{{ $yesNoLabels[$employee->fixed_allowance] ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>تفعيل الحضور والغياب:</strong>
+                    <p class="mb-0 mt-1">{{ $yesNoLabels[$employee->has_attendance] ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>صيغة الإجازة:</strong>
+                    <p class="mb-0 mt-1">{{ $yesNoLabels[$employee->vacation_formula] ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>تفعيل للإجازة:</strong>
+                    <p class="mb-0 mt-1">{{ $yesNoLabels[$employee->active_for_vacation] ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>بيانات حساسة:</strong>
+                    <p class="mb-0 mt-1">{{ $yesNoLabels[$employee->has_sensitive_data] ?? '---' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- معلومات الاستقالة والترك -->
+    <div class="card card-outline card-outline shadow-sm mb-3">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-sign-out-alt"></i>
+                معلومات الاستقالة والترك
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <strong>نوع الاستقالة:</strong>
+                    <p class="mb-0 mt-1">{{ optional($employee->resignation)->name ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>تاريخ الاستقالة:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->resignation_date ?? '---' }}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong>سبب الاستقالة:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->resignation_reason ?? '---' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- معلومات رخصة القيادة والجواز -->
+    <div class="card card-outline card-success shadow-sm mb-3">
+        <div class="card-header bg-success text-white">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-id-card"></i>
+                رخصة القيادة والجواز
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
                 <div class="col-md-3 mb-3">
                     <strong>رخصة قيادة:</strong>
                     <p class="mb-0 mt-1">{{ $yesNoLabels[$employee->driving_license] ?? '---' }}</p>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <strong>إعاقة:</strong>
-                    <p class="mb-0 mt-1">{{ $yesNoLabels[$employee->has_disability] ?? '---' }}</p>
+                    <strong>نوع الرخصة:</strong>
+                    <p class="mb-0 mt-1">{{ optional($employee->drivingLicenseType)->type ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>رقم الرخصة:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->driving_license_number ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>رقم الجواز:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->passport_number ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>صلاحية الجواز:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->passport_expiry_date ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>جهة إصدار الجواز:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->passport_place_of_issue ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>اسم الكفيل:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->sponsor_name ?? '---' }}</p>
                 </div>
             </div>
         </div>
@@ -305,8 +439,92 @@
                     <strong>آخر تحديث:</strong>
                     <p class="mb-0 mt-1">{{ $employee->updated_at ?? '---' }}</p>
                 </div>
+                <div class="col-md-3 mb-3">
+                    <strong>معرف الشركة:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->company_id ?? '---' }}</p>
+                </div>
             </div>
         </div>
     </div>
 
-</div>
+    <!-- البيانات الصحية والعائلية -->
+    <div class="card card-outline card-warning shadow-sm mb-3">
+        <div class="card-header bg-warning text-white">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-heartbeat"></i>
+                البيانات الصحية والعائلية
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <strong>إعاقة:</strong>
+                    <p class="mb-0 mt-1">{{ $yesNoLabels[$employee->has_disability] ?? '---' }}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong>وصف الإعاقة:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->disability_description ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>وجود أقارب في الشركة:</strong>
+                    <p class="mb-0 mt-1">{{ $yesNoLabels[$employee->has_relative] ?? '---' }}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong>وصف الأقارب:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->relative_description ?? '---' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- الملفات والملاحظات -->
+    <div class="card card-outline card-info shadow-sm mb-3">
+        <div class="card-header bg-info text-white">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-file-alt"></i>
+                الملفات والملاحظات
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <strong>الصورة:</strong>
+                    <p class="mb-0 mt-1">
+                        @if($employee->image)
+                        <a href="{{ asset('storage/' . $employee->image) }}" target="_blank"
+                            class="btn btn-sm btn-primary">
+                            <i class="fas fa-image"></i> عرض الصورة
+                        </a>
+                        @else
+                        ---
+                        @endif
+                    </p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>السيرة الذاتية:</strong>
+                    <p class="mb-0 mt-1">
+                        @if($employee->cv)
+                        <a href="{{ asset('storage/' . $employee->cv) }}" target="_blank"
+                            class="btn btn-sm btn-primary">
+                            <i class="fas fa-file-pdf"></i> تحميل السيرة الذاتية
+                        </a>
+                        @else
+                        ---
+                        @endif
+                    </p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <strong>الملاحظات:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->notes ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>الفرع:</strong>
+                    <p class="mb-0 mt-1">{{ optional($employee->branch)->name ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>نوع الوردية:</strong>
+                    <p class="mb-0 mt-1">{{ optional($employee->shiftType)->type ?? '---' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>

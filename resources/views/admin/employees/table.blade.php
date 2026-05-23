@@ -109,13 +109,11 @@
                             <th>كود الموظف</th>
                             <th>كود البصمة</th>
                             <th>الإسم</th>
-                            <th>الجنس</th>
                             <th>القسم</th>
                             <th>الوظيفة</th>
-                            <th>الهاتف</th>
-                            <th>الراتب</th>
+                            <th>الفرع</th>
+                            <th>الصورة</th>
                             <th>الحالة الوظيفية</th>
-                            <th>تاريخ التعيين</th>
                             <th>الإجراءات</th>
                         </tr>
                     </thead>
@@ -127,13 +125,17 @@
                             <td>{{ $employee->employee_code ?? '---' }}</td>
                             <td>{{ $employee->fingerprint_code ?? '---' }}</td>
                             <td class="text-right">{{ $employee->name ?? '---' }}</td>
-                            <td>{{ $genderLabels[$employee->gender] ?? '---' }}</td>
                             <td>{{ optional($employee->department)->name ?? '---' }}</td>
                             <td>{{ optional($employee->job)->name ?? '---' }}</td>
-                            <td>{{ $employee->work_telephone ?? $employee->home_telephone ?? '---' }}</td>
-                            <td>{{ $employee->salary !== null ? number_format($employee->salary, 2) : '---' }}</td>
+                            <td>{{ optional($employee->branch)->name ?? '---' }}</td>
+                            <td>
+                                @if($employee->image)
+                                    <img src="{{ asset('storage/' . $employee->image) }}" alt="صورة الموظف" class="img-thumbnail" style="max-width: 90px; max-height: 90px;">
+                                @else
+                                    <span>---</span>
+                                @endif
+                            </td>
                             <td>{!! $employmentStatusLabels[$employee->employment_status] ?? '---' !!}</td>
-                            <td>{{ $employee->hire_date ? \Carbon\Carbon::parse($employee->hire_date)->format('Y-m-d') : '---' }}</td>
                             <td>
                                 <div class="d-flex justify-content-center align-items-center gap-1">
                                     <button type="button" class="btn btn-sm btn-info m-1 show_employee_details" data-id="{{ $employee->id }}" title="عرض">

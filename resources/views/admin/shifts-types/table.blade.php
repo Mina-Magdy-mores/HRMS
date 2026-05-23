@@ -117,6 +117,7 @@
                             <option selected disabled value="null">اختر نوع الشفت</option>
                             <option value="1">شفت نهاري</option>
                             <option value="2">شفت ليلي</option>
+                            <option value="3">شفت كامل</option>
                         </select>
                     </div>
                 </div>
@@ -166,6 +167,8 @@
                                 شفت نهاري
                                 @elseif($shiftsType->type == 2)
                                 شفت ليلي
+                                @elseif($shiftsType->type == 3)
+                                شفت كامل
                                 @else
                                 نوع غير معروف
                                 @endif

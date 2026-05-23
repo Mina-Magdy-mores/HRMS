@@ -40,7 +40,6 @@ class EmployeeSeeder extends Seeder
         $militaryStatuses = MilitaryStatus::where('company_id', 1)->pluck('id', 'name')->toArray();
         $drivingLicenseTypes = DrivingLicenseType::where('company_id', 1)->pluck('id', 'name')->toArray();
         $languages = Language::where('company_id', 1)->pluck('id', 'name')->toArray();
-        $resignations = Resignation::where('company_id', 1)->pluck('id', 'name')->toArray();
 
         // ===================== بيانات الموظفين (10 موظفين) =====================
 
@@ -104,7 +103,7 @@ class EmployeeSeeder extends Seeder
                 'passport_number' => 'A12345678',
                 'passport_expiry_date' => '2028-05-15',
                 'passport_place_of_issue' => 'مصلحة الجوازات',
-                'image' => 'employees/ahmed.jpg',
+                'image' => 'employees/profile/ahmed.jpg',
                 'cv' => 'employees/cv/ahmed.pdf',
                 'salary' => 15000.00,
                 'language_id' => $languages['العربية'] ?? null,
@@ -185,7 +184,7 @@ class EmployeeSeeder extends Seeder
                 'passport_number' => 'B23456789',
                 'passport_expiry_date' => '2029-08-22',
                 'passport_place_of_issue' => 'مصلحة الجوازات',
-                'image' => 'employees/sara.jpg',
+                'image' => 'employees/profile/sara.jpg',
                 'cv' => 'employees/cv/sara.pdf',
                 'salary' => 12000.00,
                 'language_id' => $languages['الإنجليزية'] ?? null,
@@ -266,7 +265,7 @@ class EmployeeSeeder extends Seeder
                 'passport_number' => 'C34567890',
                 'passport_expiry_date' => '2027-11-10',
                 'passport_place_of_issue' => 'مصلحة الجوازات',
-                'image' => 'employees/mohamed.jpg',
+                'image' => 'employees/profile/mohamed.jpg',
                 'cv' => 'employees/cv/mohamed.pdf',
                 'salary' => 18000.00,
                 'language_id' => $languages['العربية'] ?? null,
@@ -347,7 +346,7 @@ class EmployeeSeeder extends Seeder
                 'passport_number' => 'D45678901',
                 'passport_expiry_date' => '2030-03-05',
                 'passport_place_of_issue' => 'مصلحة الجوازات',
-                'image' => 'employees/nasma.jpg',
+                'image' => 'employees/profile/nasma.jpg',
                 'cv' => 'employees/cv/nasma.pdf',
                 'salary' => 10000.00,
                 'language_id' => $languages['الإنجليزية'] ?? null,
@@ -428,7 +427,7 @@ class EmployeeSeeder extends Seeder
                 'passport_number' => 'E56789012',
                 'passport_expiry_date' => '2028-07-18',
                 'passport_place_of_issue' => 'مصلحة الجوازات',
-                'image' => 'employees/khaled.jpg',
+                'image' => 'employees/profile/khaled.jpg',
                 'cv' => 'employees/cv/khaled.pdf',
                 'salary' => 13000.00,
                 'language_id' => $languages['العربية'] ?? null,
@@ -509,7 +508,7 @@ class EmployeeSeeder extends Seeder
                 'passport_number' => 'F67890123',
                 'passport_expiry_date' => '2029-12-25',
                 'passport_place_of_issue' => 'مصلحة الجوازات',
-                'image' => 'employees/fatma.jpg',
+                'image' => 'employees/profile/fatma.jpg',
                 'cv' => 'employees/cv/fatma.pdf',
                 'salary' => 11000.00,
                 'language_id' => $languages['العربية'] ?? null,
@@ -590,7 +589,7 @@ class EmployeeSeeder extends Seeder
                 'passport_number' => 'G78901234',
                 'passport_expiry_date' => '2027-09-30',
                 'passport_place_of_issue' => 'مصلحة الجوازات',
-                'image' => 'employees/amr.jpg',
+                'image' => 'employees/profile/amr.jpg',
                 'cv' => 'employees/cv/amr.pdf',
                 'salary' => 20000.00,
                 'language_id' => $languages['الإنجليزية'] ?? null,
@@ -671,7 +670,7 @@ class EmployeeSeeder extends Seeder
                 'passport_number' => 'H89012345',
                 'passport_expiry_date' => '2030-06-12',
                 'passport_place_of_issue' => 'مصلحة الجوازات',
-                'image' => 'employees/mona.jpg',
+                'image' => 'employees/profile/mona.jpg',
                 'cv' => 'employees/cv/mona.pdf',
                 'salary' => 9500.00,
                 'language_id' => $languages['العربية'] ?? null,
@@ -752,7 +751,7 @@ class EmployeeSeeder extends Seeder
                 'passport_number' => 'I90123456',
                 'passport_expiry_date' => '2028-02-28',
                 'passport_place_of_issue' => 'مصلحة الجوازات',
-                'image' => 'employees/tarek.jpg',
+                'image' => 'employees/profile/tarek.jpg',
                 'cv' => 'employees/cv/tarek.pdf',
                 'salary' => 14000.00,
                 'language_id' => $languages['العربية'] ?? null,
@@ -833,7 +832,7 @@ class EmployeeSeeder extends Seeder
                 'passport_number' => 'J01234567',
                 'passport_expiry_date' => '2029-04-17',
                 'passport_place_of_issue' => 'مصلحة الجوازات',
-                'image' => 'employees/heba.jpg',
+                'image' => 'employees/profile/heba.jpg',
                 'cv' => 'employees/cv/heba.pdf',
                 'salary' => 8500.00,
                 'language_id' => $languages['العربية'] ?? null,
@@ -859,6 +858,8 @@ class EmployeeSeeder extends Seeder
         // ===================== إدراج البيانات في قاعدة البيانات =====================
 
         foreach ($employees as $employee) {
+            $employee['added_by'] = 1;
+            $employee['updated_by'] = 1;
             Employee::updateOrCreate(
                 ['employee_code' => $employee['employee_code'], 'company_id' => 1],
                 $employee

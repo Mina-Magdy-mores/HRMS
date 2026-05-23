@@ -91,117 +91,119 @@
              $(document).on('change', '#military_status', function () {
                 var emp_military_id = $(this).val();
                 if (emp_military_id == 1) {
-                    $('#military_start_date').show()
-                    $('#military_end_date').show()
-                    $('#military_weapon').show()
-                    $('#military_exemption_date').hide()
-                    $('#military_exemption_reason').hide()
+                    $('#military_start_date').show().find('input, select, textarea').prop('disabled', false);
+                    $('#military_end_date').show().find('input, select, textarea').prop('disabled', false);
+                    $('#military_weapon').show().find('input, select, textarea').prop('disabled', false);
+                    $('#military_exemption_date').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#military_exemption_reason').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#postponement_reason').hide().find('input, select, textarea').prop('disabled', true);
                 } else if (emp_military_id == 2) {
-                    $('#military_exemption_date').show()
-                    $('#military_exemption_reason').show()
-                    $('#military_start_date').hide()
-                    $('#military_end_date').hide()
-                    $('#military_weapon').hide()
+                    $('#military_exemption_date').show().find('input, select, textarea').prop('disabled', false);
+                    $('#military_exemption_reason').show().find('input, select, textarea').prop('disabled', false);
+                    $('#military_start_date').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#military_end_date').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#military_weapon').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#postponement_reason').hide().find('input, select, textarea').prop('disabled', true);
                 }else if(emp_military_id == 3){
-                    $('#military_start_date').hide()
-                    $('#military_end_date').hide()
-                    $('#military_weapon').hide()
-                    $('#military_exemption_date').hide()
-                    $('#military_exemption_reason').hide()
-                    $('#postponement_reason').show()
+                    $('#military_start_date').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#military_end_date').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#military_weapon').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#military_exemption_date').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#military_exemption_reason').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#postponement_reason').show().find('input, select, textarea').prop('disabled', false);
                 }else{
-                    $('#military_start_date').hide()
-                    $('#military_end_date').hide()
-                    $('#military_weapon').hide()
-                    $('#military_exemption_date').hide()
-                    $('#military_exemption_reason').hide()
-                                        $('#postponement_reason').hide()
+                    $('#military_start_date').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#military_end_date').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#military_weapon').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#military_exemption_date').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#military_exemption_reason').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#postponement_reason').hide().find('input, select, textarea').prop('disabled', true);
 
                 }
             })
              $(document).on('change', '#driving_license', function () {
                 var driving_license = $(this).val();
                 if (driving_license == 1) {
-                    $('#drivingLicenseTypeGroup').show()
-                    $('#drivingLicenseNumberGroup').show()
+                    $('#drivingLicenseTypeGroup').show().find('input, select, textarea').prop('disabled', false);
+                    $('#drivingLicenseNumberGroup').show().find('input, select, textarea').prop('disabled', false);
                 }else{
-                    $('#drivingLicenseTypeGroup').hide()
-                    $('#drivingLicenseNumberGroup').hide()
+                    $('#drivingLicenseTypeGroup').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#drivingLicenseNumberGroup').hide().find('input, select, textarea').prop('disabled', true);
                 }
             })
              $(document).on('change', '#fixed_shift', function () {
                 var fixed_shift = $(this).val();
                 if (fixed_shift == '1') {
-                    $('#shift_type_id').show()
-                    $('#daily_work_hours_group').hide()
+                    $('#shift_type_id').show().find('input, select, textarea').prop('disabled', false);
+                    $('#daily_work_hours_group').hide().find('input, select, textarea').prop('disabled', true);
                 }else if(fixed_shift == '0'){
-                    $('#shift_type_id').hide()
-                    $('#daily_work_hours_group').show()
+                    $('#shift_type_id').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#daily_work_hours_group').show().find('input, select, textarea').prop('disabled', false);
                 }else{
-                     $('#shift_type_id').hide()
-                     $('#daily_work_hours_group').hide()
+                     $('#shift_type_id').hide().find('input, select, textarea').prop('disabled', true);
+                     $('#daily_work_hours_group').hide().find('input, select, textarea').prop('disabled', true);
                 }
             })
              $(document).on('change', '#has_disability', function () {
                 var has_disability = $(this).val();
                 if (has_disability == 1) {
-                    $('#disability_description_group').show()
+                    $('#disability_description_group').show().find('input, select, textarea').prop('disabled', false);
                 }else{
-                    $('#disability_description_group').hide()
+                    $('#disability_description_group').hide().find('input, select, textarea').prop('disabled', true);
                 }
             })
               $(document).on('change', '#has_relative', function () {
                 var has_relative = $(this).val();
                 if (has_relative == 1) {
-                    $('#relative_description_group').show()
+                    $('#relative_description_group').show().find('input, select, textarea').prop('disabled', false);
                 }else{
-                    $('#relative_description_group').hide()
+                    $('#relative_description_group').hide().find('input, select, textarea').prop('disabled', true);
                 }
             })
               $(document).on('change', '#resignation_id', function () {
                 var resignation_id = $(this).val();
                 if (resignation_id) {
-                    $('#resignation_date_group').show()
-                    $('#resignation_reason_group').show()
+                    $('#resignation_date_group').show().find('input, select, textarea').prop('disabled', false);
+                    $('#resignation_reason_group').show().find('input, select, textarea').prop('disabled', false);
                 }else{
-                    $('#resignation_date_group').hide()
-                    $('#resignation_reason_group').hide()
+                    $('#resignation_date_group').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#resignation_reason_group').hide().find('input, select, textarea').prop('disabled', true);
                 }
             })
                           $(document).on('change', '#motivation_type', function () {
                 var motivation_type = $(this).val();
                 if (motivation_type == '1') {
-                    $('#motivation_amount_group').show()
+                    $('#motivation_amount_group').show().find('input, select, textarea').prop('disabled', false);
                 }else{
-                    $('#motivation_amount_group').hide()
+                    $('#motivation_amount_group').hide().find('input, select, textarea').prop('disabled', true);
                 }
             })
                           $(document).on('change', '#payment_method', function () {
                 var payment_method = $(this).val();
                 if (payment_method == '2') {
-                    $('#bank_account_number_group').show()
+                    $('#bank_account_number_group').show().find('input, select, textarea').prop('disabled', false);
                 }else{
-                    $('#bank_account_number_group').hide()
+                    $('#bank_account_number_group').hide().find('input, select, textarea').prop('disabled', true);
                 }
             })
                           $(document).on('change', '#has_social_insurance', function () {
                 var has_social_insurance = $(this).val();
                 if (has_social_insurance == '1') {
-                    $('#social_insurance_amount_group').show()
-                    $('#social_insurance_number_group').show()
+                    $('#social_insurance_amount_group').show().find('input, select, textarea').prop('disabled', false);
+                    $('#social_insurance_number_group').show().find('input, select, textarea').prop('disabled', false);
                 }else{
-                    $('#social_insurance_amount_group').hide()
-                    $('#social_insurance_number_group').hide()
+                    $('#social_insurance_amount_group').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#social_insurance_number_group').hide().find('input, select, textarea').prop('disabled', true);
                 }
             })
                                       $(document).on('change', '#has_medical_insurance', function () {
                 var has_medical_insurance = $(this).val();
                 if (has_medical_insurance == '1') {
-                    $('#medical_insurance_amount_group').show()
-                    $('#medical_insurance_number_group').show()
+                    $('#medical_insurance_amount_group').show().find('input, select, textarea').prop('disabled', false);
+                    $('#medical_insurance_number_group').show().find('input, select, textarea').prop('disabled', false);
                 }else{
-                    $('#medical_insurance_amount_group').hide()
-                    $('#medical_insurance_number_group').hide()
+                    $('#medical_insurance_amount_group').hide().find('input, select, textarea').prop('disabled', true);
+                    $('#medical_insurance_number_group').hide().find('input, select, textarea').prop('disabled', true);
                 }
             })
 

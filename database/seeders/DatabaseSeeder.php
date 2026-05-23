@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             GovernorateSeeder::class,
             CitySeeder::class,
             DrivingLicenseTypeSeeder::class,
+            LanguageSeeder::class,
 
                 // 3. باقي البيانات
             AdminPanelSettingSeeder::class,
