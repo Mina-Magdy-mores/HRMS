@@ -50,6 +50,10 @@
                     <p class="mb-0 mt-1">{{ optional($employee->religion)->name ?? '---' }}</p>
                 </div>
                 <div class="col-md-3 mb-3">
+                    <strong>اللغة:</strong>
+                    <p class="mb-0 mt-1">{{ optional($employee->language)->name ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
                     <strong>الحالة الاجتماعية:</strong>
                     <p class="mb-0 mt-1">{{ $maritalStatusLabels[$employee->marital_status] ?? '---' }}</p>
                 </div>
@@ -62,15 +66,19 @@
                     <p class="mb-0 mt-1">{{ optional($employee->bloodGroup)->name ?? '---' }}</p>
                 </div>
                 <div class="col-md-6 mb-3">
-                    <strong>العنوان الثابت:</strong>
+                    <strong>العنوان الحالى:</strong>
                     <p class="mb-0 mt-1">{{ $employee->stable_address ?? '---' }}</p>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <strong>صلاحية الجنسية:</strong>
+                    <strong>رقم البطاقة:</strong>
+                    <p class="mb-0 mt-1">{{ $employee->nationality_number ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>صلاحية رقم البطاقة:</strong>
                     <p class="mb-0 mt-1">{{ $employee->nationality_expiry_date ?? '---' }}</p>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <strong>جهة إصدار الجنسية:</strong>
+                    <strong>جهة إصدار رقم البطاقة:</strong>
                     <p class="mb-0 mt-1">{{ $employee->nationality_place_of_issue ?? '---' }}</p>
                 </div>
             </div>
@@ -123,12 +131,12 @@
         </div>
     </div>
 
-    <!-- المؤهلات والديانة -->
+    <!-- المؤهلات -->
     <div class="card card-outline card-warning shadow-sm mb-3">
         <div class="card-header bg-warning text-white">
             <h5 class="card-title mb-0">
                 <i class="fas fa-graduation-cap"></i>
-                المؤهلات والديانة
+                المؤهلات
             </h5>
         </div>
         <div class="card-body">
@@ -150,10 +158,6 @@
                     <strong>تخصص التخرج:</strong>
                     <p class="mb-0 mt-1">{{ $employee->graduation_specialization ?? '---' }}</p>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <strong>اللغة:</strong>
-                    <p class="mb-0 mt-1">{{ optional($employee->language)->name ?? '---' }}</p>
-                </div>
             </div>
         </div>
     </div>
@@ -173,16 +177,16 @@
                     <p class="mb-0 mt-1">{{ $employee->hire_date ?? '---' }}</p>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <strong>تاريخ التعيين (اليوم/الشهر/السنة):</strong>
-                    <p class="mb-0 mt-1">{{ $employee->hire_date_day_month_year ?? '---' }}</p>
-                </div>
-                <div class="col-md-3 mb-3">
                     <strong>القسم:</strong>
                     <p class="mb-0 mt-1">{{ optional($employee->department)->name ?? '---' }}</p>
                 </div>
                 <div class="col-md-3 mb-3">
                     <strong>الوظيفة:</strong>
                     <p class="mb-0 mt-1">{{ optional($employee->job)->name ?? '---' }}</p>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <strong>الفرع:</strong>
+                    <p class="mb-0 mt-1">{{ optional($employee->branch)->name ?? '---' }}</p>
                 </div>
                 <div class="col-md-3 mb-3">
                     <strong>حالة التوظيف:</strong>
@@ -196,11 +200,6 @@
                     <strong>الدفع اليومي:</strong>
                     <p class="mb-0 mt-1">{{ $employee->payment_per_day ?? '---' }}</p>
                 </div>
-
-                <div class="col-md-3 mb-3">
-                    <strong>رقم الهوية:</strong>
-                    <p class="mb-0 mt-1">{{ $employee->nationality_number ?? '---' }}</p>
-                </div>
                 <div class="col-md-3 mb-3">
                     <strong>نوع الوردية الثابتة:</strong>
                     <p class="mb-0 mt-1">{{ $yesNoLabels[$employee->fixed_shift] ?? '---' }}</p>
@@ -209,6 +208,40 @@
                     <strong>عدد ساعات العمل اليومية:</strong>
                     <p class="mb-0 mt-1">{{ $employee->daily_work_hours ?? '---' }}</p>
                 </div>
+                <div class="col-md-6 mb-3">
+                    <strong>نوع الوردية:</strong>
+                    <p class="mb-0 mt-1">
+                        @if ($employee->shiftType)
+
+                        @if($employee->shiftType->type == 1)
+                        شفت نهاري
+                        @elseif($employee->shiftType->type == 2)
+                        شفت ليلي
+                        @elseif($employee->shiftType->type == 3)
+                        شفت كامل اليوم
+                        @endif
+                        -
+                        @php
+                        $start_time = new DateTime($employee->shiftType->start_time);
+                        $start_time = $start_time->format('h:i A');
+                        @endphp
+
+                        {{ $start_time }}
+                        الى
+                        @php
+                        $end_time = new DateTime($employee->shiftType->end_time);
+                        $end_time = $end_time->format('h:i A');
+                        @endphp
+
+                        {{ $end_time }}
+                        -عدد الساعات
+                        {{ $employee->shiftType->total_hours }}
+                        @else
+                        '---'
+                        @endif
+                    </p>
+                </div>
+
             </div>
         </div>
     </div>
@@ -306,11 +339,11 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-3 mb-3">
-                    <strong>نوع المحفز:</strong>
+                    <strong>نوع الحافز:</strong>
                     <p class="mb-0 mt-1">{{ $motivationTypeLabels[$employee->motivation_type] ?? '---' }}</p>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <strong>قيمة المحفز:</strong>
+                    <strong>قيمة الحافز:</strong>
                     <p class="mb-0 mt-1">{{ $employee->motivation_amount ?? '---' }}</p>
                 </div>
                 <div class="col-md-3 mb-3">
@@ -440,7 +473,7 @@
                     <p class="mb-0 mt-1">{{ $employee->updated_at ?? '---' }}</p>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <strong>معرف الشركة:</strong>
+                    <strong>كود الشركة:</strong>
                     <p class="mb-0 mt-1">{{ $employee->company_id ?? '---' }}</p>
                 </div>
             </div>
@@ -461,7 +494,7 @@
                     <strong>إعاقة:</strong>
                     <p class="mb-0 mt-1">{{ $yesNoLabels[$employee->has_disability] ?? '---' }}</p>
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-md-9 mb-3">
                     <strong>وصف الإعاقة:</strong>
                     <p class="mb-0 mt-1">{{ $employee->disability_description ?? '---' }}</p>
                 </div>
@@ -469,7 +502,7 @@
                     <strong>وجود أقارب في الشركة:</strong>
                     <p class="mb-0 mt-1">{{ $yesNoLabels[$employee->has_relative] ?? '---' }}</p>
                 </div>
-                <div class="col-md-6 mb-3">
+                <div class="col-md-9 mb-3">
                     <strong>وصف الأقارب:</strong>
                     <p class="mb-0 mt-1">{{ $employee->relative_description ?? '---' }}</p>
                 </div>
@@ -516,14 +549,6 @@
                 <div class="col-md-6 mb-3">
                     <strong>الملاحظات:</strong>
                     <p class="mb-0 mt-1">{{ $employee->notes ?? '---' }}</p>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <strong>الفرع:</strong>
-                    <p class="mb-0 mt-1">{{ optional($employee->branch)->name ?? '---' }}</p>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <strong>نوع الوردية:</strong>
-                    <p class="mb-0 mt-1">{{ optional($employee->shiftType)->type ?? '---' }}</p>
                 </div>
             </div>
         </div>

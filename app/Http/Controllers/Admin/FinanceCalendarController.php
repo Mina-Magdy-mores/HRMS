@@ -208,7 +208,7 @@ class FinanceCalendarController extends Controller
                 ->with('success', 'تم التعديل بنجاح');
         } catch (\Exception $e) {
             return redirect()
-                ->route('admin.financeCalendars.index')
+                ->back()
                 ->with('error', 'حدث خطا ما برجاء المحاوله لاحقا ' . $e->getMessage())->withInput();
         }
     }

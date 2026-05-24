@@ -24,6 +24,7 @@ use App\Models\ShiftsType;
 use Date;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
 {
@@ -153,11 +154,10 @@ class EmployeeController extends Controller
             if ($request->has('cv')) {
                 $validatedData['cv'] = uploadImage('employees/cv', $request->file('cv'));
             }
-            $validatedData['hire_date_day_month_year'] = date('d/m/Y', strtotime($request->hire_date));
+            $validatedData['hire_date_day_month_year'] = $request->hire_date;
             $validatedData['employee_code'] = $employee_code;
             $validatedData['company_id'] = $company_id;
             $validatedData['added_by'] = Auth::id();
-            dd($validatedData);
             $flag = insert(Employee::class, $validatedData);
             if ($flag) {
                 return redirect()->route('admin.employees.index')->with(['success' => 'تم إضافة الموظف بنجاح']);
@@ -230,18 +230,21 @@ class EmployeeController extends Controller
             $validatedData['company_id'] = $company_id;
             $validatedData['updated_by'] = Auth::id();
             if (!empty($request->salary) && $request->salary != $employee->salary) {
-                $validatedData['payment_per_day'] = $request->salary / 30; // Assuming 30 days in a month
+                $validatedData['payment_per_day'] = $request->salary / 30;
             }
             if ($request->hasFile('image')) {
-                if ($employee->image && file_exists(public_path($employee->image))) {
-                    unlink(public_path($employee->image));
+                if (!empty($employee->image) && Storage::exists($employee->image)) {
+                    Storage::delete($employee->image);
                 }
-                $validatedData['image'] =uploadImage('employees/profile', $request->file('image'));
 
+                $validatedData['image'] = uploadImage(
+                    'employees/profile',
+                    $request->file('image')
+                );
             }
             if ($request->hasFile('cv')) {
-                if ($employee->cv && file_exists(public_path($employee->cv))) {
-                    unlink(public_path($employee->cv));
+                if (!empty($employee->cv) && Storage::exists($employee->cv)) {
+                    Storage::delete($employee->cv);
                 }
                 $validatedData['cv'] = uploadImage('employees/cv', $request->file('cv'));
             }
@@ -249,7 +252,7 @@ class EmployeeController extends Controller
             $employee->update($validatedData);
             return redirect()->route('admin.employees.index')->with(['success' => 'تم تحديث بيانات الموظف بنجاح']);
         } catch (\Exception $e) {
-            return redirect()->route('admin.employees.edit', $id)->with(['error' => 'حدث خطأ أثناء تحديث بيانات الموظف ' . $e->getMessage()])->withInput();
+            return redirect()->back()->with(['error' => 'حدث خطأ أثناء تحديث بيانات الموظف ' . $e->getMessage()])->withInput();
         }
 
     }
@@ -257,15 +260,15 @@ class EmployeeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy( $id)
+    public function destroy($id)
     {
         $company_id = Auth::user()->company_id;
         $employee = getColsWhereRow(Employee::class, ['id', 'employment_status'], ['id' => $id, 'company_id' => $company_id]);
         if (!$employee) {
             return redirect()->route('admin.employees.index')->with(['error' => 'الموظف غير موجود']);
         }
-        if($employee->employment_status == 1) {
-        return redirect()->route('admin.employees.index')->with(['error' => 'لا يمكن حذف الموظف لأنه لديه حالة توظيف نشطة']);
+        if ($employee->employment_status == 1) {
+            return redirect()->route('admin.employees.index')->with(['error' => 'لا يمكن حذف الموظف لأنه لديه حالة توظيف نشطة']);
         }
         $employee->delete();
         return redirect()->route('admin.employees.index')->with(['success' => 'تم حذف الموظف بنجاح']);
@@ -275,14 +278,16 @@ class EmployeeController extends Controller
     {
         if ($request->ajax()) {
             $governorates = get_cols_where(Governorate::class, ['id', 'name'], ['country_id' => $request->country_id, 'status' => 1], 'id', 'asc');
-            return view('admin.employees.governorate_list', compact('governorates'));
+            $selected_governorate_id = $request->selected_governorate_id;
+            return view('admin.employees.governorate_list', compact('governorates', 'selected_governorate_id'));
         }
     }
     public function getCitiesList(Request $request)
     {
         if ($request->ajax()) {
             $cities = get_cols_where(City::class, ['id', 'name'], ['governorate_id' => $request->governorate_id, 'status' => 1], 'id', 'asc');
-            return view('admin.employees.cities_list', compact('cities'));
+            $selected_city_id = $request->selected_city_id;
+            return view('admin.employees.cities_list', compact('cities', 'selected_city_id'));
         }
     }
 

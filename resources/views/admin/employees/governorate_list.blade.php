@@ -3,7 +3,8 @@
     class="form-control select2 {{ $errors->has('governorate_id') ? 'is-invalid' : '' }}">
     <option value="">اختر المحافظة</option>
     @foreach($governorates as $governorate)
-    <option value="{{ $governorate->id }}" {{ old('governorate_id')==$governorate->id ? 'selected' : '' }}>
+    <option value="{{ $governorate->id }}" {{ old('governorate_id', $selected_governorate_id ?? '' )==$governorate->id ?
+        'selected' : '' }}>
         {{ $governorate->name }}
     </option>
     @endforeach
