@@ -24,6 +24,7 @@ use App\Models\ShiftsType;
 use Date;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
@@ -233,7 +234,7 @@ class EmployeeController extends Controller
                 $validatedData['payment_per_day'] = $request->salary / 30;
             }
             if ($request->hasFile('image')) {
-                if (!empty($employee->image) && Storage::exists($employee->image)) {
+                if (!empty($employee->image)) {
                     Storage::delete($employee->image);
                 }
 
@@ -263,14 +264,22 @@ class EmployeeController extends Controller
     public function destroy($id)
     {
         $company_id = Auth::user()->company_id;
-        $employee = getColsWhereRow(Employee::class, ['id', 'employment_status'], ['id' => $id, 'company_id' => $company_id]);
+        $employee = getColsWhereRow(Employee::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
         if (!$employee) {
             return redirect()->route('admin.employees.index')->with(['error' => 'الموظف غير موجود']);
         }
         if ($employee->employment_status == 1) {
             return redirect()->route('admin.employees.index')->with(['error' => 'لا يمكن حذف الموظف لأنه لديه حالة توظيف نشطة']);
         }
-        $employee->delete();
+        DB::transaction(function () use ($employee) {
+            if (!empty($employee->image)) {
+                Storage::delete($employee->image);
+            }
+            if (!empty($employee->cv)) {
+                Storage::delete($employee->cv);
+            }
+            $employee->delete();
+        });
         return redirect()->route('admin.employees.index')->with(['success' => 'تم حذف الموظف بنجاح']);
     }
 
