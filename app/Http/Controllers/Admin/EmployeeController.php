@@ -17,11 +17,12 @@ use App\Models\Religion;
 use App\Models\Resignation;
 use App\Http\Requests\EmployeeRequest;
 use App\Http\Requests\EmployeeUpdateRequest;
+use App\Http\Requests\FileRequest;
 use App\Models\DrivingLicenseType;
+use App\Models\File;
 use App\Models\Language;
 use App\Models\MilitaryStatus;
 use App\Models\ShiftsType;
-use Date;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -83,7 +84,8 @@ class EmployeeController extends Controller
             'addedBy',
             'updatedBy',
             'drivingLicenseType',
-            'language'
+            'language',
+            'files',
         ])->findOrFail($id);
 
         return view('admin.employees.modal_details', compact('employee'));
@@ -136,13 +138,14 @@ class EmployeeController extends Controller
      */
     public function store(EmployeeRequest $request)
     {
+        dd($request->all());
         try {
             $company_id = Auth::user()->company_id;
             $checkIfExist = getColsWhereRow(Employee::class, ['id'], ['company_id' => $company_id, 'name' => $request->name]);
             if (!empty($checkIfExist)) {
                 return redirect()->back()->with(['error' => 'هذا الموظف موجود بالفعل'])->withInput();
             }
-            $last_employee = get_cols_where_row_orderby(Employee::class, ['employee_code'], ['company_id' => $company_id], 'id', 'desc');
+            $last_employee = get_cols_where_row_orderby(Employee::class, ['employee_code'], ['company_id' => $company_id], 'employee_code', 'desc');
             if (!empty($last_employee)) {
                 $employee_code = $last_employee->employee_code + 1;
             } else {
@@ -447,5 +450,65 @@ class EmployeeController extends Controller
             return view('admin.employees.ajaxSearch', compact('employees'));
         }
     }
+    public function download($id, $type, $file = null)
+    {
+        $company_id = Auth::user()->company_id;
+        $employee = getColsWhereRow(Employee::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
+        if (!$employee) {
+            return redirect()->route('admin.employees.index')->with(['error' => 'الموظف غير موجود']);
+        }
 
+        if ($type === 'image' && $employee->image) {
+            return response()->download(storage_path('app/public/' . $employee->image));
+        } elseif ($type === 'cv' && $employee->cv) {
+            return response()->download(storage_path('app/public/' . $employee->cv));
+        } elseif ($type === 'file' && $file) {
+            $file = getColsWhereRow(File::class, ['path'], ['id' => $file, 'employee_id' => $id, 'company_id' => $company_id]);
+            if ($file) {
+                return response()->download(storage_path('app/public/' . $file->path));
+            }
+        } else {
+            return redirect()->route('admin.employees.index')->with(['error' => 'الملف غير موجود']);
+        }
+    }
+    public function deleteFile($id, $employee_id)
+    {
+        $company_id = Auth::user()->company_id;
+        $file = getColsWhereRow(File::class, ['*'], ['employee_id' => $employee_id, 'company_id' => $company_id, 'id' => $id]);
+        if (!$file) {
+            return redirect()->route('admin.employees.index')->with(['error' => 'الملف غير موجود']);
+        }
+        Storage::delete($file->path);
+        destroy($file);
+        return redirect()->route('admin.employees.index')->with(['success' => 'تم حذف الملف بنجاح']);
+    }
+    public function addFile(FileRequest $request, $id)
+    {
+        $company_id = Auth::user()->company_id;
+        $employee = getColsWhereRow(Employee::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
+        if (!$employee) {
+            return redirect()->route('admin.employees.index')->with(['error' => 'الموظف غير موجود']);
+        }
+        $checkIfExists = getColsWhereRow(File::class, ['*'], ['name' => $request->name, 'employee_id' => $id, 'company_id' => $company_id]);
+        if ($checkIfExists) {
+            return redirect()->route('admin.employees.index')->with(['error' => 'الملف موجود بالفعل']);
+        }
+        try {
+            $validatedData = $request->only(['name']);
+            if ($request->has('file')) {
+                $file = $request->file('file');
+                $fileName = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
+                $path = $file->storeAs('employees/files', $fileName);
+                $validatedData['path'] = $path;
+                $validatedData['employee_id'] = $id;
+                $validatedData['company_id'] = $company_id;
+                $validatedData['added_by'] = Auth::id();
+                insert(File::class, $validatedData);
+                return redirect()->route('admin.employees.index')->with(['success' => 'تم إضافة الملف بنجاح']);
+            }
+
+        } catch (\Exception $e) {
+            return redirect()->route('admin.employees.index')->with(['error' => 'حدث خطأ أثناء إضافة الملف ' . $e->getMessage()]);
+        }
+    }
 }

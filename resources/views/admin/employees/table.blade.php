@@ -19,7 +19,7 @@
                 </span>
                 <div class="info-box-content">
                     <span class="info-box-text">عدد الموظفين</span>
-                    <span class="info-box-number">{{ $employees->total() ?? $employees->count() }}</span>
+                    <span class="info-box-number">{{ $employees->count() }}</span>
                 </div>
             </div>
         </div>
@@ -83,7 +83,19 @@
         </div>
 
         <div class="card-body">
-
+            @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show">
+                <h5>
+                    <i class="fas fa-exclamation-circle"></i>
+                    يوجد أخطاء في البيانات
+                </h5>
+                <ul class="mb-0 mt-2">
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
             @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show">
                 <i class="fas fa-check-circle"></i>
@@ -229,7 +241,7 @@
                 </div>
             </div>
             <div id="ajax_responce_search">
-                <div class="table-responsive" >
+                <div class="table-responsive">
                     <table class="table table-bordered table-hover text-center align-middle">
                         <thead class="bg-primary text-white">
                             <tr>
@@ -300,8 +312,8 @@
                         </tbody>
 
                     </table>
-                    {{-- Pagination --}}
                 </div>
+                {{-- Pagination --}}
                 <div class="mt-3">
                     {{ $employees->links() }}
                 </div>

@@ -370,20 +370,29 @@ namespace App\Models{
 /**
  * @property int $id
  * @property int $employee_code Employee Code unique identifier
- * @property string $fingerprint_code Fingerprint Code unique identifier
+ * @property string|null $fingerprint_code Fingerprint Code unique identifier
  * @property string $name
  * @property string|null $birth_date
+ * @property int $nationality_id
+ * @property int $gender 1: Male, 2: Female, 3: Other
+ * @property int|null $religion_id
+ * @property string|null $nationality_number
+ * @property string|null $nationality_expiry_date
+ * @property string|null $nationality_place_of_issue
  * @property string|null $email
  * @property string|null $home_telephone
  * @property string|null $work_telephone
- * @property int|null $blood_group_id
+ * @property int|null $marital_status 1: Single, 2: Married, 3: engaged , 4: Widowed , 5: Divorced
+ * @property int|null $children_count
  * @property string|null $stable_address
  * @property int|null $country_id
  * @property int|null $governorate_id
  * @property int|null $city_id
- * @property int $children_count
- * @property int|null $gender
- * @property int|null $marital_status 1: Single, 2: Married, 3: engaged , 4: Widowed , 5: Divorced
+ * @property string|null $home_address
+ * @property int|null $blood_group_id
+ * @property int|null $driving_license 1: Yes, 0: No
+ * @property int|null $driving_license_type_id
+ * @property string|null $driving_license_number
  * @property int|null $military_status
  * @property string|null $military_start_date
  * @property string|null $military_end_date
@@ -391,80 +400,74 @@ namespace App\Models{
  * @property string|null $military_exemption_date
  * @property string|null $military_exemption_reason
  * @property string|null $postponement_reason
- * @property int $driving_license 1: Yes, 0: No
- * @property string|null $driving_license_number
- * @property int $driving_license_type_id
- * @property int|null $religion_id
  * @property int|null $qualifications_id
  * @property string|null $qualification_year
  * @property int|null $graduation_grade 1: Excellent, 2: Very Good, 3: Good, 4: Fair, 5: Poor
  * @property string|null $graduation_specialization
+ * @property int $job_id
+ * @property int $department_id
+ * @property int $branch_id
  * @property string|null $hire_date
  * @property string|null $hire_date_day_month_year
  * @property int $employment_status 1: Active, 0: Inactive
+ * @property int|null $fixed_shift
+ * @property int|null $shift_type_id
+ * @property numeric|null $daily_work_hours
  * @property int|null $resignation_id
  * @property string|null $resignation_date
  * @property string|null $resignation_reason
+ * @property numeric|null $salary
  * @property int|null $motivation_type 0: None, 1: Fixed, 2: Variable
  * @property numeric|null $motivation_amount
  * @property int|null $payment_method 1: Cash, 2: Bank Transfer, 3: Check
  * @property string|null $bank_account_number
- * @property int|null $has_disability 1: Yes, 0: No
- * @property string|null $disability_description
- * @property int|null $has_relative 1: Yes, 0: No
- * @property string|null $relative_description
- * @property string|null $urgent_contact_details
- * @property numeric|null $daily_work_hours
- * @property int $job_id
- * @property int $department_id
- * @property int $nationality_id
- * @property string|null $nationality_number
- * @property string|null $nationality_expiry_date
- * @property string|null $nationality_place_of_issue
- * @property string|null $sponsor_name
- * @property string|null $passport_number
- * @property string|null $passport_expiry_date
- * @property string|null $passport_place_of_issue
- * @property string|null $image
- * @property numeric|null $salary
- * @property int|null $lang_id
- * @property int $company_id
- * @property int $added_by
- * @property int $updated_by
- * @property int|null $fixed_shift
- * @property int|null $shift_type_id
  * @property numeric|null $payment_per_day
  * @property int|null $has_social_insurance 1: Yes, 0: No
  * @property numeric|null $social_insurance_amount
  * @property string|null $social_insurance_number
  * @property int|null $has_medical_insurance 1: Yes, 0: No
- * @property numeric|null $medical_insurance_amount
  * @property string|null $medical_insurance_number
- * @property int $fixed_allowance
- * @property int $has_attendance 1: Yes, 0: No
- * @property int $vacation_formula
- * @property int $active_for_vacation
- * @property int $has_sensitive_data
- * @property int $branch_id
+ * @property numeric|null $medical_insurance_amount
+ * @property int|null $fixed_allowance
+ * @property int|null $has_attendance 1: Yes, 0: No
+ * @property int|null $vacation_formula
+ * @property int|null $active_for_vacation
+ * @property int|null $has_sensitive_data
+ * @property string|null $sponsor_name
+ * @property string|null $passport_number
+ * @property string|null $passport_expiry_date
+ * @property string|null $passport_place_of_issue
+ * @property string|null $image
+ * @property string|null $cv
+ * @property int|null $language_id
+ * @property int|null $has_disability 1: Yes, 0: No
+ * @property string|null $disability_description
+ * @property int|null $has_relative 1: Yes, 0: No
+ * @property string|null $relative_description
+ * @property string|null $urgent_contact_details
+ * @property string|null $notes
+ * @property int $company_id
+ * @property int $added_by
+ * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property string|null $notes
  * @property-read \App\Models\Admin $addedBy
  * @property-read \App\Models\BloodGroup|null $bloodGroup
  * @property-read \App\Models\Branche $branch
  * @property-read \App\Models\City|null $city
  * @property-read \App\Models\Country|null $country
  * @property-read \App\Models\Department $department
- * @property-read \App\Models\DrivingLicenseType $drivingLicenseType
+ * @property-read \App\Models\DrivingLicenseType|null $drivingLicenseType
  * @property-read \App\Models\Governorate|null $governorate
  * @property-read \App\Models\JobsCategory $job
+ * @property-read \App\Models\Language|null $language
  * @property-read \App\Models\MilitaryStatus|null $militaryStatus
  * @property-read \App\Models\Nationality $nationality
  * @property-read \App\Models\Qualification|null $qualification
  * @property-read \App\Models\Religion|null $religion
  * @property-read \App\Models\Resignation|null $resignation
  * @property-read \App\Models\ShiftsType|null $shiftType
- * @property-read \App\Models\Admin $updatedBy
+ * @property-read \App\Models\Admin|null $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee query()
@@ -479,6 +482,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereCompanyId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereCountryId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereCv($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDailyWorkHours($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDepartmentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereDisabilityDescription($value)
@@ -503,11 +507,12 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereHasSocialInsurance($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereHireDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereHireDateDayMonthYear($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereHomeAddress($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereHomeTelephone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereImage($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereJobId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereLangId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereLanguageId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereMaritalStatus($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereMedicalInsuranceAmount($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereMedicalInsuranceNumber($value)
@@ -551,6 +556,33 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Employee whereWorkTelephone($value)
  */
 	class Employee extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property string $name
+ * @property int $employee_id
+ * @property string $path
+ * @property int $company_id
+ * @property int $added_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|File newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|File newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|File query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereEmployeeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|File wherePath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|File whereUpdatedBy($value)
+ */
+	class File extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -701,9 +733,29 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * @property int $id
+ * @property string $name
+ * @property int $status
+ * @property int $company_id
+ * @property int $added_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $addedBy
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
+ * @property-read int|null $employees_count
+ * @property-read \App\Models\Admin|null $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Language newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Language newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Language query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Language whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Language whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Language whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Language whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Language whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Language whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Language whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Language whereUpdatedBy($value)
  */
 	class Language extends \Eloquent {}
 }

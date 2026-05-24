@@ -154,7 +154,11 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/employees/governorate-list', [EmployeeController::class, 'getGovernorateList'])->name('employees.governorate-list');
         Route::post('/employees/cities-list', [EmployeeController::class, 'getCitiesList'])->name('employees.cities-list');
         Route::post('/employees/search', [EmployeeController::class, 'search'])->name('employees.search');
-        });
+        Route::get('/employees/{id}/download/{type}/{file?}', [EmployeeController::class, 'download'])->name('employees.download');
+        Route::post('/employees/{id}/add-file', [EmployeeController::class, 'addFile'])->name('employees.add-file');
+        Route::get('/employees/files/{id}/{employee_id}', [EmployeeController::class, 'deleteFile'])->name('employees.delete');
+
+    });
 
     // guest routes
     Route::middleware('guest:admin')->group(function () {

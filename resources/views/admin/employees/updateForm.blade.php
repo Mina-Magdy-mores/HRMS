@@ -991,7 +991,7 @@
                                                 accept="image/*">
                                             @if($employee->image)
                                             <small class="form-text text-muted">
-                                                الصورة الحالية: <a href="{{ asset('storage/' .$employee->image) }}" target="_blank">عرض الصورة</a>
+                                                الصورة الحالية: <a href="{{ asset('storage/' .$employee->image) }}" target="_blank">عرض الصورة</a> - <a href="{{ route('admin.employees.download', ['id' => $employee->id, 'type' => 'image']) }}" target="_blank">تحميل الصورة</a>
                                             </small>
                                             @endif
                                             @include('admin.errors.errors', ['value' => 'image'])
@@ -1005,7 +1005,7 @@
                                                 accept="image/*,application/pdf">
                                             @if($employee->cv)
                                             <small class="form-text text-muted">
-                                                السيرة الذاتية الحالية: <a href="{{ asset('storage/' .$employee->cv) }}" target="_blank">عرض الملف</a>
+                                                السيرة الذاتية الحالية: <a href="{{ asset('storage/' .$employee->cv) }}" target="_blank">عرض الملف</a> - <a href="{{ route('admin.employees.download', ['id' => $employee->id, 'type' => 'cv']) }}" target="_blank">تحميل الملف</a>
                                             </small>
                                             @endif
                                             @include('admin.errors.errors', ['value' => 'cv'])

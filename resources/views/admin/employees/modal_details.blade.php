@@ -10,11 +10,14 @@
     $yesNoLabels = [0 => 'لا', 1 => 'نعم'];
     $employmentStatusLabels = [1 => 'نشط', 0 => 'غير نشط'];
     @endphp
-
+    <a href="{{ route('admin.employees.edit', $employee->id) }}" class="btn btn-sm btn-warning mb-3" title="تعديل">
+        <i class="fas fa-edit"></i>
+        تعديل
+    </a>
     <!-- البيانات الأساسية -->
     <div class="card card-outline card-primary shadow-sm mb-3">
-        <div class="card-header bg-primary text-white">
-            <h5 class="card-title mb-0">
+        <div class="card-header bg-primary text-white text-end">
+            <h5 class="card-title mb-0" style="float:none;">
                 <i class="fas fa-user-circle"></i>
                 البيانات الأساسية
             </h5>
@@ -88,7 +91,7 @@
     <!-- بيانات الاتصال والعنوان -->
     <div class="card card-outline card-success shadow-sm mb-3">
         <div class="card-header bg-success text-white">
-            <h5 class="card-title mb-0">
+            <h5 class="card-title mb-0" style="float:none;">
                 <i class="fas fa-phone-alt"></i>
                 بيانات الاتصال والعنوان
             </h5>
@@ -134,7 +137,7 @@
     <!-- المؤهلات -->
     <div class="card card-outline card-warning shadow-sm mb-3">
         <div class="card-header bg-warning text-white">
-            <h5 class="card-title mb-0">
+            <h5 class="card-title mb-0" style="float:none;">
                 <i class="fas fa-graduation-cap"></i>
                 المؤهلات
             </h5>
@@ -165,7 +168,7 @@
     <!-- بيانات العمل والراتب -->
     <div class="card card-outline card-info shadow-sm mb-3">
         <div class="card-header bg-info text-white">
-            <h5 class="card-title mb-0">
+            <h5 class="card-title mb-0" style="float:none;">
                 <i class="fas fa-briefcase"></i>
                 بيانات العمل والراتب
             </h5>
@@ -250,7 +253,7 @@
     @if($employee->gender == 1)
     <div class="card card-outline card-secondary shadow-sm mb-3">
         <div class="card-header bg-secondary text-white">
-            <h5 class="card-title mb-0">
+            <h5 class="card-title mb-0" style="float:none;">
                 <i class="fas fa-shield-alt"></i>
                 الحالة العسكرية
             </h5>
@@ -293,7 +296,7 @@
     <!-- معلومات التأمينات -->
     <div class="card card-outline card-danger shadow-sm mb-3">
         <div class="card-header bg-danger text-white">
-            <h5 class="card-title mb-0">
+            <h5 class="card-title mb-0" style="float:none;">
                 <i class="fas fa-file-invoice"></i>
                 التأمينات
             </h5>
@@ -328,12 +331,12 @@
         </div>
     </div>
 
-    <!-- معلومات الدفع والمحفزات -->
+    <!-- معلومات الدفع والحافز -->
     <div class="card card-outline card-primary shadow-sm mb-3">
         <div class="card-header bg-primary text-white">
-            <h5 class="card-title mb-0">
+            <h5 class="card-title mb-0" style="float:none;">
                 <i class="fas fa-money-bill-wave"></i>
-                الدفع والمحفزات
+                الدفع والحافز
             </h5>
         </div>
         <div class="card-body">
@@ -381,7 +384,7 @@
     <!-- معلومات الاستقالة والترك -->
     <div class="card card-outline card-outline shadow-sm mb-3">
         <div class="card-header bg-secondary text-white">
-            <h5 class="card-title mb-0">
+            <h5 class="card-title mb-0" style="float:none;">
                 <i class="fas fa-sign-out-alt"></i>
                 معلومات الاستقالة والترك
             </h5>
@@ -407,7 +410,7 @@
     <!-- معلومات رخصة القيادة والجواز -->
     <div class="card card-outline card-success shadow-sm mb-3">
         <div class="card-header bg-success text-white">
-            <h5 class="card-title mb-0">
+            <h5 class="card-title mb-0" style="float:none;">
                 <i class="fas fa-id-card"></i>
                 رخصة القيادة والجواز
             </h5>
@@ -449,7 +452,7 @@
     <!-- معلومات المستخدم -->
     <div class="card card-outline card-light shadow-sm">
         <div class="card-header bg-secondary text-white">
-            <h5 class="card-title mb-0">
+            <h5 class="card-title mb-0" style="float:none;">
                 <i class="fas fa-users-cog"></i>
                 معلومات الإضافة والتحديث
             </h5>
@@ -483,7 +486,7 @@
     <!-- البيانات الصحية والعائلية -->
     <div class="card card-outline card-warning shadow-sm mb-3">
         <div class="card-header bg-warning text-white">
-            <h5 class="card-title mb-0">
+            <h5 class="card-title mb-0" style="float:none;">
                 <i class="fas fa-heartbeat"></i>
                 البيانات الصحية والعائلية
             </h5>
@@ -513,7 +516,7 @@
     <!-- الملفات والملاحظات -->
     <div class="card card-outline card-info shadow-sm mb-3">
         <div class="card-header bg-info text-white">
-            <h5 class="card-title mb-0">
+            <h5 class="card-title mb-0" style="float:none;">
                 <i class="fas fa-file-alt"></i>
                 الملفات والملاحظات
             </h5>
@@ -522,11 +525,15 @@
             <div class="row">
                 <div class="col-md-3 mb-3">
                     <strong>الصورة:</strong>
-                    <p class="mb-0 mt-1">
+                    <p class="m-1">
                         @if($employee->image)
                         <a href="{{ asset('storage/' . $employee->image) }}" target="_blank"
-                            class="btn btn-sm btn-primary">
+                            class="btn btn-sm btn-primary mb-2">
                             <i class="fas fa-image"></i> عرض الصورة
+                        </a>
+                        <a href="{{ route('admin.employees.download', ['id' => $employee->id , 'type' => 'image']) }}"
+                            target="_blank" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-image"></i> تحميل الصورة
                         </a>
                         @else
                         ---
@@ -535,10 +542,14 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <strong>السيرة الذاتية:</strong>
-                    <p class="mb-0 mt-1">
+                    <p class="m-1">
                         @if($employee->cv)
                         <a href="{{ asset('storage/' . $employee->cv) }}" target="_blank"
-                            class="btn btn-sm btn-primary">
+                            class="btn btn-sm btn-primary mb-2">
+                            <i class="fas fa-file-pdf"></i> عرض السيرة الذاتية
+                        </a>
+                        <a href="{{ route('admin.employees.download', ['id' => $employee->id , 'type' => 'cv']) }}"
+                            target="_blank" class="btn btn-sm btn-secondary">
                             <i class="fas fa-file-pdf"></i> تحميل السيرة الذاتية
                         </a>
                         @else
@@ -546,10 +557,129 @@
                         @endif
                     </p>
                 </div>
+                <div class="col-md-3 mb-3">
+                    <strong>أضافة ملفات اخرى:</strong>
+                    <p class="m-1">
+                        <button id="load_add_file_modal" class="btn btn-sm btn-success mb-2" data-toggle="modal"
+                            data-target="#addFileModal">
+                            <i class="fas fa-file-upload"></i> ارفق ملف جديد
+                        </button>
+                    </p>
+                </div>
                 <div class="col-md-6 mb-3">
                     <strong>الملاحظات:</strong>
                     <p class="mb-0 mt-1">{{ $employee->notes ?? '---' }}</p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Months Modal (EMPTY BODY) -->
+    <div class="modal fade " id="addFileModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+            <div class="modal-content shadow">
+
+                <!-- Header -->
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        إضافة مرفقات للموظف
+                    </h5>
+
+                    <button type="button" class="close text-white" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+
+                <!-- BODY = EMPTY -->
+                <div class="modal-body" id="add_file_modal_body">
+
+                    <form action="{{ route('admin.employees.add-file', $employee->id) }}" method="POST"
+                        enctype="multipart/form-data">
+                        @csrf
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>اسم الملف</label><span class="text-danger h4">*</span>
+                                <input type="text" name="name" value="{{ old('name') }}"
+                                    class="form-control {{ $errors->has('name') ? 'is-invalid' : '' }}"
+                                    placeholder="أدخل اسم الملف">
+                                @include('admin.errors.errors', ['value' => 'name'])
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>رابط الملف</label>
+                                <input type="file" name="file"
+                                    class="form-control {{ $errors->has('file') ? 'is-invalid' : '' }}" accept="*">
+                                @include('admin.errors.errors', ['value' => 'file'])
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-success shadow px-4">
+                                <i class="fas fa-save"></i>
+                                حفظ البيانات
+                            </button>
+                            <button type="button" data-dismiss="modal" class="btn btn-danger shadow px-4">
+                                <i class="fas fa-times-circle"></i>
+                                إلغاء
+                            </button>
+                        </div>
+
+
+                    </form>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover text-center align-middle">
+                            <thead class="bg-primary text-white">
+                                <tr>
+                                    <th>#</th>
+                                    <th>اسم الملف</th>
+                                    <th>عرض الملف</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @forelse ($employee->files as $file)
+                                <tr>
+                                    <td>{{ $file->id }}</td>
+                                    <td>{{ $file->name ?? '---' }}</td>
+                                    <td>
+                                        @if($file->path)
+                                        <img src="{{ asset('storage/' . $file->path) }}" alt="صورة الملف"
+                                            class="img-thumbnail" style="max-width: 90px; max-height: 90px;">
+                                        <small class="form-text text-muted">
+                                            الملف الحالي: <a href="{{ asset('storage/' .$employee->image) }}"
+                                                target="_blank">عرض الملف</a> - <a
+                                                href="{{ route('admin.employees.download', ['id' => $employee->id , 'type' => 'file', 'file' => $file->id]) }}"
+                                                target="_blank">تحميل الملف</a> -
+                                            <a href="{{ route('admin.employees.delete', ['id' => $file->id, 'employee_id' => $employee->id]) }}"
+                                                class="text-danger"
+                                                onclick="return confirm('هل أنت متأكد من رغبتك في حذف هذا الملف؟')">
+                                                حذف الملف
+                                            </a>
+                                        </small>
+                                        @else
+                                        <span>---</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="12">
+                                        <div class="alert alert-warning mb-0">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            لا توجد بيانات ملفات حالياً
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

@@ -85,4 +85,8 @@ class Employee extends Model
     {
         return $this->belongsTo(Language::class, 'language_id');
     }
+    public function files()
+    {
+        return $this->hasMany(File::class, 'employee_id');
+    }
 }

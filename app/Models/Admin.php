@@ -232,4 +232,12 @@ class Admin extends User
     {
         return $this->hasMany(BloodGroup::class, 'updated_by');
     }
+    public function addedFiles()
+    {
+        return $this->hasMany(File::class, 'added_by');
+    }
+    public function updatedFiles()
+    {
+        return $this->hasMany(File::class, 'updated_by');
+    }
 }
