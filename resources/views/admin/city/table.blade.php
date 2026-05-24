@@ -172,10 +172,10 @@
                     </tbody>
 
                 </table>
-                {{-- Pagination --}}
-                <div>
-                    {{ $cities->links() }}
-                </div>
+            </div>
+            {{-- Pagination --}}
+            <div>
+                {{ $cities->links() }}
             </div>
         </div>
     </div>

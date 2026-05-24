@@ -137,7 +137,8 @@
                 </div>
 
             </div>
-            <div class="table-responsive" id="ajax_responce_search">
+<div  id="ajax_responce_search">
+                <div class="table-responsive">
                 <table class="table table-bordered table-hover text-center align-middle">
 
                     <thead class="bg-primary text-white">
@@ -244,11 +245,12 @@
                     </tbody>
 
                 </table>
-                {{-- Pagination --}}
-                <div>
-                    {{ $shiftsTypes->links() }}
-                </div>
             </div>
+            {{-- Pagination --}}
+            <div>
+                {{ $shiftsTypes->links() }}
+            </div>
+</div>
         </div>
     </div>
 </div>

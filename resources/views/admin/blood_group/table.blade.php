@@ -171,10 +171,10 @@
                     </tbody>
 
                 </table>
-                {{-- Pagination --}}
-                <div>
-                    {{ $bloodGroups->links() }}
-                </div>
+            </div>
+            {{-- Pagination --}}
+            <div>
+                {{ $bloodGroups->links() }}
             </div>
         </div>
     </div>

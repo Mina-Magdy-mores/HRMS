@@ -182,10 +182,10 @@
                     </tbody>
 
                 </table>
-                {{-- Pagination --}}
-                <div>
-                    {{ $departments->links() }}
-                </div>
+            </div>
+            {{-- Pagination --}}
+            <div>
+                {{ $departments->links() }}
             </div>
         </div>
     </div>

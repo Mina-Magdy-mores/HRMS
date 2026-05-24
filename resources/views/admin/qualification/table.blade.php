@@ -175,10 +175,10 @@
                     </tbody>
 
                 </table>
-                {{-- Pagination --}}
-                <div>
-                    {{ $qualifications->links() }}
-                </div>
+            </div>
+            {{-- Pagination --}}
+            <div>
+                {{ $qualifications->links() }}
             </div>
         </div>
     </div>

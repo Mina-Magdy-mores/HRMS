@@ -170,10 +170,10 @@
                     </tbody>
 
                 </table>
-                {{-- Pagination --}}
-                <div>
-                    {{ $religions->links() }}
-                </div>
+            </div>
+            {{-- Pagination --}}
+            <div>
+                {{ $religions->links() }}
             </div>
         </div>
     </div>

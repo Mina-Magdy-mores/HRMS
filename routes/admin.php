@@ -21,7 +21,7 @@ use App\Http\Controllers\Admin\ShiftsTypeController;
 use Illuminate\Support\Facades\Route;
 
 
-define('PAGEINATION_COUNTER', 11);
+define('PAGEINATION_COUNTER', 3);
 // Admin
 Route::prefix('/admin')->name('admin.')->group(function () {
 
@@ -145,7 +145,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
 
         //employees routs
         Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
-        Route::get('/employees/{employee}/details', [EmployeeController::class, 'getDetails'])->name('admin.employees.details');
+        Route::get('/employees/{id}/details', [EmployeeController::class, 'getDetails'])->name('employees.details');
         Route::get('/employees/create', [EmployeeController::class, 'create'])->name('employees.create');
         Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
         Route::get('/employees/{id}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
@@ -153,7 +153,8 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
         Route::post('/employees/governorate-list', [EmployeeController::class, 'getGovernorateList'])->name('employees.governorate-list');
         Route::post('/employees/cities-list', [EmployeeController::class, 'getCitiesList'])->name('employees.cities-list');
-    });
+        Route::post('/employees/search', [EmployeeController::class, 'search'])->name('employees.search');
+        });
 
     // guest routes
     Route::middleware('guest:admin')->group(function () {

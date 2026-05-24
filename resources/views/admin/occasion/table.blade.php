@@ -176,10 +176,10 @@
                     </tbody>
 
                 </table>
-                {{-- Pagination --}}
-                <div>
-                    {{ $occasions->links() }}
-                </div>
+            </div>
+            {{-- Pagination --}}
+            <div>
+                {{ $occasions->links() }}
             </div>
         </div>
     </div>

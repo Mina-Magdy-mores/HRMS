@@ -173,10 +173,10 @@
                     </tbody>
 
                 </table>
-                {{-- Pagination --}}
-                <div>
-                    {{ $governorates->links() }}
-                </div>
+            </div>
+            {{-- Pagination --}}
+            <div>
+                {{ $governorates->links() }}
             </div>
         </div>
     </div>

@@ -172,9 +172,9 @@
 
                 </table>
                 {{-- Pagination --}}
-                <div>
-                    {{ $nationalities->links() }}
-                </div>
+            </div>
+            <div>
+                {{ $nationalities->links() }}
             </div>
         </div>
     </div>

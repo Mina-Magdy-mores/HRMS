@@ -134,11 +134,11 @@
 
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>معرف البصمة</label>
+                                            <label>كود البصمة</label>
                                             <input type="text" name="fingerprint_code"
                                                 value="{{ old('fingerprint_code', $employee->fingerprint_code) }}"
                                                 class="form-control {{ $errors->has('fingerprint_code') ? 'is-invalid' : '' }}"
-                                                placeholder="أدخل معرف البصمة">
+                                                placeholder="أدخل كود البصمة">
                                             @include('admin.errors.errors', ['value' => 'fingerprint_code'])
                                         </div>
                                     </div>

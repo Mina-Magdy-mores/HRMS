@@ -171,10 +171,10 @@
                     </tbody>
 
                 </table>
-                {{-- Pagination --}}
-                <div>
-                    {{ $resignations->links() }}
-                </div>
+            </div>
+            {{-- Pagination --}}
+            <div>
+                {{ $resignations->links() }}
             </div>
         </div>
     </div>

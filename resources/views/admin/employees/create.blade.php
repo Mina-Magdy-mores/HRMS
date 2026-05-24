@@ -23,8 +23,6 @@
 @endsection
 @section('js')
 <script src="{{ asset('assets/plugins/select2/js/select2.full.min.js') }}"></script>
-
-</script>
 <script>
     function initSelect2() {
             $('.select2').select2({

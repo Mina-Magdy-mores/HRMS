@@ -59,7 +59,10 @@ class EmployeeController extends Controller
             'asc',
             PAGEINATION_COUNTER
         );
-        return view('admin.employees.index', compact('employees'));
+        $branches = get_cols_where(Branche::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $departments = get_cols_where(Department::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $jobs = get_cols_where(JobsCategory::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        return view('admin.employees.index', compact('employees', 'branches', 'departments', 'jobs'));
     }
     public function getDetails($id)
     {
@@ -297,6 +300,151 @@ class EmployeeController extends Controller
             $cities = get_cols_where(City::class, ['id', 'name'], ['governorate_id' => $request->governorate_id, 'status' => 1], 'id', 'asc');
             $selected_city_id = $request->selected_city_id;
             return view('admin.employees.cities_list', compact('cities', 'selected_city_id'));
+        }
+    }
+
+    public function search(Request $request)
+    {
+        if ($request->ajax()) {
+            $fingerprint_code = $request->fingerprint_code;
+            $employee_code = $request->employee_code;
+            $name = $request->name;
+            $branch_id = $request->branch_id;
+            $department_id = $request->department_id;
+            $job_id = $request->job_id;
+            $employment_status = $request->employment_status;
+            $payment_method = $request->payment_method;
+            $gender = $request->gender;
+            $code_type = $request->code_type;
+            if ($code_type == '') {
+                $field1 = "id";
+                $operator1 = ">=";
+                $value1 = 0;
+            } else {
+
+                if ($code_type == 'fingerprint_code') {
+
+                    if (empty($fingerprint_code)) {
+                        $field1 = "id";
+                        $operator1 = ">=";
+                        $value1 = 0;
+                    } else {
+                        $field1 = "fingerprint_code";
+                        $operator1 = "=";
+                        $value1 = $fingerprint_code;
+                    }
+                } else if ($code_type == 'employee_code') {
+
+                    if (empty($employee_code)) {
+                        $field1 = "id";
+                        $operator1 = ">=";
+                        $value1 = 0;
+                    } else {
+                        $field1 = "employee_code";
+                        $operator1 = "=";
+                        $value1 = $employee_code;
+                    }
+                } else {
+
+                    $field1 = "id";
+                    $operator1 = ">=";
+                    $value1 = 0;
+                }
+            }
+
+            if (empty($name)) {
+                $field2 = "id";
+                $operator2 = ">=";
+                $value2 = 0;
+            } else {
+                $field2 = "name";
+                $operator2 = "like";
+                $value2 = "%{$name}%";
+            }
+
+            if (empty($branch_id)) {
+                $field3 = "id";
+                $operator3 = ">=";
+                $value3 = 0;
+            } else {
+                $field3 = "branch_id";
+                $operator3 = "=";
+                $value3 = $branch_id;
+            }
+            if (empty($department_id)) {
+                $field4 = "id";
+                $operator4 = ">=";
+                $value4 = 0;
+            } else {
+                $field4 = "department_id";
+                $operator4 = "=";
+                $value4 = $department_id;
+            }
+            if (empty($job_id)) {
+                $field5 = "id";
+                $operator5 = ">=";
+                $value5 = 0;
+            } else {
+                $field5 = "job_id";
+                $operator5 = "=";
+                $value5 = $job_id;
+            }
+            if ($employment_status == '') {
+                $field6 = "id";
+                $operator6 = ">=";
+                $value6 = 0;
+            } else if ($employment_status == 0 || $employment_status == 1) {
+                $field6 = "employment_status";
+                $operator6 = "=";
+                $value6 = $employment_status;
+            }
+            if ($payment_method == '') {
+                $field7 = "id";
+                $operator7 = ">=";
+                $value7 = 0;
+            } else {
+                $field7 = "payment_method";
+                $operator7 = "=";
+                $value7 = $payment_method;
+            }
+            if ($gender == '') {
+                $field8 = "id";
+                $operator8 = ">=";
+                $value8 = 0;
+            } else {
+                $field8 = "gender";
+                $operator8 = "=";
+                $value8 = $gender;
+            }
+
+
+            $where = [
+                [$field1, $operator1, $value1],
+                [$field2, $operator2, $value2],
+                [$field3, $operator3, $value3],
+                [$field4, $operator4, $value4],
+                [$field5, $operator5, $value5],
+                [$field6, $operator6, $value6],
+                [$field7, $operator7, $value7],
+                [$field8, $operator8, $value8],
+            ];
+            $employees = getColsWhereP(Employee::class, [
+                'addedBy',
+                'updatedBy',
+                'resignation',
+                'religion',
+                'qualification',
+                'nationality',
+                'job',
+                'shiftType',
+                'department',
+                'bloodGroup',
+                'branch',
+                'country',
+                'governorate',
+                'city'
+            ], ['*'], $where, 'id', 'asc', PAGEINATION_COUNTER);
+            return view('admin.employees.ajaxSearch', compact('employees'));
         }
     }
 

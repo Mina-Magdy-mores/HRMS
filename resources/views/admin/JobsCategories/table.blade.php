@@ -175,10 +175,10 @@
                     </tbody>
 
                 </table>
-                {{-- Pagination --}}
-                <div>
-                    {{ $jobCategories->links() }}
-                </div>
+            </div>
+            {{-- Pagination --}}
+            <div>
+                {{ $jobCategories->links() }}
             </div>
         </div>
     </div>
