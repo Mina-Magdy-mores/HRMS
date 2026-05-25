@@ -23,7 +23,7 @@ class FinanceCalendarController extends Controller
     public function index()
     {
         $company_id = Auth::user()->company_id;
-        $financeCalendars = getColsWhereP(FinanceCalendar::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id], 'finance_yr', 'desc', PAGEINATION_COUNTER);
+        $financeCalendars = getColsWhereP(FinanceCalendar::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id], 'finance_yr', 'asc', PAGEINATION_COUNTER);
         return view('admin.financeCalendar.index', compact('financeCalendars'));
     }
 

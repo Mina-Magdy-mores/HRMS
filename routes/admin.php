@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\FinanceCalendarController;
 use App\Http\Controllers\Admin\GovernorateController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\JobsCategoryController;
+use App\Http\Controllers\Admin\MainSalaryRecordController;
 use App\Http\Controllers\Admin\NationalityController;
 use App\Http\Controllers\Admin\OccasionController;
 use App\Http\Controllers\Admin\QualificationController;
@@ -162,7 +163,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::get('/employees/files/{id}/{employee_id}', [EmployeeController::class, 'deleteFile'])->name('employees.delete');
 
         // AllowanceType routes
-        Route::get('/', [AllowanceTypeController::class, 'index'])->name('allowance-types.index');
+        Route::get('/allowance-types', [AllowanceTypeController::class, 'index'])->name('allowance-types.index');
         Route::get('/allowance-types/create', [AllowanceTypeController::class, 'create'])->name('allowance-types.create');
         Route::post('/allowance-types', [AllowanceTypeController::class, 'store'])->name('allowance-types.store');
         Route::get('/allowance-types/{id}/edit', [AllowanceTypeController::class, 'edit'])->name('allowance-types.edit');
@@ -184,6 +185,15 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::get('/bonuses/{id}/edit', [BonusController::class, 'edit'])->name('bonuses.edit');
         Route::put('/bonuses/{id}', [BonusController::class, 'update'])->name('bonuses.update');
         Route::delete('/bonuses/{id}', [BonusController::class, 'destroy'])->name('bonuses.destroy');
+
+        //MainSalaryRecord routes
+        Route::get('/main-salary-records', [MainSalaryRecordController::class, 'index'])->name('main-salary-records.index');
+        Route::get('/main-salary-records/create', [MainSalaryRecordController::class, 'create'])->name('main-salary-records.create');
+        Route::post('/main-salary-records', [MainSalaryRecordController::class, 'store'])->name('main-salary-records.store');
+        Route::get('/main-salary-records/{id}/edit', [MainSalaryRecordController::class, 'edit'])->name('main-salary-records.edit');
+        Route::put('/main-salary-records/{id}', [MainSalaryRecordController::class, 'update'])->name('main-salary-records.update');
+        Route::delete('/main-salary-records/{id}', [MainSalaryRecordController::class, 'destroy'])->name('main-salary-records.destroy');
+
     });
 
     // guest routes

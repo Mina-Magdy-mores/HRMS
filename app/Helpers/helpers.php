@@ -41,9 +41,9 @@ function get_cols_where_limit($model = null, $columns_names = array(), $where = 
     return $model::select($columns_names)->where($where)->orderby($order_field, $order_type)->limit($limit)->get();
 }
 /*get some cols  table 2 */
-function get_cols_where_order2($model = null, $columns_names = array(), $where = array(), $order_field = "id", $order_type = "DESC", $order_field2 = "id", $order_type2 = "DESC")
+function get_cols_where_order2($model = null, $columns_names = array(), $where = array(), $order_field = "id", $order_type = "DESC", $order_field2 = "id", $order_type2 = "DESC", $pagination_counter = 13)
 {
-    return $model::select($columns_names)->where($where)->orderby($order_field, $order_type)->orderby($order_field2, $order_type2)->get();
+    return $model::select($columns_names)->where($where)->orderby($order_field, $order_type)->orderby($order_field2, $order_type2)->paginate($pagination_counter);
 }
 /*get some cols  table */
 function get_cols($model = null, $columns_names = array(), $order_field = "id", $order_type = "DESC")

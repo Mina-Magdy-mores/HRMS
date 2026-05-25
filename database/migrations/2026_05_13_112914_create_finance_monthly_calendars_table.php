@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('finance_monthly_calendars', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('financeCalendar_id')->constrained('finance_calendars')->cascadeOnUpdate();
+            $table->foreignId('financeCalendar_id')->constrained('finance_calendars')->cascadeOnUpdate()->cascadeOnDelete();
             $table->integer('number_of_days');
             $table->string('year_and_month');
             $table->integer('finance_yr');
