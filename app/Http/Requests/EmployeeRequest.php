@@ -234,7 +234,7 @@ class EmployeeRequest extends FormRequest
             'medical_insurance_amount.min' => 'مبلغ التأمين الطبي لا يمكن أن يكون أقل من 0',
 
             // ==================== إعدادات إضافية ====================
-            'fixed_allowance.in' => 'حالة البدل الثابت غير صحيحة',
+            'fixed_allowance.in' => 'حالة البدل للراتبالثابت غير صحيحة',
             'has_attendance.in' => 'حالة الحضور غير صحيحة',
             'active_for_vacation.in' => 'حالة التفعيل للإجازات غير صحيحة',
             'has_sensitive_data.in' => 'حالة البيانات الحساسة غير صحيحة',

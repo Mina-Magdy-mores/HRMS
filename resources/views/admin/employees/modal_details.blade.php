@@ -1,14 +1,14 @@
 <div class="container-fluid p-3">
 
     @php
-    $genderLabels = [1 => 'ذكر', 2 => 'أنثى'];
-    $maritalStatusLabels = [1 => 'أعزب', 2 => 'متزوج', 3 => 'مخطوب', 4 => 'أرمل', 5 => 'مطلق'];
-    $militaryStatusLabels = [1 => 'نشط', 2 => 'مستقيل', 3 => 'مُنهي الخدمة'];
-    $graduationGradeLabels = [1 => 'ممتاز', 2 => 'جيد جدا', 3 => 'جيد', 4 => 'مقبول', 5 => 'ضعيف'];
-    $motivationTypeLabels = [0 => 'لا يوجد', 1 => 'ثابت', 2 => 'متغير'];
-    $paymentMethodLabels = [1 => 'كاش', 2 => 'تحويل بنكي', 3 => 'شيك'];
-    $yesNoLabels = [0 => 'لا', 1 => 'نعم'];
-    $employmentStatusLabels = [1 => 'نشط', 0 => 'غير نشط'];
+        $genderLabels = [1 => 'ذكر', 2 => 'أنثى'];
+        $maritalStatusLabels = [1 => 'أعزب', 2 => 'متزوج', 3 => 'مخطوب', 4 => 'أرمل', 5 => 'مطلق'];
+        $militaryStatusLabels = [1 => 'نشط', 2 => 'مستقيل', 3 => 'مُنهي الخدمة'];
+        $graduationGradeLabels = [1 => 'ممتاز', 2 => 'جيد جدا', 3 => 'جيد', 4 => 'مقبول', 5 => 'ضعيف'];
+        $motivationTypeLabels = [0 => 'لا يوجد', 1 => 'ثابت', 2 => 'متغير'];
+        $paymentMethodLabels = [1 => 'كاش', 2 => 'تحويل بنكي', 3 => 'شيك'];
+        $yesNoLabels = [0 => 'لا', 1 => 'نعم'];
+        $employmentStatusLabels = [1 => 'نشط', 0 => 'غير نشط'];
     @endphp
     <a href="{{ route('admin.employees.edit', $employee->id) }}" class="btn btn-sm btn-warning mb-3" title="تعديل">
         <i class="fas fa-edit"></i>
@@ -216,31 +216,31 @@
                     <p class="mb-0 mt-1">
                         @if ($employee->shiftType)
 
-                        @if($employee->shiftType->type == 1)
-                        شفت نهاري
-                        @elseif($employee->shiftType->type == 2)
-                        شفت ليلي
-                        @elseif($employee->shiftType->type == 3)
-                        شفت كامل اليوم
-                        @endif
-                        -
-                        @php
-                        $start_time = new DateTime($employee->shiftType->start_time);
-                        $start_time = $start_time->format('h:i A');
-                        @endphp
+                            @if ($employee->shiftType->type == 1)
+                                شفت نهاري
+                            @elseif($employee->shiftType->type == 2)
+                                شفت ليلي
+                            @elseif($employee->shiftType->type == 3)
+                                شفت كامل اليوم
+                            @endif
+                            -
+                            @php
+                                $start_time = new DateTime($employee->shiftType->start_time);
+                                $start_time = $start_time->format('h:i A');
+                            @endphp
 
-                        {{ $start_time }}
-                        الى
-                        @php
-                        $end_time = new DateTime($employee->shiftType->end_time);
-                        $end_time = $end_time->format('h:i A');
-                        @endphp
+                            {{ $start_time }}
+                            الى
+                            @php
+                                $end_time = new DateTime($employee->shiftType->end_time);
+                                $end_time = $end_time->format('h:i A');
+                            @endphp
 
-                        {{ $end_time }}
-                        -عدد الساعات
-                        {{ $employee->shiftType->total_hours }}
+                            {{ $end_time }}
+                            -عدد الساعات
+                            {{ $employee->shiftType->total_hours }}
                         @else
-                        '---'
+                            '---'
                         @endif
                     </p>
                 </div>
@@ -250,47 +250,47 @@
     </div>
 
     <!-- الحالة العسكرية -->
-    @if($employee->gender == 1)
-    <div class="card card-outline card-secondary shadow-sm mb-3">
-        <div class="card-header bg-secondary text-white">
-            <h5 class="card-title mb-0" style="float:none;">
-                <i class="fas fa-shield-alt"></i>
-                الحالة العسكرية
-            </h5>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-3 mb-3">
-                    <strong>الحالة العسكرية:</strong>
-                    <p class="mb-0 mt-1">{{ $militaryStatusLabels[$employee->military_status] ?? '---' }}</p>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <strong>تاريخ بداية الخدمة:</strong>
-                    <p class="mb-0 mt-1">{{ $employee->military_start_date ?? '---' }}</p>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <strong>تاريخ نهاية الخدمة:</strong>
-                    <p class="mb-0 mt-1">{{ $employee->military_end_date ?? '---' }}</p>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <strong>السلاح:</strong>
-                    <p class="mb-0 mt-1">{{ $employee->military_weapon ?? '---' }}</p>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <strong>تاريخ الإعفاء:</strong>
-                    <p class="mb-0 mt-1">{{ $employee->military_exemption_date ?? '---' }}</p>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <strong>سبب الإعفاء:</strong>
-                    <p class="mb-0 mt-1">{{ $employee->military_exemption_reason ?? '---' }}</p>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <strong>سبب التأجيل:</strong>
-                    <p class="mb-0 mt-1">{{ $employee->postponement_reason ?? '---' }}</p>
+    @if ($employee->gender == 1)
+        <div class="card card-outline card-secondary shadow-sm mb-3">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="card-title mb-0" style="float:none;">
+                    <i class="fas fa-shield-alt"></i>
+                    الحالة العسكرية
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <strong>الحالة العسكرية:</strong>
+                        <p class="mb-0 mt-1">{{ $militaryStatusLabels[$employee->military_status] ?? '---' }}</p>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <strong>تاريخ بداية الخدمة:</strong>
+                        <p class="mb-0 mt-1">{{ $employee->military_start_date ?? '---' }}</p>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <strong>تاريخ نهاية الخدمة:</strong>
+                        <p class="mb-0 mt-1">{{ $employee->military_end_date ?? '---' }}</p>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <strong>السلاح:</strong>
+                        <p class="mb-0 mt-1">{{ $employee->military_weapon ?? '---' }}</p>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <strong>تاريخ الإعفاء:</strong>
+                        <p class="mb-0 mt-1">{{ $employee->military_exemption_date ?? '---' }}</p>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <strong>سبب الإعفاء:</strong>
+                        <p class="mb-0 mt-1">{{ $employee->military_exemption_reason ?? '---' }}</p>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <strong>سبب التأجيل:</strong>
+                        <p class="mb-0 mt-1">{{ $employee->postponement_reason ?? '---' }}</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     @endif
 
     <!-- معلومات التأمينات -->
@@ -526,34 +526,34 @@
                 <div class="col-md-3 mb-3">
                     <strong>الصورة:</strong>
                     <p class="m-1">
-                        @if($employee->image)
-                        <a href="{{ asset('storage/' . $employee->image) }}" target="_blank"
-                            class="btn btn-sm btn-primary mb-2">
-                            <i class="fas fa-image"></i> عرض الصورة
-                        </a>
-                        <a href="{{ route('admin.employees.download', ['id' => $employee->id , 'type' => 'image']) }}"
-                            target="_blank" class="btn btn-sm btn-secondary">
-                            <i class="fas fa-image"></i> تحميل الصورة
-                        </a>
+                        @if ($employee->image)
+                            <a href="{{ asset('storage/' . $employee->image) }}" target="_blank"
+                                class="btn btn-sm btn-primary mb-2">
+                                <i class="fas fa-image"></i> عرض الصورة
+                            </a>
+                            <a href="{{ route('admin.employees.download', ['id' => $employee->id, 'type' => 'image']) }}"
+                                target="_blank" class="btn btn-sm btn-secondary">
+                                <i class="fas fa-image"></i> تحميل الصورة
+                            </a>
                         @else
-                        ---
+                            ---
                         @endif
                     </p>
                 </div>
                 <div class="col-md-3 mb-3">
                     <strong>السيرة الذاتية:</strong>
                     <p class="m-1">
-                        @if($employee->cv)
-                        <a href="{{ asset('storage/' . $employee->cv) }}" target="_blank"
-                            class="btn btn-sm btn-primary mb-2">
-                            <i class="fas fa-file-pdf"></i> عرض السيرة الذاتية
-                        </a>
-                        <a href="{{ route('admin.employees.download', ['id' => $employee->id , 'type' => 'cv']) }}"
-                            target="_blank" class="btn btn-sm btn-secondary">
-                            <i class="fas fa-file-pdf"></i> تحميل السيرة الذاتية
-                        </a>
+                        @if ($employee->cv)
+                            <a href="{{ asset('storage/' . $employee->cv) }}" target="_blank"
+                                class="btn btn-sm btn-primary mb-2">
+                                <i class="fas fa-file-pdf"></i> عرض السيرة الذاتية
+                            </a>
+                            <a href="{{ route('admin.employees.download', ['id' => $employee->id, 'type' => 'cv']) }}"
+                                target="_blank" class="btn btn-sm btn-secondary">
+                                <i class="fas fa-file-pdf"></i> تحميل السيرة الذاتية
+                            </a>
                         @else
-                        ---
+                            ---
                         @endif
                     </p>
                 </div>
@@ -612,7 +612,8 @@
                             <div class="form-group">
                                 <label>رابط الملف</label>
                                 <input type="file" name="file"
-                                    class="form-control {{ $errors->has('file') ? 'is-invalid' : '' }}" accept="*">
+                                    class="form-control {{ $errors->has('file') ? 'is-invalid' : '' }}"
+                                    accept="*">
                                 @include('admin.errors.errors', ['value' => 'file'])
                             </div>
                         </div>
@@ -641,38 +642,38 @@
 
                             <tbody>
                                 @forelse ($employee->files as $file)
-                                <tr>
-                                    <td>{{ $file->id }}</td>
-                                    <td>{{ $file->name ?? '---' }}</td>
-                                    <td>
-                                        @if($file->path)
-                                        <img src="{{ asset('storage/' . $file->path) }}" alt="صورة الملف"
-                                            class="img-thumbnail" style="max-width: 90px; max-height: 90px;">
-                                        <small class="form-text text-muted">
-                                            الملف الحالي: <a href="{{ asset('storage/' .$employee->image) }}"
-                                                target="_blank">عرض الملف</a> - <a
-                                                href="{{ route('admin.employees.download', ['id' => $employee->id , 'type' => 'file', 'file' => $file->id]) }}"
-                                                target="_blank">تحميل الملف</a> -
-                                            <a href="{{ route('admin.employees.delete', ['id' => $file->id, 'employee_id' => $employee->id]) }}"
-                                                class="text-danger"
-                                                onclick="return confirm('هل أنت متأكد من رغبتك في حذف هذا الملف؟')">
-                                                حذف الملف
-                                            </a>
-                                        </small>
-                                        @else
-                                        <span>---</span>
-                                        @endif
-                                    </td>
-                                </tr>
+                                    <tr>
+                                        <td>{{ $file->id }}</td>
+                                        <td>{{ $file->name ?? '---' }}</td>
+                                        <td>
+                                            @if ($file->path)
+                                                <img src="{{ asset('storage/' . $file->path) }}" alt="صورة الملف"
+                                                    class="img-thumbnail" style="max-width: 90px; max-height: 90px;">
+                                                <small class="form-text text-muted">
+                                                    الملف الحالي: <a href="{{ asset('storage/' . $employee->image) }}"
+                                                        target="_blank">عرض الملف</a> - <a
+                                                        href="{{ route('admin.employees.download', ['id' => $employee->id, 'type' => 'file', 'file' => $file->id]) }}"
+                                                        target="_blank">تحميل الملف</a> -
+                                                    <a href="{{ route('admin.employees.delete', ['id' => $file->id, 'employee_id' => $employee->id]) }}"
+                                                        class="text-danger"
+                                                        onclick="return confirm('هل أنت متأكد من رغبتك في حذف هذا الملف؟')">
+                                                        حذف الملف
+                                                    </a>
+                                                </small>
+                                            @else
+                                                <span>---</span>
+                                            @endif
+                                        </td>
+                                    </tr>
                                 @empty
-                                <tr>
-                                    <td colspan="12">
-                                        <div class="alert alert-warning mb-0">
-                                            <i class="fas fa-exclamation-circle"></i>
-                                            لا توجد بيانات ملفات حالياً
-                                        </div>
-                                    </td>
-                                </tr>
+                                    <tr>
+                                        <td colspan="12">
+                                            <div class="alert alert-warning mb-0">
+                                                <i class="fas fa-exclamation-circle"></i>
+                                                لا توجد بيانات ملفات حالياً
+                                            </div>
+                                        </td>
+                                    </tr>
                                 @endforelse
                             </tbody>
 

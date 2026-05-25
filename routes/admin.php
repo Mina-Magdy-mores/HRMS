@@ -1,11 +1,14 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminPanelSettingController;
+use App\Http\Controllers\Admin\AllowanceTypeController;
 use App\Http\Controllers\Admin\BloodGroupController;
+use App\Http\Controllers\Admin\BonusController;
 use App\Http\Controllers\Admin\BrancheController;
 use App\Http\Controllers\Admin\CityController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\DeductionTypeController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\FinanceCalendarController;
@@ -158,6 +161,29 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/employees/{id}/add-file', [EmployeeController::class, 'addFile'])->name('employees.add-file');
         Route::get('/employees/files/{id}/{employee_id}', [EmployeeController::class, 'deleteFile'])->name('employees.delete');
 
+        // AllowanceType routes
+        Route::get('/', [AllowanceTypeController::class, 'index'])->name('allowance-types.index');
+        Route::get('/allowance-types/create', [AllowanceTypeController::class, 'create'])->name('allowance-types.create');
+        Route::post('/allowance-types', [AllowanceTypeController::class, 'store'])->name('allowance-types.store');
+        Route::get('/allowance-types/{id}/edit', [AllowanceTypeController::class, 'edit'])->name('allowance-types.edit');
+        Route::put('/allowance-types/{id}', [AllowanceTypeController::class, 'update'])->name('allowance-types.update');
+        Route::delete('/allowance-types/{id}', [AllowanceTypeController::class, 'destroy'])->name('allowance-types.destroy');
+
+        // DeductionType routes
+        Route::get('/deduction-types', [DeductionTypeController::class, 'index'])->name('deduction-types.index');
+        Route::get('/deduction-types/create', [DeductionTypeController::class, 'create'])->name('deduction-types.create');
+        Route::post('/deduction-types', [DeductionTypeController::class, 'store'])->name('deduction-types.store');
+        Route::get('/deduction-types/{id}/edit', [DeductionTypeController::class, 'edit'])->name('deduction-types.edit');
+        Route::put('/deduction-types/{id}', [DeductionTypeController::class, 'update'])->name('deduction-types.update');
+        Route::delete('/deduction-types/{id}', [DeductionTypeController::class, 'destroy'])->name('deduction-types.destroy');
+
+        //Bonus routes
+        Route::get('/bonuses', [BonusController::class, 'index'])->name('bonuses.index');
+        Route::get('/bonuses/create', [BonusController::class, 'create'])->name('bonuses.create');
+        Route::post('/bonuses', [BonusController::class, 'store'])->name('bonuses.store');
+        Route::get('/bonuses/{id}/edit', [BonusController::class, 'edit'])->name('bonuses.edit');
+        Route::put('/bonuses/{id}', [BonusController::class, 'update'])->name('bonuses.update');
+        Route::delete('/bonuses/{id}', [BonusController::class, 'destroy'])->name('bonuses.destroy');
     });
 
     // guest routes

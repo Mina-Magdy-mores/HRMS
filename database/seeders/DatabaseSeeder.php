@@ -51,6 +51,11 @@ class DatabaseSeeder extends Seeder
                 //4. بيانات الموظفين
             EmployeeSeeder::class,
 
+            AllowanceTypeSeeder::class,
+            DeductionTypeSeeder::class,
+            BonusSeeder::class,
+
+
         ]);
 
         $this->command->info('✅ All seeders completed successfully!');

@@ -240,4 +240,26 @@ class Admin extends User
     {
         return $this->hasMany(File::class, 'updated_by');
     }
+    public function addedAllowanceTypes()
+    {
+        return $this->hasMany(AllowanceType::class, 'added_by');
+    }
+    public function updatedAllowanceTypes()
+    {
+        return $this->hasMany(AllowanceType::class, 'updated_by');
+    }
+    public function addedDeductionTypes()
+    {
+        return $this->hasMany(DeductionType::class, 'added_by');
+    }
+    public function updatedDeductionTypes()
+    {
+        return $this->hasMany(DeductionType::class, 'updated_by');
+    }
+    public function addedBonuses(){
+        return $this->hasMany(Bonus::class, 'added_by');
+    }
+    public function updatedBonuses(){
+        return $this->hasMany(Bonus::class, 'updated_by');
+    }
 }

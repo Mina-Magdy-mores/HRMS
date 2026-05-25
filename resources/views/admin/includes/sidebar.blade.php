@@ -21,10 +21,12 @@
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
-            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+                data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-                <li class="nav-item has-treeview  {{ request()->is('admin/general-settings*') ||
+                <li
+                    class="nav-item has-treeview  {{ request()->is('admin/general-settings*') ||
                     request()->routeIs('admin.financeCalendars.*') ||
                     request()->routeIs('admin.branches.*') ||
                     request()->routeIs('admin.shifts-types.*') ||
@@ -41,7 +43,8 @@
                     request()->routeIs('admin.cities.*')
                         ? 'menu-open'
                         : '' }}">
-                    <a href="#" class="nav-link {{ request()->is('admin/general-settings*') ||
+                    <a href="#"
+                        class="nav-link {{ request()->is('admin/general-settings*') ||
                         request()->routeIs('admin.financeCalendars.*') ||
                         request()->routeIs('admin.branches.*') ||
                         request()->routeIs('admin.shifts-types.*') ||
@@ -172,12 +175,18 @@
                         </li>
                     </ul>
                 </li>
-                <li class="nav-item has-treeview  {{
-                    request()->routeIs('admin.employees.*')
+                <li
+                    class="nav-item has-treeview  {{ request()->routeIs('admin.employees.*') ||
+                    request()->routeIs('admin.allowance-types.*') ||
+                    request()->routeIs('admin.deduction-types.*') ||
+                    request()->routeIs('admin.bonuses.*')
                         ? 'menu-open'
                         : '' }}">
-                    <a href="#" class="nav-link {{
-                        request()->routeIs('admin.employees.*')
+                    <a href="#"
+                        class="nav-link {{ request()->routeIs('admin.employees.*') ||
+                        request()->routeIs('admin.allowance-types.*') ||
+                        request()->routeIs('admin.deduction-types.*') ||
+                        request()->routeIs('admin.bonuses.*')
                             ? 'active'
                             : '' }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -195,40 +204,27 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('admin.financeCalendars.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.financeCalendars.*')) active @endif">
+                            <a href="{{ route('admin.allowance-types.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.allowance-types.*')) active @endif">
                                 <i class="fas fa-calendar"></i>
-                                <p>بيانات موظفين الإدارة</p>
+                                <p>انواع البدل للراتب</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('admin.financeCalendars.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.financeCalendars.*')) active @endif">
-                                <i class="fas fa-calendar"></i>
-                                <p>انواع الإضافى للراتب</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('admin.financeCalendars.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.financeCalendars.*')) active @endif">
+                            <a href="{{ route('admin.deduction-types.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.deduction-types.*')) active @endif">
                                 <i class="fas fa-calendar"></i>
                                 <p>انواع الخصم للراتب</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{ route('admin.financeCalendars.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.financeCalendars.*')) active @endif">
+                         <li class="nav-item">
+                            <a href="{{ route('admin.bonuses.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.bonuses.*')) active @endif">
                                 <i class="fas fa-calendar"></i>
-                                <p>انواع البدلات</p>
+                                <p>انواع المكافآت للراتب</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{ route('admin.financeCalendars.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.financeCalendars.*')) active @endif">
-                                <i class="fas fa-calendar"></i>
-                                <p>هواتف الموظفين</p>
-                            </a>
-                        </li>
+
                     </ul>
                 </li>
 

@@ -80,14 +80,20 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereUpdatedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereUsername($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AllowanceType> $addedAllowanceTypes
+ * @property-read int|null $added_allowance_types_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BloodGroup> $addedBloodGroup
  * @property-read int|null $added_blood_group_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\City> $addedCities
  * @property-read int|null $added_cities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Country> $addedCountries
  * @property-read int|null $added_countries_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\DeductionType> $addedDeductionTypes
+ * @property-read int|null $added_deduction_types_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $addedEmployees
  * @property-read int|null $added_employees_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\File> $addedFiles
+ * @property-read int|null $added_files_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Governorate> $addedGovernorates
  * @property-read int|null $added_governorates_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Nationality> $addedNationality
@@ -96,14 +102,20 @@ namespace App\Models{
  * @property-read int|null $added_religion_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Resignation> $addedResignation
  * @property-read int|null $added_resignation_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AllowanceType> $updatedAllowanceTypes
+ * @property-read int|null $updated_allowance_types_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BloodGroup> $updatedBloodGroup
  * @property-read int|null $updated_blood_group_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\City> $updatedCities
  * @property-read int|null $updated_cities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Country> $updatedCountries
  * @property-read int|null $updated_countries_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\DeductionType> $updatedDeductionTypes
+ * @property-read int|null $updated_deduction_types_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $updatedEmployees
  * @property-read int|null $updated_employees_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\File> $updatedFiles
+ * @property-read int|null $updated_files_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Governorate> $updatedGovernorates
  * @property-read int|null $updated_governorates_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Nationality> $updatedNationality
@@ -188,6 +200,33 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Admin $addedBy
+ * @property-read \App\Models\Admin|null $updatedBy
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AllowanceType newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AllowanceType newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AllowanceType query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AllowanceType whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AllowanceType whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AllowanceType whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AllowanceType whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AllowanceType whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AllowanceType whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AllowanceType whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AllowanceType whereUpdatedBy($value)
+ */
+	class AllowanceType extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property string $name
+ * @property int $status
+ * @property int $company_id
+ * @property int $added_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $addedBy
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
  * @property-read int|null $employees_count
  * @property-read \App\Models\Admin|null $updatedBy
@@ -204,6 +243,31 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|BloodGroup whereUpdatedBy($value)
  */
 	class BloodGroup extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property string $name
+ * @property int $status
+ * @property int $company_id
+ * @property int $added_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Bonus newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Bonus newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Bonus query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Bonus whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Bonus whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Bonus whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Bonus whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Bonus whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Bonus whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Bonus whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Bonus whereUpdatedBy($value)
+ */
+	class Bonus extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -303,6 +367,33 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Country whereUpdatedBy($value)
  */
 	class Country extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property string $name
+ * @property int $status
+ * @property int $company_id
+ * @property int $added_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $addedBy
+ * @property-read \App\Models\Admin|null $updatedBy
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DeductionType newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DeductionType newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DeductionType query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DeductionType whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DeductionType whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DeductionType whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DeductionType whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DeductionType whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DeductionType whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DeductionType whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DeductionType whereUpdatedBy($value)
+ */
+	class DeductionType extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -458,6 +549,8 @@ namespace App\Models{
  * @property-read \App\Models\Country|null $country
  * @property-read \App\Models\Department $department
  * @property-read \App\Models\DrivingLicenseType|null $drivingLicenseType
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\File> $files
+ * @property-read int|null $files_count
  * @property-read \App\Models\Governorate|null $governorate
  * @property-read \App\Models\JobsCategory $job
  * @property-read \App\Models\Language|null $language
@@ -569,6 +662,9 @@ namespace App\Models{
  * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $addedBy
+ * @property-read \App\Models\Employee $employee
+ * @property-read \App\Models\Admin|null $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|File newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|File newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|File query()
