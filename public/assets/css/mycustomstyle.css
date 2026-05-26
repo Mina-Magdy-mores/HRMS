@@ -19,3 +19,9 @@
 .content-wrapper {
     background: transparent !important;
 }
+
+@media (min-width: 1200px) {
+    .modal-xl {
+        max-width: 1540px;
+    }
+}

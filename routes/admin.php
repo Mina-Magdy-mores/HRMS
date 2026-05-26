@@ -188,6 +188,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
 
         //MainSalaryRecord routes
         Route::get('/main-salary-records', [MainSalaryRecordController::class, 'index'])->name('main-salary-records.index');
+        Route::get('/main-salary-records/open-month/{id}', [MainSalaryRecordController::class, 'openMonth'])->name('main-salary-records.open-month');
         Route::get('/main-salary-records/create', [MainSalaryRecordController::class, 'create'])->name('main-salary-records.create');
         Route::post('/main-salary-records', [MainSalaryRecordController::class, 'store'])->name('main-salary-records.store');
         Route::get('/main-salary-records/{id}/edit', [MainSalaryRecordController::class, 'edit'])->name('main-salary-records.edit');

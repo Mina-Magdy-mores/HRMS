@@ -35,7 +35,7 @@
                     <i class="fas fa-times-circle"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">الشهور المعطلة</span>
+                    <span class="info-box-text">الشهور المغلقة و فى انتظار الفتح</span>
                     <span class="info-box-number">
                         {{ $finanaceMonthlyCalendars->where('status', 0)->count() }}
                     </span>
@@ -94,42 +94,49 @@
                             <tr>
 
                                 <td>
-                                        {{ $month->month->name }}
+                                    {{ $month->month->name }}
                                 </td>
                                 <td>
-                                        {{ $month->month->name_en }}
-                                </td>
-
-                                <td>
-                                        {{ $month->number_of_days }}
+                                    {{ $month->month->name_en }}
                                 </td>
 
                                 <td>
-                                        {{ $month->start_date }}
+                                    {{ $month->number_of_days }}
                                 </td>
 
                                 <td>
-                                        {{ $month->end_date }}
+                                    {{ $month->start_date }}
                                 </td>
 
                                 <td>
-                                    @if($month->status == 1)
+                                    {{ $month->end_date }}
+                                </td>
+
+                                <td>
+                                    @if ($month->status == 1)
                                         <span class="badge badge-success px-3 py-2">
+                                            <i class="fas fa-check-circle"></i>
                                             مفعل
+                                        </span>
+                                    @elseif ($month->status == 2)
+                                        <span class="badge badge-danger px-3 py-2">
+                                            <i class="fas fa-lock"></i>
+                                            مغلق و مؤرشف
                                         </span>
                                     @else
                                         <span class="badge badge-danger px-3 py-2">
-                                            معطل
+                                            <i class="fas fa-times-circle"></i>
+                                            مغلق و فى انتظار الفتح
                                         </span>
                                     @endif
                                 </td>
 
                                 <td>
-                                        {{ $month->addedBy->name }}
+                                    {{ $month->addedBy->name }}
                                 </td>
 
                                 <td>
-                                        {{ $month->updatedBy->name }}
+                                    {{ $month->updatedBy->name }}
                                 </td>
 
                             </tr>

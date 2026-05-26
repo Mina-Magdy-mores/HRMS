@@ -262,4 +262,10 @@ class Admin extends User
     public function updatedBonuses(){
         return $this->hasMany(Bonus::class, 'updated_by');
     }
+    public function addedMainSalaryEmployees(){
+        return $this->hasMany(MainSalaryEmployee::class, 'added_by');
+    }
+    public function updatedMainSalaryEmployees(){
+        return $this->hasMany(MainSalaryEmployee::class, 'updated_by');
+    }
 }

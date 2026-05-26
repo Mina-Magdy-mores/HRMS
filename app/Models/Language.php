@@ -18,9 +18,4 @@ class Language extends Model
     {
         return $this->belongsTo(Admin::class, 'updated_by');
     }
-
-    public function employees()
-    {
-        return $this->hasMany(Employee::class, 'job_id');
-    }
 }

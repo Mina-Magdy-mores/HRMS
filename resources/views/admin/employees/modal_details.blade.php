@@ -532,7 +532,7 @@
                                 <i class="fas fa-image"></i> عرض الصورة
                             </a>
                             <a href="{{ route('admin.employees.download', ['id' => $employee->id, 'type' => 'image']) }}"
-                                target="_blank" class="btn btn-sm btn-secondary">
+                                target="_blank" class="btn btn-sm btn-secondary  mb-2">
                                 <i class="fas fa-image"></i> تحميل الصورة
                             </a>
                         @else
@@ -549,7 +549,7 @@
                                 <i class="fas fa-file-pdf"></i> عرض السيرة الذاتية
                             </a>
                             <a href="{{ route('admin.employees.download', ['id' => $employee->id, 'type' => 'cv']) }}"
-                                target="_blank" class="btn btn-sm btn-secondary">
+                                target="_blank" class="btn btn-sm btn-secondary mb-2">
                                 <i class="fas fa-file-pdf"></i> تحميل السيرة الذاتية
                             </a>
                         @else
@@ -594,90 +594,100 @@
 
                 <!-- BODY = EMPTY -->
                 <div class="modal-body" id="add_file_modal_body">
+                    <div class="card">
+                        <div class="card-header">
 
-                    <form action="{{ route('admin.employees.add-file', $employee->id) }}" method="POST"
-                        enctype="multipart/form-data">
-                        @csrf
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>اسم الملف</label><span class="text-danger h4">*</span>
-                                <input type="text" name="name" value="{{ old('name') }}"
-                                    class="form-control {{ $errors->has('name') ? 'is-invalid' : '' }}"
-                                    placeholder="أدخل اسم الملف">
-                                @include('admin.errors.errors', ['value' => 'name'])
+                            <form action="{{ route('admin.employees.add-file', $employee->id) }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>اسم الملف</label><span class="text-danger h4">*</span>
+                                        <input type="text" name="name" value="{{ old('name') }}"
+                                            class="form-control {{ $errors->has('name') ? 'is-invalid' : '' }}"
+                                            placeholder="أدخل اسم الملف">
+                                        @include('admin.errors.errors', ['value' => 'name'])
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>رابط الملف</label>
+                                        <input type="file" name="file"
+                                            class="form-control {{ $errors->has('file') ? 'is-invalid' : '' }}"
+                                            accept="*">
+                                        @include('admin.errors.errors', ['value' => 'file'])
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-success shadow px-4">
+                                        <i class="fas fa-save"></i>
+                                        حفظ البيانات
+                                    </button>
+                                    <button type="button" data-dismiss="modal" class="btn btn-danger shadow px-4">
+                                        <i class="fas fa-times-circle"></i>
+                                        إلغاء
+                                    </button>
+                                </div>
+
+
+                            </form>
+                        </div>
+                        <div class="card-body">
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover text-center align-middle">
+                                    <thead class="bg-primary text-white">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>اسم الملف</th>
+                                            <th>عرض الملف</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        @forelse ($employee->files as $file)
+                                            <tr>
+                                                <td>{{ $file->id }}</td>
+                                                <td>{{ $file->name ?? '---' }}</td>
+                                                <td>
+                                                    @if ($file->path)
+                                                        <img src="{{ asset('storage/' . $file->path) }}"
+                                                            alt="صورة الملف" class="img-thumbnail"
+                                                            style="max-width: 90px; max-height: 90px;">
+                                                        <small class="form-text text-muted">
+                                                            الملف الحالي: <a
+                                                                href="{{ asset('storage/' . $employee->image) }}"
+                                                                target="_blank">عرض الملف</a> - <a
+                                                                href="{{ route('admin.employees.download', ['id' => $employee->id, 'type' => 'file', 'file' => $file->id]) }}"
+                                                                target="_blank">تحميل الملف</a> -
+                                                            <a href="{{ route('admin.employees.delete', ['id' => $file->id, 'employee_id' => $employee->id]) }}"
+                                                                class="text-danger"
+                                                                onclick="return confirm('هل أنت متأكد من رغبتك في حذف هذا الملف؟')">
+                                                                حذف الملف
+                                                            </a>
+                                                        </small>
+                                                    @else
+                                                        <span>---</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="12">
+                                                    <div class="alert alert-warning mb-0">
+                                                        <i class="fas fa-exclamation-circle"></i>
+                                                        لا توجد بيانات ملفات حالياً
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+
+                                </table>
                             </div>
                         </div>
 
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>رابط الملف</label>
-                                <input type="file" name="file"
-                                    class="form-control {{ $errors->has('file') ? 'is-invalid' : '' }}"
-                                    accept="*">
-                                @include('admin.errors.errors', ['value' => 'file'])
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <button type="submit" class="btn btn-success shadow px-4">
-                                <i class="fas fa-save"></i>
-                                حفظ البيانات
-                            </button>
-                            <button type="button" data-dismiss="modal" class="btn btn-danger shadow px-4">
-                                <i class="fas fa-times-circle"></i>
-                                إلغاء
-                            </button>
-                        </div>
-
-
-                    </form>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover text-center align-middle">
-                            <thead class="bg-primary text-white">
-                                <tr>
-                                    <th>#</th>
-                                    <th>اسم الملف</th>
-                                    <th>عرض الملف</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                @forelse ($employee->files as $file)
-                                    <tr>
-                                        <td>{{ $file->id }}</td>
-                                        <td>{{ $file->name ?? '---' }}</td>
-                                        <td>
-                                            @if ($file->path)
-                                                <img src="{{ asset('storage/' . $file->path) }}" alt="صورة الملف"
-                                                    class="img-thumbnail" style="max-width: 90px; max-height: 90px;">
-                                                <small class="form-text text-muted">
-                                                    الملف الحالي: <a href="{{ asset('storage/' . $employee->image) }}"
-                                                        target="_blank">عرض الملف</a> - <a
-                                                        href="{{ route('admin.employees.download', ['id' => $employee->id, 'type' => 'file', 'file' => $file->id]) }}"
-                                                        target="_blank">تحميل الملف</a> -
-                                                    <a href="{{ route('admin.employees.delete', ['id' => $file->id, 'employee_id' => $employee->id]) }}"
-                                                        class="text-danger"
-                                                        onclick="return confirm('هل أنت متأكد من رغبتك في حذف هذا الملف؟')">
-                                                        حذف الملف
-                                                    </a>
-                                                </small>
-                                            @else
-                                                <span>---</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="12">
-                                            <div class="alert alert-warning mb-0">
-                                                <i class="fas fa-exclamation-circle"></i>
-                                                لا توجد بيانات ملفات حالياً
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-
-                        </table>
                     </div>
                 </div>
 

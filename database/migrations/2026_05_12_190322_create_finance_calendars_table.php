@@ -16,7 +16,7 @@ return new class extends Migration {
                 $table->string('finance_yr_desc');
                 $table->date('start_date');
                 $table->date('end_date');
-                $table->tinyInteger('status')->default(0)->comment('واحد مفعل - صفر معطل');
+                $table->tinyInteger('status')->default(0)->comment('واحد مفعل - صفر معطل - اتنين مغلق و مؤرشف');
                 $table->integer('company_id');
                 $table->foreignId('added_by')
                     ->constrained('admins')

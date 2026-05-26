@@ -99,5 +99,6 @@ class AdminPanelSetting extends Model
     {
         return $this->belongsTo(Admin::class, 'updated_by');
     }
+    
 
 }

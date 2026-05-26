@@ -35,7 +35,7 @@
                     <i class="fas fa-times-circle"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">الشهور المعطلة</span>
+                    <span class="info-box-text">الشهور المغلقة و فى انتظار الفتح</span>
                     <span class="info-box-number">
                         {{ $financeMonthlyCalendars->where('status', 0)->count() }}
                     </span>
@@ -126,9 +126,12 @@
                                 <th>إلى</th>
                                 <th>تاريخ البدء لحساب البصمة</th>
                                 <th>تاريخ الانتهاء لحساب البصمة</th>
-
                                 <th>عدد الأيام</th>
                                 <th>الحالة</th>
+                                <th>السنة المالية</th>
+                                <th>حالة السنه الماليه</th>
+                                <th>الأجرائات</th>
+
 
                             </tr>
                         </thead>
@@ -164,15 +167,55 @@
                                     <td>
                                         @if ($month->status == 1)
                                             <span class="badge badge-success px-3 py-2">
+                                                 <i class="fas fa-check-circle"></i>
                                                 مفعل
+                                            </span>
+                                        @elseif ($month->status == 2)
+                                            <span class="badge badge-danger px-3 py-2">
+                                                <i class="fas fa-lock"></i>
+                                                مغلق و مؤرشف
                                             </span>
                                         @else
                                             <span class="badge badge-danger px-3 py-2">
-                                                معطل
+                                                <i class="fas fa-times-circle"></i>
+                                                مغلق و فى انتظار الفتح
                                             </span>
                                         @endif
                                     </td>
-
+                                    <td>
+                                        {{ $month->finance_yr }}
+                                    </td>
+                                    <td>
+                                        @if ($month->financeCalendar->status == 1)
+                                            <span class="badge badge-success px-3 py-2">
+                                                <i class="fas fa-check-circle"></i>
+                                                مفعل
+                                            </span>
+                                        @elseif ($month->financeCalendar->status == 2)
+                                            <span class="badge badge-danger px-3 py-2">
+                                                <i class="fas fa-lock"></i>
+                                                مغلق و مؤرشف
+                                            </span>
+                                        @else
+                                            <span class="badge badge-danger px-3 py-2">
+                                                <i class="fas fa-times-circle"></i>
+                                                مغلق و فى انتظار الفتح
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if (
+                                            $month->financeCalendar->status == 1 &&
+                                                $month->status == 0 &&
+                                                $month->total_prev_months_waiting_to_open == 0 &&
+                                                $month->total_opened_months == 0)
+                                            <a href="{{ route('admin.main-salary-records.open-month', $month->id) }}" class="btn btn-sm btn-primary">
+                                                <i class="fa fa-folder-open"></i>
+                                                فتح الشهر المالى
+                                            </a>
+                                        @else
+                                        @endif
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>

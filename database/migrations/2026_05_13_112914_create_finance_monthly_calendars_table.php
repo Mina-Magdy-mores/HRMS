@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->foreignId('month_id')->constrained('months')->cascadeOnUpdate();
             $table->date('start_date');
             $table->date('end_date');
-            $table->tinyInteger('status')->default(0)->comment('واحد مفعل - صفر معطل');
+            $table->tinyInteger('status')->default(0)->comment('واحد مفعل - صفر معطل - اتنين مغلق و مؤرشف');
             $table->date('start_date_for_calculation');
             $table->date('end_date_for_calculation');
             $table->integer('company_id');

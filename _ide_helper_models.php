@@ -84,6 +84,8 @@ namespace App\Models{
  * @property-read int|null $added_allowance_types_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BloodGroup> $addedBloodGroup
  * @property-read int|null $added_blood_group_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Bonus> $addedBonuses
+ * @property-read int|null $added_bonuses_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\City> $addedCities
  * @property-read int|null $added_cities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Country> $addedCountries
@@ -106,6 +108,8 @@ namespace App\Models{
  * @property-read int|null $updated_allowance_types_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BloodGroup> $updatedBloodGroup
  * @property-read int|null $updated_blood_group_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Bonus> $updatedBonuses
+ * @property-read int|null $updated_bonuses_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\City> $updatedCities
  * @property-read int|null $updated_cities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Country> $updatedCountries
@@ -255,6 +259,8 @@ namespace App\Models{
  * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $addedBy
+ * @property-read \App\Models\Admin|null $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Bonus newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Bonus newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Bonus query()
@@ -854,6 +860,111 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Language whereUpdatedBy($value)
  */
 	class Language extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property int $finance_monthly_calendars_id
+ * @property int $employees_id
+ * @property string $employee_name Name of the employee
+ * @property int|null $sensitive Indicates if the employee is sensitive
+ * @property int $employee_branch_id
+ * @property int $employee_department_id
+ * @property int $employee_status Status of the employee
+ * @property int $employee_job_id
+ * @property numeric|null $employee_total_bonus Total bonus of the employee
+ * @property numeric|null $employee_total_allowance Total allowance of the employee
+ * @property numeric|null $employee_total_overtime_days_counter Total overtime of the employee
+ * @property numeric|null $employee_total_overtime_payment_per_day Overtime payment per day of the employee
+ * @property numeric|null $employee_absence_days_counter Number of absence days of the employee
+ * @property numeric|null $employee_absence_payment_per_day Payment per absence day of the employee
+ * @property numeric|null $monthly_loan_amount Amount of the monthly loan
+ * @property numeric|null $permanent_loan_amount Amount of the permanent loan
+ * @property numeric|null $total_deductions Total deductions
+ * @property numeric|null $total_phone_payments Total phone payments
+ * @property numeric|null $medical_insurance_amount Amount of the medical insurance
+ * @property numeric|null $social_insurance_amount Amount of the social insurance
+ * @property numeric|null $fixed_allowance Fixed allowance for the employee
+ * @property numeric|null $variable_allowance Variable allowance for the employee
+ * @property numeric|null $total_benefits Total benefits
+ * @property numeric|null $employee_penalty_days_counter_type1 Number of penalty days of the employee
+ * @property numeric|null $employee_penalty_payment_per_day_type1 Payment per penalty day of the employee
+ * @property numeric|null $employee_penalty_days_counter_type2 Number of penalty days of the employee for finger print
+ * @property numeric|null $employee_penalty_payment_per_day_type2 Payment per penalty day of the employee for finger print
+ * @property numeric|null $employee_penalty_days_counter_type3 Number of penalty days of the employee for absence
+ * @property numeric|null $employee_penalty_payment_per_day_type3 Payment per penalty day of the employee for absence
+ * @property numeric|null $employee_total_penalty_days Number of penalty days of the employee
+ * @property numeric|null $employee_salary Salary of the employee
+ * @property numeric|null $employee_rollover_amount Rollover amount for the employee
+ * @property numeric|null $employee_last_month_salary Last month salary of the employee
+ * @property numeric|null $employee_net_salary Net salary of the employee
+ * @property numeric|null $employee_per_day_salary Per day salary of the employee
+ * @property string|null $year_and_month Year and month for the salary record
+ * @property int|null $financial_year Financial year for the salary record
+ * @property int|null $payment_method Payment method for the salary record
+ * @property int|null $payment_on_hold Status of the payment on hold
+ * @property int|null $archived_by
+ * @property int|null $is_archived Status of the archived employee
+ * @property string|null $archived_at Date when the employee was archived
+ * @property int $company_id
+ * @property int $added_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereArchivedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereArchivedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeAbsenceDaysCounter($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeAbsencePaymentPerDay($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeBranchId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeDepartmentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeJobId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeLastMonthSalary($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeNetSalary($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeePenaltyDaysCounterType1($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeePenaltyDaysCounterType2($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeePenaltyDaysCounterType3($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeePenaltyPaymentPerDayType1($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeePenaltyPaymentPerDayType2($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeePenaltyPaymentPerDayType3($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeePerDaySalary($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeRolloverAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeSalary($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeTotalAllowance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeTotalBonus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeTotalOvertimeDaysCounter($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeTotalOvertimePaymentPerDay($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeTotalPenaltyDays($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeesId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereFinanceMonthlyCalendarsId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereFinancialYear($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereFixedAllowance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereIsArchived($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereMedicalInsuranceAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereMonthlyLoanAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee wherePaymentMethod($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee wherePaymentOnHold($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee wherePermanentLoanAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereSensitive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereSocialInsuranceAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereTotalBenefits($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereTotalDeductions($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereTotalPhonePayments($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereUpdatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereVariableAllowance($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereYearAndMonth($value)
+ */
+	class MainSalaryEmployee extends \Eloquent {}
 }
 
 namespace App\Models{
