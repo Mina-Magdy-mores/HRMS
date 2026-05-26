@@ -81,4 +81,7 @@ class FinanceMonthlyCalendar extends Model
     {
         return $this->belongsTo(Month::class);
     }
+    public function mainSalaryEmployee(){
+        return $this->hasMany(MainSalaryEmployee::class, 'finance_monthly_calendar_id');
+    }
 }

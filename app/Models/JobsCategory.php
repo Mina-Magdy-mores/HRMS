@@ -47,4 +47,7 @@ class JobsCategory extends Model
     {
         return $this->hasMany(Employee::class, 'job_id');
     }
+    public function mainSalaryEmployee(){
+        return $this->hasMany(MainSalaryEmployee::class, 'job_category_id');
+    }
 }

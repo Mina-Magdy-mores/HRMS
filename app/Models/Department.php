@@ -50,5 +50,8 @@ class Department extends Model
     {
         return $this->hasMany(Employee::class, 'department_id');
     }
-    
+    public function mainSalaryEmployee()
+    {
+        return $this->hasMany(MainSalaryEmployee::class, 'employee_department_id');
+    }
 }

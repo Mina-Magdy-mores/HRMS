@@ -12,8 +12,8 @@ return new class extends Migration {
     {
         Schema::create('main_salary_employees', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('finance_monthly_calendars_id')->constrained('finance_monthly_calendars')->onUpdate('cascade')->comment('ID of the finance monthly calendar');
-            $table->foreignId('employees_id')->constrained('employees')->onUpdate('cascade')->comment('ID of the employee');
+            $table->foreignId('finance_monthly_calendar_id')->constrained('finance_monthly_calendars')->onUpdate('cascade')->comment('ID of the finance monthly calendar');
+            $table->foreignId('employee_id')->constrained('employees')->onUpdate('cascade')->comment('ID of the employee');
             $table->string('employee_name', 255)->comment('Name of the employee');
             $table->tinyInteger('sensitive')->nullable()->default(0)->comment('Indicates if the employee is sensitive');
             $table->foreignId('employee_branch_id')->constrained('branches')->onUpdate('cascade')->comment('ID of the branch');

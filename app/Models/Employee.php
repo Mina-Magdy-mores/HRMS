@@ -89,4 +89,7 @@ class Employee extends Model
     {
         return $this->hasMany(File::class, 'employee_id');
     }
+    public function mainSalaryEmployee(){
+        return $this->hasMany(MainSalaryEmployee::class, 'employee_id');
+    }
 }

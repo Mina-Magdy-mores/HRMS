@@ -52,4 +52,7 @@ class Branche extends Model
     {
         return $this->hasMany(Employee::class, 'qualifications_id');
     }
+    public function mainSalaryEmployee(){
+        return $this->hasMany(MainSalaryEmployee::class, 'employee_branch_id');
+    }
 }
