@@ -20,7 +20,7 @@ class AdminPanelSettingController extends Controller
         $general_settings = getColsWhere(AdminPanelSetting::class, [], ['*'], ['company_id' => $company_id], 'id', 'desc');
         return view('admin.AdminPanelSetting.index', compact('general_settings'));
     }
-    /**
+    /*
      * Update the specified resource in storage.
      */
     public function update(AdminPanelSettingRequest $request, AdminPanelSetting $adminPanelSetting)

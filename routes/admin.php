@@ -204,7 +204,6 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::get('/main-salary-employee-deductions/{id}/edit', [MainSalaryEmployeeDeductionController::class, 'edit'])->name('main-salary-employee-deductions.edit');
         Route::put('/main-salary-employee-deductions/{id}', [MainSalaryEmployeeDeductionController::class, 'update'])->name('main-salary-employee-deductions.update');
         Route::delete('/main-salary-employee-deductions/{id}', [MainSalaryEmployeeDeductionController::class, 'destroy'])->name('main-salary-employee-deductions.destroy');
-
     });
 
     // guest routes
