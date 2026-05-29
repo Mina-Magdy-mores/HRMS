@@ -21,17 +21,13 @@ class MainSalaryEmployeeDeductionController extends Controller
             $calendar->total_opened_months = get_count_where(FinanceMonthlyCalendar::class, ['company_id' => $company_id, 'status' => '1']);
             $calendar->total_prev_months_waiting_to_open = FinanceMonthlyCalendar::where(['company_id' => $company_id, 'status' => '0', 'finance_yr' => $calendar->finance_yr])->where('month_id', '<', $calendar->month_id)->count();
         }
-        dd($financeMonthlyCalendars);
-        return view('admin.mainSalaryRecord.index', ['financeMonthlyCalendars' => $financeMonthlyCalendars]);
+        return view('admin.mainSalaryRecordDeduction.index', ['financeMonthlyCalendars' => $financeMonthlyCalendars]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
@@ -44,9 +40,34 @@ class MainSalaryEmployeeDeductionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(MainSalaryEmployeeDeduction $mainSalaryEmployeeDeduction)
+    public function show($id)
     {
-        //
+        $company_id = Auth::user()->company_id;
+        $financeMonthlyCalendar = FinanceMonthlyCalendar::with('month')
+            ->where('company_id', $company_id)
+            ->where('id', $id)
+            ->first();
+
+        if (empty($financeMonthlyCalendar)) {
+            return redirect()->route('admin.main-salary-employee-deductions.index')->with('error', 'عفوا غير قادر للوصول الى بيانات الشهر');
+        }
+
+        $mainSalaryEmployeeDeductions = MainSalaryEmployeeDeduction::with([
+            'employee',
+            'financeMonthlyCalendar.month',
+            'addedBy',
+            'updatedBy',
+            'approvedBy'
+        ])
+        ->where('company_id', $company_id)
+        ->where('finance_monthly_calendar_id', $id)
+        ->orderBy('id', 'desc')
+        ->get();
+
+        return view('admin.mainSalaryRecordDeduction.show', [
+            'financeMonthlyCalendar' => $financeMonthlyCalendar,
+            'mainSalaryEmployeeDeductions' => $mainSalaryEmployeeDeductions
+        ]);
     }
 
     /**

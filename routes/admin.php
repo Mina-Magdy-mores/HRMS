@@ -199,11 +199,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
 
         //main_salary_employee_deductions
         Route::get('/main-salary-employee-deductions', [MainSalaryEmployeeDeductionController::class, 'index'])->name('main-salary-employee-deductions.index');
-        Route::get('/main-salary-employee-deductions/create', [MainSalaryEmployeeDeductionController::class, 'create'])->name('main-salary-employee-deductions.create');
-        Route::post('/main-salary-employee-deductions', [MainSalaryEmployeeDeductionController::class, 'store'])->name('main-salary-employee-deductions.store');
-        Route::get('/main-salary-employee-deductions/{id}/edit', [MainSalaryEmployeeDeductionController::class, 'edit'])->name('main-salary-employee-deductions.edit');
-        Route::put('/main-salary-employee-deductions/{id}', [MainSalaryEmployeeDeductionController::class, 'update'])->name('main-salary-employee-deductions.update');
-        Route::delete('/main-salary-employee-deductions/{id}', [MainSalaryEmployeeDeductionController::class, 'destroy'])->name('main-salary-employee-deductions.destroy');
+        Route::get('/main-salary-employee-deductions/show/{id}', [MainSalaryEmployeeDeductionController::class, 'show'])->name('main-salary-employee-deductions.show');
     });
 
     // guest routes
