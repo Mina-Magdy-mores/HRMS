@@ -16,3 +16,4 @@
 @include('admin.mainSalaryRecordDeduction.table', ['financeMonthlyCalendars' => $financeMonthlyCalendars])
 
 @endsection
+

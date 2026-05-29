@@ -93,7 +93,7 @@
 
                 @if ($financeMonthlyCalendar->status == 1)
                     <button type="button" class="btn btn-primary btn-sm shadow-sm" data-toggle="modal"
-                        data-target="#addDeductionModal">
+                        data-target="#addMainSalaryRecordDeductionModal">
 
                         <i class="fas fa-list-plus"></i>
                         إضافة جزاء جديد
@@ -238,3 +238,136 @@
         </div>
     </div>
 </div>
+
+
+<!-- Months Modal (EMPTY BODY) -->
+<div class="modal fade " id="addMainSalaryRecordDeductionModal" tabindex="0" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content shadow">
+
+            <!-- Header -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-calendar-alt"></i>
+                    إضافة جزاءات شهرية جديدة
+                </h5>
+
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <!-- BODY = EMPTY -->
+            <div class="modal-body" id="months_modal_body">
+                <form action="{{ route('admin.main-salary-employee-deductions.store') }}" method="POST">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>بيانات الموظفين</label>
+                                <select name="employee_id" id="employee_id"
+                                    class="form-control select2 {{ $errors->has('employee_id') ? 'is-invalid' : '' }}">
+                                    <option value="">اختر الموظف</option>
+                                    @foreach ($employees as $employee)
+                                        <option value="{{ $employee->id }}" data-salary="{{ $employee->salary }}"
+                                            data-payment-per-day="{{ $employee->payment_per_day }}"
+                                            {{ old('employee_id') == $employee->id ? 'selected' : '' }}>
+                                            {{ $employee->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4 related_to_employee" style="display: none;">
+                            <div class="form-group">
+                                <label>الراتب</label>
+                                <input readonly type="number" name="salary" value="0.0" id="salary"
+                                    class="form-control" placeholder="أدخل الراتب">
+                            </div>
+                        </div>
+                        <div class="col-md-4 related_to_employee" style="display: none;">
+                            <div class="form-group">
+                                <label>أجر اليوم</label>
+                                <input readonly type="number" name="payment_per_day" value="0.0"
+                                    id="payment_per_day" class="form-control" placeholder="أدخل أجر اليوم">
+                            </div>
+                        </div>
+                        <div class="col-md-4 related_to_employee" style="display: none;">
+                            <div class="form-group">
+                                <label>نوع الجزاء</label>
+                                <select name="deduction_type" id="deduction_type" class="form-control select2">
+                                    <option value="">اختر النوع</option>
+                                    <option value="1" {{ old('deduction_type') == '1' ? 'selected' : '' }}>
+                                        جزاء ايام</option>
+                                    <option value="2" {{ old('deduction_type') == '2' ? 'selected' : '' }}>
+                                        جزاء بصمة</option>
+                                    <option value="3" {{ old('deduction_type') == '3' ? 'selected' : '' }}>
+                                        جزاء تحقيق</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4 related_to_employee" style="display: none;">
+                            <div class="form-group">
+                                <label>عدد الايام</label>
+                                <input type="number" name="amount" value="0" id="amount"
+                                    class="form-control" placeholder="أدخل عدد الايام">
+                            </div>
+                        </div>
+                        <div class="col-md-4 related_to_employee" style="display: none;">
+                            <div class="form-group">
+                                <label>اجمالى المبلغ المالي</label>
+                                <input type="number" name="total" value="0" id="total"
+                                    class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-12 related_to_employee" style="display: none;">
+                            <div class="form-group">
+                                <label>ملاحظات</label>
+                                <textarea type="text" name="notes" id="notes" class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-success shadow px-4">
+                                <i class="fas fa-save"></i>
+                                حفظ البيانات
+                            </button>
+                            <button type="button" class="btn btn-danger shadow px-4"
+                                data-dismiss="modal">الغاء</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+@section('js')
+    <script src="{{ asset('assets/plugins/select2/js/select2.full.min.js') }}"></script>
+
+    <script>
+        function initSelect2() {
+            $('.select2').select2({
+                theme: 'bootstrap4'
+            });
+        }
+        $(document).ready(function() {
+            initSelect2();
+            $(document).on('change', '#employee_id', function() {
+                var employee_id = $(this).val();
+                var salary = $(this).find(':selected').data('salary');
+                var payment_per_day = $(this).find(':selected').data('payment-per-day');
+                if (employee_id) {
+                    $('#salary').val(salary);
+                    $('#payment_per_day').val(payment_per_day);
+                    $('.related_to_employee').show();
+                } else {
+                    $('#salary').val(0);
+                    $('#payment_per_day').val(0);
+                    $('.related_to_employee').hide();
+                }
+            })
+
+        })
+    </script>
+@endsection

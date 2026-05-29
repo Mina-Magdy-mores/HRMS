@@ -200,6 +200,8 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         //main_salary_employee_deductions
         Route::get('/main-salary-employee-deductions', [MainSalaryEmployeeDeductionController::class, 'index'])->name('main-salary-employee-deductions.index');
         Route::get('/main-salary-employee-deductions/show/{id}', [MainSalaryEmployeeDeductionController::class, 'show'])->name('main-salary-employee-deductions.show');
+        Route::post('/main-salary-employee-deductions', [MainSalaryEmployeeDeductionController::class, 'store'])->name('main-salary-employee-deductions.store');
+        
     });
 
     // guest routes

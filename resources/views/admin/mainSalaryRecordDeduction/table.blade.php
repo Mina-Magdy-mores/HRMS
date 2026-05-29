@@ -200,7 +200,8 @@
                                     </td>
                                     <td>
                                         @if ($month->status != 0)
-                                            <a href="{{ route('admin.main-salary-employee-deductions.show', $month->id) }}" class="btn btn-sm btn-primary">
+                                            <a href="{{ route('admin.main-salary-employee-deductions.show', $month->id) }}"
+                                                class="btn btn-sm btn-primary">
                                                 <i class="fa fa-folder-open"></i>
                                                 عرض الشهر المالى
                                             </a>
@@ -233,16 +234,17 @@
 
 @section('js')
     <script>
-        $(document).ready(function () {
-            $(document).on('change', '#type-search', function () {
+
+            $(document).on('change', '#type-search', function() {
                 ajax_search();
             })
-            $(document).on('input', '#start_time_search', function () {
+            $(document).on('input', '#start_time_search', function() {
                 ajax_search();
             })
-            $(document).on('input', '#end_time_search', function () {
+            $(document).on('input', '#end_time_search', function() {
                 ajax_search();
             })
+
             function ajax_search() {
                 var type = $('#type-search').val();
                 var start_time = $('#start_time_search').val();
@@ -258,14 +260,14 @@
                         start_time: start_time,
                         end_time: end_time
                     },
-                    success: function (financeMonthlyCalendars) {
+                    success: function(financeMonthlyCalendars) {
                         $('#ajax_responce_search').html(financeMonthlyCalendars);
                     },
-                    error: function (xhr) {
+                    error: function(xhr) {
                         alert('حدث خطأ');
                     }
                 });
-                $(document).on('click', '#ajax-pagination a', function (e) {
+                $(document).on('click', '#ajax-pagination a', function(e) {
                     e.preventDefault();
                     var type = $('#type-search').val();
                     var start_time = $('#start_time_search').val();
@@ -282,18 +284,15 @@
                             start_time: start_time,
                             end_time: end_time
                         },
-                        success: function (financeMonthlyCalendars) {
+                        success: function(financeMonthlyCalendars) {
                             $('#ajax_responce_search').html(financeMonthlyCalendars);
                         },
-                        error: function (xhr) {
+                        error: function(xhr) {
                             alert('حدث خطأ');
                         }
                     });
                 })
             }
         })
-
-
-
     </script>
 @endsection

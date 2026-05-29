@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Employee;
 use App\Models\FinanceMonthlyCalendar;
 use App\Models\MainSalaryEmployeeDeduction;
 use Illuminate\Http\Request;
@@ -51,7 +52,7 @@ class MainSalaryEmployeeDeductionController extends Controller
         if (empty($financeMonthlyCalendar)) {
             return redirect()->route('admin.main-salary-employee-deductions.index')->with('error', 'عفوا غير قادر للوصول الى بيانات الشهر');
         }
-
+        $employees = Employee::select('id', 'name', 'employee_code','salary','payment_per_day')->where('company_id', $company_id)->orderBy('id', 'asc')->get();
         $mainSalaryEmployeeDeductions = MainSalaryEmployeeDeduction::with([
             'employee',
             'financeMonthlyCalendar.month',
@@ -59,14 +60,15 @@ class MainSalaryEmployeeDeductionController extends Controller
             'updatedBy',
             'approvedBy'
         ])
-        ->where('company_id', $company_id)
-        ->where('finance_monthly_calendar_id', $id)
-        ->orderBy('id', 'desc')
-        ->get();
+            ->where('company_id', $company_id)
+            ->where('finance_monthly_calendar_id', $id)
+            ->orderBy('id', 'desc')
+            ->get();
 
         return view('admin.mainSalaryRecordDeduction.show', [
             'financeMonthlyCalendar' => $financeMonthlyCalendar,
-            'mainSalaryEmployeeDeductions' => $mainSalaryEmployeeDeductions
+            'mainSalaryEmployeeDeductions' => $mainSalaryEmployeeDeductions,
+            'employees' => $employees,
         ]);
     }
 
