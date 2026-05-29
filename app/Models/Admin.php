@@ -268,4 +268,13 @@ class Admin extends User
     public function updatedMainSalaryEmployees(){
         return $this->hasMany(MainSalaryEmployee::class, 'updated_by');
     }
+    public function addedMainSalaryEmployeeDeductions(){
+        return $this->hasMany(MainSalaryEmployeeDeduction::class, 'added_by');
+    }
+    public function updatedMainSalaryEmployeeDeductions(){
+        return $this->hasMany(MainSalaryEmployeeDeduction::class, 'updated_by');
+    }
+    public function approvedMainSalaryEmployeeDeductions(){
+        return $this->hasMany(MainSalaryEmployeeDeduction::class, 'approved_by');
+    }
 }

@@ -25,7 +25,7 @@ class MainSalaryRecordController extends Controller
         }
         return view('admin.mainSalaryRecord.index', ['financeMonthlyCalendars' => $financeMonthlyCalendars]);
     }
-    public function openMonth($id)
+    public function openMonth(Request $request, $id)
     {
         try {
             $company_id = Auth::user()->company_id;
@@ -51,14 +51,18 @@ class MainSalaryRecordController extends Controller
             if ($total_prev_months_waiting_to_open > 0) {
                 return redirect()->back()->with('error', 'عذراً، يوجد أشهر مالية سابقة معلقة و فى انتظار للفتح');
             }
-            DB::transaction(function () use ($financeMonthlyCalendar, $company_id) {
-                $dataToUpdate = ['status' => 1];
+            DB::transaction(function () use ($financeMonthlyCalendar, $company_id, $request) {
+                $dataToUpdate = [
+                    'status' => 1,
+                    'start_date_for_calculation' => $request->start_date_for_calculation,
+                    'end_date_for_calculation' => $request->end_date_for_calculation
+                ];
                 $dataToUpdate['updated_by'] = Auth::id();
                 $flag = update($financeMonthlyCalendar, $dataToUpdate);
                 if (!$flag) {
                     return redirect()->back()->with('error', 'عذراً، حدث خطأ أثناء فتح الشهر المالى');
                 } else {
-                    $all_employees = get_cols_where(Employee::class, ['*'], ['company_id' => $company_id, 'employment_status' => 1], 'employee_code','asc');
+                    $all_employees = get_cols_where(Employee::class, ['*'], ['company_id' => $company_id, 'employment_status' => 1], 'employee_code', 'asc');
                     if ($all_employees) {
                         foreach ($all_employees as $employee) {
                             $dataToInsert = [];
@@ -99,9 +103,16 @@ class MainSalaryRecordController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function loadOpenMonth(Request $request)
     {
-        return view('admin.mainSalaryRecord.create');
+        if ($request->ajax()) {
+            $company_id = Auth::user()->company_id;
+            $financeMonthlyCalendar = getColsWhere(FinanceMonthlyCalendar::class, ['financeCalendar'], ['*'], ['id' => $request->id, 'company_id' => $company_id]);
+            if (!$financeMonthlyCalendar) {
+                return redirect()->back()->with('error', 'عذراً، الشهر المالى غير موجود');
+            }
+            return view('admin.mainSalaryRecord.load_open_month', compact('financeMonthlyCalendar'));
+        }
     }
 
     /**

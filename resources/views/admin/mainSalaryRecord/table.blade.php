@@ -167,7 +167,7 @@
                                     <td>
                                         @if ($month->status == 1)
                                             <span class="badge badge-success px-3 py-2">
-                                                 <i class="fas fa-check-circle"></i>
+                                                <i class="fas fa-check-circle"></i>
                                                 مفعل
                                             </span>
                                         @elseif ($month->status == 2)
@@ -205,14 +205,15 @@
                                     </td>
                                     <td>
                                         @if (
-                                            $month->financeCalendar->status == 1 &&
+                                                $month->financeCalendar->status == 1 &&
                                                 $month->status == 0 &&
                                                 $month->total_prev_months_waiting_to_open == 0 &&
-                                                $month->total_opened_months == 0)
-                                            <a href="{{ route('admin.main-salary-records.open-month', $month->id) }}" class="btn btn-sm btn-primary">
+                                                $month->total_opened_months == 0
+                                            )
+                                            <button data-id="{{ $month->id }}" class="btn load-modal btn-sm btn-primary">
                                                 <i class="fa fa-folder-open"></i>
                                                 فتح الشهر المالى
-                                            </a>
+                                            </button>
                                         @else
                                         @endif
                                     </td>
@@ -240,20 +241,43 @@
     </div>
 </div>
 
+<!-- Months Modal (EMPTY BODY) -->
+<div class="modal fade " id="loadModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content shadow">
 
+            <!-- Header -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-calendar-alt"></i>
+                  فتح الشهر المالى
+                </h5>
+
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <!-- BODY = EMPTY -->
+            <div class="modal-body" id="loadModal_body">
+
+            </div>
+
+        </div>
+    </div>
+</div>
 @section('js')
     <script>
-        $(document).ready(function() {
-            $(document).on('change', '#type-search', function() {
+        $(document).ready(function () {
+            $(document).on('change', '#type-search', function () {
                 ajax_search();
             })
-            $(document).on('input', '#start_time_search', function() {
+            $(document).on('input', '#start_time_search', function () {
                 ajax_search();
             })
-            $(document).on('input', '#end_time_search', function() {
+            $(document).on('input', '#end_time_search', function () {
                 ajax_search();
             })
-
             function ajax_search() {
                 var type = $('#type-search').val();
                 var start_time = $('#start_time_search').val();
@@ -269,14 +293,14 @@
                         start_time: start_time,
                         end_time: end_time
                     },
-                    success: function(financeMonthlyCalendars) {
+                    success: function (financeMonthlyCalendars) {
                         $('#ajax_responce_search').html(financeMonthlyCalendars);
                     },
-                    error: function(xhr) {
+                    error: function (xhr) {
                         alert('حدث خطأ');
                     }
                 });
-                $(document).on('click', '#ajax-pagination a', function(e) {
+                $(document).on('click', '#ajax-pagination a', function (e) {
                     e.preventDefault();
                     var type = $('#type-search').val();
                     var start_time = $('#start_time_search').val();
@@ -293,15 +317,43 @@
                             start_time: start_time,
                             end_time: end_time
                         },
-                        success: function(financeMonthlyCalendars) {
+                        success: function (financeMonthlyCalendars) {
                             $('#ajax_responce_search').html(financeMonthlyCalendars);
                         },
-                        error: function(xhr) {
+                        error: function (xhr) {
                             alert('حدث خطأ');
                         }
                     });
                 })
             }
+
+
+
+            $(document).on('click', '.load-modal', function () {
+                var id = $(this).data('id');
+                $.ajax({
+                    url: '{{ route('admin.main-salary-records.load-open-month') }}',
+                    type: 'POST',
+                    dataType: 'html',
+                    cache: false,
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        id: id
+                    },
+                    success: function (data) {
+                        $('#loadModal_body').html(data);
+                        $('#loadModal').modal('show');
+                    },
+                    error: function (xhr) {
+                        alert('حدث خطأ');
+                    }
+                });
+
+
+            })
         })
+
+
+
     </script>
 @endsection

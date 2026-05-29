@@ -21,46 +21,43 @@
 
         <!-- Sidebar Menu -->
         <nav class="mt-2">
-            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
-                data-accordion="false">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-                <li
-                    class="nav-item has-treeview  {{ request()->is('admin/general-settings*') ||
-                    request()->routeIs('admin.financeCalendars.*') ||
-                    request()->routeIs('admin.branches.*') ||
-                    request()->routeIs('admin.shifts-types.*') ||
-                    request()->routeIs('admin.departments.*') ||
-                    request()->routeIs('admin.jobCategories.*') ||
-                    request()->routeIs('admin.qualifications.*') ||
-                    request()->routeIs('admin.occasions.*') ||
-                    request()->routeIs('admin.resignations.*') ||
-                    request()->routeIs('admin.nationalities.*') ||
-                    request()->routeIs('admin.religions.*') ||
-                    request()->routeIs('admin.blood-groups.*') ||
-                    request()->routeIs('admin.countries.*') ||
-                    request()->routeIs('admin.governorates.*') ||
-                    request()->routeIs('admin.cities.*')
-                        ? 'menu-open'
-                        : '' }}">
-                    <a href="#"
-                        class="nav-link {{ request()->is('admin/general-settings*') ||
-                        request()->routeIs('admin.financeCalendars.*') ||
-                        request()->routeIs('admin.branches.*') ||
-                        request()->routeIs('admin.shifts-types.*') ||
-                        request()->routeIs('admin.departments.*') ||
-                        request()->routeIs('admin.jobCategories.*') ||
-                        request()->routeIs('admin.qualifications.*') ||
-                        request()->routeIs('admin.occasions.*') ||
-                        request()->routeIs('admin.resignations.*') ||
-                        request()->routeIs('admin.nationalities.*') ||
-                        request()->routeIs('admin.religions.*') ||
-                        request()->routeIs('admin.blood-groups.*') ||
-                        request()->routeIs('admin.countries.*') ||
-                        request()->routeIs('admin.governorates.*') ||
-                        request()->routeIs('admin.cities.*')
-                            ? 'active'
-                            : '' }}">
+                <li class="nav-item has-treeview  {{ request()->is('admin/general-settings*') ||
+    request()->routeIs('admin.financeCalendars.*') ||
+    request()->routeIs('admin.branches.*') ||
+    request()->routeIs('admin.shifts-types.*') ||
+    request()->routeIs('admin.departments.*') ||
+    request()->routeIs('admin.jobCategories.*') ||
+    request()->routeIs('admin.qualifications.*') ||
+    request()->routeIs('admin.occasions.*') ||
+    request()->routeIs('admin.resignations.*') ||
+    request()->routeIs('admin.nationalities.*') ||
+    request()->routeIs('admin.religions.*') ||
+    request()->routeIs('admin.blood-groups.*') ||
+    request()->routeIs('admin.countries.*') ||
+    request()->routeIs('admin.governorates.*') ||
+    request()->routeIs('admin.cities.*')
+    ? 'menu-open'
+    : '' }}">
+                    <a href="#" class="nav-link {{ request()->is('admin/general-settings*') ||
+    request()->routeIs('admin.financeCalendars.*') ||
+    request()->routeIs('admin.branches.*') ||
+    request()->routeIs('admin.shifts-types.*') ||
+    request()->routeIs('admin.departments.*') ||
+    request()->routeIs('admin.jobCategories.*') ||
+    request()->routeIs('admin.qualifications.*') ||
+    request()->routeIs('admin.occasions.*') ||
+    request()->routeIs('admin.resignations.*') ||
+    request()->routeIs('admin.nationalities.*') ||
+    request()->routeIs('admin.religions.*') ||
+    request()->routeIs('admin.blood-groups.*') ||
+    request()->routeIs('admin.countries.*') ||
+    request()->routeIs('admin.governorates.*') ||
+    request()->routeIs('admin.cities.*')
+    ? 'active'
+    : '' }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>
                             قائمة الضبط
@@ -175,23 +172,21 @@
                         </li>
                     </ul>
                 </li>
-                <li
-                    class="nav-item has-treeview  {{ request()->routeIs('admin.employees.*') ||
-                    request()->routeIs('admin.allowance-types.*') ||
-                    request()->routeIs('admin.deduction-types.*') ||
-                    request()->routeIs('admin.bonuses.*')
-                        ? 'menu-open'
-                        : '' }}">
-                    <a href="#"
-                        class="nav-link {{ request()->routeIs('admin.employees.*') ||
-                        request()->routeIs('admin.allowance-types.*') ||
-                        request()->routeIs('admin.deduction-types.*') ||
-                        request()->routeIs('admin.bonuses.*')
-                            ? 'active'
-                            : '' }}">
+                <li class="nav-item has-treeview  {{ request()->routeIs('admin.employees.*') ||
+    request()->routeIs('admin.allowance-types.*') ||
+    request()->routeIs('admin.deduction-types.*') ||
+    request()->routeIs('admin.bonuses.*')
+    ? 'menu-open'
+    : '' }}">
+                    <a href="#" class="nav-link {{ request()->routeIs('admin.employees.*') ||
+    request()->routeIs('admin.allowance-types.*') ||
+    request()->routeIs('admin.deduction-types.*') ||
+    request()->routeIs('admin.bonuses.*')
+    ? 'active'
+    : '' }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>
-                            قائمة ِشئون الموظفين
+                            قائمة شئون الموظفين
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
@@ -230,8 +225,10 @@
 
                     </ul>
                 </li>
-                <li class="nav-item has-treeview  {{ request()->routeIs('admin.main-salary-records.*') ? 'menu-open' : '' }}">
-                    <a href="#" class="nav-link {{ request()->routeIs('admin.main-salary-records.*') ? 'active' : '' }}">
+                <li
+                    class="nav-item has-treeview  {{ request()->routeIs('admin.main-salary-records.*') ? 'menu-open' : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->routeIs('admin.main-salary-records.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>
                             قائمة أجور الموظفين
@@ -242,11 +239,80 @@
                         <li class="nav-item">
                             <a href="{{ route('admin.main-salary-records.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
-                                <i class="fas fa-wallet"></i>
+                                <i class="fas fa-users"></i>
                                 <p>بيانات رواتب الموظفين</p>
                             </a>
                         </li>
-
+                        <li class="nav-item">
+                            <a href="{{ route('admin.main-salary-records.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
+                                <i class="fas fa-gavel"></i>
+                                <p>الجزاءات</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.main-salary-records.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
+                                <i class="fas fa-calendar-times"></i>
+                                <p>الغياب</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.main-salary-records.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
+                                <i class="fas fa-plus-circle"></i>
+                                <p>الإضافى</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.main-salary-records.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
+                                <i class="fas fa-minus-circle"></i>
+                                <p>الخصومات المالية</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.main-salary-records.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
+                                <i class="fas fa-trophy"></i>
+                                <p>المكافئات المالية</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.main-salary-records.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
+                                <i class="fas fa-chart-line"></i>
+                                <p>البدلات المتغيره</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.main-salary-records.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
+                                <i class="fas fa-mobile-alt"></i>
+                                <p>فواتير التليفونات</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.main-salary-records.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
+                                <i class="fas fa-hand-holding-usd"></i>
+                                <p>السلف الشهرية</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.main-salary-records.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
+                                <i class="fas fa-coins"></i>
+                                <p>السلف المستديمة</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.main-salary-records.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
+                                <i class="fas fa-print"></i>
+                                <p>رواتب الموظفين مفصله</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
 

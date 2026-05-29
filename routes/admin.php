@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\FinanceCalendarController;
 use App\Http\Controllers\Admin\GovernorateController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\JobsCategoryController;
+use App\Http\Controllers\Admin\MainSalaryEmployeeDeductionController;
 use App\Http\Controllers\Admin\MainSalaryRecordController;
 use App\Http\Controllers\Admin\NationalityController;
 use App\Http\Controllers\Admin\OccasionController;
@@ -188,12 +189,21 @@ Route::prefix('/admin')->name('admin.')->group(function () {
 
         //MainSalaryRecord routes
         Route::get('/main-salary-records', [MainSalaryRecordController::class, 'index'])->name('main-salary-records.index');
-        Route::get('/main-salary-records/open-month/{id}', [MainSalaryRecordController::class, 'openMonth'])->name('main-salary-records.open-month');
+        Route::post('/main-salary-records/open-month/{id}', [MainSalaryRecordController::class, 'openMonth'])->name('main-salary-records.open-month');
         Route::get('/main-salary-records/create', [MainSalaryRecordController::class, 'create'])->name('main-salary-records.create');
         Route::post('/main-salary-records', [MainSalaryRecordController::class, 'store'])->name('main-salary-records.store');
         Route::get('/main-salary-records/{id}/edit', [MainSalaryRecordController::class, 'edit'])->name('main-salary-records.edit');
         Route::put('/main-salary-records/{id}', [MainSalaryRecordController::class, 'update'])->name('main-salary-records.update');
         Route::delete('/main-salary-records/{id}', [MainSalaryRecordController::class, 'destroy'])->name('main-salary-records.destroy');
+        Route::post('/main-salary-records/load-open-month', [MainSalaryRecordController::class, 'loadOpenMonth'])->name('main-salary-records.load-open-month');
+
+        //main_salary_employee_deductions
+        Route::get('/main-salary-employee-deductions', [MainSalaryEmployeeDeductionController::class, 'index'])->name('main-salary-employee-deductions.index');
+        Route::get('/main-salary-employee-deductions/create', [MainSalaryEmployeeDeductionController::class, 'create'])->name('main-salary-employee-deductions.create');
+        Route::post('/main-salary-employee-deductions', [MainSalaryEmployeeDeductionController::class, 'store'])->name('main-salary-employee-deductions.store');
+        Route::get('/main-salary-employee-deductions/{id}/edit', [MainSalaryEmployeeDeductionController::class, 'edit'])->name('main-salary-employee-deductions.edit');
+        Route::put('/main-salary-employee-deductions/{id}', [MainSalaryEmployeeDeductionController::class, 'update'])->name('main-salary-employee-deductions.update');
+        Route::delete('/main-salary-employee-deductions/{id}', [MainSalaryEmployeeDeductionController::class, 'destroy'])->name('main-salary-employee-deductions.destroy');
 
     });
 

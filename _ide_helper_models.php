@@ -98,6 +98,8 @@ namespace App\Models{
  * @property-read int|null $added_files_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Governorate> $addedGovernorates
  * @property-read int|null $added_governorates_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployee> $addedMainSalaryEmployees
+ * @property-read int|null $added_main_salary_employees_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Nationality> $addedNationality
  * @property-read int|null $added_nationality_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Religion> $addedReligion
@@ -122,6 +124,8 @@ namespace App\Models{
  * @property-read int|null $updated_files_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Governorate> $updatedGovernorates
  * @property-read int|null $updated_governorates_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployee> $updatedMainSalaryEmployees
+ * @property-read int|null $updated_main_salary_employees_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Nationality> $updatedNationality
  * @property-read int|null $updated_nationality_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Religion> $updatedReligion
@@ -308,6 +312,8 @@ namespace App\Models{
  * @mixin \Eloquent
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
  * @property-read int|null $employees_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployee> $mainSalaryEmployee
+ * @property-read int|null $main_salary_employee_count
  */
 	class Branche extends \Eloquent {}
 }
@@ -432,6 +438,8 @@ namespace App\Models{
  * @mixin \Eloquent
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
  * @property-read int|null $employees_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployee> $mainSalaryEmployee
+ * @property-read int|null $main_salary_employee_count
  */
 	class Department extends \Eloquent {}
 }
@@ -560,6 +568,8 @@ namespace App\Models{
  * @property-read \App\Models\Governorate|null $governorate
  * @property-read \App\Models\JobsCategory $job
  * @property-read \App\Models\Language|null $language
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployee> $mainSalaryEmployee
+ * @property-read int|null $main_salary_employee_count
  * @property-read \App\Models\MilitaryStatus|null $militaryStatus
  * @property-read \App\Models\Nationality $nationality
  * @property-read \App\Models\Qualification|null $qualification
@@ -765,6 +775,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereUpdatedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereYearAndMonth($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployee> $mainSalaryEmployee
+ * @property-read int|null $main_salary_employee_count
  */
 	class FinanceMonthlyCalendar extends \Eloquent {}
 }
@@ -829,6 +841,8 @@ namespace App\Models{
  * @mixin \Eloquent
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
  * @property-read int|null $employees_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployee> $mainSalaryEmployee
+ * @property-read int|null $main_salary_employee_count
  */
 	class JobsCategory extends \Eloquent {}
 }
@@ -844,8 +858,6 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Admin $addedBy
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
- * @property-read int|null $employees_count
  * @property-read \App\Models\Admin|null $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Language newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Language newQuery()
@@ -865,8 +877,8 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
- * @property int $finance_monthly_calendars_id
- * @property int $employees_id
+ * @property int $finance_monthly_calendar_id
+ * @property int $employee_id
  * @property string $employee_name Name of the employee
  * @property int|null $sensitive Indicates if the employee is sensitive
  * @property int $employee_branch_id
@@ -912,6 +924,14 @@ namespace App\Models{
  * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Admin $addedBy
+ * @property-read \App\Models\Admin|null $archivedBy
+ * @property-read \App\Models\Branche $branch
+ * @property-read \App\Models\Department $department
+ * @property-read \App\Models\Employee $employee
+ * @property-read \App\Models\FinanceMonthlyCalendar $financeMonthlyCalendar
+ * @property-read \App\Models\JobsCategory $job
+ * @property-read \App\Models\Admin|null $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee query()
@@ -924,6 +944,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeAbsencePaymentPerDay($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeBranchId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeDepartmentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeJobId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeLastMonthSalary($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeName($value)
@@ -943,8 +964,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeTotalOvertimeDaysCounter($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeTotalOvertimePaymentPerDay($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeeTotalPenaltyDays($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereEmployeesId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereFinanceMonthlyCalendarsId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereFinanceMonthlyCalendarId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereFinancialYear($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereFixedAllowance($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereId($value)
@@ -965,6 +985,53 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereYearAndMonth($value)
  */
 	class MainSalaryEmployee extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property int $main_salary_employee_id
+ * @property int $employee_id
+ * @property int $finance_monthly_calendar_id
+ * @property string $name
+ * @property int $deduction_type 1: days deducted, 2: finger print deduction
+ * @property numeric $amount
+ * @property numeric $total
+ * @property int $is_approved
+ * @property int|null $approved_by
+ * @property string|null $approved_at
+ * @property int $is_auto
+ * @property int $status
+ * @property int $company_id
+ * @property int $added_by
+ * @property int|null $updated_by
+ * @property string|null $notes
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereAddedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereApprovedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereApprovedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereCompanyId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereDeductionType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereEmployeeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereFinanceMonthlyCalendarId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereIsApproved($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereIsAuto($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereMainSalaryEmployeeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereTotal($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereUpdatedBy($value)
+ */
+	class MainSalaryEmployeeDeduction extends \Eloquent {}
 }
 
 namespace App\Models{

@@ -41,5 +41,8 @@ class MainSalaryEmployee extends Model
     {
         return $this->belongsTo(JobsCategory::class, 'employee_job_id');
     }
-
+    public function mainSalaryEmployeeDeductions()
+    {
+        return $this->hasMany(MainSalaryEmployeeDeduction::class, 'main_salary_employee_id');
+    }
 }
