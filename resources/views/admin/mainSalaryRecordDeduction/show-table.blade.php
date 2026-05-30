@@ -31,7 +31,7 @@
                 </span>
                 <div class="info-box-content">
                     <span class="info-box-text">إجمالي عدد الجزاءات</span>
-                    <span class="info-box-number">{{ $mainSalaryEmployeeDeductions->count() }}</span>
+                    <span class="info-box-number">{{ $mainSalaryEmployeeDeductions2->count() }}</span>
                 </div>
             </div>
         </div>
@@ -44,7 +44,7 @@
                 <div class="info-box-content">
                     <span class="info-box-text">الجزاءات المعتمدة</span>
                     <span class="info-box-number">
-                        {{ $mainSalaryEmployeeDeductions->where('is_approved', 1)->count() }}
+                        {{ $mainSalaryEmployeeDeductions2->where('is_approved', 1)->count() }}
                     </span>
                 </div>
             </div>
@@ -58,7 +58,7 @@
                 <div class="info-box-content">
                     <span class="info-box-text">بانتظار الاعتماد</span>
                     <span class="info-box-number">
-                        {{ $mainSalaryEmployeeDeductions->where('is_approved', 0)->count() }}
+                        {{ $mainSalaryEmployeeDeductions2->where('is_approved', 0)->count() }}
                     </span>
                 </div>
             </div>
@@ -72,7 +72,7 @@
                 <div class="info-box-content">
                     <span class="info-box-text">إجمالي المبالغ المستقطعة</span>
                     <span class="info-box-number text-danger font-weight-bold">
-                        {{ number_format($mainSalaryEmployeeDeductions->sum('total'), 2) }}
+                        {{ number_format($mainSalaryEmployeeDeductions2->sum('total'), 2) }}
                         <small>ج.م</small>
                     </span>
                 </div>
@@ -124,119 +124,191 @@
                     </button>
                 </div>
             @endif
+            <div class="row">
+                <div class="col-md-12">
+                    <p class="btn btn-primary btn-sm shadow-sm">
+                        <i class="fas fa-search"></i>
+                    </p>
+                </div>
 
-            <div class="table-responsive">
-                <table class="table table-striped table-bordered table-hover text-center align-middle">
-                    <thead class="bg-primary text-white">
-                        <tr>
-                            <th style="width: 50px;">#</th>
-                            <th>كود الموظف</th>
-                            <th>الموظف</th>
-                            <th>اسم الجزاء / السبب</th>
-                            <th>نوع الجزاء</th>
-                            <th>القيمة / الأيام</th>
-                            <th>إجمالي الخصم</th>
-                            <th>الإضافة</th>
-                            <th>حالة الاعتماد</th>
-                            <th>تاريخ الإضافة</th>
-                            <th>أضيف بواسطة</th>
-                            <th>ملاحظات</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($mainSalaryEmployeeDeductions as $deduction)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>
-                                    <span class="badge badge-secondary font-weight-normal px-2 py-1">
-                                        {{ $deduction->employee->employee_code ?? '---' }}
-                                    </span>
-                                </td>
-                                <td class="text-right font-weight-bold">
-                                    {{ $deduction->employee->name ?? '---' }}
-                                </td>
-                                <td>
-                                    <span class="text-dark font-weight-bold">{{ $deduction->name }}</span>
-                                </td>
-                                <td>
-                                    @if ($deduction->deduction_type == 1)
-                                        <span class="badge badge-warning px-2 py-1">
-                                            <i class="fas fa-calendar-times mr-1"></i> خصم أيام
-                                        </span>
-                                    @elseif ($deduction->deduction_type == 2)
-                                        <span class="badge badge-danger px-2 py-1">
-                                            <i class="fas fa-fingerprint mr-1"></i> خصم بصمة
-                                        </span>
-                                    @else
-                                        <span class="badge badge-secondary px-2 py-1">
-                                            غير معروف
-                                        </span>
-                                    @endif
-                                </td>
-                                <td>
-                                    {{ number_format($deduction->amount, 2) }}
-                                </td>
-                                <td class="text-danger font-weight-bold">
-                                    {{ number_format($deduction->total, 2) }} ج.م
-                                </td>
-                                <td>
-                                    @if ($deduction->is_auto == 1)
-                                        <span class="badge badge-info px-2 py-1">
-                                            <i class="fas fa-robot mr-1"></i> تلقائي
-                                        </span>
-                                    @else
-                                        <span class="badge badge-secondary px-2 py-1">
-                                            <i class="fas fa-keyboard mr-1"></i> يدوي
-                                        </span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if ($deduction->is_approved == 1)
-                                        <span class="badge badge-success px-2 py-1"
-                                            title="اعتمد بواسطة: {{ optional($deduction->approvedBy)->name ?? '---' }} في {{ $deduction->approved_at }}">
-                                            <i class="fas fa-check-double mr-1"></i> معتمد
-                                        </span>
-                                    @else
-                                        <span class="badge badge-warning px-2 py-1">
-                                            <i class="fas fa-hourglass-half mr-1"></i> قيد الانتظار
-                                        </span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <span class="small text-muted d-block">
-                                        {{ $deduction->created_at ? $deduction->created_at->format('Y-m-d') : '---' }}
-                                    </span>
-                                    <span class="small text-muted d-block font-italic">
-                                        {{ $deduction->created_at ? $deduction->created_at->format('h:i A') : '' }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge badge-light border text-secondary px-2 py-1">
-                                        {{ optional($deduction->addedBy)->name ?? '---' }}
-                                    </span>
-                                </td>
-                                <td class="text-right">
-                                    <span class="small font-italic text-secondary">
-                                        {{ $deduction->notes ?? '---' }}
-                                    </span>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="12">
-                                    <div class="alert alert-warning mb-0 text-center py-3">
-                                        <i class="fas fa-exclamation-triangle fa-2x mb-2 d-block"></i>
-                                        لا توجد سجلات جزاءات للموظفين في هذا الشهر المالي حالياً.
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>أسم الموظف</label>
+                        <select name="employee_id_search" id="employee_id_search" class="form-control select2">
+                            <option value="">اختر أسم الموظف</option>
+                            @foreach ($employees as $employee)
+                                <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>نوع الجزاء</label>
+                        <select name="deduction_type_search" id="deduction_type_search" class="form-control select2">
+                            <option value="">اختر نوع الجزاء</option>
+                            <option value="1">خصم أيام</option>
+                            <option value="2">خصم بصمة</option>
+                            <option value="3">خصم تحقيق</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>نوع الحالة</label>
+                        <select name="is_archived" id="is_archived_search" class="form-control select2">
+                            <option value="">اختر نوع الحالة</option>
+                            <option value="1">مؤرشف</option>
+                            <option value="0">غير مؤرشف</option>
+                        </select>
+                    </div>
+                </div>
             </div>
+
+            <div id="ajax_responce_search">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover text-center align-middle">
+                        <thead class="bg-primary text-white">
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>كود الموظف</th>
+                                <th>الموظف</th>
+                                <th>نوع الجزاء</th>
+                                <th>عدد الأيام</th>
+                                <th>إجمالي الخصم</th>
+                                <th>الإضافة</th>
+                                <th>تاريخ الإضافة</th>
+                                <th>تاريخ التعديل</th>
+                                <th>أضيف بواسطة</th>
+                                <th>ملاحظات</th>
+                                <th>الإجراءات</th>
+                                <th>الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($mainSalaryEmployeeDeductions as $deduction)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>
+                                        <span class="badge badge-secondary font-weight-normal px-2 py-1">
+                                            {{ $deduction->employee->employee_code ?? '---' }}
+                                        </span>
+                                    </td>
+                                    <td class=" font-weight-bold">
+                                        {{ $deduction->employee->name ?? '---' }}
+                                    </td>
+                                    <td>
+                                        @if ($deduction->deduction_type == 1)
+                                            <span class="badge badge-warning px-2 py-1">
+                                                <i class="fas fa-calendar-times mr-1"></i> خصم أيام
+                                            </span>
+                                        @elseif ($deduction->deduction_type == 2)
+                                            <span class="badge badge-danger px-2 py-1">
+                                                <i class="fas fa-fingerprint mr-1"></i> خصم بصمة
+                                            </span>
+                                        @elseif ($deduction->deduction_type == 3)
+                                            <span class="badge badge-secondary px-2 py-1">
+                                                <i class="fas fa-folder-minus mr-1"></i>
+                                                خصم تحقيق
+                                            </span>
+                                        @else
+                                            <span class="badge badge-secondary px-2 py-1">
+                                                غير معروف
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        {{ number_format($deduction->days_amount, 2) }}
+                                    </td>
+                                    <td class="text-danger font-weight-bold">
+                                        {{ number_format($deduction->total, 2) }} ج.م
+                                    </td>
+                                    <td>
+                                        @if ($deduction->is_auto == 1)
+                                            <span class="badge badge-info px-2 py-1">
+                                                <i class="fas fa-robot mr-1"></i> تلقائي
+                                            </span>
+                                        @else
+                                            <span class="badge badge-secondary px-2 py-1">
+                                                <i class="fas fa-keyboard mr-1"></i> يدوي
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="small text-muted d-block"
+                                            title="أضيف بواسطة: {{ optional($deduction->addedBy)->name ?? '---' }} في {{ $deduction->created_at }}">
+                                            {{ $deduction->created_at ? $deduction->created_at->format('Y-m-d') : '---' }}
+                                        </span>
+                                        <span class="small text-muted d-block font-italic"
+                                            title="أضيف بواسطة: {{ optional($deduction->addedBy)->name ?? '---' }} في {{ $deduction->created_at }}">
+                                            {{ $deduction->created_at ? $deduction->created_at->format('h:i A') : '' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @if ($deduction->updated_at)
+                                            <span class="small text-muted d-block"
+                                                title="عدل بواسطة: {{ optional($deduction->updatedBy)->name ?? '---' }} في {{ $deduction->updated_at }}">
+                                                {{ $deduction->updated_at->format('Y-m-d') }}
+                                            </span>
+                                            <span class="small text-muted d-block font-italic"
+                                                title="عدل بواسطة: {{ optional($deduction->updatedBy)->name ?? '---' }} في {{ $deduction->updated_at }}">
+                                                {{ $deduction->updated_at->format('h:i A') }}
+                                            </span>
+                                        @else
+                                            <span class="small text-secondary">لا يوجد تعديل</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-light border text-secondary px-2 py-1">
+                                            {{ optional($deduction->addedBy)->name ?? '---' }}
+                                        </span>
+                                    </td>
+                                    <td class="">
+                                        <span class="small font-italic text-secondary">
+                                            {{ $deduction->notes ?? '---' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        @if ($deduction->is_archived == 1)
+                                            <span class="badge badge-danger px-3 py-2">
+                                                <i class="fas fa-times-circle"></i>
+                                                مؤرشف</span>
+                                        @else
+                                            <span class="badge badge-success px-3 py-2">
+                                                <i class="fas fa-check-circle"></i>
+                                                غير مؤرشف</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm delete-deduction"
+                                            data-id="{{ $deduction->id }}">
+                                            <i class="fas fa-trash mr-1"></i> حذف
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="12">
+                                        <div class="alert alert-warning mb-0 text-center py-3">
+                                            <i class="fas fa-exclamation-triangle fa-2x mb-2 d-block"></i>
+                                            لا توجد سجلات جزاءات للموظفين في هذا الشهر المالي حالياً.
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                {{-- Pagination --}}
+                <div class="">
+                    {{ $mainSalaryEmployeeDeductions->links() }}
+                </div>
+            </div>
+
 
         </div>
     </div>
+</div>
 </div>
 
 
@@ -259,85 +331,80 @@
 
             <!-- BODY = EMPTY -->
             <div class="modal-body" id="months_modal_body">
-                <form action="{{ route('admin.main-salary-employee-deductions.store') }}" method="POST">
-                    @csrf
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>بيانات الموظفين</label>
-                                <select name="employee_id" id="employee_id"
-                                    class="form-control select2 {{ $errors->has('employee_id') ? 'is-invalid' : '' }}">
-                                    <option value="">اختر الموظف</option>
-                                    @foreach ($employees as $employee)
-                                        <option value="{{ $employee->id }}" data-salary="{{ $employee->salary }}"
-                                            data-payment-per-day="{{ $employee->payment_per_day }}"
-                                            {{ old('employee_id') == $employee->id ? 'selected' : '' }}>
-                                            {{ $employee->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4 related_to_employee" style="display: none;">
-                            <div class="form-group">
-                                <label>الراتب</label>
-                                <input readonly type="number" name="salary" value="0.0" id="salary"
-                                    class="form-control" placeholder="أدخل الراتب">
-                            </div>
-                        </div>
-                        <div class="col-md-4 related_to_employee" style="display: none;">
-                            <div class="form-group">
-                                <label>أجر اليوم</label>
-                                <input readonly type="number" name="payment_per_day" value="0.0"
-                                    id="payment_per_day" class="form-control" placeholder="أدخل أجر اليوم">
-                            </div>
-                        </div>
-                        <div class="col-md-4 related_to_employee" style="display: none;">
-                            <div class="form-group">
-                                <label>نوع الجزاء</label>
-                                <select name="deduction_type" id="deduction_type" class="form-control select2">
-                                    <option value="">اختر النوع</option>
-                                    <option value="1" {{ old('deduction_type') == '1' ? 'selected' : '' }}>
-                                        جزاء ايام</option>
-                                    <option value="2" {{ old('deduction_type') == '2' ? 'selected' : '' }}>
-                                        جزاء بصمة</option>
-                                    <option value="3" {{ old('deduction_type') == '3' ? 'selected' : '' }}>
-                                        جزاء تحقيق</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4 related_to_employee" style="display: none;">
-                            <div class="form-group">
-                                <label>عدد الايام</label>
-                                <input type="number" name="amount" value="0" id="amount"
-                                    class="form-control" placeholder="أدخل عدد الايام">
-                            </div>
-                        </div>
-                        <div class="col-md-4 related_to_employee" style="display: none;">
-                            <div class="form-group">
-                                <label>اجمالى المبلغ المالي</label>
-                                <input type="number" name="total" value="0" id="total"
-                                    class="form-control" readonly>
-                            </div>
-                        </div>
-                        <div class="col-md-12 related_to_employee" style="display: none;">
-                            <div class="form-group">
-                                <label>ملاحظات</label>
-                                <textarea type="text" name="notes" id="notes" class="form-control"></textarea>
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <button type="submit" class="btn btn-success shadow px-4">
-                                <i class="fas fa-save"></i>
-                                حفظ البيانات
-                            </button>
-                            <button type="button" class="btn btn-danger shadow px-4"
-                                data-dismiss="modal">الغاء</button>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>بيانات الموظفين</label>
+                            <select name="employee_id" id="employee_id"
+                                class="form-control select2 {{ $errors->has('employee_id') ? 'is-invalid' : '' }}">
+                                <option value="">اختر الموظف</option>
+                                @foreach ($employees as $employee)
+                                    <option value="{{ $employee->id }}" data-salary="{{ $employee->salary }}"
+                                        data-payment-per-day="{{ $employee->payment_per_day }}"
+                                        {{ old('employee_id') == $employee->id ? 'selected' : '' }}>
+                                        {{ $employee->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
-                </form>
+                    <div class="col-md-4 related_to_employee" style="display: none;">
+                        <div class="form-group">
+                            <label>الراتب</label>
+                            <input readonly type="number" name="salary" value="0.0" id="salary"
+                                class="form-control" placeholder="أدخل الراتب">
+                        </div>
+                    </div>
+                    <div class="col-md-4 related_to_employee" style="display: none;">
+                        <div class="form-group">
+                            <label>أجر اليوم</label>
+                            <input readonly type="number" name="payment_per_day" value="0.0"
+                                id="payment_per_day" class="form-control" placeholder="أدخل أجر اليوم">
+                        </div>
+                    </div>
+                    <div class="col-md-4 related_to_employee" style="display: none;">
+                        <div class="form-group">
+                            <label>نوع الجزاء</label>
+                            <select name="deduction_type" id="deduction_type" class="form-control select2">
+                                <option value="">اختر النوع</option>
+                                <option value="1" {{ old('deduction_type') == '1' ? 'selected' : '' }}>
+                                    جزاء ايام</option>
+                                <option value="2" {{ old('deduction_type') == '2' ? 'selected' : '' }}>
+                                    جزاء بصمة</option>
+                                <option value="3" {{ old('deduction_type') == '3' ? 'selected' : '' }}>
+                                    جزاء تحقيق</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4 related_to_employee" style="display: none;">
+                        <div class="form-group">
+                            <label>عدد الايام</label>
+                            <input type="number" name="days_amount" value="0" id="days_amount"
+                                class="form-control" placeholder="أدخل عدد الايام">
+                        </div>
+                    </div>
+                    <div class="col-md-4 related_to_employee" style="display: none;">
+                        <div class="form-group">
+                            <label>اجمالى المبلغ المالي</label>
+                            <input type="number" name="total" value="0" id="total" class="form-control"
+                                readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-12 related_to_employee" style="display: none;">
+                        <div class="form-group">
+                            <label>ملاحظات</label>
+                            <textarea type="text" name="notes" id="notes" class="form-control"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-success shadow px-4" id="submit_add_deduction">
+                            <i class="fas fa-save"></i>
+                            حفظ البيانات
+                        </button>
+                        <button type="button" class="btn btn-danger shadow px-4" data-dismiss="modal">الغاء</button>
+                    </div>
+                </div>
             </div>
-
 
         </div>
     </div>
@@ -366,7 +433,155 @@
                     $('#payment_per_day').val(0);
                     $('.related_to_employee').hide();
                 }
+
+
             })
+            $(document).on('click', '#submit_add_deduction', function(e) {
+                var employee_id = $('#employee_id').val();
+                if (employee_id == '') {
+                    $('#employee_id').addClass('is-invalid');
+                    alert('اختر الموظف');
+                    return false;
+                } else {
+                    $('#employee_id').removeClass('is-invalid');
+                }
+                var deduction_type = $('#deduction_type').val();
+                if (deduction_type == '') {
+                    $('#deduction_type').addClass('is-invalid');
+                    alert('نوع الجزاء');
+                    return false;
+                } else {
+                    $('#deduction_type').removeClass('is-invalid');
+                }
+                $.ajax({
+                    url: "{{ route('admin.main-salary-employee-deductions.ajax-check') }}",
+                    dataType: "json",
+                    cache: false,
+                    method: "POST",
+                    data: {
+                        finance_monthly_calendar_id: {{ $financeMonthlyCalendar->id }},
+                        employee_id: employee_id,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(response) {
+                        if (response.status == 'true') {
+                            var res = confirm(' يوجد عدد  ' + response.count +
+                                '  جزاءات لنفس الموظف ونفس الشهر هل تريد الاضافة');
+                            if (res == true) {
+                                var flag = true;
+                            } else {
+                                var flag = false;
+                            }
+                        } else {
+                            var flag = true;
+                        }
+                        if (flag) {
+                            $.ajax({
+                                url: "{{ route('admin.main-salary-employee-deductions.store') }}",
+                                dataType: "json",
+                                cache: false,
+                                method: "POST",
+                                data: {
+                                    finance_monthly_calendar_id: {{ $financeMonthlyCalendar->id }},
+                                    employee_id: employee_id,
+                                    deduction_type: deduction_type,
+                                    days_amount: $('#days_amount').val(),
+                                    payment_per_day: $('#payment_per_day').val(),
+                                    total: $('#total').val(),
+                                    notes: $('#notes').val(),
+                                    _token: "{{ csrf_token() }}"
+                                },
+                                success: function(response) {
+                                    if (response.status == 'true') {
+                                        alert(response.message);
+                                        $('#addMainSalaryRecordDeductionModal')
+                                            .modal('hide');
+                                        location.reload();
+                                    } else {
+                                        alert(response.message ||
+                                            'عفوا، حدث خطأ أثناء الحفظ.');
+                                    }
+                                },
+                                error: function(xhr, status, error) {
+                                    alert(
+                                        'عفوا، حدث خطأ غير متوقع أثناء الاتصال بالخادم.'
+                                    );
+                                }
+                            })
+                        }
+                    }
+                })
+            })
+            $(document).on('input', '#days_amount', function() {
+                var days_amount = $('#days_amount').val();
+                if (days_amount == '') {
+                    $('#days_amount').val(0);
+                }
+                var payment_per_day = $('#payment_per_day').val();
+                var total = days_amount * payment_per_day;
+                $('#total').val(total);
+            })
+
+            $(document).on('change', '#employee_id_search', function() {
+                    ajax_search();
+            })
+            $(document).on('change', '#deduction_type_search', function() {
+                ajax_search();
+            })
+            $(document).on('change', '#is_archived_search', function() {
+                ajax_search();
+            })
+
+            function ajax_search() {
+                var employee_id_search = $('#employee_id_search').val();
+                var deduction_type_search = $('#deduction_type_search').val();
+                var is_archived_search = $('#is_archived_search').val();
+                $.ajax({
+                    url: '{{ route('admin.main-salary-employee-deductions.ajax-search') }}',
+                    type: 'POST',
+                    dataType: 'html',
+                    cache: false,
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        finance_monthly_calendar_id: {{ $financeMonthlyCalendar->id }},
+                        employee_id_search: employee_id_search,
+                        deduction_type_search: deduction_type_search,
+                        is_archived_search: is_archived_search
+                    },
+                    success: function(mainSalaryEmployeeDeductions) {
+                        $('#ajax_responce_search').html(mainSalaryEmployeeDeductions);
+                    },
+                    error: function(xhr) {
+                    
+                    }
+                });
+                $(document).on('click', '#ajax-pagination a', function(e) {
+                    e.preventDefault();
+                    var employee_id_search = $('#employee_id_search').val();
+                    var deduction_type_search = $('#deduction_type_search').val();
+                    var is_archived_search = $('#is_archived_search').val();
+                    var url = $(this).attr('href');
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        dataType: 'html',
+                        cache: false,
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            finance_monthly_calendar_id: {{ $financeMonthlyCalendar->id }},
+                            employee_id_search: employee_id_search,
+                            deduction_type_search: deduction_type_search,
+                            is_archived_search: is_archived_search
+                        },
+                        success: function(mainSalaryEmployeeDeductions) {
+                            $('#ajax_responce_search').html(mainSalaryEmployeeDeductions);
+                        },
+                        error: function(xhr) {
+                            
+                        }
+                    });
+                })
+            }
 
         })
     </script>

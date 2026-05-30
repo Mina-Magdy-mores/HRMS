@@ -13,10 +13,7 @@
 
 @section('content')
 
-@include('admin.mainSalaryRecordDeduction.show-table', [
-    'financeMonthlyCalendar' => $financeMonthlyCalendar,
-    'mainSalaryEmployeeDeductions' => $mainSalaryEmployeeDeductions
-])
+@include('admin.mainSalaryRecordDeduction.show-table')  
 
 @endsection
 

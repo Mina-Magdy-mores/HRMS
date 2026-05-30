@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\FinanceMonthlyCalendar;
+use App\Models\MainSalaryEmployee;
 use App\Models\MainSalaryEmployeeDeduction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class MainSalaryEmployeeDeductionController extends Controller
 {
@@ -24,18 +26,58 @@ class MainSalaryEmployeeDeductionController extends Controller
         }
         return view('admin.mainSalaryRecordDeduction.index', ['financeMonthlyCalendars' => $financeMonthlyCalendars]);
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create() {}
+    public function ajaxCheck(Request $request)
+    {
+        if ($request->ajax()) {
+            $company_id = Auth::user()->company_id;
+            $checkIfExistsCounter = get_count_where(MainSalaryEmployeeDeduction::class, ['company_id' => $company_id, 'finance_monthly_calendar_id' => $request->finance_monthly_calendar_id, 'employee_id' => $request->employee_id]);
+            if ($checkIfExistsCounter > 0) {
+                return response()->json(['status' => 'true', 'count' => $checkIfExistsCounter]);
+            }
+            return response()->json(['status' => 'false', 'count' => 0]);
+        }
+    }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        //
+        if ($request->ajax()) {
+            $company_id = Auth::user()->company_id;
+
+            $financeMonthlyCalendars = getColsWhereRow(FinanceMonthlyCalendar::class, ['id'], ['company_id' => $company_id, 'id' => $request->finance_monthly_calendar_id, 'status' => 1]);
+            $mainSalaryEmployee = getColsWhereRow(MainSalaryEmployee::class, ['id'], ['company_id' => $company_id, 'employee_id' => $request->employee_id, 'finance_monthly_calendar_id' => $request->finance_monthly_calendar_id, 'is_archived' => 0]);
+            if (!empty($financeMonthlyCalendars) && !empty($mainSalaryEmployee)) {
+                try {
+                    return DB::transaction(function () use ($request, $company_id, $mainSalaryEmployee) {
+                        $dataToInsert = [
+                            'main_salary_employee_id' => $mainSalaryEmployee['id'],
+                            'employee_id' => $request->employee_id,
+                            'finance_monthly_calendar_id' => $request->finance_monthly_calendar_id,
+                            'deduction_type' => $request->deduction_type,
+                            'days_amount' => $request->days_amount,
+                            'total' => $request->total,
+                            'company_id' => $company_id,
+                            'is_auto' => 0,
+                            'status' => 1,
+                            'added_by' => Auth::user()->id,
+                            'notes' => $request->notes,
+                        ];
+                        $insertData = insert(MainSalaryEmployeeDeduction::class, $dataToInsert);
+                        if ($insertData) {
+                            return response()->json(['status' => 'true', 'message' => 'تم اضافة الجزاء بنجاح']);
+                        } else {
+                            return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم اضافة الجزاء']);
+                        }
+                    });
+                } catch (\Exception $e) {
+                    return response()->json(['status' => 'false', 'message' => 'عفوا حدث خطأ ' . $e->getMessage()]);
+                }
+            } else {
+                return response()->json(['status' => 'false', 'message' => 'عفوا، لا توجد بيانات راتب مسجلة لهذا الموظف في هذا الشهر المالي.']);
+            }
+        }
     }
 
     /**
@@ -52,10 +94,10 @@ class MainSalaryEmployeeDeductionController extends Controller
         if (empty($financeMonthlyCalendar)) {
             return redirect()->route('admin.main-salary-employee-deductions.index')->with('error', 'عفوا غير قادر للوصول الى بيانات الشهر');
         }
-        $employees = Employee::select('id', 'name', 'employee_code','salary','payment_per_day')->where('company_id', $company_id)->orderBy('id', 'asc')->get();
+        $employees = Employee::select(['id', 'name', 'employee_code', 'salary', 'payment_per_day'])->where('company_id', $company_id)->orderBy('id', 'asc')->get();
         $mainSalaryEmployeeDeductions = MainSalaryEmployeeDeduction::with([
             'employee',
-            'financeMonthlyCalendar.month',
+            'financeMonthlyCalendar',
             'addedBy',
             'updatedBy',
             'approvedBy'
@@ -63,29 +105,76 @@ class MainSalaryEmployeeDeductionController extends Controller
             ->where('company_id', $company_id)
             ->where('finance_monthly_calendar_id', $id)
             ->orderBy('id', 'desc')
+            ->paginate(PAGEINATION_COUNTER);
+        $mainSalaryEmployeeDeductions2 = MainSalaryEmployeeDeduction::where('company_id', $company_id)
+            ->where('finance_monthly_calendar_id', $id)
+            ->orderBy('id', 'desc')
             ->get();
 
         return view('admin.mainSalaryRecordDeduction.show', [
             'financeMonthlyCalendar' => $financeMonthlyCalendar,
             'mainSalaryEmployeeDeductions' => $mainSalaryEmployeeDeductions,
+            'mainSalaryEmployeeDeductions2' => $mainSalaryEmployeeDeductions2,
             'employees' => $employees,
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(MainSalaryEmployeeDeduction $mainSalaryEmployeeDeduction)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, MainSalaryEmployeeDeduction $mainSalaryEmployeeDeduction)
+    public function ajaxSearch(Request $request)
     {
-        //
+        if ($request->ajax()) {
+            $employee_id_search = $request->employee_id_search;
+            $deduction_type_search = $request->deduction_type_search;
+            $is_archived_search = $request->is_archived_search;
+            if (empty($employee_id_search)) {
+                $field1 = "id";
+                $operator1 = ">=";
+                $value1 = 0;
+            } else {
+                $field1 = "employee_id";
+                $operator1 = "=";
+                $value1 = $employee_id_search;
+            }
+            if (empty($deduction_type_search)) {
+                $field2 = "id";
+                $operator2 = ">=";
+                $value2 = 0;
+            } else {
+                $field2 = "deduction_type";
+                $operator2 = "=";
+                $value2 = $deduction_type_search;
+            }
+
+            if (empty($is_archived_search)) {
+                $field3 = "id";
+                $operator3 = ">=";
+                $value3 = 0;
+            } else {
+                $field3 = "is_archived";
+                $operator3 = "=";
+                $value3 = $is_archived_search;
+            }
+
+
+            $where = [
+                [$field1, $operator1, $value1],
+                [$field2, $operator2, $value2],
+                [$field3, $operator3, $value3],
+            ];
+            $company_id = Auth::user()->company_id;
+            $mainSalaryEmployeeDeductions = MainSalaryEmployeeDeduction::with([
+                'employee',
+                'financeMonthlyCalendar',
+                'addedBy',
+                'updatedBy'
+            ])
+                ->where('company_id', $company_id)
+                ->where('finance_monthly_calendar_id', $request->finance_monthly_calendar_id)
+                ->where($where)
+                ->orderBy('id', 'desc')
+                ->paginate(PAGEINATION_COUNTER);
+            return view('admin.mainSalaryRecordDeduction.ajaxSearch', ['mainSalaryEmployeeDeductions' => $mainSalaryEmployeeDeductions]);
+        }
     }
 
     /**

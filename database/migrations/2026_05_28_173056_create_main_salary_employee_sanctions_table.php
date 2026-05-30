@@ -20,13 +20,12 @@ return new class extends Migration
                 ->references('id')
                 ->on('finance_monthly_calendars')
                 ->onUpdate('cascade');
-            $table->string('name');
-            $table->integer('deduction_type')->comment('1: days deducted, 2: finger print deduction');
-            $table->decimal('amount', 10, 2);
+            $table->integer('deduction_type')->comment('1: days deducted, 2: finger print deduction, 3: Investigation');
+            $table->decimal('days_amount', 10, 2);
             $table->decimal('total', 10, 2);
-            $table->integer('is_approved')->default(0);
-            $table->foreignId('approved_by')->nullable()->constrained('admins')->cascadeOnUpdate();
-            $table->dateTime('approved_at')->nullable();
+            $table->integer('is_archived')->default(0)->nullable();
+            $table->foreignId('archived_by')->nullable()->constrained('admins')->cascadeOnUpdate();
+            $table->dateTime('archived_at')->nullable();
             $table->integer('is_auto')->default(0);
             $table->tinyInteger('status')->default(1);
             $table->integer('company_id');

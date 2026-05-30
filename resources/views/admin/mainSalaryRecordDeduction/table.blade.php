@@ -112,7 +112,7 @@
             <div id="ajax_responce_search">
                 <div class="table-responsive">
 
-                    <table class="table table-bordered table-hover text-center align-middle">
+                    <table class="table table-striped table-bordered table-hover text-center align-middle">
 
                         <thead class="bg-primary text-white">
                             <tr>
