@@ -112,9 +112,15 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <button class="btn btn-danger btn-sm delete-deduction"
+                                        <button class="btn btn-danger btn-sm delete-deduction" id="delete-deduction-btn"
+                                            data-main-salary-employee-id="{{ $deduction->main_salary_employee_id }}"
                                             data-id="{{ $deduction->id }}">
                                             <i class="fas fa-trash mr-1"></i> حذف
+                                        </button>
+                                        <button class="btn btn-warning btn-sm edit-deduction" id="edit-deduction-btn"
+                                            data-main-salary-employee-id="{{ $deduction->main_salary_employee_id }}"
+                                            data-id="{{ $deduction->id }}">
+                                            <i class="fas fa-edit mr-1"></i> تعديل
                                         </button>
                                     </td>
                                 </tr>
@@ -132,6 +138,6 @@
                     </table>
                 </div>
                 {{-- Pagination --}}
-                <div class="ajax-pagination">
+                <div class="mt-3" id="ajax-pagination">
                     {{ $mainSalaryEmployeeDeductions->links() }}
                 </div>

@@ -124,46 +124,59 @@
                     </button>
                 </div>
             @endif
-            <div class="row">
-                <div class="col-md-12">
-                    <p class="btn btn-primary btn-sm shadow-sm">
-                        <i class="fas fa-search"></i>
-                    </p>
-                </div>
+            <form action="{{ route('admin.main-salary-employee-deductions.print-search') }}" method="POST">
+                @csrf
+                <input type="hidden" name="finance_monthly_calendar_id_search" value="{{ $financeMonthlyCalendar->id }}">
+                <div class="row">
+                    <div class="col-md-12">
+                        <p class="btn btn-primary btn-sm shadow-sm">
+                            <i class="fas fa-search"></i>
+                        </p>
+                    </div>
 
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label>أسم الموظف</label>
-                        <select name="employee_id_search" id="employee_id_search" class="form-control select2">
-                            <option value="">اختر أسم الموظف</option>
-                            @foreach ($employees as $employee)
-                                <option value="{{ $employee->id }}">{{ $employee->name }}</option>
-                            @endforeach
-                        </select>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>أسم الموظف</label>
+                            <select name="employee_id_search" id="employee_id_search" class="form-control select2">
+                                <option value="">اختر أسم الموظف</option>
+                                @foreach ($employees as $employee)
+                                    <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>نوع الجزاء</label>
+                            <select name="deduction_type_search" id="deduction_type_search"
+                                class="form-control select2">
+                                <option value="">اختر نوع الجزاء</option>
+                                <option value="1">خصم أيام</option>
+                                <option value="2">خصم بصمة</option>
+                                <option value="3">خصم تحقيق</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>نوع الحالة</label>
+                            <select name="is_archived" id="is_archived_search" class="form-control select2">
+                                <option value="">اختر نوع الحالة</option>
+                                <option value="1">مؤرشف</option>
+                                <option value="0">غير مؤرشف</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3 align-content-end">
+                        <div class="form-group">
+                            <button type="" class="btn btn-success" id="print_button">
+                                <i class="fas fa-print"></i>
+                                طباعة البحث
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label>نوع الجزاء</label>
-                        <select name="deduction_type_search" id="deduction_type_search" class="form-control select2">
-                            <option value="">اختر نوع الجزاء</option>
-                            <option value="1">خصم أيام</option>
-                            <option value="2">خصم بصمة</option>
-                            <option value="3">خصم تحقيق</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label>نوع الحالة</label>
-                        <select name="is_archived" id="is_archived_search" class="form-control select2">
-                            <option value="">اختر نوع الحالة</option>
-                            <option value="1">مؤرشف</option>
-                            <option value="0">غير مؤرشف</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+            </form>
 
             <div id="ajax_responce_search">
                 <div class="table-responsive">
@@ -281,8 +294,14 @@
                                     </td>
                                     <td>
                                         <button class="btn btn-danger btn-sm delete-deduction"
-                                            data-id="{{ $deduction->id }}">
+                                            id="delete-deduction-btn" data-id="{{ $deduction->id }}"
+                                            data-main-salary-employee-id="{{ $deduction->main_salary_employee_id }}"
                                             <i class="fas fa-trash mr-1"></i> حذف
+                                        </button>
+                                        <button class="btn btn-warning btn-sm edit-deduction" id="edit-deduction-btn"
+                                            data-main-salary-employee-id="{{ $deduction->main_salary_employee_id }}"
+                                            data-id="{{ $deduction->id }}">
+                                            <i class="fas fa-edit mr-1"></i> تعديل
                                         </button>
                                     </td>
                                 </tr>
@@ -300,7 +319,7 @@
                     </table>
                 </div>
                 {{-- Pagination --}}
-                <div class="">
+                <div class="mt-3" id="ajax-pagination">
                     {{ $mainSalaryEmployeeDeductions->links() }}
                 </div>
             </div>
@@ -312,7 +331,7 @@
 </div>
 
 
-<!-- Months Modal (EMPTY BODY) -->
+<!-- Add Modal -->
 <div class="modal fade " id="addMainSalaryRecordDeductionModal" tabindex="0" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content shadow">
@@ -338,7 +357,7 @@
                             <select name="employee_id" id="employee_id"
                                 class="form-control select2 {{ $errors->has('employee_id') ? 'is-invalid' : '' }}">
                                 <option value="">اختر الموظف</option>
-                                @foreach ($employees as $employee)
+                                @foreach ($employees_has_opened_monthly_record as $employee)
                                     <option value="{{ $employee->id }}" data-salary="{{ $employee->salary }}"
                                         data-payment-per-day="{{ $employee->payment_per_day }}"
                                         {{ old('employee_id') == $employee->id ? 'selected' : '' }}>
@@ -398,6 +417,94 @@
                     </div>
                     <div class="col-md-12">
                         <button type="submit" class="btn btn-success shadow px-4" id="submit_add_deduction">
+                            <i class="fas fa-save"></i>
+                            حفظ البيانات
+                        </button>
+                        <button type="button" class="btn btn-danger shadow px-4" data-dismiss="modal">الغاء</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Edit Modal -->
+<div class="modal fade " id="editMainSalaryRecordDeductionModal" tabindex="0" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content shadow">
+
+            <!-- Header -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-calendar-alt"></i>
+                    تعديل جزاءات شهرية جديدة
+                </h5>
+
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <!-- BODY -->
+            <div class="modal-body" id="edit_months_modal_body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>بيانات الموظفين</label>
+                            <select name="employee_id" id="edit_employee_id" class="form-control" disabled>
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4 edit_related_to_employee" style="display: none;">
+                        <div class="form-group">
+                            <label>الراتب</label>
+                            <input readonly type="number" name="salary" value="0.0" id="edit_salary"
+                                class="form-control" placeholder="أدخل الراتب">
+                        </div>
+                    </div>
+                    <div class="col-md-4 edit_related_to_employee" style="display: none;">
+                        <div class="form-group">
+                            <label>أجر اليوم</label>
+                            <input readonly type="number" name="payment_per_day" value="0.0"
+                                id="edit_payment_per_day" class="form-control" placeholder="أدخل أجر اليوم">
+                        </div>
+                    </div>
+                    <div class="col-md-4 edit_related_to_employee" style="display: none;">
+                        <div class="form-group">
+                            <label>نوع الجزاء</label>
+                            <select name="deduction_type" id="edit_deduction_type" class="form-control select2">
+                                <option value="">اختر النوع</option>
+                                <option value="1">خصم أيام</option>
+                                <option value="2">خصم بصمة</option>
+                                <option value="3">خصم تحقيق</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4 edit_related_to_employee" style="display: none;">
+                        <div class="form-group">
+                            <label>عدد الايام</label>
+                            <input type="number" name="days_amount" value="0" id="edit_days_amount"
+                                class="form-control" placeholder="أدخل عدد الايام">
+                        </div>
+                    </div>
+                    <div class="col-md-4 edit_related_to_employee" style="display: none;">
+                        <div class="form-group">
+                            <label>اجمالى المبلغ المالي</label>
+                            <input type="number" name="total" value="0" id="edit_total"
+                                class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-12 edit_related_to_employee" style="display: none;">
+                        <div class="form-group">
+                            <label>ملاحظات</label>
+                            <textarea type="text" name="notes" id="edit_notes" class="form-control"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <input type="hidden" id="edit_deduction_id" name="id">
+                        <input type="hidden" id="edit_main_salary_employee_id" name="main_salary_employee_id">
+                        <button type="submit" class="btn btn-success shadow px-4" id="submit_edit_deduction">
                             <i class="fas fa-save"></i>
                             حفظ البيانات
                         </button>
@@ -496,7 +603,6 @@
                                         alert(response.message);
                                         $('#addMainSalaryRecordDeductionModal')
                                             .modal('hide');
-                                        location.reload();
                                     } else {
                                         alert(response.message ||
                                             'عفوا، حدث خطأ أثناء الحفظ.');
@@ -523,7 +629,7 @@
             })
 
             $(document).on('change', '#employee_id_search', function() {
-                    ajax_search();
+                ajax_search();
             })
             $(document).on('change', '#deduction_type_search', function() {
                 ajax_search();
@@ -552,36 +658,184 @@
                         $('#ajax_responce_search').html(mainSalaryEmployeeDeductions);
                     },
                     error: function(xhr) {
-                    
+
                     }
                 });
-                $(document).on('click', '#ajax-pagination a', function(e) {
-                    e.preventDefault();
-                    var employee_id_search = $('#employee_id_search').val();
-                    var deduction_type_search = $('#deduction_type_search').val();
-                    var is_archived_search = $('#is_archived_search').val();
-                    var url = $(this).attr('href');
+            }
+
+            $(document).on('click', '#ajax-pagination a', function(e) {
+                e.preventDefault();
+                var employee_id_search = $('#employee_id_search').val();
+                var deduction_type_search = $('#deduction_type_search').val();
+                var is_archived_search = $('#is_archived_search').val();
+                var url = $(this).attr('href');
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    dataType: 'html',
+                    cache: false,
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        finance_monthly_calendar_id: {{ $financeMonthlyCalendar->id }},
+                        employee_id_search: employee_id_search,
+                        deduction_type_search: deduction_type_search,
+                        is_archived_search: is_archived_search
+                    },
+                    success: function(mainSalaryEmployeeDeductions) {
+                        $('#ajax_responce_search').html(mainSalaryEmployeeDeductions);
+                    },
+                    error: function(xhr) {
+
+                    }
+                });
+            })
+
+            $(document).on('click', '#delete-deduction-btn', function() {
+                var id = $(this).data('id');
+                var main_salary_employee_id = $(this).data('main-salary-employee-id');
+                var res = confirm('هل انت متاكد من حذف هذا الجزاء');
+                if (res == true) {
                     $.ajax({
-                        url: url,
+                        url: "{{ route('admin.main-salary-employee-deductions.destroy') }}",
                         type: 'POST',
-                        dataType: 'html',
+                        dataType: 'json',
                         cache: false,
                         data: {
                             _token: '{{ csrf_token() }}',
+                            id: id,
                             finance_monthly_calendar_id: {{ $financeMonthlyCalendar->id }},
-                            employee_id_search: employee_id_search,
-                            deduction_type_search: deduction_type_search,
-                            is_archived_search: is_archived_search
+                            main_salary_employee_id: main_salary_employee_id
                         },
-                        success: function(mainSalaryEmployeeDeductions) {
-                            $('#ajax_responce_search').html(mainSalaryEmployeeDeductions);
+                        success: function(response) {
+                            if (response.status == 'true') {
+                                alert(response.message);
+                                ajax_search();
+                            } else {
+                                alert(response.message ||
+                                    'عفوا، حدث خطأ أثناء الحذف.');
+                            }
                         },
                         error: function(xhr) {
-                            
+                            alert(
+                                'عفوا، حدث خطأ غير متوقع أثناء الاتصال بالخادم.'
+                            );
                         }
-                    });
-                })
-            }
+                    })
+                }
+            })
+            $(document).on('click', '.edit-deduction', function() {
+                var id = $(this).data('id');
+                var main_salary_employee_id = $(this).data('main-salary-employee-id');
+                $.ajax({
+                    url: "{{ route('admin.main-salary-employee-deductions.edit') }}",
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        id: id,
+                        finance_monthly_calendar_id: {{ $financeMonthlyCalendar->id }},
+                        main_salary_employee_id: main_salary_employee_id
+                    },
+                    cache: false,
+                    success: function(response) {
+                        if (response.status == 'true') {
+                            var deduction = response.mainSalaryEmployeeDeductions;
+                            var employee = deduction.employee;
+                            var modal = $('#editMainSalaryRecordDeductionModal');
+
+                            // Set value of the hidden input ID
+                            modal.find("#edit_deduction_id").val(deduction.id);
+                            modal.find("#edit_main_salary_employee_id").val(deduction
+                                .main_salary_employee_id);
+
+                            // Populate employee details dynamically
+                            modal.find("#edit_employee_id").html(`
+                                <option value="${employee.id}" data-salary="${employee.salary}" data-payment-per-day="${employee.payment_per_day}" selected>
+                                    ${employee.name}
+                                </option>
+                            `);
+
+                            modal.find("#edit_salary").val(employee.salary);
+                            modal.find("#edit_payment_per_day").val(employee.payment_per_day);
+                            modal.find("#edit_deduction_type").val(deduction.deduction_type)
+                                .trigger('change');
+                            modal.find("#edit_days_amount").val(deduction.days_amount);
+                            modal.find("#edit_total").val(deduction.total);
+                            modal.find("#edit_notes").val(deduction.notes);
+
+                            // Show values and open modal
+                            modal.find(".edit_related_to_employee").show();
+                            modal.modal('show');
+                        } else {
+                            alert(response.message || 'عفوا، حدث خطأ أثناء جلب البيانات.');
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('عفوا، حدث خطأ غير متوقع أثناء الاتصال بالخادم.');
+                    }
+                });
+            })
+
+            // Live calculation in Edit Modal on days_amount input
+            $(document).on('input', '#edit_days_amount', function() {
+                var days_amount = $('#edit_days_amount').val();
+                if (days_amount == '') {
+                    $('#edit_days_amount').val(0);
+                }
+                var payment_per_day = $('#edit_payment_per_day').val();
+                var total = days_amount * payment_per_day;
+                $('#edit_total').val(total);
+            })
+
+            // Submit Edit Form via AJAX
+            $(document).on('click', '#submit_edit_deduction', function(e) {
+                var id = $('#edit_deduction_id').val();
+                var deduction_type = $('#edit_deduction_type').val();
+                if (deduction_type == '') {
+                    $('#edit_deduction_type').addClass('is-invalid');
+                    alert('نوع الجزاء');
+                    return false;
+                } else {
+                    $('#edit_deduction_type').removeClass('is-invalid');
+                }
+                var total = $('#edit_total').val();
+                var notes = $('#edit_notes').val();
+                var finance_monthly_calendar_id = {{ $financeMonthlyCalendar->id }};
+                var main_salary_employee_id = $('#edit_main_salary_employee_id').val();
+                var days_amount = $('#edit_days_amount').val();
+                var payment_per_day = $('#edit_payment_per_day').val();
+                var deduction_type = $('#edit_deduction_type').val();
+                $.ajax({
+                    url: "{{ route('admin.main-salary-employee-deductions.update') }}",
+                    type: 'POST',
+                    dataType: 'json',
+                    cache: false,
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        _method: 'PUT',
+                        id: id,
+                        deduction_type: deduction_type,
+                        days_amount: days_amount,
+                        payment_per_day: payment_per_day,
+                        total: total,
+                        notes: notes,
+                        finance_monthly_calendar_id: finance_monthly_calendar_id,
+                        main_salary_employee_id: main_salary_employee_id,
+                    },
+                    success: function(response) {
+                        if (response.status == 'true') {
+                            alert(response.message);
+                            $('#editMainSalaryRecordDeductionModal').modal('hide');
+                            ajax_search(); // Refresh search/list
+                        } else {
+                            alert(response.message || 'عفوا، حدث خطأ أثناء الحفظ.');
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('عفوا، حدث خطأ غير متوقع أثناء الاتصال بالخادم.');
+                    }
+                });
+            })
 
         })
     </script>

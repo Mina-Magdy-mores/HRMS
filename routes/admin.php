@@ -26,7 +26,7 @@ use App\Http\Controllers\Admin\ShiftsTypeController;
 use Illuminate\Support\Facades\Route;
 
 
-define('PAGEINATION_COUNTER', 10);
+define('PAGEINATION_COUNTER', 3);
 // Admin
 Route::prefix('/admin')->name('admin.')->group(function () {
 
@@ -199,10 +199,15 @@ Route::prefix('/admin')->name('admin.')->group(function () {
 
         //main_salary_employee_deductions
         Route::get('/main-salary-employee-deductions', [MainSalaryEmployeeDeductionController::class, 'index'])->name('main-salary-employee-deductions.index');
-        Route::get('/main-salary-employee-deductions/show/{id}', [MainSalaryEmployeeDeductionController::class, 'show'])->name('main-salary-employee-deductions.show');
+        Route::get('/main-salary-employee-deductions/{id}/show', [MainSalaryEmployeeDeductionController::class, 'show'])->name('main-salary-employee-deductions.show');
         Route::post('/main-salary-employee-deductions/ajax-check', [MainSalaryEmployeeDeductionController::class,'ajaxCheck'])->name('main-salary-employee-deductions.ajax-check');
         Route::post('/main-salary-employee-deductions/store', [MainSalaryEmployeeDeductionController::class,'store'])->name('main-salary-employee-deductions.store');
         Route::post('/main-salary-employee-deductions/ajax-search', [MainSalaryEmployeeDeductionController::class,'ajaxSearch'])->name('main-salary-employee-deductions.ajax-search');
+        Route::post('/main-salary-employee-deductions/destroy', [MainSalaryEmployeeDeductionController::class,'destroy'])->name('main-salary-employee-deductions.destroy');
+        Route::post('/main-salary-employee-deductions/edit', [MainSalaryEmployeeDeductionController::class,'edit'])->name('main-salary-employee-deductions.edit');
+        Route::put('/main-salary-employee-deductions', [MainSalaryEmployeeDeductionController::class,'update'])->name('main-salary-employee-deductions.update');
+        Route::post('/main-salary-employee-deductions/print-search', [MainSalaryEmployeeDeductionController::class,'printSearch'])->name('main-salary-employee-deductions.print-search');
+        
 
         
     });

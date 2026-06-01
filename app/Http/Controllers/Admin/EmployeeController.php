@@ -138,7 +138,6 @@ class EmployeeController extends Controller
      */
     public function store(EmployeeRequest $request)
     {
-        dd($request->all());
         try {
             $company_id = Auth::user()->company_id;
             $checkIfExist = getColsWhereRow(Employee::class, ['id'], ['company_id' => $company_id, 'name' => $request->name]);
