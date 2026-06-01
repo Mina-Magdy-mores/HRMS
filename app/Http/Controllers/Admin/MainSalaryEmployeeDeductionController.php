@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminPanelSetting;
 use App\Models\Employee;
 use App\Models\FinanceMonthlyCalendar;
 use App\Models\MainSalaryEmployee;
@@ -330,17 +331,44 @@ class MainSalaryEmployeeDeductionController extends Controller
                 [$field3, $operator3, $value3],
             ];
             $company_id = Auth::user()->company_id;
+
+            $adminPanelSetting = AdminPanelSetting::where('company_id', $company_id)->first();
+            $systemData = [
+                'system_name' => $adminPanelSetting->company_name ?? '',
+                'photo'       => $adminPanelSetting->image ?? '',
+                'address'     => $adminPanelSetting->address ?? '',
+                'phone'       => $adminPanelSetting->phone ?? '',
+                'email'       => $adminPanelSetting->email ?? '',
+            ];
+
+            $financeMonthlyCalendar = FinanceMonthlyCalendar::with('financeCalendar')
+                ->where('company_id', $company_id)
+                ->where('id', $finance_monthly_calendar_id)
+                ->first();
+
             $mainSalaryEmployeeDeductions = MainSalaryEmployeeDeduction::with([
                 'employee',
                 'financeMonthlyCalendar',
                 'addedBy',
-                'updatedBy'
+                'updatedBy',
+                'approvedBy',
             ])
                 ->where('company_id', $company_id)
-                ->where('finance_monthly_calendar_id', $request->finance_monthly_calendar_id)
+                ->where('finance_monthly_calendar_id', $finance_monthly_calendar_id)
                 ->where($where)
-                ->orderBy('id', 'desc')
+                ->orderBy('employee_id', 'asc')
+                ->orderBy('id', 'asc')
                 ->get();
-            return view('admin.mainSalaryRecordDeduction.print_search', ['mainSalaryEmployeeDeductions' => $mainSalaryEmployeeDeductions]);
+
+            $total_sum         = $mainSalaryEmployeeDeductions->sum('total');
+            $total_days_sum    = $mainSalaryEmployeeDeductions->sum('days_amount');
+
+            return view('admin.mainSalaryRecordDeduction.print_search', [
+                'mainSalaryEmployeeDeductions' => $mainSalaryEmployeeDeductions,
+                'systemData'                   => $systemData,
+                'financeMonthlyCalendar'        => $financeMonthlyCalendar,
+                'total_sum'                    => $total_sum,
+                'total_days_sum'               => $total_days_sum,
+            ]);
     }
 }

@@ -1,162 +1,406 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 
 <head>
-   <meta charset="utf-8">
-   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-   <title> بحث فواتير المبيعات</title>
-   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-   <link rel="stylesheet" href="{{ asset('assets/css/bootstrap_rtl-v4.2.1/bootstrap.min.css')}}">
-   <style>
-      @media print {
-         .hidden-print {
-            display: none;
-         }
-      }
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>طباعة الجزاءات الشهرية للموظفين</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="{{ asset('assets/css/bootstrap_rtl-v4.2.1/bootstrap.min.css')}}">
+    <style>
+        body {
+            font-family: 'Tahoma', sans-serif;
+            font-size: 13px;
+            padding: 10px;
+            background: #fff;
+            color: #222;
+        }
 
-      @media print {
-         #printButton {
-            display: none;
-         }
-      }
+        /* ===== HEADER ===== */
+        .print-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #2c3e50;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        .print-header .company-info {
+            text-align: right;
+        }
+        .print-header .company-info h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .print-header .company-info p {
+            margin: 2px 0;
+            font-size: 12px;
+            color: #555;
+        }
+        .print-header .logo img {
+            width: 100px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
 
-      td {
-         font-size: 15px !important;
-         text-align: center;
-      }
-      th{
-         text-align: center;
-      }
-   </style>
+        /* ===== REPORT TITLE ===== */
+        .report-title-box {
+            text-align: center;
+            margin: 10px 0;
+            padding: 8px;
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: #fff;
+            border-radius: 6px;
+        }
+        .report-title-box h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .report-title-box p {
+            margin: 3px 0 0;
+            font-size: 12px;
+            opacity: 0.9;
+        }
 
-<body style="padding-top: 10px;font-family: tahoma;">
+        /* ===== META INFO ===== */
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            background: #f0f4f8;
+            border: 1px solid #cdd8e3;
+            border-radius: 5px;
+            padding: 8px 15px;
+            margin-bottom: 12px;
+            font-size: 12px;
+        }
+        .meta-row span {
+            display: inline-block;
+        }
+        .meta-row strong {
+            color: #2c3e50;
+        }
 
+        /* ===== TABLE ===== */
+        table.print-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+        table.print-table thead tr {
+            background-color: #2c3e50;
+            color: #fff;
+        }
+        table.print-table thead th {
+            padding: 7px 5px;
+            text-align: center;
+            border: 1px solid #4a6278;
+            white-space: nowrap;
+        }
+        table.print-table tbody tr:nth-child(even) {
+            background-color: #f7f9fb;
+        }
+        table.print-table tbody tr:hover {
+            background-color: #eaf2ff;
+        }
+        table.print-table tbody td {
+            padding: 6px 5px;
+            text-align: center;
+            border: 1px solid #dde3ea;
+            vertical-align: middle;
+        }
+        table.print-table tfoot tr {
+            background-color: #d5e8f7;
+            font-weight: bold;
+        }
+        table.print-table tfoot td {
+            padding: 7px 5px;
+            border: 1px solid #aac6e0;
+            text-align: center;
+        }
 
-   <table style="width: 60%;float: right;  margin-right: 5px;" dir="rtl">
-      <tr>
-         <td style="text-align: center;padding: 5px;"> <span> نوع التقرير </span></td>
-      </tr>
-      <tr>
-         <td style="text-align: center;padding: 5px;font-weight: bold;"> <span style=" display: inline-block;
-               width: 400px;
-               height: 30px;
-               text-align: center;
-               color: red;
-               border: 1px solid black; ">
-               بحث بحركة فواتير المبيعات
-            </span>
-         </td>
-      </tr>
-      <tr>
-         <td style="text-align: center;padding: 5px;font-weight: bold;">
-            <span style=" display: inline-block;
-                  width: 200px;
-                  height: 30px;
-                  text-align: center;
-                  color: blue;
-                  border: 1px solid black; ">
-               طبع بتاريخ @php echo date('Y-m-d'); @endphp
-            </span>
-         </td>
-      </tr>
-      <tr>
-         <td style="text-align: center;padding: 5px;font-weight: bold;">
-            <span style=" display: inline-block;
-                  width: 200px;
-                  height: 30px;
-                  text-align: center;
-                  color: blue;
-                  border: 1px solid black; ">
-               طبع بواسطة {{ auth()->user()->name }}
-            </span>
-         </td>
-      </tr>
-   </table>
-   <table style="width: 35%;float: right; margin-left: 5px; " dir="rtl">
-      <tr>
-         <td style="text-align:left !important;padding: 5px;">
-            <img style="width: 150px; height: 110px; border-radius: 10px;"
-               src="{{ asset('assets/admin/uploads').'/'.$systemData['photo'] }}">
-            <p>{{ $systemData['system_name'] }}</p>
-         </td>
-      </tr>
-   </table>
+        /* ===== BADGES ===== */
+        .badge-type {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .badge-days      { background: #fff3cd; color: #856404; border: 1px solid #ffc107; }
+        .badge-finger    { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .badge-invest    { background: #d6d8db; color: #383d41; border: 1px solid #c6c8ca; }
+        .badge-auto      { background: #cce5ff; color: #004085; border: 1px solid #b8daff; }
+        .badge-manual    { background: #e2e3e5; color: #383d41; border: 1px solid #d6d8db; }
+        .badge-approved  { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .badge-pending   { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .badge-archived  { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .badge-active    { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
 
-   <br>
+        /* ===== SUMMARY CARDS ===== */
+        .summary-section {
+            display: flex;
+            gap: 10px;
+            margin: 12px 0;
+            flex-wrap: wrap;
+        }
+        .summary-card {
+            flex: 1;
+            min-width: 150px;
+            border: 1px solid #cdd8e3;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            background: #f8fafc;
+        }
+        .summary-card .sc-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        .summary-card .sc-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .summary-card.danger  .sc-value { color: #c0392b; }
+        .summary-card.success .sc-value { color: #27ae60; }
+        .summary-card.info    .sc-value { color: #2980b9; }
 
-   @if (@isset($data) && !@empty($data) && count($data)>0)
-   <table dir="rtl" id="example2" class="table table-bordered table-hover" style="width: 99%;margin: 0 auto;">
-      <thead style="background-color: yellow">
-        
-            <th style="width: 10%;">كود</th>
-            <th style="width: 20%;"> العميل</th>
-            <th style="width: 10%;"> فئة</th>
-            <th style="width: 10%;" >   الدفع</th>
-            <th style="width: 10%;">    اجمالي </th>
-            <th style="width: 10%;">المدفوع</th>
-            <th style="width: 10%;">الآجل</th>
-            <th style="width: 10%;">الحالة </th>
-            <th style="width: 10%;">التاريخ </th>
-     
-         </thead>
+        /* ===== FOOTER ===== */
+        .print-footer {
+            margin-top: 15px;
+            border-top: 2px solid #2c3e50;
+            padding-top: 8px;
+            text-align: center;
+            font-size: 12px;
+            color: #555;
+        }
+        .no-data-msg {
+            text-align: center;
+            padding: 30px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #c0392b;
+        }
 
+        /* ===== PRINT BUTTON ===== */
+        .print-btn-area {
+            text-align: center;
+            margin: 15px 0;
+        }
 
-      </thead>
-      <tbody>
-         @foreach ($data as $info )
-         <tr>
-            <td>{{ $info->auto_serial }}</td>
-                     
-                        <td>{{ $info->customer_name }}</td>
-                        <td>{{ $info->Sales_matrial_types_names}}</td>
-                        <td>@if($info->pill_type==1)  كاش  @elseif($info->pill_type==2)  اجل  @else  غير محدد @endif</td>
-                        <td>{{ $info->total_cost*1 }}</td>
-                        <td>{{ $info->what_paid*1 }}</td>
-                        <td>{{ $info->what_remain*1 }}</td>
-                        <td>@if($info->is_approved==1)  معتمدة   @else   مفتوحة @endif</td>
-                        <td>{{ $info->invoice_date }}</td>
+        @media print {
+            .print-btn-area { display: none; }
+            body { padding: 0; }
+            table.print-table tbody tr:hover { background-color: inherit; }
+        }
+    </style>
+</head>
 
-         </tr>
-         @endforeach
-         <tr>
-   <td style="background-color:lightsalmon;" colspan="4"> الاجمالي 
+<body>
 
-</td>
-<td style="background-color: lightgreen;text-align: right; " > 
-{{ $total_sum*1 }} جنيه
-</td>
-<td style="background-color: lightgreen;text-align: right" > 
-   {{ $total_whatpaid_sum*1 }} جنيه
-   </td>
-   <td style="background-color: lightgreen;text-align: right" colspan="3s" > 
-      {{ $total_whatremai_sum*1 }} جنيه
-      </td>
-         </tr>
-      </tbody>
-   </table>
-   <br>
+    {{-- ===== HEADER ===== --}}
+    <div class="print-header">
+        <div class="company-info">
+            <h2>{{ $systemData['system_name'] ?? 'النظام' }}</h2>
+            <p>📍 {{ $systemData['address'] ?? '' }}</p>
+            <p>📞 {{ $systemData['phone'] ?? '' }}</p>
+            @if(!empty($systemData['email']))
+                <p>✉️ {{ $systemData['email'] }}</p>
+            @endif
+        </div>
+        <div class="logo">
+            @if(!empty($systemData['photo']))
+                <img src="{{ asset('assets//images') . '/' . $systemData['photo'] }}" alt="شعار الشركة">
+            @endif
+        </div>
+    </div>
 
-   @else
- <div class="clearfix"></div>
-      <p class="" style="text-align: center; font-size: 16px;font-weight: bold; color: brown">
-      عفوا لاتوجد بيانات لعرضها !!
-      </p>
+    {{-- ===== REPORT TITLE ===== --}}
+    <div class="report-title-box">
+        <h3>كشف الجزاءات الشهرية للموظفين</h3>
+        @if($financeMonthlyCalendar)
+            <p>
+                الشهر:
+                <strong>
+                    {{ optional(optional($financeMonthlyCalendar)->month)->name ?? '' }}
+                    {{ optional($financeMonthlyCalendar)->finance_yr ?? '' }}
+                </strong>
+            </p>
+        @endif
+    </div>
 
-   @endif
+    {{-- ===== META INFO ===== --}}
+    <div class="meta-row">
+        <span>📅 <strong>تاريخ الطباعة:</strong> @php echo date('Y-m-d'); @endphp</span>
+        <span>🕐 <strong>الوقت:</strong> @php echo date('h:i A'); @endphp</span>
+        <span>👤 <strong>طُبع بواسطة:</strong> {{ auth()->user()->name }}</span>
+        <span>📋 <strong>إجمالي السجلات:</strong> {{ $mainSalaryEmployeeDeductions->count() }}</span>
+    </div>
 
+    @if($mainSalaryEmployeeDeductions->count() > 0)
 
-   <br>
-   <p style="
-         padding: 10px 10px 0px 10px;
-         bottom: 0;
-         width: 100%;
-         /* Height of the footer*/ 
-         text-align: center;font-size: 16px; font-weight: bold;
-         "> {{ $systemData['address'] }} - {{ $systemData['phone'] }} </p>
-   <div class="clearfix"></div> <br>
-   <p class="text-center">
-      <button onclick="window.print()" class="btn btn-success btn-sm" id="printButton">طباعة</button>
-   </p>
+        {{-- ===== SUMMARY CARDS ===== --}}
+        <div class="summary-section">
+            <div class="summary-card info">
+                <div class="sc-label">عدد الجزاءات</div>
+                <div class="sc-value">{{ $mainSalaryEmployeeDeductions->count() }}</div>
+            </div>
+            <div class="summary-card">
+                <div class="sc-label">إجمالي الأيام المخصومة</div>
+                <div class="sc-value">{{ number_format($total_days_sum, 2) }} يوم</div>
+            </div>
+            <div class="summary-card danger">
+                <div class="sc-label">إجمالي المبالغ المستقطعة</div>
+                <div class="sc-value">{{ number_format($total_sum, 2) }} ج.م</div>
+            </div>
+            <div class="summary-card success">
+                <div class="sc-label">جزاءات مؤرشفة</div>
+                <div class="sc-value">{{ $mainSalaryEmployeeDeductions->where('is_archived', 1)->count() }}</div>
+            </div>
+            <div class="summary-card">
+                <div class="sc-label">جزاءات غير مؤرشفة</div>
+                <div class="sc-value">{{ $mainSalaryEmployeeDeductions->where('is_archived', 0)->count() }}</div>
+            </div>
+        </div>
+
+        {{-- ===== MAIN TABLE ===== --}}
+        <table class="print-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>كود الموظف</th>
+                    <th>اسم الموظف</th>
+                    <th>نوع الجزاء</th>
+                    <th>عدد الأيام</th>
+                    <th>إجمالي الخصم</th>
+                    <th>طريقة الإضافة</th>
+                    <th>الحالة</th>
+                    <th>أضيف بواسطة</th>
+                    <th>تاريخ الإضافة</th>
+                    <th>آخر تعديل</th>
+                    <th>ملاحظات</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($mainSalaryEmployeeDeductions as $index => $deduction)
+                <tr>
+                    {{-- رقم --}}
+                    <td>{{ $index + 1 }}</td>
+
+                    {{-- كود الموظف --}}
+                    <td>{{ optional($deduction->employee)->employee_code ?? '---' }}</td>
+
+                    {{-- اسم الموظف --}}
+                    <td style="text-align:right; font-weight:bold;">
+                        {{ optional($deduction->employee)->name ?? '---' }}
+                    </td>
+
+                    {{-- نوع الجزاء --}}
+                    <td>
+                        @if($deduction->deduction_type == 1)
+                            <span class="badge-type badge-days">خصم أيام</span>
+                        @elseif($deduction->deduction_type == 2)
+                            <span class="badge-type badge-finger">خصم بصمة</span>
+                        @elseif($deduction->deduction_type == 3)
+                            <span class="badge-type badge-invest">خصم تحقيق</span>
+                        @else
+                            <span class="badge-type badge-manual">غير محدد</span>
+                        @endif
+                    </td>
+
+                    {{-- عدد الأيام --}}
+                    <td>{{ number_format($deduction->days_amount, 2) }}</td>
+
+                    {{-- إجمالي الخصم --}}
+                    <td style="color:#c0392b; font-weight:bold;">
+                        {{ number_format($deduction->total, 2) }} ج.م
+                    </td>
+
+                    {{-- طريقة الإضافة --}}
+                    <td>
+                        @if($deduction->is_auto == 1)
+                            <span class="badge-type badge-auto">تلقائي</span>
+                        @else
+                            <span class="badge-type badge-manual">يدوي</span>
+                        @endif
+                    </td>
+
+                    {{-- الحالة (أرشفة) --}}
+                    <td>
+                        @if($deduction->is_archived == 1)
+                            <span class="badge-type badge-archived">مؤرشف</span>
+                        @else
+                            <span class="badge-type badge-active">نشط</span>
+                        @endif
+                    </td>
+
+                    {{-- أضيف بواسطة --}}
+                    <td>{{ optional($deduction->addedBy)->name ?? '---' }}</td>
+
+                    {{-- تاريخ الإضافة --}}
+                    <td style="white-space:nowrap;">
+                        {{ $deduction->created_at ? $deduction->created_at->format('Y-m-d h:i:s A') : '---' }}
+                    </td>
+
+                    {{-- آخر تعديل --}}
+                    <td style="white-space:nowrap;">
+                        @if($deduction->updated_at && $deduction->updated_at != $deduction->created_at)
+                            {{ $deduction->updated_at->format('Y-m-d h:i:s A') }}
+                            @if(optional($deduction->updatedBy)->name)
+                                <br><small style="color:#777;">{{ $deduction->updatedBy->name }}</small>
+                            @endif
+                        @else
+                            ---
+                        @endif
+                    </td>
+
+                    {{-- ملاحظات --}}
+                    <td style="text-align:right; font-size:11px; color:#555;">
+                        {{ $deduction->notes ?? '---' }}
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4" style="text-align:right; padding-right:10px;">الإجمالي</td>
+                    <td>{{ number_format($total_days_sum, 2) }} يوم</td>
+                    <td style="color:#c0392b;">{{ number_format($total_sum, 2) }} ج.م</td>
+                    <td colspan="7"></td>
+                </tr>
+            </tfoot>
+        </table>
+
+    @else
+
+        <div class="no-data-msg">
+            ⚠️ عفواً، لا توجد بيانات لعرضها بناءً على معايير البحث المحددة.
+        </div>
+
+    @endif
+
+    {{-- ===== FOOTER ===== --}}
+    <div class="print-footer">
+        {{ $systemData['address'] ?? '' }}
+        @if(!empty($systemData['phone'])) — {{ $systemData['phone'] }} @endif
+        @if(!empty($systemData['email'])) — {{ $systemData['email'] }} @endif
+    </div>
+
+    <div class="print-btn-area">
+        <button onclick="window.print()" class="btn btn-success btn-sm" id="printButton">
+            🖨️ طباعة
+        </button>
+        <button onclick="window.close()" class="btn btn-secondary btn-sm mr-2">
+            ✖ إغلاق
+        </button>
+    </div>
+
 </body>
 
 </html>

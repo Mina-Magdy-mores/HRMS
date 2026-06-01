@@ -124,7 +124,7 @@
                     </button>
                 </div>
             @endif
-            <form action="{{ route('admin.main-salary-employee-deductions.print-search') }}" method="POST">
+            <form action="{{ route('admin.main-salary-employee-deductions.print-search') }}" method="POST" target="_blank">
                 @csrf
                 <input type="hidden" name="finance_monthly_calendar_id_search" value="{{ $financeMonthlyCalendar->id }}">
                 <div class="row">
