@@ -64,28 +64,28 @@
         <div class="card-body">
             <!-- عرض رسائل الخطأ إن وجدت -->
             @if ($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h4 class="alert-heading"><i class="fas fa-exclamation-circle"></i> خطأ في البيانات</h4>
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h4 class="alert-heading"><i class="fas fa-exclamation-circle"></i> خطأ في البيانات</h4>
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
             @endif
 
             @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="fas fa-check-circle"></i>
-                {{ session('success') }}
-                <button type="button" class="close text-white text-right" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i>
+                    {{ session('success') }}
+                    <button type="button" class="close text-white text-right" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
             @endif
             <!-- الفورم يوجه لروت التحديث الذي ستنشئه -->
             <form action="{{ route('admin.general-settings.update', $general_settings) }}" method="POST"
-                id="settings_form">
+                enctype="multipart/form-data" id="settings_form">
                 @csrf
                 @method('PUT')
                 <!-- بيانات الشركة -->
@@ -108,9 +108,11 @@
                             <select name="status"
                                 class="form-control editable-input {{ $errors->has('status') ? 'is-invalid' : '' }}"
                                 disabled>
-                                <option value="1" {{ old('status', $general_settings->status) == 1 ? 'selected' : '' }}>
+                                <option value="1"
+                                    {{ old('status', $general_settings->status) == 1 ? 'selected' : '' }}>
                                     مفعل</option>
-                                <option value="0" {{ old('status', $general_settings->status) == 0 ? 'selected' : '' }}>
+                                <option value="0"
+                                    {{ old('status', $general_settings->status) == 0 ? 'selected' : '' }}>
                                     معطل</option>
                             </select>
                             @include('admin.errors.errors', ['value' => 'status'])
@@ -143,6 +145,23 @@
                             @include('admin.errors.errors', ['value' => 'address'])
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>رابط الصورة</label>
+                            <input type="file" name="image"
+                                class="form-control editable-input {{ $errors->has('image') ? 'is-invalid' : '' }}"
+                                readonly>
+                            @if ($general_settings->image)
+                                <small class="form-text text-muted">
+                                    الصورة الحالية: <a href="{{ asset('storage/' . $general_settings->image) }}"
+                                        target="_blank">عرض الصورة</a> - <a
+                                        href="{{ route('admin.general-settings.downloadImage', ['id' => $general_settings->id]) }}"
+                                        target="_blank">تحميل الصورة</a>
+                                </small>
+                            @endif
+                            @include('admin.errors.errors', ['value' => 'image'])
+                        </div>
+                    </div>
                 </div>
 
                 <hr>
@@ -169,7 +188,9 @@
                                 class="form-control editable-input {{ $errors->has('after_minute_calculate_early_departure') ? 'is-invalid' : '' }}"
                                 value="{{ old('after_minute_calculate_early_departure', $general_settings->after_minute_calculate_early_departure) }}"
                                 readonly>
-                            @include('admin.errors.errors', ['value' => 'after_minute_calculate_early_departure'])
+                            @include('admin.errors.errors', [
+                                'value' => 'after_minute_calculate_early_departure',
+                            ])
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -332,7 +353,8 @@
                 <!-- أزرار التحكم تظهر فقط عند الضغط على تعديل -->
                 <div id="action_buttons" class="text-start mt-4  " style="display: none;">
                     <button type="submit" class="btn btn-success px-3 shadow">حفظ التعديلات</button>
-                    <button type="button" class="btn btn-danger px-3 shadow" onclick="location.reload()">إلغاء</button>
+                    <button type="button" class="btn btn-danger px-3 shadow"
+                        onclick="location.reload()">إلغاء</button>
                 </div>
 
             </form>
@@ -343,10 +365,10 @@
 <!-- JavaScript للتحكم في وضع التعديل -->
 
 @section('js')
-<script>
-    // Check if there are validation errors - if yes, enable edit mode automatically
+    <script>
+        // Check if there are validation errors - if yes, enable edit mode automatically
         @if ($errors->any())
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 makeEditable();
             });
         @endif
@@ -383,5 +405,5 @@
 
             document.querySelector('.back-btn').classList.remove('d-none');
         }
-</script>
+    </script>
 @endsection

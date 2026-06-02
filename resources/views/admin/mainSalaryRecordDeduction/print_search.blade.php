@@ -216,7 +216,7 @@
         </div>
         <div class="logo">
             @if(!empty($systemData['photo']))
-                <img src="{{ asset('assets//images') . '/' . $systemData['photo'] }}" alt="شعار الشركة">
+                <img src="{{ asset('/storage/' . $systemData['photo']) }}" alt="شعار الشركة">
             @endif
         </div>
     </div>
