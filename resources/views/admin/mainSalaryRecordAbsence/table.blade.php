@@ -66,7 +66,7 @@
 
             <h3 class="card-title">
                 <i class="fas fa-table"></i>
-                جزاءات الموظفين
+                غياب الموظفين
             </h3>
 
 
@@ -95,7 +95,7 @@
                 </div>
             @endif
 
-           
+            
             <div id="ajax_responce_search">
                 <div class="table-responsive">
 
@@ -187,7 +187,7 @@
                                     </td>
                                     <td>
                                         @if ($month->status != 0)
-                                            <a href="{{ route('admin.main-salary-employee-deductions.show', $month->id) }}"
+                                            <a href="{{ route('admin.main-salary-employee-absences.show', $month->id) }}"
                                                 class="btn btn-sm btn-primary">
                                                 <i class="fa fa-folder-open"></i>
                                                 عرض الشهر المالى

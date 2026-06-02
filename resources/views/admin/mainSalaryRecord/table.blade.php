@@ -93,20 +93,7 @@
                 </div>
             @endif
 
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label>نوع الشفت</label>
-                        <select name="type-search" id="type-search" class="form-control">
-                            <option selected disabled value="null">اختر نوع الشفت</option>
-                            <option value="1">شفت نهاري</option>
-                            <option value="2">شفت ليلي</option>
-                            <option value="3">شفت كامل</option>
-                        </select>
-                    </div>
-                </div>
-
-            </div>
+            
             <div id="ajax_responce_search">
                 <div class="table-responsive">
 

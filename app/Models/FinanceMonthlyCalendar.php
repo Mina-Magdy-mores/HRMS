@@ -87,4 +87,5 @@ class FinanceMonthlyCalendar extends Model
     public function mainSalaryEmployeeDeductions(){
         return $this->hasMany(MainSalaryEmployeeDeduction::class, 'finance_monthly_calendar_id');
     }
+
 }

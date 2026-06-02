@@ -15,6 +15,8 @@ use App\Http\Controllers\Admin\FinanceCalendarController;
 use App\Http\Controllers\Admin\GovernorateController;
 use App\Http\Controllers\Admin\LoginController;
 use App\Http\Controllers\Admin\JobsCategoryController;
+use App\Http\Controllers\Admin\MainSalaryEmployeeAbsenceController;
+use App\Http\Controllers\Admin\MainSalaryEmployeeAllowanceController;
 use App\Http\Controllers\Admin\MainSalaryEmployeeDeductionController;
 use App\Http\Controllers\Admin\MainSalaryRecordController;
 use App\Http\Controllers\Admin\NationalityController;
@@ -209,6 +211,29 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/main-salary-employee-deductions/edit', [MainSalaryEmployeeDeductionController::class, 'edit'])->name('main-salary-employee-deductions.edit');
         Route::put('/main-salary-employee-deductions', [MainSalaryEmployeeDeductionController::class, 'update'])->name('main-salary-employee-deductions.update');
         Route::post('/main-salary-employee-deductions/print-search', [MainSalaryEmployeeDeductionController::class, 'printSearch'])->name('main-salary-employee-deductions.print-search');
+
+
+        //main_salary_employee_absences
+        Route::get('/main-salary-employee-absences', [MainSalaryEmployeeAbsenceController::class, 'index'])->name('main-salary-employee-absences.index');
+        Route::get('/main-salary-employee-absences/{id}/show', [MainSalaryEmployeeAbsenceController::class, 'show'])->name('main-salary-employee-absences.show');
+        Route::post('/main-salary-employee-absences/ajax-check', [MainSalaryEmployeeAbsenceController::class, 'ajaxCheck'])->name('main-salary-employee-absences.ajax-check');
+        Route::post('/main-salary-employee-absences/store', [MainSalaryEmployeeAbsenceController::class, 'store'])->name('main-salary-employee-absences.store');
+        Route::post('/main-salary-employee-absences/ajax-search', [MainSalaryEmployeeAbsenceController::class, 'ajaxSearch'])->name('main-salary-employee-absences.ajax-search');
+        Route::post('/main-salary-employee-absences/destroy', [MainSalaryEmployeeAbsenceController::class, 'destroy'])->name('main-salary-employee-absences.destroy');
+        Route::post('/main-salary-employee-absences/edit', [MainSalaryEmployeeAbsenceController::class, 'edit'])->name('main-salary-employee-absences.edit');
+        Route::put('/main-salary-employee-absences', [MainSalaryEmployeeAbsenceController::class, 'update'])->name('main-salary-employee-absences.update');
+        Route::post('/main-salary-employee-absences/print-search', [MainSalaryEmployeeAbsenceController::class, 'printSearch'])->name('main-salary-employee-absences.print-search');
+
+        //main_salary_employee_allowances
+        Route::get('/main-salary-employee-allowances', [MainSalaryEmployeeAllowanceController::class, 'index'])->name('main-salary-employee-allowances.index');
+        Route::get('/main-salary-employee-allowances/{id}/show', [MainSalaryEmployeeAllowanceController::class, 'show'])->name('main-salary-employee-allowances.show');
+        Route::post('/main-salary-employee-allowances/ajax-check', [MainSalaryEmployeeAllowanceController::class, 'ajaxCheck'])->name('main-salary-employee-allowances.ajax-check');
+        Route::post('/main-salary-employee-allowances/store', [MainSalaryEmployeeAllowanceController::class, 'store'])->name('main-salary-employee-allowances.store');
+        Route::post('/main-salary-employee-allowances/ajax-search', [MainSalaryEmployeeAllowanceController::class, 'ajaxSearch'])->name('main-salary-employee-allowances.ajax-search');
+        Route::post('/main-salary-employee-allowances/destroy', [MainSalaryEmployeeAllowanceController::class, 'destroy'])->name('main-salary-employee-allowances.destroy');
+        Route::post('/main-salary-employee-allowances/edit', [MainSalaryEmployeeAllowanceController::class, 'edit'])->name('main-salary-employee-allowances.edit');
+        Route::put('/main-salary-employee-allowances', [MainSalaryEmployeeAllowanceController::class, 'update'])->name('main-salary-employee-allowances.update');
+        Route::post('/main-salary-employee-allowances/print-search', [MainSalaryEmployeeAllowanceController::class, 'printSearch'])->name('main-salary-employee-allowances.print-search');
     });
 
     // guest routes

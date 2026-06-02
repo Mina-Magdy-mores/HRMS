@@ -66,10 +66,8 @@
 
             <h3 class="card-title">
                 <i class="fas fa-table"></i>
-                جزاءات الموظفين
+                بدلات الموظفين
             </h3>
-
-
 
         </div>
 
@@ -95,7 +93,6 @@
                 </div>
             @endif
 
-           
             <div id="ajax_responce_search">
                 <div class="table-responsive">
 
@@ -113,8 +110,6 @@
                                 <th>السنة المالية</th>
                                 <th>حالة السنه الماليه</th>
                                 <th>الأجرائات</th>
-
-
                             </tr>
                         </thead>
 
@@ -125,7 +120,6 @@
                                     <td>
                                         {{ $month->month->name }}
                                     </td>
-
 
                                     <td>
                                         {{ $month->start_date }}
@@ -187,7 +181,7 @@
                                     </td>
                                     <td>
                                         @if ($month->status != 0)
-                                            <a href="{{ route('admin.main-salary-employee-deductions.show', $month->id) }}"
+                                            <a href="{{ route('admin.main-salary-employee-allowances.show', $month->id) }}"
                                                 class="btn btn-sm btn-primary">
                                                 <i class="fa fa-folder-open"></i>
                                                 عرض الشهر المالى

@@ -232,12 +232,16 @@
                 </li>
                 <li
                     class="nav-item has-treeview  {{ request()->routeIs('admin.main-salary-records.*') ||
-                    request()->routeIs('admin.main-salary-employee-deductions.*')
+                    request()->routeIs('admin.main-salary-employee-deductions.*') ||
+                    request()->routeIs('admin.main-salary-employee-absences.*') ||
+                    request()->routeIs('admin.main-salary-employee-allowances.*') 
                         ? 'menu-open'
                         : '' }}">
                     <a href="#"
                         class="nav-link {{ request()->routeIs('admin.main-salary-records.*') ||
-                        request()->routeIs('admin.main-salary-employee-deductions.*')
+                        request()->routeIs('admin.main-salary-employee-deductions.*') ||
+                        request()->routeIs('admin.main-salary-employee-absences.*') ||
+                        request()->routeIs('admin.main-salary-employee-allowances.*')
                             ? 'active'
                             : '' }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -262,15 +266,15 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('admin.main-salary-records.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
+                            <a href="{{ route('admin.main-salary-employee-absences.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-employee-absences.*')) active @endif ">
                                 <i class="fas fa-calendar-times"></i>
-                                <p>الغياب</p>
+                                <p>خصم الغياب</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('admin.main-salary-records.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
+                            <a href="{{ route('admin.main-salary-employee-allowances.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-employee-allowances.*')) active @endif ">
                                 <i class="fas fa-plus-circle"></i>
                                 <p>الإضافى</p>
                             </a>
