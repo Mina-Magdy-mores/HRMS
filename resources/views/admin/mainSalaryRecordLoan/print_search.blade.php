@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>طباعة الخصومات الشهرية المجمعة للموظفين</title>
+    <title>طباعة السلف الشهرية للموظفين</title>
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap_rtl-v4.2.1/bootstrap.min.css')}}">
     <style>
@@ -51,7 +51,7 @@
             text-align: center;
             margin: 10px 0;
             padding: 8px;
-            background: linear-gradient(135deg, #2c3e50, #3498db);
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
             color: #fff;
             border-radius: 6px;
         }
@@ -92,20 +92,20 @@
             font-size: 12px;
         }
         table.print-table thead tr {
-            background-color: #2c3e50;
+            background-color: #27ae60;
             color: #fff;
         }
         table.print-table thead th {
             padding: 7px 5px;
             text-align: center;
-            border: 1px solid #4a6278;
+            border: 1px solid #1e8449;
             white-space: nowrap;
         }
         table.print-table tbody tr:nth-child(even) {
-            background-color: #f7f9fb;
+            background-color: #f7fdf9;
         }
         table.print-table tbody tr:hover {
-            background-color: #eaf2ff;
+            background-color: #eafaf1;
         }
         table.print-table tbody td {
             padding: 6px 5px;
@@ -114,12 +114,12 @@
             vertical-align: middle;
         }
         table.print-table tfoot tr {
-            background-color: #d5e8f7;
+            background-color: #d5f5e3;
             font-weight: bold;
         }
         table.print-table tfoot td {
             padding: 7px 5px;
-            border: 1px solid #aac6e0;
+            border: 1px solid #abebc6;
             text-align: center;
         }
 
@@ -162,7 +162,6 @@
             font-weight: bold;
             color: #2c3e50;
         }
-        .summary-card.danger  .sc-value { color: #c0392b; }
         .summary-card.success .sc-value { color: #27ae60; }
         .summary-card.info    .sc-value { color: #2980b9; }
 
@@ -218,7 +217,7 @@
 
     {{-- ===== REPORT TITLE ===== --}}
     <div class="report-title-box">
-        <h3>كشف الخصومات المالية الشهرية للموظفين</h3>
+        <h3>كشف السلف الشهرية للموظفين</h3>
         @if($financeMonthlyCalendar)
             <p>
                 الشهر:
@@ -235,28 +234,28 @@
         <span>📅 <strong>تاريخ الطباعة:</strong> @php echo date('Y-m-d'); @endphp</span>
         <span>🕐 <strong>الوقت:</strong> @php echo date('h:i A'); @endphp</span>
         <span>👤 <strong>طُبع بواسطة:</strong> {{ auth()->user()->name }}</span>
-        <span>📋 <strong>إجمالي السجلات:</strong> {{ $mainSalaryEmployeeDeductionTypes->count() }}</span>
+        <span>📋 <strong>إجمالي السجلات:</strong> {{ $mainSalaryEmployeeLoans->count() }}</span>
     </div>
 
-    @if($mainSalaryEmployeeDeductionTypes->count() > 0)
+    @if($mainSalaryEmployeeLoans->count() > 0)
 
         {{-- ===== SUMMARY CARDS ===== --}}
         <div class="summary-section">
             <div class="summary-card info">
-                <div class="sc-label">عدد الخصومات</div>
-                <div class="sc-value">{{ $mainSalaryEmployeeDeductionTypes->count() }}</div>
+                <div class="sc-label">عدد السلف</div>
+                <div class="sc-value">{{ $mainSalaryEmployeeLoans->count() }}</div>
             </div>
-            <div class="summary-card danger">
-                <div class="sc-label">إجمالي مبالغ الخصومات</div>
-                <div class="sc-value">{{ number_format($total_amount_sum, 2) }} ج.م</div>
-            </div>
-            <div class="summary-card">
-                <div class="sc-label">خصومات مؤرشفة</div>
-                <div class="sc-value">{{ $mainSalaryEmployeeDeductionTypes->where('is_archived', 1)->count() }}</div>
+            <div class="summary-card success">
+                <div class="sc-label">إجمالي مبالغ السلف</div>
+                <div class="sc-value">{{ number_format($total_sum, 2) }} ج.م</div>
             </div>
             <div class="summary-card">
-                <div class="sc-label">خصومات غير مؤرشفة</div>
-                <div class="sc-value">{{ $mainSalaryEmployeeDeductionTypes->where('is_archived', 0)->count() }}</div>
+                <div class="sc-label">سلف مؤرشفة</div>
+                <div class="sc-value">{{ $mainSalaryEmployeeLoans->where('is_archived', 1)->count() }}</div>
+            </div>
+            <div class="summary-card">
+                <div class="sc-label">سلف غير مؤرشفة</div>
+                <div class="sc-value">{{ $mainSalaryEmployeeLoans->where('is_archived', 0)->count() }}</div>
             </div>
         </div>
 
@@ -267,7 +266,6 @@
                     <th>#</th>
                     <th>كود الموظف</th>
                     <th>اسم الموظف</th>
-                    <th>نوع الخصم</th>
                     <th>المبلغ</th>
                     <th>طريقة الإضافة</th>
                     <th>الحالة</th>
@@ -278,30 +276,27 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($mainSalaryEmployeeDeductionTypes as $index => $deduction)
+                @foreach ($mainSalaryEmployeeLoans as $index => $loan)
                 <tr>
                     {{-- رقم --}}
                     <td>{{ $index + 1 }}</td>
 
                     {{-- كود الموظف --}}
-                    <td>{{ optional($deduction->employee)->employee_code ?? '---' }}</td>
+                    <td>{{ optional($loan->employee)->employee_code ?? '---' }}</td>
 
                     {{-- اسم الموظف --}}
                     <td style="text-align:right; font-weight:bold;">
-                        {{ optional($deduction->employee)->name ?? '---' }}
+                        {{ optional($loan->employee)->name ?? '---' }}
                     </td>
 
-                    {{-- نوع الخصم --}}
-                    <td>{{ optional($deduction->deductionType)->name ?? '---' }}</td>
-
                     {{-- المبلغ --}}
-                    <td style="color:#c0392b; font-weight:bold;">
-                        {{ number_format($deduction->amount, 2) }} ج.م
+                    <td style="color:#27ae60; font-weight:bold;">
+                        {{ number_format($loan->amount, 2) }} ج.م
                     </td>
 
                     {{-- طريقة الإضافة --}}
                     <td>
-                        @if($deduction->is_auto == 1)
+                        @if($loan->is_auto == 1)
                             <span class="badge-type badge-auto">تلقائي</span>
                         @else
                             <span class="badge-type badge-manual">يدوي</span>
@@ -310,7 +305,7 @@
 
                     {{-- الحالة (أرشفة) --}}
                     <td>
-                        @if($deduction->is_archived == 1)
+                        @if($loan->is_archived == 1)
                             <span class="badge-type badge-archived">مؤرشف</span>
                         @else
                             <span class="badge-type badge-active">نشط</span>
@@ -318,19 +313,19 @@
                     </td>
 
                     {{-- أضيف بواسطة --}}
-                    <td>{{ optional($deduction->addedBy)->name ?? '---' }}</td>
+                    <td>{{ optional($loan->addedBy)->name ?? '---' }}</td>
 
                     {{-- تاريخ الإضافة --}}
                     <td style="white-space:nowrap;">
-                        {{ $deduction->created_at ? $deduction->created_at->format('Y-m-d h:i:s A') : '---' }}
+                        {{ $loan->created_at ? $loan->created_at->format('Y-m-d h:i:s A') : '---' }}
                     </td>
 
                     {{-- آخر تعديل --}}
                     <td style="white-space:nowrap;">
-                        @if($deduction->updated_at && $deduction->updated_at != $deduction->created_at)
-                            {{ $deduction->updated_at->format('Y-m-d h:i:s A') }}
-                            @if(optional($deduction->updatedBy)->name)
-                                <br><small style="color:#777;">{{ $deduction->updatedBy->name }}</small>
+                        @if($loan->updated_at && $loan->updated_at != $loan->created_at)
+                            {{ $loan->updated_at->format('Y-m-d h:i:s A') }}
+                            @if(optional($loan->updatedBy)->name)
+                                <br><small style="color:#777;">{{ $loan->updatedBy->name }}</small>
                             @endif
                         @else
                             ---
@@ -339,15 +334,15 @@
 
                     {{-- ملاحظات --}}
                     <td style="text-align:right; font-size:11px; color:#555;">
-                        {{ $deduction->notes ?? '---' }}
+                        {{ $loan->notes ?? '---' }}
                     </td>
                 </tr>
                 @endforeach
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="4" style="text-align:right; padding-right:10px;">الإجمالي</td>
-                    <td style="color:#c0392b; font-weight:bold;">{{ number_format($total_amount_sum, 2) }} ج.م</td>
+                    <td colspan="3" style="text-align:right; padding-right:10px;">الإجمالي</td>
+                    <td style="color:#27ae60;">{{ number_format($total_sum, 2) }} ج.م</td>
                     <td colspan="6"></td>
                 </tr>
             </tfoot>
@@ -376,6 +371,7 @@
             ✖ إغلاق
         </button>
     </div>
+
 
 </body>
 

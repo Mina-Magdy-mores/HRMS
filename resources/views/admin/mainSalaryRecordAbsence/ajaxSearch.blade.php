@@ -74,8 +74,9 @@
                                             {{ optional($absence->addedBy)->name ?? '---' }}
                                         </span>
                                     </td>
-                                    <td class="">
-                                        <span class="small font-italic text-secondary">
+                                    <td style="max-width: 100px;">
+                                        <span class="small font-italic text-secondary d-inline-block text-truncate"
+                                            style="max-width: 60px;" title="{{ $absence->notes }}">
                                             {{ $absence->notes ?? '---' }}
                                         </span>
                                     </td>

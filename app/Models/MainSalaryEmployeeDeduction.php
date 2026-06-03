@@ -20,9 +20,9 @@ class MainSalaryEmployeeDeduction extends Model
         {
             return $this->belongsTo(FinanceMonthlyCalendar::class);
         }
-        public function approvedBy()
+        public function archivedBy()
         {
-            return $this->belongsTo(Admin::class, 'approved_by');
+            return $this->belongsTo(Admin::class, 'archived_by');
         }
         public function addedBy()
         {

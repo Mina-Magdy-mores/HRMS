@@ -234,16 +234,22 @@
                     class="nav-item has-treeview  {{ request()->routeIs('admin.main-salary-records.*') ||
                     request()->routeIs('admin.main-salary-employee-deductions.*') ||
                     request()->routeIs('admin.main-salary-employee-absences.*') ||
+                    request()->routeIs('admin.main-salary-employee-additions.*') ||
                     request()->routeIs('admin.main-salary-employee-allowances.*') ||
-                    request()->routeIs('admin.main-salary-employee-deduction-types.*')
+                    request()->routeIs('admin.main-salary-employee-deduction-types.*') ||
+                    request()->routeIs('admin.main-salary-employee-bonuses.*') ||
+                    request()->routeIs('admin.main-salary-employee-loans.*')
                         ? 'menu-open'
                         : '' }}">
                     <a href="#"
                         class="nav-link {{ request()->routeIs('admin.main-salary-records.*') ||
                         request()->routeIs('admin.main-salary-employee-deductions.*') ||
                         request()->routeIs('admin.main-salary-employee-absences.*') ||
+                        request()->routeIs('admin.main-salary-employee-additions.*') ||
                         request()->routeIs('admin.main-salary-employee-allowances.*') ||
-                        request()->routeIs('admin.main-salary-employee-deduction-types.*')
+                        request()->routeIs('admin.main-salary-employee-deduction-types.*') ||
+                        request()->routeIs('admin.main-salary-employee-bonuses.*') ||
+                        request()->routeIs('admin.main-salary-employee-loans.*')
                             ? 'active'
                             : '' }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -264,54 +270,48 @@
                             <a href="{{ route('admin.main-salary-employee-deductions.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-salary-employee-deductions.*')) active @endif ">
                                 <i class="fas fa-gavel"></i>
-                                <p>الجزاءات</p>
+                                <p>الجزاءات اليدويه</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('admin.main-salary-employee-absences.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-salary-employee-absences.*')) active @endif ">
                                 <i class="fas fa-calendar-times"></i>
-                                <p>خصم الغياب</p>
+                                <p>خصم الغياب اليدوي</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.main-salary-employee-additions.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-employee-additions.*')) active @endif ">
+                                <i class="fas fa-calendar-plus"></i>
+                                <p>أضافه الأيام اليدوي</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('admin.main-salary-employee-deduction-types.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-employee-deduction-types.*')) active @endif ">
+                                <i class="fas fa-minus-circle"></i>
+                                <p>الخصومات المالية الثابتة</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.main-salary-employee-bonuses.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-employee-bonuses.*')) active @endif ">
+                                <i class="fas fa-trophy"></i>
+                                <p>المكافئات المالية الثابتة</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('admin.main-salary-employee-allowances.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-salary-employee-allowances.*')) active @endif ">
                                 <i class="fas fa-plus-circle"></i>
-                                <p>الإضافى</p>
+                                <p>البدلات المالية الثابتة</p>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('admin.main-salary-employee-deduction-types.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.main-salary-employee-deduction-types.*')) active @endif ">
-                                <i class="fas fa-minus-circle"></i>
-                                <p>الخصومات المالية</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('admin.main-salary-records.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
-                                <i class="fas fa-trophy"></i>
-                                <p>المكافئات المالية</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('admin.main-salary-records.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
-                                <i class="fas fa-chart-line"></i>
-                                <p>البدلات المتغيره</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('admin.main-salary-records.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
-                                <i class="fas fa-mobile-alt"></i>
-                                <p>فواتير التليفونات</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('admin.main-salary-records.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
+                            <a href="{{ route('admin.main-salary-employee-loans.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-employee-loans.*')) active @endif ">
                                 <i class="fas fa-hand-holding-usd"></i>
                                 <p>السلف الشهرية</p>
                             </a>

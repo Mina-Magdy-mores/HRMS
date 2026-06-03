@@ -274,8 +274,8 @@ class Admin extends User
     public function updatedMainSalaryEmployeeDeductions(){
         return $this->hasMany(MainSalaryEmployeeDeduction::class, 'updated_by');
     }
-    public function approvedMainSalaryEmployeeDeductions(){
-        return $this->hasMany(MainSalaryEmployeeDeduction::class, 'approved_by');
+    public function archivedMainSalaryEmployeeDeductions(){
+        return $this->hasMany(MainSalaryEmployeeDeduction::class, 'archived_by');
     }
     public function addedMainSalaryEmployeeAllowances(){
         return $this->hasMany(MainSalaryEmployeeAllowance::class, 'added_by');
@@ -306,6 +306,44 @@ class Admin extends User
     {
         return $this->hasMany(MainSalaryEmployeeDeductionType::class, 'archived_by');
     }
+    public function addedMainSalaryEmployeeLoans()
+    {
+        return $this->hasMany(MainSalaryEmployeeLoan::class, 'added_by');
+    }
+    public function updatedMainSalaryEmployeeLoans()
+    {
+        return $this->hasMany(MainSalaryEmployeeLoan::class, 'updated_by');
+    }
+    public function archivedMainSalaryEmployeeLoans()
+    {
+        return $this->hasMany(MainSalaryEmployeeLoan::class, 'archived_by');
+    }
+    public function addedMainSalaryEmployeeBonuses()
+    {
+        return $this->hasMany(MainSalaryEmployeeBonus::class, 'added_by');
+    }
+    public function updatedMainSalaryEmployeeBonuses()
+    {
+        return $this->hasMany(MainSalaryEmployeeBonus::class, 'updated_by');
+    }
+    public function archivedMainSalaryEmployeeBonuses()
+    {
+        return $this->hasMany(MainSalaryEmployeeBonus::class, 'archived_by');
+    }
+    public function addedMainSalaryEmployeeAdditions()
+    {
+        return $this->hasMany(MainSalaryEmployeeAddition::class, 'added_by');
+    }
+    public function updatedMainSalaryEmployeeAdditions()
+    {
+        return $this->hasMany(MainSalaryEmployeeAddition::class, 'updated_by');
+    }
+    public function archivedMainSalaryEmployeeAdditions()
+    {
+        return $this->hasMany(MainSalaryEmployeeAddition::class, 'archived_by');
+    }
+    
+
 
 
 }

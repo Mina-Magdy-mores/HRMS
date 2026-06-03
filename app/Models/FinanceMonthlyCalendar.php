@@ -95,4 +95,16 @@ class FinanceMonthlyCalendar extends Model
     public function mainSalaryEmployeeAllowances(){
         return $this->hasMany(MainSalaryEmployeeAllowance::class, 'finance_monthly_calendar_id');
     }
+    public function mainSalaryEmployeeLoans(){
+        return $this->hasMany(MainSalaryEmployeeLoan::class, 'finance_monthly_calendar_id');
+    }
+    public function mainSalaryEmployeeAdditions(){
+        return $this->hasMany(MainSalaryEmployeeAddition::class, 'finance_monthly_calendar_id');
+    }
+    public function mainSalaryEmployeeBonuses(){
+        return $this->hasMany(MainSalaryEmployeeBonus::class, 'finance_monthly_calendar_id');
+    }
+    public function mainSalaryEmployeeDeductions(){
+        return $this->hasMany(MainSalaryEmployeeDeduction::class, 'finance_monthly_calendar_id');
+    }
 }
