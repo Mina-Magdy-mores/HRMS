@@ -234,14 +234,16 @@
                     class="nav-item has-treeview  {{ request()->routeIs('admin.main-salary-records.*') ||
                     request()->routeIs('admin.main-salary-employee-deductions.*') ||
                     request()->routeIs('admin.main-salary-employee-absences.*') ||
-                    request()->routeIs('admin.main-salary-employee-allowances.*') 
+                    request()->routeIs('admin.main-salary-employee-allowances.*') ||
+                    request()->routeIs('admin.main-salary-employee-deduction-types.*')
                         ? 'menu-open'
                         : '' }}">
                     <a href="#"
                         class="nav-link {{ request()->routeIs('admin.main-salary-records.*') ||
                         request()->routeIs('admin.main-salary-employee-deductions.*') ||
                         request()->routeIs('admin.main-salary-employee-absences.*') ||
-                        request()->routeIs('admin.main-salary-employee-allowances.*')
+                        request()->routeIs('admin.main-salary-employee-allowances.*') ||
+                        request()->routeIs('admin.main-salary-employee-deduction-types.*')
                             ? 'active'
                             : '' }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -280,8 +282,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('admin.main-salary-records.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
+                            <a href="{{ route('admin.main-salary-employee-deduction-types.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-employee-deduction-types.*')) active @endif ">
                                 <i class="fas fa-minus-circle"></i>
                                 <p>الخصومات المالية</p>
                             </a>

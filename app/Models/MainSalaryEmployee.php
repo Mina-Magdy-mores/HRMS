@@ -45,10 +45,15 @@ class MainSalaryEmployee extends Model
     {
         return $this->hasMany(MainSalaryEmployeeDeduction::class, 'main_salary_employee_id');
     }
-
-    public function mainSalaryEmployeeAllowances()
+    public function mainSalaryEmployeeAbsences()
     {
-        return $this->hasMany(MainSalaryEmployeeAllowance::class, 'main_salary_employee_id');
+        return $this->hasMany(MainSalaryEmployeeAbsence::class, 'main_salary_employee_id');
     }
+
+    public function mainSalaryEmployeeDeductionTypes()
+    {
+        return $this->hasMany(MainSalaryEmployeeDeductionType::class, 'main_salary_employee_id');
+    }
+
 
 }

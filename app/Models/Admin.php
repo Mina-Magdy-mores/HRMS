@@ -277,4 +277,35 @@ class Admin extends User
     public function approvedMainSalaryEmployeeDeductions(){
         return $this->hasMany(MainSalaryEmployeeDeduction::class, 'approved_by');
     }
+    public function addedMainSalaryEmployeeAllowances(){
+        return $this->hasMany(MainSalaryEmployeeAllowance::class, 'added_by');
+    }
+    public function updatedMainSalaryEmployeeAllowances(){
+        return $this->hasMany(MainSalaryEmployeeAllowance::class, 'updated_by');
+    }
+    public function archivedMainSalaryEmployeeAllowances(){
+        return $this->hasMany(MainSalaryEmployeeAllowance::class, 'archived_by');
+    }
+        public function addedMainSalaryEmployeeAbsences(){
+        return $this->hasMany(MainSalaryEmployeeAbsence::class, 'added_by');
+    }
+    public function updatedMainSalaryEmployeeAbsences(){
+        return $this->hasMany(MainSalaryEmployeeAbsence::class, 'updated_by');
+    }
+    public function addedMainSalaryEmployeeDeductionTypes()
+    {
+        return $this->hasMany(MainSalaryEmployeeDeductionType::class, 'added_by');
+    }
+
+    public function updatedMainSalaryEmployeeDeductionTypes()
+    {
+        return $this->hasMany(MainSalaryEmployeeDeductionType::class, 'updated_by');
+    }
+
+    public function archivedMainSalaryEmployeeDeductionTypes()
+    {
+        return $this->hasMany(MainSalaryEmployeeDeductionType::class, 'archived_by');
+    }
+
+
 }

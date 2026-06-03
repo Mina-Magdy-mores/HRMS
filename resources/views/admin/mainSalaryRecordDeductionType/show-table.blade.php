@@ -7,12 +7,12 @@
                 <div class="col-md-8">
                     <h5 class="mb-0 text-dark font-weight-bold">
                         <i class="fas fa-calendar-alt text-info mr-2"></i>
-                        بدلات شهر: <span class="text-primary">{{ $financeMonthlyCalendar->month->name }}</span>
+                        خصومات شهر: <span class="text-primary">{{ $financeMonthlyCalendar->month->name }}</span>
                         للسنة المالية <span class="text-primary">{{ $financeMonthlyCalendar->finance_yr }}</span>
                     </h5>
                 </div>
                 <div class="col-md-4 text-right">
-                    <a href="{{ route('admin.main-salary-employee-allowances.index') }}"
+                    <a href="{{ route('admin.main-salary-employee-deduction-types.index') }}"
                         class="btn btn-outline-secondary btn-sm">
                         <i class="fas fa-arrow-left mr-1"></i> العودة لقائمة الشهور
                     </a>
@@ -30,22 +30,8 @@
                     <i class="fas fa-hand-holding-usd text-white"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">إجمالي عدد البدلات</span>
-                    <span class="info-box-number">{{ $mainSalaryEmployeeAllowances2->count() }}</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-3 col-md-6 col-12">
-            <div class="info-box shadow-sm">
-                <span class="info-box-icon bg-danger">
-                    <i class="fas fa-archive text-white"></i>
-                </span>
-                <div class="info-box-content">
-                    <span class="info-box-text">البدلات المؤرشفة</span>
-                    <span class="info-box-number">
-                        {{ $mainSalaryEmployeeAllowances2->where('is_archived', 1)->count() }}
-                    </span>
+                    <span class="info-box-text">إجمالي عدد الخصومات</span>
+                    <span class="info-box-number">{{ $mainSalaryEmployeeDeductionTypes2->count() }}</span>
                 </div>
             </div>
         </div>
@@ -56,9 +42,23 @@
                     <i class="fas fa-archive text-white"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">البدلات الغير مؤرشفة</span>
+                    <span class="info-box-text">الخصومات المؤرشفة</span>
                     <span class="info-box-number">
-                        {{ $mainSalaryEmployeeAllowances2->where('is_archived', 0)->count() }}
+                        {{ $mainSalaryEmployeeDeductionTypes2->where('is_archived', 1)->count() }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 col-12">
+            <div class="info-box shadow-sm">
+                <span class="info-box-icon bg-danger">
+                    <i class="fas fa-archive text-white"></i>
+                </span>
+                <div class="info-box-content">
+                    <span class="info-box-text">الخصومات الغير مؤرشفة</span>
+                    <span class="info-box-number">
+                        {{ $mainSalaryEmployeeDeductionTypes2->where('is_archived', 0)->count() }}
                     </span>
                 </div>
             </div>
@@ -70,9 +70,9 @@
                     <i class="fas fa-calculator text-white"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">إجمالي مبالغ البدلات</span>
+                    <span class="info-box-text">إجمالي مبالغ الخصومات</span>
                     <span class="info-box-number text-info font-weight-bold">
-                        {{ number_format($mainSalaryEmployeeAllowances2->sum('amount'), 2) }}
+                        {{ number_format($mainSalaryEmployeeDeductionTypes2->sum('amount'), 2) }}
                         <small>ج.م</small>
                     </span>
                 </div>
@@ -87,16 +87,16 @@
         <div class="card-header">
             <h3 class="card-title text-primary font-weight-bold">
                 <i class="fas fa-list mr-2"></i>
-                سجل بدلات الموظفين المفصل للشهر
+                سجل خصومات الموظفين المفصل للشهر
             </h3>
             <div class="card-tools">
 
                 @if ($financeMonthlyCalendar->status == 1)
                     <button type="button" class="btn btn-primary btn-sm shadow-sm" data-toggle="modal"
-                        data-target="#addMainSalaryRecordAllowanceModal">
+                        data-target="#addMainSalaryRecordDeductionTypeModal">
 
                         <i class="fas fa-list-plus"></i>
-                        إضافة بدل جديد
+                        إضافة خصم جديد
                     </button>
                 @endif
 
@@ -124,7 +124,7 @@
                     </button>
                 </div>
             @endif
-            <form action="{{ route('admin.main-salary-employee-allowances.print-search') }}" method="POST"
+            <form action="{{ route('admin.main-salary-employee-deduction-types.print-search') }}" method="POST"
                 target="_blank">
                 @csrf
                 <input type="hidden" name="finance_monthly_calendar_id_search"
@@ -149,10 +149,10 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label>نوع البدل</label>
-                            <select name="allowance_type_search" id="allowance_type_search" class="form-control select2">
-                                <option value="">اختر نوع البدل</option>
-                                @foreach ($allowanceTypes as $type)
+                            <label>نوع الخصم</label>
+                            <select name="deduction_type_search" id="deduction_type_search" class="form-control select2">
+                                <option value="">اختر نوع الخصم</option>
+                                @foreach ($deductionTypes as $type)
                                     <option value="{{ $type->id }}">{{ $type->name }}</option>
                                 @endforeach
                             </select>
@@ -187,7 +187,7 @@
                                 <th style="width: 50px;">#</th>
                                 <th>كود الموظف</th>
                                 <th>الموظف</th>
-                                <th>نوع البدل</th>
+                                <th>نوع الخصم</th>
                                 <th>المبلغ</th>
                                 <th>الإضافة</th>
                                 <th>تاريخ الإضافة</th>
@@ -199,28 +199,28 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($mainSalaryEmployeeAllowances as $allowance)
+                            @forelse ($mainSalaryEmployeeDeductionTypes as $deduction)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
                                     <td>
                                         <span class="badge badge-secondary font-weight-normal px-2 py-1">
-                                            {{ $allowance->employee->employee_code ?? '---' }}
+                                            {{ $deduction->employee->employee_code ?? '---' }}
                                         </span>
                                     </td>
                                     <td class=" font-weight-bold">
-                                        {{ $allowance->employee->name ?? '---' }}
+                                        {{ $deduction->employee->name ?? '---' }}
                                     </td>
                                     <td>
                                         <span class="badge badge-info px-2 py-1">
                                             <i class="fas fa-tag mr-1"></i>
-                                            {{ optional($allowance->allowanceType)->name ?? '---' }}
+                                            {{ optional($deduction->deductionType)->name ?? '---' }}
                                         </span>
                                     </td>
-                                    <td class="text-success font-weight-bold">
-                                        {{ number_format($allowance->amount, 2) }} ج.م
+                                    <td class="text-danger font-weight-bold">
+                                        {{ number_format($deduction->amount, 2) }} ج.م
                                     </td>
                                     <td>
-                                        @if ($allowance->is_auto == 1)
+                                        @if ($deduction->is_auto == 1)
                                             <span class="badge badge-info px-2 py-1">
                                                 <i class="fas fa-robot mr-1"></i> تلقائي
                                             </span>
@@ -232,23 +232,23 @@
                                     </td>
                                     <td>
                                         <span class="small text-muted d-block"
-                                            title="أضيف بواسطة: {{ optional($allowance->addedBy)->name ?? '---' }} في {{ $allowance->created_at }}">
-                                            {{ $allowance->created_at ? $allowance->created_at->format('Y-m-d') : '---' }}
+                                            title="أضيف بواسطة: {{ optional($deduction->addedBy)->name ?? '---' }} في {{ $deduction->created_at }}">
+                                            {{ $deduction->created_at ? $deduction->created_at->format('Y-m-d') : '---' }}
                                         </span>
                                         <span class="small text-muted d-block font-italic"
-                                            title="أضيف بواسطة: {{ optional($allowance->addedBy)->name ?? '---' }} في {{ $allowance->created_at }}">
-                                            {{ $allowance->created_at ? $allowance->created_at->format('h:i A') : '' }}
+                                            title="أضيف بواسطة: {{ optional($deduction->addedBy)->name ?? '---' }} في {{ $deduction->created_at }}">
+                                            {{ $deduction->created_at ? $deduction->created_at->format('h:i A') : '' }}
                                         </span>
                                     </td>
                                     <td>
-                                        @if ($allowance->updated_at)
+                                        @if ($deduction->updated_at)
                                             <span class="small text-muted d-block"
-                                                title="عدل بواسطة: {{ optional($allowance->updatedBy)->name ?? '---' }} في {{ $allowance->updated_at }}">
-                                                {{ $allowance->updated_at->format('Y-m-d') }}
+                                                title="عدل بواسطة: {{ optional($deduction->updatedBy)->name ?? '---' }} في {{ $deduction->updated_at }}">
+                                                {{ $deduction->updated_at->format('Y-m-d') }}
                                             </span>
                                             <span class="small text-muted d-block font-italic"
-                                                title="عدل بواسطة: {{ optional($allowance->updatedBy)->name ?? '---' }} في {{ $allowance->updated_at }}">
-                                                {{ $allowance->updated_at->format('h:i A') }}
+                                                title="عدل بواسطة: {{ optional($deduction->updatedBy)->name ?? '---' }} في {{ $deduction->updated_at }}">
+                                                {{ $deduction->updated_at->format('h:i A') }}
                                             </span>
                                         @else
                                             <span class="small text-secondary">لا يوجد تعديل</span>
@@ -256,17 +256,17 @@
                                     </td>
                                     <td>
                                         <span class="badge badge-light border text-secondary px-2 py-1">
-                                            {{ optional($allowance->addedBy)->name ?? '---' }}
+                                            {{ optional($deduction->addedBy)->name ?? '---' }}
                                         </span>
                                     </td>
                                     <td style="max-width: 100px;">
                                         <span class="small font-italic text-secondary d-inline-block text-truncate"
-                                            style="max-width: 60px;" title="{{ $allowance->notes }}">
-                                            {{ $allowance->notes ?? '---' }}
+                                            style="max-width: 60px;" title="{{ $deduction->notes }}">
+                                            {{ $deduction->notes ?? '---' }}
                                         </span>
                                     </td>
                                     <td>
-                                        @if ($allowance->is_archived == 1)
+                                        @if ($deduction->is_archived == 1)
                                             <span class="badge badge-danger px-3 py-2">
                                                 <i class="fas fa-times-circle"></i>
                                                 مؤرشف</span>
@@ -277,14 +277,14 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <button class="btn btn-danger btn-sm delete-allowance"
-                                            id="delete-allowance-btn" data-id="{{ $allowance->id }}"
-                                            data-main-salary-employee-id="{{ $allowance->main_salary_employee_id }}">
+                                        <button class="btn btn-danger btn-sm delete-deduction"
+                                            id="delete-deduction-btn" data-id="{{ $deduction->id }}"
+                                            data-main-salary-employee-id="{{ $deduction->main_salary_employee_id }}">
                                             <i class="fas fa-trash mr-1"></i> حذف
                                         </button>
-                                        <button class="btn btn-warning btn-sm edit-allowance" id="edit-allowance-btn"
-                                            data-main-salary-employee-id="{{ $allowance->main_salary_employee_id }}"
-                                            data-id="{{ $allowance->id }}">
+                                        <button class="btn btn-warning btn-sm edit-deduction" id="edit-deduction-btn"
+                                            data-main-salary-employee-id="{{ $deduction->main_salary_employee_id }}"
+                                            data-id="{{ $deduction->id }}">
                                             <i class="fas fa-edit mr-1"></i> تعديل
                                         </button>
                                     </td>
@@ -294,7 +294,7 @@
                                     <td colspan="12">
                                         <div class="alert alert-warning mb-0 text-center py-3">
                                             <i class="fas fa-exclamation-triangle fa-2x mb-2 d-block"></i>
-                                            لا توجد سجلات بدلات للموظفين في هذا الشهر المالي حالياً.
+                                            لا توجد سجلات خصومات للموظفين في هذا الشهر المالي حالياً.
                                         </div>
                                     </td>
                                 </tr>
@@ -304,7 +304,7 @@
                 </div>
                 {{-- Pagination --}}
                 <div class="mt-3">
-                    {{ $mainSalaryEmployeeAllowances->links() }}
+                    {{ $mainSalaryEmployeeDeductionTypes->links() }}
                 </div>
             </div>
 
@@ -317,7 +317,7 @@
 
 
 <!-- Add Modal -->
-<div class="modal fade " id="addMainSalaryRecordAllowanceModal" tabindex="0" role="dialog" aria-hidden="true">
+<div class="modal fade " id="addMainSalaryRecordDeductionTypeModal" tabindex="0" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content shadow">
 
@@ -325,7 +325,7 @@
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title">
                     <i class="fas fa-hand-holding-usd"></i>
-                    إضافة بدلات شهرية جديدة
+                    إضافة خصم شهري جديد
                 </h5>
 
                 <button type="button" class="close text-white" data-dismiss="modal">
@@ -354,10 +354,10 @@
                     </div>
                     <div class="col-md-4 related_to_employee" style="display: none;">
                         <div class="form-group">
-                            <label>نوع البدل</label>
-                            <select name="allowance_type_id" id="allowance_type_id" class="form-control select2">
-                                <option value="">اختر نوع البدل</option>
-                                @foreach ($allowanceTypes as $type)
+                            <label>نوع الخصم</label>
+                            <select name="deduction_type_id" id="deduction_type_id" class="form-control select2">
+                                <option value="">اختر نوع الخصم</option>
+                                @foreach ($deductionTypes as $type)
                                     <option value="{{ $type->id }}">{{ $type->name }}</option>
                                 @endforeach
                             </select>
@@ -365,9 +365,9 @@
                     </div>
                     <div class="col-md-4 related_to_employee" style="display: none;">
                         <div class="form-group">
-                            <label>مبلغ البدل</label>
+                            <label>مبلغ الخصم</label>
                             <input type="number" name="amount" value="0" id="amount"
-                                class="form-control" placeholder="أدخل مبلغ البدل" step="0.01" min="0">
+                                class="form-control" placeholder="أدخل مبلغ الخصم" step="0.01" min="0">
                         </div>
                     </div>
                     <div class="col-md-12 related_to_employee" style="display: none;">
@@ -377,7 +377,7 @@
                         </div>
                     </div>
                     <div class="col-md-12">
-                        <button type="submit" class="btn btn-success shadow px-4" id="submit_add_allowance">
+                        <button type="submit" class="btn btn-success shadow px-4" id="submit_add_deduction">
                             <i class="fas fa-save"></i>
                             حفظ البيانات
                         </button>
@@ -390,7 +390,7 @@
     </div>
 </div>
 <!-- Edit Modal -->
-<div class="modal fade " id="editMainSalaryRecordAllowanceModal" tabindex="0" role="dialog" aria-hidden="true">
+<div class="modal fade " id="editMainSalaryRecordDeductionTypeModal" tabindex="0" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content shadow">
 
@@ -398,7 +398,7 @@
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title">
                     <i class="fas fa-hand-holding-usd"></i>
-                    تعديل بدل شهري
+                    تعديل خصم شهري
                 </h5>
 
                 <button type="button" class="close text-white" data-dismiss="modal">
@@ -419,10 +419,10 @@
                     </div>
                     <div class="col-md-4 edit_related_to_employee" style="display: none;">
                         <div class="form-group">
-                            <label>نوع البدل</label>
-                            <select name="allowance_type_id" id="edit_allowance_type_id" class="form-control select2">
-                                <option value="">اختر نوع البدل</option>
-                                @foreach ($allowanceTypes as $type)
+                            <label>نوع الخصم</label>
+                            <select name="deduction_type_id" id="edit_deduction_type_id" class="form-control select2">
+                                <option value="">اختر نوع الخصم</option>
+                                @foreach ($deductionTypes as $type)
                                     <option value="{{ $type->id }}">{{ $type->name }}</option>
                                 @endforeach
                             </select>
@@ -430,7 +430,7 @@
                     </div>
                     <div class="col-md-4 edit_related_to_employee" style="display: none;">
                         <div class="form-group">
-                            <label>مبلغ البدل</label>
+                            <label>مبلغ الخصم</label>
                             <input type="number" name="amount" value="0" id="edit_amount"
                                 class="form-control" step="0.01" min="0">
                         </div>
@@ -442,9 +442,9 @@
                         </div>
                     </div>
                     <div class="col-md-12">
-                        <input type="hidden" id="edit_allowance_id" name="id">
+                        <input type="hidden" id="edit_deduction_id" name="id">
                         <input type="hidden" id="edit_main_salary_employee_id" name="main_salary_employee_id">
-                        <button type="submit" class="btn btn-success shadow px-4" id="submit_edit_allowance">
+                        <button type="submit" class="btn btn-success shadow px-4" id="submit_edit_deduction">
                             <i class="fas fa-save"></i>
                             حفظ البيانات
                         </button>
@@ -477,7 +477,7 @@
                 }
             });
 
-            $(document).on('click', '#submit_add_allowance', function(e) {
+            $(document).on('click', '#submit_add_deduction', function(e) {
                 var employee_id = $('#employee_id').val();
                 if (employee_id == '') {
                     $('#employee_id').addClass('is-invalid');
@@ -486,29 +486,29 @@
                 } else {
                     $('#employee_id').removeClass('is-invalid');
                 }
-                var allowance_type_id = $('#allowance_type_id').val();
-                if (allowance_type_id == '') {
-                    $('#allowance_type_id').addClass('is-invalid');
-                    alert('اختر نوع البدل');
+                var deduction_type_id = $('#deduction_type_id').val();
+                if (deduction_type_id == '') {
+                    $('#deduction_type_id').addClass('is-invalid');
+                    alert('اختر نوع الخصم');
                     return false;
                 } else {
-                    $('#allowance_type_id').removeClass('is-invalid');
+                    $('#deduction_type_id').removeClass('is-invalid');
                 }
                 $.ajax({
-                    url: "{{ route('admin.main-salary-employee-allowances.ajax-check') }}",
+                    url: "{{ route('admin.main-salary-employee-deduction-types.ajax-check') }}",
                     dataType: "json",
                     cache: false,
                     method: "POST",
                     data: {
                         finance_monthly_calendar_id: {{ $financeMonthlyCalendar->id }},
                         employee_id: employee_id,
-                        allowance_type_id: allowance_type_id,
+                        deduction_type_id: deduction_type_id,
                         _token: "{{ csrf_token() }}"
                     },
                     success: function(response) {
                         if (response.status == 'true') {
                             var res = confirm(' يوجد عدد  ' + response.count +
-                                '  بدلات لنفس الموظف ونفس الشهر ونفس النوع هل تريد الاضافة');
+                                '  خصومات لنفس الموظف ونفس الشهر ونفس النوع هل تريد الاضافة');
                             if (res == true) {
                                 var flag = true;
                             } else {
@@ -519,14 +519,14 @@
                         }
                         if (flag) {
                             $.ajax({
-                                url: "{{ route('admin.main-salary-employee-allowances.store') }}",
+                                url: "{{ route('admin.main-salary-employee-deduction-types.store') }}",
                                 dataType: "json",
                                 cache: false,
                                 method: "POST",
                                 data: {
                                     finance_monthly_calendar_id: {{ $financeMonthlyCalendar->id }},
                                     employee_id: employee_id,
-                                    allowance_type_id: allowance_type_id,
+                                    deduction_type_id: deduction_type_id,
                                     amount: $('#amount').val(),
                                     notes: $('#notes').val(),
                                     _token: "{{ csrf_token() }}"
@@ -534,7 +534,7 @@
                                 success: function(response) {
                                     if (response.status == 'true') {
                                         alert(response.message);
-                                        $('#addMainSalaryRecordAllowanceModal')
+                                        $('#addMainSalaryRecordDeductionTypeModal')
                                             .modal('hide');
                                         window.location.reload();
                                     } else {
@@ -556,7 +556,7 @@
             $(document).on('change', '#employee_id_search', function() {
                 ajax_search();
             });
-            $(document).on('change', '#allowance_type_search', function() {
+            $(document).on('change', '#deduction_type_search', function() {
                 ajax_search();
             });
             $(document).on('change', '#is_archived_search', function() {
@@ -565,10 +565,10 @@
 
             function ajax_search() {
                 var employee_id_search    = $('#employee_id_search').val();
-                var allowance_type_search = $('#allowance_type_search').val();
+                var deduction_type_search = $('#deduction_type_search').val();
                 var is_archived_search    = $('#is_archived_search').val();
                 $.ajax({
-                    url: '{{ route('admin.main-salary-employee-allowances.ajax-search') }}',
+                    url: '{{ route('admin.main-salary-employee-deduction-types.ajax-search') }}',
                     type: 'POST',
                     dataType: 'html',
                     cache: false,
@@ -576,11 +576,11 @@
                         _token: '{{ csrf_token() }}',
                         finance_monthly_calendar_id: {{ $financeMonthlyCalendar->id }},
                         employee_id_search: employee_id_search,
-                        allowance_type_search: allowance_type_search,
+                        deduction_type_search: deduction_type_search,
                         is_archived_search: is_archived_search
                     },
-                    success: function(mainSalaryEmployeeAllowances) {
-                        $('#ajax_responce_search').html(mainSalaryEmployeeAllowances);
+                    success: function(mainSalaryEmployeeDeductionTypes) {
+                        $('#ajax_responce_search').html(mainSalaryEmployeeDeductionTypes);
                     },
                     error: function(xhr) {}
                 });
@@ -589,7 +589,7 @@
             $(document).on('click', '#ajax-pagination a', function(e) {
                 e.preventDefault();
                 var employee_id_search    = $('#employee_id_search').val();
-                var allowance_type_search = $('#allowance_type_search').val();
+                var deduction_type_search = $('#deduction_type_search').val();
                 var is_archived_search    = $('#is_archived_search').val();
                 var url = $(this).attr('href');
                 $.ajax({
@@ -601,23 +601,23 @@
                         _token: '{{ csrf_token() }}',
                         finance_monthly_calendar_id: {{ $financeMonthlyCalendar->id }},
                         employee_id_search: employee_id_search,
-                        allowance_type_search: allowance_type_search,
+                        deduction_type_search: deduction_type_search,
                         is_archived_search: is_archived_search
                     },
-                    success: function(mainSalaryEmployeeAllowances) {
-                        $('#ajax_responce_search').html(mainSalaryEmployeeAllowances);
+                    success: function(mainSalaryEmployeeDeductionTypes) {
+                        $('#ajax_responce_search').html(mainSalaryEmployeeDeductionTypes);
                     },
                     error: function(xhr) {}
                 });
             });
 
-            $(document).on('click', '#delete-allowance-btn', function() {
+            $(document).on('click', '#delete-deduction-btn', function() {
                 var id = $(this).data('id');
                 var main_salary_employee_id = $(this).data('main-salary-employee-id');
-                var res = confirm('هل انت متاكد من حذف هذا البدل');
+                var res = confirm('هل انت متاكد من حذف هذا الخصم');
                 if (res == true) {
                     $.ajax({
-                        url: "{{ route('admin.main-salary-employee-allowances.destroy') }}",
+                        url: "{{ route('admin.main-salary-employee-deduction-types.destroy') }}",
                         type: 'POST',
                         dataType: 'json',
                         cache: false,
@@ -645,11 +645,11 @@
                 }
             });
 
-            $(document).on('click', '.edit-allowance', function() {
+            $(document).on('click', '.edit-deduction', function() {
                 var id = $(this).data('id');
                 var main_salary_employee_id = $(this).data('main-salary-employee-id');
                 $.ajax({
-                    url: "{{ route('admin.main-salary-employee-allowances.edit') }}",
+                    url: "{{ route('admin.main-salary-employee-deduction-types.edit') }}",
                     type: 'POST',
                     dataType: 'json',
                     data: {
@@ -661,12 +661,12 @@
                     cache: false,
                     success: function(response) {
                         if (response.status == 'true') {
-                            var allowance = response.mainSalaryEmployeeAllowance;
-                            var employee  = allowance.employee;
-                            var modal     = $('#editMainSalaryRecordAllowanceModal');
+                            var deduction = response.mainSalaryEmployeeDeductionType;
+                            var employee  = deduction.employee;
+                            var modal     = $('#editMainSalaryRecordDeductionTypeModal');
 
-                            modal.find("#edit_allowance_id").val(allowance.id);
-                            modal.find("#edit_main_salary_employee_id").val(allowance.main_salary_employee_id);
+                            modal.find("#edit_deduction_id").val(deduction.id);
+                            modal.find("#edit_main_salary_employee_id").val(deduction.main_salary_employee_id);
 
                             modal.find("#edit_employee_id").html(`
                                 <option value="${employee.id}" selected>
@@ -674,9 +674,9 @@
                                 </option>
                             `);
 
-                            modal.find("#edit_allowance_type_id").val(allowance.allowance_type_id).trigger('change');
-                            modal.find("#edit_amount").val(allowance.amount);
-                            modal.find("#edit_notes").val(allowance.notes);
+                            modal.find("#edit_deduction_type_id").val(deduction.deduction_type_id).trigger('change');
+                            modal.find("#edit_amount").val(deduction.amount);
+                            modal.find("#edit_notes").val(deduction.notes);
 
                             modal.find(".edit_related_to_employee").show();
                             modal.modal('show');
@@ -691,22 +691,22 @@
             });
 
             // Submit Edit Form via AJAX
-            $(document).on('click', '#submit_edit_allowance', function(e) {
-                var id                      = $('#edit_allowance_id').val();
-                var allowance_type_id       = $('#edit_allowance_type_id').val();
-                if (allowance_type_id == '') {
-                    $('#edit_allowance_type_id').addClass('is-invalid');
-                    alert('اختر نوع البدل');
+            $(document).on('click', '#submit_edit_deduction', function(e) {
+                var id                      = $('#edit_deduction_id').val();
+                var deduction_type_id       = $('#edit_deduction_type_id').val();
+                if (deduction_type_id == '') {
+                    $('#edit_deduction_type_id').addClass('is-invalid');
+                    alert('اختر نوع الخصم');
                     return false;
                 } else {
-                    $('#edit_allowance_type_id').removeClass('is-invalid');
+                    $('#edit_deduction_type_id').removeClass('is-invalid');
                 }
                 var amount                  = $('#edit_amount').val();
                 var notes                   = $('#edit_notes').val();
                 var finance_monthly_calendar_id = {{ $financeMonthlyCalendar->id }};
                 var main_salary_employee_id = $('#edit_main_salary_employee_id').val();
                 $.ajax({
-                    url: "{{ route('admin.main-salary-employee-allowances.update') }}",
+                    url: "{{ route('admin.main-salary-employee-deduction-types.update') }}",
                     type: 'POST',
                     dataType: 'json',
                     cache: false,
@@ -714,7 +714,7 @@
                         _token: '{{ csrf_token() }}',
                         _method: 'PUT',
                         id: id,
-                        allowance_type_id: allowance_type_id,
+                        deduction_type_id: deduction_type_id,
                         amount: amount,
                         notes: notes,
                         finance_monthly_calendar_id: finance_monthly_calendar_id,
@@ -723,7 +723,7 @@
                     success: function(response) {
                         if (response.status == 'true') {
                             alert(response.message);
-                            $('#editMainSalaryRecordAllowanceModal').modal('hide');
+                            $('#editMainSalaryRecordDeductionTypeModal').modal('hide');
                             ajax_search();
                         } else {
                             alert(response.message || 'عفوا، حدث خطأ أثناء الحفظ.');

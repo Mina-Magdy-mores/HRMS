@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Model;
+
 #[Guarded([])]
 class AllowanceType extends Model
 {
-        public function addedBy()
+
+
+    public function addedBy()
     {
         return $this->belongsTo(Admin::class, 'added_by');
     }
@@ -15,5 +18,9 @@ class AllowanceType extends Model
     public function updatedBy()
     {
         return $this->belongsTo(Admin::class, 'updated_by');
+    }
+    public function mainSalaryEmployeeAllowances()
+    {
+        return $this->hasMany(MainSalaryEmployeeAllowance::class);
     }
 }

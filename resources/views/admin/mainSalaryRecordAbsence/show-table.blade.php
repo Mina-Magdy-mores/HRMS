@@ -35,16 +35,15 @@
                 </div>
             </div>
         </div>
-
         <div class="col-lg-3 col-md-6 col-12">
             <div class="info-box shadow-sm">
                 <span class="info-box-icon bg-success">
-                    <i class="fas fa-check-circle text-white"></i>
+                    <i class="fas fa-archive text-white"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">الغياب المعتمدة</span>
+                    <span class="info-box-text">الغياب غير المؤرشفة</span>
                     <span class="info-box-number">
-                        {{ $mainSalaryEmployeeAbsences2->where('is_approved', 1)->count() }}
+                        {{ $mainSalaryEmployeeAbsences2->where('is_archived', 0)->count() }}
                     </span>
                 </div>
             </div>
@@ -52,13 +51,13 @@
 
         <div class="col-lg-3 col-md-6 col-12">
             <div class="info-box shadow-sm">
-                <span class="info-box-icon bg-warning">
-                    <i class="fas fa-clock text-white"></i>
+                <span class="info-box-icon bg-danger">
+                    <i class="fas fa-archive text-white"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">بانتظار الاعتماد</span>
+                    <span class="info-box-text">الغياب المؤرشفة</span>
                     <span class="info-box-number">
-                        {{ $mainSalaryEmployeeAbsences2->where('is_approved', 0)->count() }}
+                        {{ $mainSalaryEmployeeAbsences2->where('is_archived', 1)->count() }}
                     </span>
                 </div>
             </div>

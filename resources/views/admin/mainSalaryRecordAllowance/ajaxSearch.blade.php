@@ -94,7 +94,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <button class="btn btn-danger btn-sm delete-allowance"
+                                        <button class="btn btn-danger btn-sm delete-allowance" id="delete-allowance-btn"
                                             data-main-salary-employee-id="{{ $allowance->main_salary_employee_id }}"
                                             data-id="{{ $allowance->id }}">
                                             <i class="fas fa-trash mr-1"></i> حذف

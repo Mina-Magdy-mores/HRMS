@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\JobsCategoryController;
 use App\Http\Controllers\Admin\MainSalaryEmployeeAbsenceController;
 use App\Http\Controllers\Admin\MainSalaryEmployeeAllowanceController;
 use App\Http\Controllers\Admin\MainSalaryEmployeeDeductionController;
+use App\Http\Controllers\Admin\MainSalaryEmployeeDeductionTypeController;
 use App\Http\Controllers\Admin\MainSalaryRecordController;
 use App\Http\Controllers\Admin\NationalityController;
 use App\Http\Controllers\Admin\OccasionController;
@@ -234,6 +235,17 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/main-salary-employee-allowances/edit', [MainSalaryEmployeeAllowanceController::class, 'edit'])->name('main-salary-employee-allowances.edit');
         Route::put('/main-salary-employee-allowances', [MainSalaryEmployeeAllowanceController::class, 'update'])->name('main-salary-employee-allowances.update');
         Route::post('/main-salary-employee-allowances/print-search', [MainSalaryEmployeeAllowanceController::class, 'printSearch'])->name('main-salary-employee-allowances.print-search');
+        
+        // MainSalaryEmployeeDeductionType routes
+        Route::get('/main-salary-employee-deduction-types', [MainSalaryEmployeeDeductionTypeController::class, 'index'])->name('main-salary-employee-deduction-types.index');
+        Route::get('/main-salary-employee-deduction-types/{id}/show', [MainSalaryEmployeeDeductionTypeController::class, 'show'])->name('main-salary-employee-deduction-types.show');
+        Route::post('/main-salary-employee-deduction-types/ajax-check', [MainSalaryEmployeeDeductionTypeController::class, 'ajaxCheck'])->name('main-salary-employee-deduction-types.ajax-check');
+        Route::post('/main-salary-employee-deduction-types/store', [MainSalaryEmployeeDeductionTypeController::class, 'store'])->name('main-salary-employee-deduction-types.store');
+        Route::post('/main-salary-employee-deduction-types/ajax-search', [MainSalaryEmployeeDeductionTypeController::class, 'ajaxSearch'])->name('main-salary-employee-deduction-types.ajax-search');
+        Route::post('/main-salary-employee-deduction-types/destroy', [MainSalaryEmployeeDeductionTypeController::class, 'destroy'])->name('main-salary-employee-deduction-types.destroy');
+        Route::post('/main-salary-employee-deduction-types/edit', [MainSalaryEmployeeDeductionTypeController::class, 'edit'])->name('main-salary-employee-deduction-types.edit');
+        Route::put('/main-salary-employee-deduction-types', [MainSalaryEmployeeDeductionTypeController::class, 'update'])->name('main-salary-employee-deduction-types.update');
+        Route::post('/main-salary-employee-deduction-types/print-search', [MainSalaryEmployeeDeductionTypeController::class, 'printSearch'])->name('main-salary-employee-deduction-types.print-search');
     });
 
     // guest routes
