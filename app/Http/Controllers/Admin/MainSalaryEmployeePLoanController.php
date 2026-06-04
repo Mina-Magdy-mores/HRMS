@@ -249,7 +249,8 @@ class MainSalaryEmployeePLoanController extends Controller
             'addedBy',
             'updatedBy',
             'archivedBy',
-            'disbursedBy'
+            'disbursedBy',
+            'mainSalaryEmployeePLoanInstallments'
         ])
             ->where('company_id', $company_id)
             ->where($where)
