@@ -342,8 +342,34 @@ class Admin extends User
     {
         return $this->hasMany(MainSalaryEmployeeAddition::class, 'archived_by');
     }
-    
-
+    public function addedMainSalaryEmployeePLoans()
+    {
+        return $this->hasMany(MainSalaryEmployeePLoan::class, 'added_by');
+    }
+    public function updatedMainSalaryEmployeePLoans()
+    {
+        return $this->hasMany(MainSalaryEmployeePLoan::class, 'updated_by');
+    }
+    public function archivedMainSalaryEmployeePLoans()
+    {
+        return $this->hasMany(MainSalaryEmployeePLoan::class, 'archived_by');
+    }
+    public function disbursedMainSalaryEmployeePLoans()
+    {
+        return $this->hasMany(MainSalaryEmployeePLoan::class, 'disbursed_by');
+    }
+    public function addedMainSalaryEmployeePLoanInstallments()
+    {
+        return $this->hasMany(MainSalaryEmployeePLoanInstallment::class, 'added_by');
+    }
+    public function updatedMainSalaryEmployeePLoanInstallments()
+    {
+        return $this->hasMany(MainSalaryEmployeePLoanInstallment::class, 'updated_by');
+    }
+    public function archivedMainSalaryEmployeePLoanInstallments()
+    {
+        return $this->hasMany(MainSalaryEmployeePLoanInstallment::class, 'archived_by');
+    }
 
 
 }

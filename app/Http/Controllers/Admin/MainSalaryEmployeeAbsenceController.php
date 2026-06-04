@@ -114,7 +114,6 @@ class MainSalaryEmployeeAbsenceController extends Controller
             'financeMonthlyCalendar',
             'addedBy',
             'updatedBy',
-            'approvedBy',
         ])
             ->where('company_id', $company_id)
             ->where('finance_monthly_calendar_id', $id)
@@ -325,7 +324,6 @@ class MainSalaryEmployeeAbsenceController extends Controller
             'financeMonthlyCalendar',
             'addedBy',
             'updatedBy',
-            'approvedBy',
         ])
             ->where('company_id', $company_id)
             ->where('finance_monthly_calendar_id', $finance_monthly_calendar_id)

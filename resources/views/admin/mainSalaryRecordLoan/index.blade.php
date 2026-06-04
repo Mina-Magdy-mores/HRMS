@@ -16,3 +16,5 @@
 @include('admin.mainSalaryRecordLoan.table', ['financeMonthlyCalendars' => $financeMonthlyCalendars])
 
 @endsection
+
+

@@ -118,6 +118,10 @@ class Employee extends Model
     {
         return $this->hasMany(MainSalaryEmployeeAllowance::class, 'employee_id');
     }
+    public function mainSalaryEmployeePLoans()
+    {
+        return $this->hasMany(MainSalaryEmployeePLoan::class, 'employee_id');
+    }
     
 
 }

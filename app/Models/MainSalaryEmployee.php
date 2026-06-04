@@ -70,4 +70,8 @@ class MainSalaryEmployee extends Model
     {
         return $this->hasMany(MainSalaryEmployeeAllowance::class, 'main_salary_employee_id');
     }
+    public function mainSalaryEmployeePLoanInstallments()
+    {
+        return $this->hasMany(MainSalaryEmployeePLoanInstallment::class, 'main_salary_employee_id');
+    }
 }

@@ -11,21 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('main_salary_employee_p_loans', function (Blueprint $table) {
+        Schema::create('main_salary_employee_p_loan_installments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id')->constrained('employees')->cascadeOnUpdate();
-            $table->decimal('employee_basic_salary', 10, 2)->comment('employee basic salary for this loan');
+            $table->foreignId('main_salary_employee_p_loan_id');
+            $table->foreign('main_salary_employee_p_loan_id', 'fk_loan_installment_loan')
+                ->references('id')->on('main_salary_employee_p_loans')->cascadeOnUpdate();
+            $table->foreignId('main_salary_employee_id')->nullable();
+            $table->foreign('main_salary_employee_id', 'fk_loan_installment_employee')
+                ->references('id')->on('main_salary_employees')->cascadeOnUpdate();
             $table->decimal('amount', 10, 2)->comment('loan amount');
-            $table->unsignedInteger('number_of_installment_months')->comment('number of installments for loan');
             $table->decimal('installment_amount_monthly', 10, 2)->comment('amount of each installment monthly');
             $table->string('next_installment_year_and_month')->comment('year and month of next installment');
-            $table->date('next_installment_date')->comment('date of next installment');
-            $table->decimal('paid_amount', 10, 2)->default(0)->comment('paid amount for loan');
-            $table->decimal('remaining_amount', 10, 2)->default(0)->comment('remaining amount for loan');
+            $table->enum('installment_status', ['1', '0', '2'])->default('0')->comment('0 is pending for installment,1 is paid for installment on salary,2 is paid for installment cash');
             $table->integer('is_archived')->default(0)->nullable();
-            $table->integer('is_disbursed')->default(0)->nullable()->comment('is loan disbursed');
-            $table->foreignId('disbursed_by')->nullable()->constrained('admins')->cascadeOnUpdate();
-            $table->dateTime('disbursed_at')->nullable();
             $table->foreignId('archived_by')->nullable()->constrained('admins')->cascadeOnUpdate();
             $table->dateTime('archived_at')->nullable();
             $table->integer('company_id');
@@ -41,6 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('main_salary_employee_p_loans');
+        Schema::dropIfExists('main_salary_employee_p_loan_installments');
     }
 };

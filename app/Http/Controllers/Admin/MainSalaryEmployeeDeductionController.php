@@ -116,7 +116,6 @@ class MainSalaryEmployeeDeductionController extends Controller
             'financeMonthlyCalendar',
             'addedBy',
             'updatedBy',
-            'approvedBy',
         ])
             ->where('company_id', $company_id)
             ->where('finance_monthly_calendar_id', $id)
@@ -351,7 +350,6 @@ class MainSalaryEmployeeDeductionController extends Controller
                 'financeMonthlyCalendar',
                 'addedBy',
                 'updatedBy',
-                'approvedBy',
             ])
                 ->where('company_id', $company_id)
                 ->where('finance_monthly_calendar_id', $finance_monthly_calendar_id)

@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\MainSalaryEmployeeDeductionController;
 use App\Http\Controllers\Admin\MainSalaryEmployeeDeductionTypeController;
 use App\Http\Controllers\Admin\MainSalaryEmployeeBonusController;
 use App\Http\Controllers\Admin\MainSalaryEmployeeLoanController;
+use App\Http\Controllers\Admin\MainSalaryEmployeePLoanController;
 use App\Http\Controllers\Admin\MainSalaryRecordController;
 use App\Http\Controllers\Admin\NationalityController;
 use App\Http\Controllers\Admin\OccasionController;
@@ -249,7 +250,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/main-salary-employee-allowances/edit', [MainSalaryEmployeeAllowanceController::class, 'edit'])->name('main-salary-employee-allowances.edit');
         Route::put('/main-salary-employee-allowances', [MainSalaryEmployeeAllowanceController::class, 'update'])->name('main-salary-employee-allowances.update');
         Route::post('/main-salary-employee-allowances/print-search', [MainSalaryEmployeeAllowanceController::class, 'printSearch'])->name('main-salary-employee-allowances.print-search');
-        
+
         // MainSalaryEmployeeDeductionType routes
         Route::get('/main-salary-employee-deduction-types', [MainSalaryEmployeeDeductionTypeController::class, 'index'])->name('main-salary-employee-deduction-types.index');
         Route::get('/main-salary-employee-deduction-types/{id}/show', [MainSalaryEmployeeDeductionTypeController::class, 'show'])->name('main-salary-employee-deduction-types.show');
@@ -273,7 +274,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/main-salary-employee-bonuses/print-search', [MainSalaryEmployeeBonusController::class, 'printSearch'])->name('main-salary-employee-bonuses.print-search');
 
         //loans routes
-           Route::get('/main-salary-employee-loans', [MainSalaryEmployeeLoanController::class, 'index'])->name('main-salary-employee-loans.index');
+        Route::get('/main-salary-employee-loans', [MainSalaryEmployeeLoanController::class, 'index'])->name('main-salary-employee-loans.index');
         Route::get('/main-salary-employee-loans/{id}/show', [MainSalaryEmployeeLoanController::class, 'show'])->name('main-salary-employee-loans.show');
         Route::post('/main-salary-employee-loans/ajax-check', [MainSalaryEmployeeLoanController::class, 'ajaxCheck'])->name('main-salary-employee-loans.ajax-check');
         Route::post('/main-salary-employee-loans/store', [MainSalaryEmployeeLoanController::class, 'store'])->name('main-salary-employee-loans.store');
@@ -282,6 +283,13 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/main-salary-employee-loans/edit', [MainSalaryEmployeeLoanController::class, 'edit'])->name('main-salary-employee-loans.edit');
         Route::put('/main-salary-employee-loans', [MainSalaryEmployeeLoanController::class, 'update'])->name('main-salary-employee-loans.update');
         Route::post('/main-salary-employee-loans/print-search', [MainSalaryEmployeeLoanController::class, 'printSearch'])->name('main-salary-employee-loans.print-search');
+
+        //MainSalaryEmployeePLoans Route
+        Route::get('/main-salary-employee-ploans', [MainSalaryEmployeePLoanController::class, 'index'])->name('main-salary-employee-ploans.index');
+        Route::post('/main-salary-employee-ploans/ajax-check', [MainSalaryEmployeePLoanController::class, 'ajaxCheck'])->name('main-salary-employee-ploans.ajax-check');
+        Route::post('/main-salary-employee-ploans/store', [MainSalaryEmployeePLoanController::class, 'store'])->name('main-salary-employee-ploans.store');
+        Route::post('/main-salary-employee-ploans/ajax-search', [MainSalaryEmployeePLoanController::class, 'ajaxSearch'])->name('main-salary-employee-ploans.ajax-search');
+        Route::post('/main-salary-employee-ploans/print-search', [MainSalaryEmployeePLoanController::class, 'printSearch'])->name('main-salary-employee-ploans.print-search');
     });
 
     // guest routes
