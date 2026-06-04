@@ -11,6 +11,10 @@ function getColsWhere($model = null, $with = [], $cols = [], $where = [], $order
 {
     return $model::with($with)->select($cols)->where($where)->orderBy($orderBy, $orderType)->first();
 }
+function getColsWhereget($model = null, $with = [], $cols = [], $where = [], $orderBy = 'id', $orderType = 'asc')
+{
+    return $model::with($with)->select($cols)->where($where)->orderBy($orderBy, $orderType)->get();
+}
 
 function uploadImage($folder, $image)
 {

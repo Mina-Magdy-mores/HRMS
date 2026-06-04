@@ -282,17 +282,18 @@
 
                                     <td>
                                         <div class="d-flex justify-content-center align-items-center gap-1">
-                                            <button class="btn btn-sm btn-info m-1" title="عرض الأقساط والتفاصيل">
+                                            <button class="btn btn-sm btn-info m-1 show_employee_loan_details_btn"
+                                                title="عرض الأقساط والتفاصيل" data-id="{{ $loan->id }}">
                                                 <i class="fas fa-eye"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-warning m-1" title="تعديل">
+                                            <button class="btn btn-sm btn-warning m-1 edit_employee_loan_btn"
+                                                title="تعديل" data-id="{{ $loan->id }}">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-danger m-1" title="حذف">
+                                            <button class="btn btn-sm btn-danger m-1 delete_employee_loan_btn"
+                                                title="حذف" data-id="{{ $loan->id }}">
                                                 <i class="fas fa-trash"></i>
                                             </button>
-
-
                                         </div>
                                     </td>
                                 </tr>
@@ -357,6 +358,7 @@
                             </select>
                         </div>
                     </div>
+
                     <div class="col-md-4 related_to_employee" style="display: none;">
                         <div class="form-group">
                             <label>الراتب</label>
@@ -440,7 +442,7 @@
             <!-- BODY -->
             <div class="modal-body" id="edit_months_modal_body">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-3">
                         <div class="form-group">
                             <label>بيانات الموظف</label>
                             <select name="employee_id" id="edit_employee_id" class="form-control" disabled>
@@ -448,14 +450,28 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-6 edit_related_to_employee" style="display: none;">
+                    <div class="col-md-3 edit_related_to_employee" style="display: none;">
+                        <div class="form-group">
+                            <label>الراتب</label>
+                            <input readonly type="number" name="salary" value="0.0" id="edit_salary"
+                                class="form-control" placeholder="أدخل الراتب">
+                        </div>
+                    </div>
+                    <div class="col-md-3 edit_related_to_employee" style="display: none;">
+                        <div class="form-group">
+                            <label>أجر اليوم</label>
+                            <input readonly type="number" name="payment_per_day" value="0.0"
+                                id="edit_payment_per_day" class="form-control" placeholder="أدخل أجر اليوم">
+                        </div>
+                    </div>
+                    <div class="col-md-3 edit_related_to_employee" style="display: none;">
                         <div class="form-group">
                             <label>إجمالى مبلغ السلفة</label>
                             <input type="number" name="amount" value="0" id="edit_amount"
                                 class="form-control" step="0.01" min="0">
                         </div>
                     </div>
-                    <div class="col-md-6 edit_related_to_employee" style="display: none;">
+                    <div class="col-md-3 edit_related_to_employee" style="display: none;">
                         <div class="form-group">
                             <label>عدد الأقساط</label>
                             <input type="number" name="number_of_installment_months" value="0"
@@ -463,254 +479,392 @@
                                 min="1">
                         </div>
                     </div>
+                    <div class="col-md-3 edit_related_to_employee" style="display: none;">
+                        <div class="form-group">
+                            <label>قسط الشهر</label>
+                            <input type="number" name="installment_amount_monthly" readonly
+                                id="edit_installment_amount_monthly" class="form-control"
+                                placeholder="أدخل قسط الشهر" min="0">
+                        </div>
+                    </div>
+                    <div class="col-md-3 edit_related_to_employee" style="display: none;">
+                        <div class="form-group">
+                            <label>تاريخ بدء خصم القسط</label>
+                            <input type="date" name="year_and_month_started"
+                                id="edit_year_and_month_started" class="form-control">
+                        </div>
+                    </div>
                     <div class="col-md-12 edit_related_to_employee" style="display: none;">
                         <div class="form-group">
                             <label>ملاحظات</label>
                             <textarea type="text" name="notes" id="edit_notes" class="form-control" rows="3"></textarea>
                         </div>
-                    </div>
-                    <div class="col-md-12 mt-3">
-                        <input type="hidden" id="edit_loan_id" name="id">
-                        <input type="hidden" id="edit_main_salary_employee_id" name="main_salary_employee_id">
-                        <button type="submit" class="btn btn-success shadow px-4" id="submit_edit_loan">
-                            <i class="fas fa-save"></i>
-                            حفظ البيانات
-                        </button>
-                        <button type="button" class="btn btn-danger shadow px-4" data-dismiss="modal">الغاء</button>
+                    </cla>
+                        <div class="col-md-12 mt-3">
+                            <input type="hidden" id="edit_main_salary_employee_p_loan_id" name="id">
+                            <button type="submit" class="btn btn-success shadow px-4" id="submit_edit_loan">
+                                <i class="fas fa-save"></i>
+                                حفظ البيانات
+                            </button>
+                            <button type="button" class="btn btn-danger shadow px-4"
+                                data-dismiss="modal">الغاء</button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
+            </div>
         </div>
     </div>
-</div>
+
+    <!-- Details Modal -->
+    <div class="modal fade" id="mainSalaryEmployeePLoanDetailsModal" tabindex="-1" role="dialog"
+        aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+            <div class="modal-content shadow">
+
+                <!-- Header -->
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        تفاصيل السلفة الشهرية
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+
+                <!-- BODY -->
+                <div class="modal-body" id="mainSalaryEmployeePLoanDetailsModalBody">
+
+                </div>
+
+            </div>
+        </div>
+    </div>
 
 
-@section('js')
-    <script src="{{ asset('assets/plugins/select2/js/select2.full.min.js') }}"></script>
+    @section('js')
+        <script src="{{ asset('assets/plugins/select2/js/select2.full.min.js') }}"></script>
 
-    <script>
-        function initSelect2() {
-            $('.select2').select2({
-                theme: 'bootstrap4'
-            });
-        }
-
-        function installment_amount_monthly_calc() {
-            let amount = parseInt($('#amount').val());
-            let number_of_installment_months = parseInt($('#number_of_installment_months').val());
-            if (amount == '') {
-                amount = 0
-            } else {
-                amount = Math.ceil(amount)
-                $('#amount').val(amount);
+        <script>
+            function initSelect2() {
+                $('.select2').select2({
+                    theme: 'bootstrap4'
+                });
             }
-            if (number_of_installment_months == '') {
-                number_of_installment_months = 0;
-            } else {
-                number_of_installment_months = Math.ceil(number_of_installment_months);
-                $('#number_of_installment_months').val(number_of_installment_months);
+
+            function installment_amount_monthly_calc() {
+                let amount = parseInt($('#amount').val());
+                let number_of_installment_months = parseInt($('#number_of_installment_months').val());
+                if (amount == '') {
+                    amount = 0
+                } else {
+                    amount = Math.ceil(amount)
+                    $('#amount').val(amount);
+                }
+                if (number_of_installment_months == '') {
+                    number_of_installment_months = 0;
+                } else {
+                    number_of_installment_months = Math.ceil(number_of_installment_months);
+                    $('#number_of_installment_months').val(number_of_installment_months);
+                }
+                if (number_of_installment_months > 0 && amount > 0) {
+                    let installment_amount_monthly = parseFloat((amount / number_of_installment_months).toFixed(2));
+                    $('#installment_amount_monthly').val(installment_amount_monthly);
+                } else {
+                    $('#installment_amount_monthly').val(0);
+
+                }
             }
-            if (number_of_installment_months > 0 && amount > 0) {
-                let installment_amount_monthly = parseFloat((amount / number_of_installment_months).toFixed(2));
-                $('#installment_amount_monthly').val(installment_amount_monthly);
-            } else {
-                $('#installment_amount_monthly').val(0);
+            $(document).ready(function() {
+                initSelect2();
+                $(document).on('change', '#employee_id', function() {
+                    var employee_id = $(this).val();
+                    var salary = $(this).find(':selected').data('salary');
+                    var payment_per_day = $(this).find(':selected').data('payment-per-day');
 
-            }
-        }
-        $(document).ready(function() {
-            initSelect2();
-            $(document).on('change', '#employee_id', function() {
-                var employee_id = $(this).val();
-                var salary = $(this).find(':selected').data('salary');
-                var payment_per_day = $(this).find(':selected').data('payment-per-day');
+                    if (employee_id) {
+                        $('#salary').val(salary);
+                        $('#payment_per_day').val(payment_per_day);
+                        $('.related_to_employee').show();
+                    } else {
+                        $('#salary').val(0);
+                        $('#payment_per_day').val(0);
+                        $('.related_to_employee').hide();
+                    }
 
-                if (employee_id) {
-                    $('#salary').val(salary);
-                    $('#payment_per_day').val(payment_per_day);
-                    $('.related_to_employee').show();
-                } else {
-                    $('#salary').val(0);
-                    $('#payment_per_day').val(0);
-                    $('.related_to_employee').hide();
-                }
+                });
+                $(document).on('input', '#amount', function() {
+                    installment_amount_monthly_calc();
+                });
+                $(document).on('input', '#number_of_installment_months', function() {
+                    installment_amount_monthly_calc();
+                });
+                $(document).on('change', '#year_and_month_started', function(e) {
+                    const date = new Date($(this).val());
+                    date.setDate(date.getDate() + 1);
+                    const today = new Date();
+                    if (date < today) {
+                        alert('من فضلك اختر تاريخ صحيح');
+                        $(this).val(today.toISOString().split('T')[0]);
+                    }
+                });
 
-            });
-            $(document).on('input', '#amount', function() {
-                installment_amount_monthly_calc();
-            });
-            $(document).on('input', '#number_of_installment_months', function() {
-                installment_amount_monthly_calc();
-            });
-            $(document).on('change', '#year_and_month_started', function(e) {
-                const date = new Date($(this).val());
-                date.setDate(date.getDate() + 1);
-                const today = new Date();
-                if (date < today) {
-                    alert('من فضلك اختر تاريخ صحيح');
-                    $(this).val(today.toISOString().split('T')[0]);
-                }
-            });
+                $(document).on('click', '#submit_add_loan', function(e) {
+                    var employee_id = $('#employee_id').val();
+                    if (employee_id == '') {
+                        $('#employee_id').addClass('is-invalid');
+                        alert('اختر الموظف');
+                        return false;
+                    } else {
+                        $('#employee_id').removeClass('is-invalid');
+                    }
 
-            $(document).on('click', '#submit_add_loan', function(e) {
-                var employee_id = $('#employee_id').val();
-                if (employee_id == '') {
-                    $('#employee_id').addClass('is-invalid');
-                    alert('اختر الموظف');
-                    return false;
-                } else {
-                    $('#employee_id').removeClass('is-invalid');
-                }
+                    var amount = $('#amount').val();
+                    if (amount == '' || amount <= 0) {
+                        $('#amount').addClass('is-invalid');
+                        alert('أدخل إجمالى مبلغ السلفة بشكل صحيح');
+                        return false;
+                    } else {
+                        $('#amount').removeClass('is-invalid');
+                    }
 
-                var amount = $('#amount').val();
-                if (amount == '' || amount <= 0) {
-                    $('#amount').addClass('is-invalid');
-                    alert('أدخل إجمالى مبلغ السلفة بشكل صحيح');
-                    return false;
-                } else {
-                    $('#amount').removeClass('is-invalid');
-                }
+                    var number_of_installment_months = $('#number_of_installment_months').val();
+                    if (number_of_installment_months == '' || number_of_installment_months <= 0) {
+                        $('#number_of_installment_months').addClass('is-invalid');
+                        alert('أدخل عدد الأقساط بشكل صحيح');
+                        return false;
+                    } else {
+                        $('#number_of_installment_months').removeClass('is-invalid');
+                    }
+                    var year_and_month_started = $('#year_and_month_started').val();
+                    if (year_and_month_started == '' || year_and_month_started == null) {
+                        $('#year_and_month_started').addClass('is-invalid');
+                        alert('أدخل تاريخ بدء خصم القسط بشكل صحيح');
+                        return false;
+                    } else {
+                        $('#year_and_month_started').removeClass('is-invalid');
+                    }
 
-                var number_of_installment_months = $('#number_of_installment_months').val();
-                if (number_of_installment_months == '' || number_of_installment_months <= 0) {
-                    $('#number_of_installment_months').addClass('is-invalid');
-                    alert('أدخل عدد الأقساط بشكل صحيح');
-                    return false;
-                } else {
-                    $('#number_of_installment_months').removeClass('is-invalid');
-                }
-                var year_and_month_started = $('#year_and_month_started').val();
-                if (year_and_month_started == '' || year_and_month_started == null) {
-                    $('#year_and_month_started').addClass('is-invalid');
-                    alert('أدخل تاريخ بدء خصم القسط بشكل صحيح');
-                    return false;
-                } else {
-                    $('#year_and_month_started').removeClass('is-invalid');
-                }
+                    $.ajax({
+                        url: "{{ route('admin.main-salary-employee-ploans.ajax-check') }}",
+                        dataType: "json",
+                        cache: false,
+                        method: "POST",
+                        data: {
+                            employee_id: employee_id,
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(response) {
+                            var flag = true;
+                            if (response.status == 'true') {
+                                var res = confirm(
+                                    'يوجد ' + response.count +
+                                    ' سلفة مسجلة لنفس الموظف. هل تريد إضافة سلفة أخرى؟'
+                                );
+                                if (res == false) {
+                                    flag = false;
+                                }
+                            }
 
-                $.ajax({
-                    url: "{{ route('admin.main-salary-employee-ploans.ajax-check') }}",
-                    dataType: "json",
-                    cache: false,
-                    method: "POST",
-                    data: {
-                        employee_id: employee_id,
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function(response) {
-                        var flag = true;
-                        if (response.status == 'true') {
-                            var res = confirm(
-                                'يوجد ' + response.count +
-                                ' سلفة مسجلة لنفس الموظف. هل تريد إضافة سلفة أخرى؟'
-                            );
-                            if (res == false) {
-                                flag = false;
+                            if (flag) {
+                                var formData = {
+                                    employee_id: employee_id,
+                                    employee_basic_salary: $('#salary').val(),
+                                    amount: amount,
+                                    number_of_installment_months: number_of_installment_months,
+                                    next_installment_date: year_and_month_started,
+                                    installment_amount_monthly: $('#installment_amount_monthly')
+                                        .val(),
+                                    notes: $('#notes').val(),
+                                    _token: "{{ csrf_token() }}"
+                                };
+                                $.ajax({
+                                    url: "{{ route('admin.main-salary-employee-ploans.store') }}",
+                                    dataType: "json",
+                                    cache: false,
+                                    method: "POST",
+                                    data: formData,
+                                    success: function(response) {
+                                        if (response.status == 'true') {
+                                            alert(response.message);
+                                            $('#addMainSalaryRecordLoanModal').modal(
+                                                'hide');
+                                            window.location.reload();
+                                        } else {
+                                            alert(response.message ||
+                                                'عفوا، حدث خطأ أثناء الحفظ.');
+                                        }
+                                    },
+                                    error: function(xhr, status, error) {
+                                        alert(
+                                            'عفوا، حدث خطأ غير متوقع أثناء الاتصال بالخادم.'
+                                        );
+                                    }
+                                })
                             }
                         }
+                    })
+                });
 
-                        if (flag) {
-                            var formData = {
-                                employee_id: employee_id,
-                                employee_basic_salary: $('#salary').val(),
-                                amount: amount,
-                                number_of_installment_months: number_of_installment_months,
-                                next_installment_date: year_and_month_started,
-                                installment_amount_monthly: $('#installment_amount_monthly')
-                                    .val(),
-                                notes: $('#notes').val(),
-                                _token: "{{ csrf_token() }}"
-                            };
-                            $.ajax({
-                                url: "{{ route('admin.main-salary-employee-ploans.store') }}",
-                                dataType: "json",
-                                cache: false,
-                                method: "POST",
-                                data: formData,
-                                success: function(response) {
-                                    if (response.status == 'true') {
-                                        alert(response.message);
-                                        $('#addMainSalaryRecordLoanModal').modal(
-                                            'hide');
-                                        window.location.reload();
-                                    } else {
-                                        alert(response.message ||
-                                            'عفوا، حدث خطأ أثناء الحفظ.');
-                                    }
-                                },
-                                error: function(xhr, status, error) {
-                                    alert(
-                                        'عفوا، حدث خطأ غير متوقع أثناء الاتصال بالخادم.'
-                                    );
+
+                $(document).on('change', '#employee_id_search', function() {
+                    ajax_search();
+                });
+                $(document).on('change', '#is_archived_search', function() {
+                    ajax_search();
+                });
+
+                $(document).on('change', '#is_disbursed_search', function() {
+                    ajax_search();
+                });
+
+                function ajax_search() {
+                    var employee_id_search = $('#employee_id_search').val();
+                    var is_archived_search = $('#is_archived_search').val();
+                    var is_disbursed_search = $('#is_disbursed_search').val();
+                    $.ajax({
+                        url: '{{ route('admin.main-salary-employee-ploans.ajax-search') }}',
+                        type: 'POST',
+                        dataType: 'html',
+                        cache: false,
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            employee_id_search: employee_id_search,
+                            is_archived_search: is_archived_search,
+                            is_disbursed_search: is_disbursed_search,
+                        },
+                        success: function(mainSalaryEmployeePLoans) {
+                            $('#ajax_responce_search').html(mainSalaryEmployeePLoans);
+                        },
+                        error: function(xhr) {}
+                    });
+                }
+
+                $(document).on('click', '#ajax-pagination a', function(e) {
+                    e.preventDefault();
+                    var employee_id_search = $('#employee_id_search').val();
+                    var is_archived_search = $('#is_archived_search').val();
+                    var is_disbursed_search = $('#is_disbursed_search').val();
+                    var url = $(this).attr('href');
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        dataType: 'html',
+                        cache: false,
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            employee_id_search: employee_id_search,
+                            is_archived_search: is_archived_search,
+                            is_disbursed_search: is_disbursed_search,
+
+                        },
+                        success: function(mainSalaryEmployeePLoans) {
+                            $('#ajax_responce_search').html(mainSalaryEmployeePLoans);
+                        },
+                        error: function(xhr) {}
+                    });
+                });
+
+                $(document).on('click', '.show_employee_loan_details_btn', function(e) {
+                    var id = $(this).data('id');
+                    $.ajax({
+                        url: '{{ route('admin.main-salary-employee-ploans.show') }}',
+                        type: 'POST',
+                        dataType: 'html',
+                        cache: false,
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            id: id,
+                        },
+                        success: function(mainSalaryEmployeePLoans) {
+                            $('#mainSalaryEmployeePLoanDetailsModalBody').html(
+                                mainSalaryEmployeePLoans);
+                            $('#mainSalaryEmployeePLoanDetailsModal').modal('show');
+                        },
+                        error: function(xhr) {}
+                    });
+                });
+
+                $(document).on('click', '.delete_employee_loan_btn', function() {
+                    var id = $(this).data('id');
+                    var res = confirm('هل انت متاكد من حذف هذه السلفة؟');
+                    if (res == true) {
+                        $.ajax({
+                            url: "{{ route('admin.main-salary-employee-ploans.destroy') }}",
+                            type: 'POST',
+                            dataType: 'json',
+                            cache: false,
+                            data: {
+                                _token: '{{ csrf_token() }}',
+                                id: id,
+                            },
+                            success: function(response) {
+                                if (response.status == 'true') {
+                                    alert(response.message);
+                                    ajax_search();
+                                } else {
+                                    alert(response.message || 'عفوا، حدث خطأ أثناء الحذف.');
                                 }
-                            })
-                        }
+                            },
+                            error: function(xhr) {
+                                alert('عفوا، حدث خطأ غير متوقع أثناء الاتصال بالخادم.');
+                            }
+                        })
                     }
-                })
-            });
-
-
-            $(document).on('change', '#employee_id_search', function() {
-                ajax_search();
-            });
-            $(document).on('change', '#is_archived_search', function() {
-                ajax_search();
-            });
-
-            $(document).on('change', '#is_disbursed_search', function() {
-                ajax_search();
-            });
-
-            function ajax_search() {
-                var employee_id_search = $('#employee_id_search').val();
-                var is_archived_search = $('#is_archived_search').val();
-                var is_disbursed_search = $('#is_disbursed_search').val();
-                $.ajax({
-                    url: '{{ route('admin.main-salary-employee-ploans.ajax-search') }}',
-                    type: 'POST',
-                    dataType: 'html',
-                    cache: false,
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        employee_id_search: employee_id_search,
-                        is_archived_search: is_archived_search,
-                        is_disbursed_search: is_disbursed_search,
-                    },
-                    success: function(mainSalaryEmployeePLoans) {
-                        $('#ajax_responce_search').html(mainSalaryEmployeePLoans);
-                    },
-                    error: function(xhr) {}
                 });
-            }
 
-            $(document).on('click', '#ajax-pagination a', function(e) {
-                e.preventDefault();
-                var employee_id_search = $('#employee_id_search').val();
-                var is_archived_search = $('#is_archived_search').val();
-                var is_disbursed_search = $('#is_disbursed_search').val();
+                $(document).on('click', '.edit_employee_loan_btn', function() {
+                    var id = $(this).data('id');
+                    $.ajax({
+                        url: "{{ route('admin.main-salary-employee-ploans.edit') }}",
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            id: id,
+                        },
+                        cache: false,
+                        success: function(response) {
+                            if (response.status == 'true') {
+                                var mainSalaryEmployeePLoan = response.mainSalaryEmployeePLoan;
+                                var employee = mainSalaryEmployeePLoan.employee;
+                                var modal = $('#editMainSalaryRecordLoanModal');
+                                modal.find("#edit_main_salary_employee_p_loan_id").val(mainSalaryEmployeePLoan.id);
 
-                var url = $(this).attr('href');
-                console.log(url);
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    dataType: 'html',
-                    cache: false,
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        employee_id_search: employee_id_search,
-                        is_archived_search: is_archived_search,
-                        is_disbursed_search: is_disbursed_search,
+                                modal.find("#edit_employee_id").html(`
+                                <option value="${employee.id}" selected>
+                                    ${employee.name}
+                                </option>
+                            `);
 
-                    },
-                    success: function(mainSalaryEmployeePLoans) {
-                        $('#ajax_responce_search').html(mainSalaryEmployeePLoans);
-                    },
-                    error: function(xhr) {}
+                                modal.find("#edit_salary").val(mainSalaryEmployeePLoan.employee_basic_salary);
+
+                                modal.find("#edit_payment_per_day").val(employee.payment_per_day);
+                                
+                                modal.find("#edit_amount").val(mainSalaryEmployeePLoan.amount);
+                                
+                                modal.find("#edit_number_of_installment_months").val(mainSalaryEmployeePLoan.number_of_installment_months);
+
+                                modal.find("#edit_installment_amount_monthly").val(mainSalaryEmployeePLoan.installment_amount_monthly);
+                                
+                                modal.find("#edit_year_and_month_started").val(mainSalaryEmployeePLoan.next_installment_date);
+                                modal.find("#edit_notes").val(mainSalaryEmployeePLoan.notes);
+
+                                modal.find(".edit_related_to_employee").show();
+                                modal.modal('show');
+                            } else {
+                                alert(response.message || 'عفوا، حدث خطأ أثناء جلب البيانات.');
+                            }
+                        },
+                        error: function(xhr) {
+                            alert('عفوا، حدث خطأ غير متوقع أثناء الاتصال بالخادم.');
+                        }
+                    });
                 });
-            });
 
-        })
-    </script>
-@endsection
+
+
+            })
+        </script>
+    @endsection

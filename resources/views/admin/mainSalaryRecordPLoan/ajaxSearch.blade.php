@@ -129,18 +129,19 @@
                                     </td>
 
                                     <td>
-                                        <div class="d-flex justify-content-center align-items-center gap-1">
-                                            <button class="btn btn-sm btn-info m-1" title="عرض الأقساط والتفاصيل">
+                                         <div class="d-flex justify-content-center align-items-center gap-1">
+                                            <button class="btn btn-sm btn-info m-1 show_employee_loan_details_btn"
+                                                title="عرض الأقساط والتفاصيل" data-id="{{ $loan->id }}">
                                                 <i class="fas fa-eye"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-warning m-1" title="تعديل">
+                                            <button class="btn btn-sm btn-warning m-1 edit_employee_loan_btn" title="تعديل"
+                                                data-id="{{ $loan->id }}">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-danger m-1" title="حذف">
+                                            <button class="btn btn-sm btn-danger m-1 delete_employee_loan_btn"
+                                                title="حذف" data-id="{{ $loan->id }}">
                                                 <i class="fas fa-trash"></i>
                                             </button>
-
-
                                         </div>
                                     </td>
                                 </tr>

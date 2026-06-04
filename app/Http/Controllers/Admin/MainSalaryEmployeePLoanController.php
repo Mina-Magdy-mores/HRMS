@@ -266,4 +266,59 @@ class MainSalaryEmployeePLoanController extends Controller
             'total_sum'               => $total_sum,
         ]);
     }
+
+    public function show(Request $request)
+    {
+        if ($request->ajax()) {
+            $company_id = Auth::user()->company_id;
+            $mainSalaryEmployeePLoans = getColsWhereRow(MainSalaryEmployeePLoan::class, ['*'], ['id' => $request->id, 'company_id' => $company_id]);
+            return view('admin.mainSalaryRecordPLoan.show', [
+                'mainSalaryEmployeePLoans' => $mainSalaryEmployeePLoans,
+            ]);
+        }
+    }
+    public function destroy(Request $request)
+    {
+        if ($request->ajax()) {
+            $company_id = Auth::user()->company_id;
+            $mainSalaryEmployeePLoan = getColsWhereRow(MainSalaryEmployeePLoan::class, ['id', 'is_archived', 'is_disbursed'], ['company_id' => $company_id, 'id' => $request->id]);
+            if (empty($mainSalaryEmployeePLoan)) {
+                return response()->json(['status' => 'false', 'message' => 'عفوا غير قادر للوصول الى بيانات السلفة']);
+            }
+            if ($mainSalaryEmployeePLoan['is_archived'] == 1 || $mainSalaryEmployeePLoan['is_disbursed'] == 1) {
+                return response()->json(['status' => 'false', 'message' => 'عفوا لا يمكن حذف السلفة']);
+            }
+            try {
+                return DB::transaction(function () use ($mainSalaryEmployeePLoan) {
+                    $destroyMainSalaryEmployeePLoanInstallments = $mainSalaryEmployeePLoan->mainSalaryEmployeePLoanInstallments()->delete();
+                    $destroyMainSalaryEmployeePLoan = $mainSalaryEmployeePLoan->delete();
+                    if ($destroyMainSalaryEmployeePLoan && $destroyMainSalaryEmployeePLoanInstallments) {
+                        return response()->json(['status' => 'true', 'message' => 'تم حذف السلفة بنجاح']);
+                    } else {
+                        return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم حذف السلفة']);
+                    }
+                });
+            } catch (\Exception $e) {
+                return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم حذف السلفة']);
+            }
+        }
+    }
+
+    public function edit(Request $request)
+    {
+        $company_id = Auth::user()->company_id;
+        $mainSalaryEmployeePLoan = MainSalaryEmployeePLoan::with([
+            'employee:name,id,salary,payment_per_day',
+        ])
+            ->where('company_id', $company_id)
+            ->where('id', $request->id)
+            ->first();
+        if (empty($mainSalaryEmployeePLoan)) {
+            return response()->json(['status' => 'false', 'message' => 'عفوا غير قادر للوصول الى بيانات السلفة']);
+        }
+        if ($mainSalaryEmployeePLoan['is_archived'] == 1 || $mainSalaryEmployeePLoan['is_disbursed'] == 1) {
+            return response()->json(['status' => 'false', 'message' => 'عفوا لا يمكن تعديل السلفة']);
+        }
+        return response()->json(['status' => 'true', 'mainSalaryEmployeePLoan' => $mainSalaryEmployeePLoan]);
+    }
 }

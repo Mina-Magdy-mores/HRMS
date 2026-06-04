@@ -290,6 +290,11 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/main-salary-employee-ploans/store', [MainSalaryEmployeePLoanController::class, 'store'])->name('main-salary-employee-ploans.store');
         Route::post('/main-salary-employee-ploans/ajax-search', [MainSalaryEmployeePLoanController::class, 'ajaxSearch'])->name('main-salary-employee-ploans.ajax-search');
         Route::post('/main-salary-employee-ploans/print-search', [MainSalaryEmployeePLoanController::class, 'printSearch'])->name('main-salary-employee-ploans.print-search');
+        Route::post('/main-salary-employee-ploans/show', [MainSalaryEmployeePLoanController::class, 'show'])->name('main-salary-employee-ploans.show');
+        Route::post('/main-salary-employee-ploans/destroy', [MainSalaryEmployeePLoanController::class, 'destroy'])->name('main-salary-employee-ploans.destroy');
+        Route::post('/main-salary-employee-ploans/edit', [MainSalaryEmployeePLoanController::class, 'edit'])->name('main-salary-employee-ploans.edit');
+        Route::put('/main-salary-employee-ploans', [MainSalaryEmployeePLoanController::class, 'update'])->name('main-salary-employee-ploans.update');
+        
     });
 
     // guest routes
