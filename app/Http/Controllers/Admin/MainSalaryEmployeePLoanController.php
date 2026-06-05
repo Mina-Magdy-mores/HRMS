@@ -321,4 +321,58 @@ class MainSalaryEmployeePLoanController extends Controller
         }
         return response()->json(['status' => 'true', 'mainSalaryEmployeePLoan' => $mainSalaryEmployeePLoan]);
     }
+
+    public function update(Request $request)
+    {
+        $company_id = Auth::user()->company_id;
+        $mainSalaryEmployeePLoan = MainSalaryEmployeePLoan::where('company_id', $company_id)->where('id', $request->id)->where('employee_id', $request->employee_id)->first();
+        if (empty($mainSalaryEmployeePLoan)) {
+            return response()->json(['status' => 'false', 'message' => 'عفوا غير قادر للوصول الى بيانات السلفة']);
+        }
+        if ($mainSalaryEmployeePLoan['is_archived'] == 1 || $mainSalaryEmployeePLoan['is_disbursed'] == 1) {
+            return response()->json(['status' => 'false', 'message' => 'عفوا لا يمكن تعديل السلفة']);
+        }
+        try {
+            return DB::transaction(function () use ($request, $company_id, $mainSalaryEmployeePLoan) {
+                $dataToUpdate = [
+                    'amount'                  => $request->amount,
+                    'number_of_installment_months' => $request->number_of_installment_months,
+                    'installment_amount_monthly' => $request->installment_amount_monthly,
+                    'next_installment_date'   => $request->year_and_month_started,
+                    'next_installment_year_and_month'  => date('Y-m', strtotime($request->year_and_month_started)),
+                    'updated_by'                => Auth::user()->id,
+                    'notes'                   => $request->notes,
+                ];
+                $mainSalaryEmployeePLoan->mainSalaryEmployeePLoanInstallments()->delete();
+                $flag = MainSalaryEmployeePLoan::where('id', $request->id)->update($dataToUpdate);
+                $updateData = $mainSalaryEmployeePLoan->refresh();
+                if ($flag) {
+                    $next_installment_year_and_month = date('Y-m', strtotime($request->year_and_month_started));
+                    for ($i = 1; $i <= $request->number_of_installment_months; $i++) {
+                        $dataToInsertInstallment = [
+                            'main_salary_employee_p_loan_id' => $updateData->id,
+                            'amount' => $request->amount,
+                            'installment_amount_monthly' => $request->installment_amount_monthly,
+                            'next_installment_year_and_month'  => $next_installment_year_and_month,
+                            'installment_status' => '0',
+                            'company_id' => $company_id,
+                            'added_by'                => Auth::user()->id,
+                            'notes'                   => $request->notes,
+                        ];
+                        $next_installment_year_and_month = date('Y-m', strtotime($next_installment_year_and_month . ' + 1 month'));
+                        $insertDataInstallment = insert(MainSalaryEmployeePLoanInstallment::class, $dataToInsertInstallment);
+                    }
+                    if ($insertDataInstallment) {
+                        return response()->json(['status' => 'true', 'message' => 'تم تعديل السلفة بنجاح']);
+                    } else {
+                        return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم تعديل السلفة']);
+                    }
+                } else {
+                    return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم تعديل السلفة']);
+                }
+            });
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'false', 'message' => 'عفوا حدث خطأ ' . $e->getMessage()]);
+        }
+    }
 }

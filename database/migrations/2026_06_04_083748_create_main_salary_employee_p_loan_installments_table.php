@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('main_salary_employee_p_loan_id');
             $table->foreign('main_salary_employee_p_loan_id', 'fk_loan_installment_loan')
-                ->references('id')->on('main_salary_employee_p_loans')->cascadeOnUpdate();
+                ->references('id')->on('main_salary_employee_p_loans')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('main_salary_employee_id')->nullable();
             $table->foreign('main_salary_employee_id', 'fk_loan_installment_employee')
                 ->references('id')->on('main_salary_employees')->cascadeOnUpdate();
