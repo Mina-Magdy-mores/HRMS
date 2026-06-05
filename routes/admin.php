@@ -294,6 +294,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/main-salary-employee-ploans/destroy', [MainSalaryEmployeePLoanController::class, 'destroy'])->name('main-salary-employee-ploans.destroy');
         Route::post('/main-salary-employee-ploans/edit', [MainSalaryEmployeePLoanController::class, 'edit'])->name('main-salary-employee-ploans.edit');
         Route::put('/main-salary-employee-ploans', [MainSalaryEmployeePLoanController::class, 'update'])->name('main-salary-employee-ploans.update');
+        Route::post('/main-salary-employee-ploans/disbursed', [MainSalaryEmployeePLoanController::class, 'disbursed'])->name('main-salary-employee-ploans.disbursed');
         
     });
 

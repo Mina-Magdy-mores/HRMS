@@ -79,7 +79,6 @@ class MainSalaryRecordController extends Controller
                                 $dataToInsert['employee_department_id'] = $employee->department_id;
                                 $dataToInsert['employee_job_id'] = $employee->job_id;
                                 $dataToInsert['employee_salary'] = $employee->salary;
-                                // will do it later
                                 $dataToInsert['employee_rollover_amount'] = 0;
                                 $dataToInsert['year_and_month'] = $financeMonthlyCalendar->year_and_month;
                                 $dataToInsert['financial_year'] = $financeMonthlyCalendar->finance_yr;
