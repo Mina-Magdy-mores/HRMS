@@ -242,8 +242,9 @@
                                             @endif
                                         @else
                                             <span class="badge badge-warning px-3 py-2 text-white">
-                                                <i class="fas fa-hourglass-half mr-1"></i> قيد الانتظار
+                                                <i class="fas fa-hourglass-half mr-1"></i>
                                             </span>
+
                                         @endif
                                     </td>
 
@@ -294,6 +295,12 @@
                                                 title="حذف" data-id="{{ $loan->id }}">
                                                 <i class="fas fa-trash"></i>
                                             </button>
+                                            @if ($loan->is_disbursed == 0)
+                                                <button type="button" class="btn btn-success btn-sm shadow-sm m-1"
+                                                    id="disburseBtn" data-id="{{ $loan->id }}" title="صرف السلفة">
+                                                    <i class="fas fa-check-circle mr-1"></i>
+                                                </button>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
@@ -964,6 +971,35 @@
                     }
                 });
             });
+
+            $(document).on('click', '#disburseBtn', function() {
+                var id = $(this).data('id');
+                var res = confirm('هل انت متاكد من صرف هذه السلفة؟');
+                if (res == true) {
+                    $.ajax({
+                        url: "{{ route('admin.main-salary-employee-ploans.disbursed') }}",
+                        type: 'POST',
+                        dataType: 'json',
+                        cache: false,
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            id: id,
+                        },
+                        success: function(response) {
+                            if (response.status == 'true') {
+                                alert(response.message);
+                                ajax_search();
+                            } else {
+                                alert(response.message || 'عفوا، حدث خطأ أثناء صرف السلفة.');
+                            }
+                        },
+                        error: function(xhr) {
+                            alert('عفوا، حدث خطأ غير متوقعتعديل بواسطة: أثناء الاتصال بالخادم.');
+                        }
+                    })
+                }
+            });
+
 
         })
     </script>

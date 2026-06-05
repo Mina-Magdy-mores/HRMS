@@ -142,6 +142,12 @@
                                                 title="حذف" data-id="{{ $loan->id }}">
                                                 <i class="fas fa-trash"></i>
                                             </button>
+                                           @if ($loan->is_disbursed == 0)
+                                                <button type="button" class="btn btn-success btn-sm shadow-sm m-1"
+                                                    id="disburseBtn" data-id="{{ $loan->id }}" title="صرف السلفة">
+                                                    <i class="fas fa-check-circle mr-1"></i>
+                                                </button>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
