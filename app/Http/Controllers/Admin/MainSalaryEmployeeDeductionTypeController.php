@@ -9,12 +9,15 @@ use App\Models\Employee;
 use App\Models\FinanceMonthlyCalendar;
 use App\Models\MainSalaryEmployee;
 use App\Models\MainSalaryEmployeeDeductionType;
+use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class MainSalaryEmployeeDeductionTypeController extends Controller
 {
+        use GeneralTrait;
+
     /**
      * Display a listing of the resource.
      */
@@ -68,6 +71,8 @@ class MainSalaryEmployeeDeductionTypeController extends Controller
                         ];
                         $insertData = insert(MainSalaryEmployeeDeductionType::class, $dataToInsert);
                         if ($insertData) {
+                                                        $this->recalculate_main_salary($mainSalaryEmployee['id']);
+
                             return response()->json(['status' => 'true', 'message' => 'تم اضافة الخصم بنجاح']);
                         } else {
                             return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم اضافة الخصم']);
@@ -226,6 +231,8 @@ class MainSalaryEmployeeDeductionTypeController extends Controller
             }
             $destroy = destroy($mainSalaryEmployeeDeductionType);
             if ($destroy) {
+                                                                        $this->recalculate_main_salary($mainSalaryEmployee['id']);
+
                 return response()->json(['status' => 'true', 'message' => 'تم حذف الخصم بنجاح']);
             } else {
                 return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم حذف الخصم']);
@@ -281,7 +288,7 @@ class MainSalaryEmployeeDeductionTypeController extends Controller
             }
 
             try {
-                return DB::transaction(function () use ($request, $mainSalaryEmployeeDeductionType) {
+                return DB::transaction(function () use ($request, $mainSalaryEmployeeDeductionType,$mainSalaryEmployee) {
                     $dataToUpdate = [
                         'deduction_type_id' => $request->deduction_type_id,
                         'amount'            => $request->amount,
@@ -290,6 +297,8 @@ class MainSalaryEmployeeDeductionTypeController extends Controller
                     ];
                     $updateData = update($mainSalaryEmployeeDeductionType, $dataToUpdate);
                     if ($updateData) {
+                                                                                $this->recalculate_main_salary($mainSalaryEmployee['id']);
+
                         return response()->json(['status' => 'true', 'message' => 'تم تعديل الخصم بنجاح']);
                     } else {
                         return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم تعديل الخصم']);

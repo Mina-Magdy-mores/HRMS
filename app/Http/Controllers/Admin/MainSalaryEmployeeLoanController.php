@@ -9,11 +9,14 @@ use App\Models\AdminPanelSetting;
 use App\Models\Employee;
 use App\Models\FinanceMonthlyCalendar;
 use App\Models\MainSalaryEmployee;
+use App\Traits\GeneralTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class MainSalaryEmployeeLoanController extends Controller
 {
+            use GeneralTrait;
+
     /**
      * Display a listing of the resource.
      */
@@ -66,6 +69,7 @@ class MainSalaryEmployeeLoanController extends Controller
                         ];
                         $insertData = insert(MainSalaryEmployeeLoan::class, $dataToInsert);
                         if ($insertData) {
+                              $this->recalculate_main_salary($mainSalaryEmployee['id']);
                             return response()->json(['status' => 'true', 'message' => 'تم اضافة السلفة بنجاح']);
                         } else {
                             return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم اضافة السلفة']);
@@ -200,6 +204,7 @@ class MainSalaryEmployeeLoanController extends Controller
             }
             $destroy = destroy($mainSalaryEmployeeLoans);
             if ($destroy) {
+                $this->recalculate_main_salary($mainSalaryEmployee['id']);
                 return response()->json(['status' => 'true', 'message' => 'تم حذف السلفة بنجاح']);
             } else {
                 return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم حذف السلفة']);
@@ -254,7 +259,7 @@ class MainSalaryEmployeeLoanController extends Controller
             }
 
             try {
-                return DB::transaction(function () use ($request, $mainSalaryEmployeeLoan) {
+                return DB::transaction(function () use ($request, $mainSalaryEmployeeLoan,$mainSalaryEmployee) {
                     $dataToUpdate = [
                         'amount'     => $request->amount,
                         'notes'      => $request->notes,
@@ -262,6 +267,7 @@ class MainSalaryEmployeeLoanController extends Controller
                     ];
                     $updateData = update($mainSalaryEmployeeLoan, $dataToUpdate);
                     if ($updateData) {
+                        $this->recalculate_main_salary($mainSalaryEmployee['id']);
                         return response()->json(['status' => 'true', 'message' => 'تم تعديل السلفة بنجاح']);
                     } else {
                         return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم تعديل السلفة']);

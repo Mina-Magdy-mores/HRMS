@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\FinanceMonthlyCalendar;
 use App\Models\MainSalaryEmployee;
+use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class MainSalaryRecordController extends Controller
 {
+    use GeneralTrait;
     /**
      * Display a listing of the resource.
      */
@@ -79,13 +81,21 @@ class MainSalaryRecordController extends Controller
                                 $dataToInsert['employee_department_id'] = $employee->department_id;
                                 $dataToInsert['employee_job_id'] = $employee->job_id;
                                 $dataToInsert['employee_salary'] = $employee->salary;
-                                $dataToInsert['employee_rollover_amount'] = 0;
+                                $employee_rollover_amount = get_cols_where_row_orderby(MainSalaryEmployee::class,
+                                 ['employee_net_salary_after_close_for_roll_over'], ['employee_id' => $employee->id, 'company_id' => $company_id,'is_archived' => 1], 'id', 'desc');
+                                 if(!empty($employee_rollover_amount)){
+                                    $dataToInsert['employee_rollover_amount'] = $employee_rollover_amount->employee_net_salary_after_close_for_roll_over;
+                                 }else{
+                                    $dataToInsert['employee_rollover_amount'] = 0;
+                                 }
                                 $dataToInsert['year_and_month'] = $financeMonthlyCalendar->year_and_month;
                                 $dataToInsert['financial_year'] = $financeMonthlyCalendar->finance_yr;
                                 $dataToInsert['payment_method'] = $employee->payment_method;
                                 $dataToInsert['added_by'] = Auth::id();
-                                $insert = insert(MainSalaryEmployee::class, $dataToInsert);
-                                if (!$insert) {
+                                $insert = insert(MainSalaryEmployee::class, $dataToInsert,true);
+                                if (!empty($insert)) {
+                                    $this->recalculate_main_salary($insert->id);
+                                }else{
                                     throw new \Exception('عذراً، حدث خطأ أثناء إدخال بيانات الموظف: الماليه ');
                                 }
                             }

@@ -9,10 +9,14 @@ use App\Models\AdminPanelSetting;
 use App\Models\Employee;
 use App\Models\FinanceMonthlyCalendar;
 use App\Models\MainSalaryEmployee;
+use App\Traits\GeneralTrait;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+
 class MainSalaryEmployeeAbsenceController extends Controller
 {
+    use GeneralTrait;
+
     /**
      * Display a listing of the resource.
      */
@@ -65,6 +69,8 @@ class MainSalaryEmployeeAbsenceController extends Controller
                         ];
                         $insertData = insert(MainSalaryEmployeeAbsence::class, $dataToInsert);
                         if ($insertData) {
+                            $this->recalculate_main_salary($mainSalaryEmployee['id']);
+
                             return response()->json(['status' => 'true', 'message' => 'تم اضافة الغياب بنجاح']);
                         } else {
                             return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم اضافة الغياب']);
@@ -200,6 +206,8 @@ class MainSalaryEmployeeAbsenceController extends Controller
             }
             $destroy = destroy($mainSalaryEmployeeAbsences);
             if ($destroy) {
+                $this->recalculate_main_salary($mainSalaryEmployee['id']);
+
                 return response()->json(['status' => 'true', 'message' => 'تم حذف الجزاء بنجاح']);
             } else {
                 return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم حذف الجزاء']);
@@ -254,7 +262,7 @@ class MainSalaryEmployeeAbsenceController extends Controller
             }
 
             try {
-                return DB::transaction(function () use ($request, $mainSalaryEmployeeAbsence) {
+                return DB::transaction(function () use ($request, $mainSalaryEmployeeAbsence, $mainSalaryEmployee) {
                     $dataToUpdate = [
                         'days_amount' => $request->days_amount,
                         'total' => $request->total,
@@ -263,6 +271,8 @@ class MainSalaryEmployeeAbsenceController extends Controller
                     ];
                     $updateData = update($mainSalaryEmployeeAbsence, $dataToUpdate);
                     if ($updateData) {
+                        $this->recalculate_main_salary($mainSalaryEmployee['id']);
+
                         return response()->json(['status' => 'true', 'message' => 'تم تعديل الجزاء بنجاح']);
                     } else {
                         return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم تعديل الجزاء']);

@@ -16,10 +16,12 @@ return new class extends Migration {
             $table->foreignId('employee_id')->constrained('employees')->onUpdate('cascade')->comment('ID of the employee');
             $table->string('employee_name', 255)->comment('Name of the employee');
             $table->tinyInteger('sensitive')->nullable()->default(0)->comment('Indicates if the employee is sensitive');
+            $table->tinyInteger('employee_status')->comment('Status of the employee');
+
+            $table->foreignId('employee_job_id')->constrained('jobs_categories')->onUpdate('cascade')->nullable()->comment('ID of the employee job');
             $table->foreignId('employee_branch_id')->constrained('branches')->onUpdate('cascade')->comment('ID of the branch');
             $table->foreignId('employee_department_id')->constrained('departments')->onUpdate('cascade')->nullable()->comment('ID of the department');
-            $table->tinyInteger('employee_status')->comment('Status of the employee');
-            $table->foreignId('employee_job_id')->constrained('jobs_categories')->onUpdate('cascade')->nullable()->comment('ID of the employee job');
+            
             $table->decimal('employee_total_bonus', 15, 2)->nullable()->default(0)->comment('Total bonus of the employee');
             $table->decimal('employee_total_overtime_days_counter', 15, 2)->nullable()->default(0)->comment('Total overtime of the employee');
             $table->decimal('employee_total_overtime_payment_per_day', 15, 2)->nullable()->default(0)->comment('Overtime payment per day of the employee');
@@ -28,6 +30,7 @@ return new class extends Migration {
             $table->decimal('total_phone_payments', 15, 2)->nullable()->default(0)->comment('Total phone payments');
             $table->decimal('medical_insurance_amount', 15, 2)->nullable()->default(0)->comment('Amount of the medical insurance');
             $table->decimal('social_insurance_amount', 15, 2)->nullable()->default(0)->comment('Amount of the social insurance');
+            
             $table->decimal('fixed_allowance', 15, 2)->nullable()->default(0)->comment('Fixed allowance for the employee');
             $table->decimal('variable_allowance', 15, 2)->nullable()->default(0)->comment('Variable allowance for the employee');
             $table->decimal('total_benefits', 15, 2)->nullable()->default(0)->comment('Total benefits');

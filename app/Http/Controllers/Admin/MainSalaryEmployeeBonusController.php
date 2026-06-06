@@ -9,12 +9,15 @@ use App\Models\Employee;
 use App\Models\FinanceMonthlyCalendar;
 use App\Models\MainSalaryEmployee;
 use App\Models\MainSalaryEmployeeBonus;
+use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class MainSalaryEmployeeBonusController extends Controller
 {
+        use GeneralTrait;
+
     /**
      * Display a listing of the resource.
      */
@@ -68,6 +71,7 @@ class MainSalaryEmployeeBonusController extends Controller
                         ];
                         $insertData = insert(MainSalaryEmployeeBonus::class, $dataToInsert);
                         if ($insertData) {
+                              $this->recalculate_main_salary($mainSalaryEmployee['id']);
                             return response()->json(['status' => 'true', 'message' => 'تم اضافة المكافأة بنجاح']);
                         } else {
                             return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم اضافة المكافأة']);
@@ -226,6 +230,8 @@ class MainSalaryEmployeeBonusController extends Controller
             }
             $destroy = destroy($mainSalaryEmployeeBonus);
             if ($destroy) {
+                                                                        $this->recalculate_main_salary($mainSalaryEmployee['id']);
+
                 return response()->json(['status' => 'true', 'message' => 'تم حذف المكافأة بنجاح']);
             } else {
                 return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم حذف المكافأة']);
@@ -281,7 +287,7 @@ class MainSalaryEmployeeBonusController extends Controller
             }
 
             try {
-                return DB::transaction(function () use ($request, $mainSalaryEmployeeBonus) {
+                return DB::transaction(function () use ($request, $mainSalaryEmployeeBonus,$mainSalaryEmployee) {
                     $dataToUpdate = [
                         'bonus_id'   => $request->bonus_id,
                         'amount'     => $request->amount,
@@ -290,6 +296,7 @@ class MainSalaryEmployeeBonusController extends Controller
                     ];
                     $updateData = update($mainSalaryEmployeeBonus, $dataToUpdate);
                     if ($updateData) {
+                          $this->recalculate_main_salary($mainSalaryEmployee['id']);
                         return response()->json(['status' => 'true', 'message' => 'تم تعديل المكافأة بنجاح']);
                     } else {
                         return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم تعديل المكافأة']);

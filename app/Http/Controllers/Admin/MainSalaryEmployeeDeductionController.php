@@ -8,12 +8,14 @@ use App\Models\Employee;
 use App\Models\FinanceMonthlyCalendar;
 use App\Models\MainSalaryEmployee;
 use App\Models\MainSalaryEmployeeDeduction;
+use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class MainSalaryEmployeeDeductionController extends Controller
 {
+    use GeneralTrait;
     /**
      * Display a listing of the resource.
      */
@@ -67,6 +69,7 @@ class MainSalaryEmployeeDeductionController extends Controller
                         ];
                         $insertData = insert(MainSalaryEmployeeDeduction::class, $dataToInsert);
                         if ($insertData) {
+                            $this->recalculate_main_salary($mainSalaryEmployee['id']);
                             return response()->json(['status' => 'true', 'message' => 'تم اضافة الجزاء بنجاح']);
                         } else {
                             return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم اضافة الجزاء']);
@@ -214,6 +217,8 @@ class MainSalaryEmployeeDeductionController extends Controller
             }
             $destroy = destroy($mainSalaryEmployeeDeductions);
             if ($destroy) {
+                $this->recalculate_main_salary($mainSalaryEmployee['id']);
+
                 return response()->json(['status' => 'true', 'message' => 'تم حذف الجزاء بنجاح']);
             } else {
                 return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم حذف الجزاء']);
@@ -268,7 +273,7 @@ class MainSalaryEmployeeDeductionController extends Controller
             }
 
             try {
-                return DB::transaction(function () use ($request, $mainSalaryEmployeeDeduction) {
+                return DB::transaction(function () use ($request, $mainSalaryEmployeeDeduction,$mainSalaryEmployee) {
                     $dataToUpdate = [
                         'deduction_type' => $request->deduction_type,
                         'days_amount' => $request->days_amount,
@@ -278,6 +283,7 @@ class MainSalaryEmployeeDeductionController extends Controller
                     ];
                     $updateData = update($mainSalaryEmployeeDeduction, $dataToUpdate);
                     if ($updateData) {
+                        $this->recalculate_main_salary($mainSalaryEmployee['id']);
                         return response()->json(['status' => 'true', 'message' => 'تم تعديل الجزاء بنجاح']);
                     } else {
                         return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم تعديل الجزاء']);
@@ -291,82 +297,82 @@ class MainSalaryEmployeeDeductionController extends Controller
     public function printSearch(Request $request)
     {
         $finance_monthly_calendar_id = $request->finance_monthly_calendar_id_search;
-            $employee_id_search = $request->employee_id_search;
-            $deduction_type_search = $request->deduction_type_search;
-            $is_archived_search = $request->is_archived_search;
-            if (empty($employee_id_search)) {
-                $field1 = "id";
-                $operator1 = ">=";
-                $value1 = 0;
-            } else {
-                $field1 = "employee_id";
-                $operator1 = "=";
-                $value1 = $employee_id_search;
-            }
-            if (empty($deduction_type_search)) {
-                $field2 = "id";
-                $operator2 = ">=";
-                $value2 = 0;
-            } else {
-                $field2 = "deduction_type";
-                $operator2 = "=";
-                $value2 = $deduction_type_search;
-            }
+        $employee_id_search = $request->employee_id_search;
+        $deduction_type_search = $request->deduction_type_search;
+        $is_archived_search = $request->is_archived_search;
+        if (empty($employee_id_search)) {
+            $field1 = "id";
+            $operator1 = ">=";
+            $value1 = 0;
+        } else {
+            $field1 = "employee_id";
+            $operator1 = "=";
+            $value1 = $employee_id_search;
+        }
+        if (empty($deduction_type_search)) {
+            $field2 = "id";
+            $operator2 = ">=";
+            $value2 = 0;
+        } else {
+            $field2 = "deduction_type";
+            $operator2 = "=";
+            $value2 = $deduction_type_search;
+        }
 
-            if (empty($is_archived_search)) {
-                $field3 = "id";
-                $operator3 = ">=";
-                $value3 = 0;
-            } else {
-                $field3 = "is_archived";
-                $operator3 = "=";
-                $value3 = $is_archived_search;
-            }
+        if (empty($is_archived_search)) {
+            $field3 = "id";
+            $operator3 = ">=";
+            $value3 = 0;
+        } else {
+            $field3 = "is_archived";
+            $operator3 = "=";
+            $value3 = $is_archived_search;
+        }
 
 
-            $where = [
-                [$field1, $operator1, $value1],
-                [$field2, $operator2, $value2],
-                [$field3, $operator3, $value3],
-            ];
-            $company_id = Auth::user()->company_id;
+        $where = [
+            [$field1, $operator1, $value1],
+            [$field2, $operator2, $value2],
+            [$field3, $operator3, $value3],
+        ];
+        $company_id = Auth::user()->company_id;
 
-            $adminPanelSetting = AdminPanelSetting::where('company_id', $company_id)->first();
-            $systemData = [
-                'system_name' => $adminPanelSetting->company_name ?? '',
-                'photo'       => $adminPanelSetting->image ?? '',
-                'address'     => $adminPanelSetting->address ?? '',
-                'phone'       => $adminPanelSetting->phone ?? '',
-                'email'       => $adminPanelSetting->email ?? '',
-            ];
+        $adminPanelSetting = AdminPanelSetting::where('company_id', $company_id)->first();
+        $systemData = [
+            'system_name' => $adminPanelSetting->company_name ?? '',
+            'photo'       => $adminPanelSetting->image ?? '',
+            'address'     => $adminPanelSetting->address ?? '',
+            'phone'       => $adminPanelSetting->phone ?? '',
+            'email'       => $adminPanelSetting->email ?? '',
+        ];
 
-            $financeMonthlyCalendar = FinanceMonthlyCalendar::with('financeCalendar')
-                ->where('company_id', $company_id)
-                ->where('id', $finance_monthly_calendar_id)
-                ->first();
+        $financeMonthlyCalendar = FinanceMonthlyCalendar::with('financeCalendar')
+            ->where('company_id', $company_id)
+            ->where('id', $finance_monthly_calendar_id)
+            ->first();
 
-            $mainSalaryEmployeeDeductions = MainSalaryEmployeeDeduction::with([
-                'employee',
-                'financeMonthlyCalendar',
-                'addedBy',
-                'updatedBy',
-            ])
-                ->where('company_id', $company_id)
-                ->where('finance_monthly_calendar_id', $finance_monthly_calendar_id)
-                ->where($where)
-                ->orderBy('employee_id', 'asc')
-                ->orderBy('id', 'asc')
-                ->get();
+        $mainSalaryEmployeeDeductions = MainSalaryEmployeeDeduction::with([
+            'employee',
+            'financeMonthlyCalendar',
+            'addedBy',
+            'updatedBy',
+        ])
+            ->where('company_id', $company_id)
+            ->where('finance_monthly_calendar_id', $finance_monthly_calendar_id)
+            ->where($where)
+            ->orderBy('employee_id', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
 
-            $total_sum         = $mainSalaryEmployeeDeductions->sum('total');
-            $total_days_sum    = $mainSalaryEmployeeDeductions->sum('days_amount');
+        $total_sum         = $mainSalaryEmployeeDeductions->sum('total');
+        $total_days_sum    = $mainSalaryEmployeeDeductions->sum('days_amount');
 
-            return view('admin.mainSalaryRecordDeduction.print_search', [
-                'mainSalaryEmployeeDeductions' => $mainSalaryEmployeeDeductions,
-                'systemData'                   => $systemData,
-                'financeMonthlyCalendar'        => $financeMonthlyCalendar,
-                'total_sum'                    => $total_sum,
-                'total_days_sum'               => $total_days_sum,
-            ]);
+        return view('admin.mainSalaryRecordDeduction.print_search', [
+            'mainSalaryEmployeeDeductions' => $mainSalaryEmployeeDeductions,
+            'systemData'                   => $systemData,
+            'financeMonthlyCalendar'        => $financeMonthlyCalendar,
+            'total_sum'                    => $total_sum,
+            'total_days_sum'               => $total_days_sum,
+        ]);
     }
 }

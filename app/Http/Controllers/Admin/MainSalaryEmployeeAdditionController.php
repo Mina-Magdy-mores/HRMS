@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\MainSalaryEmployeeAddition;
+use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
 use App\Models\AdminPanelSetting;
 use App\Models\Employee;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 
 class MainSalaryEmployeeAdditionController extends Controller
 {
+    use GeneralTrait;
     /**
      * Display a listing of the resource.
      */
@@ -67,6 +69,7 @@ class MainSalaryEmployeeAdditionController extends Controller
                         ];
                         $insertData = insert(MainSalaryEmployeeAddition::class, $dataToInsert);
                         if ($insertData) {
+                            $this->recalculate_main_salary($mainSalaryEmployee['id']);
                             return response()->json(['status' => 'true', 'message' => 'تم اضافة الايام بنجاح']);
                         } else {
                             return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم اضافة الايام']);
@@ -201,6 +204,7 @@ class MainSalaryEmployeeAdditionController extends Controller
             }
             $destroy = destroy($mainSalaryEmployeeAdditions);
             if ($destroy) {
+                $this->recalculate_main_salary($mainSalaryEmployee['id']);
                 return response()->json(['status' => 'true', 'message' => 'تم حذف الاضافة بنجاح']);
             } else {
                 return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم حذف الاضافة']);
@@ -255,7 +259,7 @@ class MainSalaryEmployeeAdditionController extends Controller
             }
 
             try {
-                return DB::transaction(function () use ($request, $mainSalaryEmployeeAddition) {
+                return DB::transaction(function () use ($request, $mainSalaryEmployeeAddition, $mainSalaryEmployee) {
                     $dataToUpdate = [
                         'days_amount' => $request->days_amount,
                         'total'       => $request->total,
@@ -264,6 +268,8 @@ class MainSalaryEmployeeAdditionController extends Controller
                     ];
                     $updateData = update($mainSalaryEmployeeAddition, $dataToUpdate);
                     if ($updateData) {
+                        $this->recalculate_main_salary($mainSalaryEmployee['id']);
+
                         return response()->json(['status' => 'true', 'message' => 'تم تعديل الاضافة بنجاح']);
                     } else {
                         return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم تعديل الاضافة']);
