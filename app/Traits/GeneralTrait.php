@@ -69,7 +69,7 @@ trait GeneralTrait
             
             $dataToUpdate['monthly_loan_amount'] = $main_salary_employee_loans['amount'] ?? 0;
             
-            $dataToUpdate['permanent_loan_amount'] = $main_salary_employee_loans['amount'] ?? 0;
+            $dataToUpdate['permanent_loan_amount'] = $main_salary_employee_p_loans['amount'] ?? 0;
 
 
 
