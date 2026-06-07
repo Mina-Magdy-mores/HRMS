@@ -370,6 +370,14 @@ class Admin extends User
     {
         return $this->hasMany(MainSalaryEmployeePLoanInstallment::class, 'archived_by');
     }
+    public function employeeFixedAllowances()
+    {
+        return $this->hasMany(EmployeeFixedAllowance::class, 'added_by');
+    }
+    public function updatedEmployeeFixedAllowances()
+    {
+        return $this->hasMany(EmployeeFixedAllowance::class, 'updated_by');
+    }
 
 
 }

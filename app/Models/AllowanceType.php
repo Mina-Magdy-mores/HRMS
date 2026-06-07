@@ -23,4 +23,8 @@ class AllowanceType extends Model
     {
         return $this->hasMany(MainSalaryEmployeeAllowance::class);
     }
+    public function employeeFixedAllowances()
+    {
+        return $this->hasMany(EmployeeFixedAllowance::class);
+    }
 }

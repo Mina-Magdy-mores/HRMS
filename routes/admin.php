@@ -171,6 +171,9 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::get('/employees/{id}/download/{type}/{file?}', [EmployeeController::class, 'download'])->name('employees.download');
         Route::post('/employees/{id}/add-file', [EmployeeController::class, 'addFile'])->name('employees.add-file');
         Route::get('/employees/files/{id}/{employee_id}', [EmployeeController::class, 'deleteFile'])->name('employees.delete');
+        Route::post('/employees/fixed-allowances', [EmployeeController::class, 'addFixedAllowances'])->name('employees.add-allowance');
+        Route::post('/employees/fixed-allowances/delete', [EmployeeController::class, 'deleteFixedAllowance'])->name('employees.delete-allowance');
+        Route::post('/employees/fixed-allowances/update', [EmployeeController::class, 'updateFixedAllowance'])->name('employees.update-allowance');
 
         // AllowanceType routes
         Route::get('/allowance-types', [AllowanceTypeController::class, 'index'])->name('allowance-types.index');

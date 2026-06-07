@@ -122,6 +122,8 @@ class Employee extends Model
     {
         return $this->hasMany(MainSalaryEmployeePLoan::class, 'employee_id');
     }
-    
-
+    public function employeeFixedAllowances()
+    {
+        return $this->hasMany(EmployeeFixedAllowance::class, 'employee_id');
+    }
 }

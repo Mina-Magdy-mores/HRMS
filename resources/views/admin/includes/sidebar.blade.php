@@ -294,21 +294,21 @@
                             <a href="{{ route('admin.main-salary-employee-deduction-types.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-salary-employee-deduction-types.*')) active @endif ">
                                 <i class="fas fa-minus-circle"></i>
-                                <p>الخصومات المالية الثابتة</p>
+                                <p>الخصومات المالية المسجلة</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('admin.main-salary-employee-bonuses.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-salary-employee-bonuses.*')) active @endif ">
                                 <i class="fas fa-trophy"></i>
-                                <p>المكافئات المالية الثابتة</p>
+                                <p>المكافئات المالية المسجلة</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('admin.main-salary-employee-allowances.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-salary-employee-allowances.*')) active @endif ">
                                 <i class="fas fa-plus-circle"></i>
-                                <p>البدلات المالية الثابتة</p>
+                                <p>البدلات المالية المسجلة</p>
                             </a>
                         </li>
                         <li class="nav-item">

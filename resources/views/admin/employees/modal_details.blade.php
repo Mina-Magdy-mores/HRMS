@@ -358,10 +358,6 @@
                     <p class="mb-0 mt-1">{{ $employee->bank_account_number ?? '---' }}</p>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <strong>بدل ثابت:</strong>
-                    <p class="mb-0 mt-1">{{ $yesNoLabels[$employee->fixed_allowance] ?? '---' }}</p>
-                </div>
-                <div class="col-md-3 mb-3">
                     <strong>تفعيل الحضور والغياب:</strong>
                     <p class="mb-0 mt-1">{{ $yesNoLabels[$employee->has_attendance] ?? '---' }}</p>
                 </div>
@@ -377,6 +373,21 @@
                     <strong>بيانات حساسة:</strong>
                     <p class="mb-0 mt-1">{{ $yesNoLabels[$employee->has_sensitive_data] ?? '---' }}</p>
                 </div>
+                <div class="col-md-3 mb-3">
+                    <strong>بدل ثابت:</strong>
+                    <p class="mb-0 mt-1">{{ $yesNoLabels[$employee->fixed_allowance] ?? '---' }}</p>
+                </div>
+                @if ($employee->fixed_allowance == 1)
+                    <div class="col-md-3 mb-3">
+                        <strong>إضافة وعرض البدلات الثابتة:</strong>
+                        <p class="m-1">
+                            <button id="load_add_allowance_modal" class="btn btn-sm btn-success mb-2"
+                                data-toggle="modal" data-target="#addAllowanceModal">
+                                <i class="fas fa-file-upload"></i> إضافة وعرض البدلات الثابتة
+                            </button>
+                        </p>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -558,11 +569,11 @@
                     </p>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <strong>أضافة ملفات اخرى:</strong>
+                    <strong>إضافة وعرض الملفات المرفقة:</strong>
                     <p class="m-1">
                         <button id="load_add_file_modal" class="btn btn-sm btn-success mb-2" data-toggle="modal"
                             data-target="#addFileModal">
-                            <i class="fas fa-file-upload"></i> ارفق ملف جديد
+                            <i class="fas fa-file-upload"></i> إضافة و عرض الملفات المرفقة
                         </button>
                     </p>
                 </div>
@@ -575,7 +586,7 @@
     </div>
 
 
-    <!-- Months Modal (EMPTY BODY) -->
+    <!-- File Modal -->
     <div class="modal    fade " id="addFileModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
             <div class="modal-content shadow">
@@ -694,3 +705,232 @@
             </div>
         </div>
     </div>
+
+    <!-- Allowance Modal -->
+    <div class="modal    fade " id="addAllowanceModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+            <div class="modal-content shadow">
+
+                <!-- Header -->
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        إضافة بدلات ثابتة للموظف
+                    </h5>
+
+                    <button type="button" class="close text-white" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+
+                <!-- BODY = EMPTY -->
+                <div class="modal-body" id="add_allowance_modal_body">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>نوع البدل</label><span class="text-danger h4">*</span>
+                                    <select name="allowance_type_id" id="allowance_type_id" class="form-control select2">
+                                        <option value="">اختر نوع البدل</option>
+                                        @foreach ($allowances as $allowance)
+                                            <option value="{{ $allowance->id }}">{{ $allowance->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @include('admin.errors.errors', ['value' => 'type'])
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>قيمة البدل</label>
+                                    <input type="number" name="amount" step="0.01" id="allowance_amount"
+                                        class="form-control {{ $errors->has('amount') ? 'is-invalid' : '' }}"
+                                        placeholder="أدخل قيمة البدل">
+                                    @include('admin.errors.errors', ['value' => 'amount'])
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="hidden" id="editing_allowance_id" value="">
+                                <button type="submit" id="add_allowance_btn" class="btn btn-success shadow px-4">
+                                    <i class="fas fa-save"></i>
+                                    <span id="submit_btn_text">حفظ البيانات</span>
+                                </button>
+                                <button type="button" id="cancel_edit_btn" class="btn btn-warning shadow px-4" style="display: none;">
+                                    <i class="fas fa-undo"></i>
+                                    تراجع
+                                </button>
+                                <button type="button" data-dismiss="modal" class="btn btn-danger shadow px-4">
+                                    <i class="fas fa-times-circle"></i>
+                                    إلغاء
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover text-center align-middle">
+                                    <thead class="bg-primary text-white">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>نوع البدل</th>
+                                            <th>قيمة البدل</th>
+                                            <th>تاريخ الاضافة</th>
+                                            <th>تاريخ التحديث</th>
+                                            <th>الإجراءات</th>
+
+
+
+                                        </tr>
+                                    </thead>
+
+                                    <tbody id="allowances_table_body">
+                                        @include('admin.employees.allowances_rows', ['fixedAllowances' => $employee->employeeFixedAllowances])
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        $(document).ready(function() {
+            // Function to reset edit mode
+            function resetAllowanceForm() {
+                $('#editing_allowance_id').val('');
+                $('#allowance_amount').val('');
+                $('#allowance_type_id').val('').trigger('change');
+                $('#submit_btn_text').text('حفظ البيانات');
+                $('#cancel_edit_btn').hide();
+            }
+
+            // Edit Allowance button click
+            $(document).off('click', '.edit_allowance_btn');
+            $(document).on('click', '.edit_allowance_btn', function(e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+                var typeId = $(this).data('type-id');
+                var amount = $(this).data('amount');
+
+                $('#editing_allowance_id').val(id);
+                $('#allowance_type_id').val(typeId).trigger('change');
+                $('#allowance_amount').val(amount);
+                $('#submit_btn_text').text('تعديل البيانات');
+                $('#cancel_edit_btn').show();
+                
+                // Focus on the select element
+                $('#allowance_type_id').focus();
+            });
+
+            // Cancel Edit button click
+            $(document).off('click', '#cancel_edit_btn');
+            $(document).on('click', '#cancel_edit_btn', function(e) {
+                e.preventDefault();
+                resetAllowanceForm();
+            });
+
+            // Add or Update Allowance
+            $(document).off('click', '#add_allowance_btn');
+            $(document).on('click', '#add_allowance_btn', function(e) {
+                e.preventDefault();
+                
+                var allowance_id = $("#editing_allowance_id").val();
+                var allowance_type_id = $("#allowance_type_id").val();
+                var allowance_amount = $("#allowance_amount").val();
+                var employee_id = "{{ $employee->id }}";
+                
+                if (allowance_type_id == '' || allowance_type_id == null) {
+                    alert('الرجاء اختيار نوع البدل');
+                    return;
+                }
+                
+                if (allowance_amount == '' || allowance_amount <= 0) {
+                    alert('الرجاء إدخال قيمة بدل صحيحة أكبر من الصفر');
+                    return;
+                }
+
+                var isEdit = allowance_id !== '';
+                var targetUrl = isEdit ? "{{ route('admin.employees.update-allowance') }}" : "{{ route('admin.employees.add-allowance') }}";
+                var ajaxData = {
+                    _token: "{{ csrf_token() }}",
+                    employee_id: employee_id,
+                    allowance_type_id: allowance_type_id,
+                    amount: allowance_amount
+                };
+
+                if (isEdit) {
+                    ajaxData.id = allowance_id;
+                }
+
+                $.ajax({
+                    url: targetUrl,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: ajaxData,
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            alert(response.message);
+                            $('#allowances_table_body').html(response.html);
+                            resetAllowanceForm();
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        var response = xhr.responseJSON;
+                        if (response && response.message) {
+                            alert(response.message);
+                        } else {
+                            alert(isEdit ? 'حدث خطأ أثناء تعديل البدل' : 'حدث خطأ أثناء إضافة البدل');
+                        }
+                    }
+                });
+            });
+
+            // Delete Allowance
+            $(document).off('click', '.delete_allowance_btn');
+            $(document).on('click', '.delete_allowance_btn', function(e) {
+                e.preventDefault();
+                
+                if (!confirm('هل أنت متأكد من حذف هذا البدل الثابت؟')) {
+                    return;
+                }
+
+                var allowance_id = $(this).data('id');
+                var employee_id = "{{ $employee->id }}";
+
+                $.ajax({
+                    url: "{{ route('admin.employees.delete-allowance') }}",
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        id: allowance_id,
+                        employee_id: employee_id
+                    },
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            alert(response.message);
+                            $('#allowances_table_body').html(response.html);
+                            
+                            // If the deleted allowance was being edited, reset the form
+                            if ($('#editing_allowance_id').val() == allowance_id) {
+                                resetAllowanceForm();
+                            }
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('حدث خطأ أثناء حذف البدل');
+                    }
+                });
+            });
+        });
+    </script>

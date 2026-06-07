@@ -18,7 +18,9 @@ use App\Models\Resignation;
 use App\Http\Requests\EmployeeRequest;
 use App\Http\Requests\EmployeeUpdateRequest;
 use App\Http\Requests\FileRequest;
+use App\Models\AllowanceType;
 use App\Models\DrivingLicenseType;
+use App\Models\EmployeeFixedAllowance;
 use App\Models\File;
 use App\Models\Language;
 use App\Models\MilitaryStatus;
@@ -67,6 +69,7 @@ class EmployeeController extends Controller
     }
     public function getDetails($id)
     {
+        $company_id = Auth::user()->company_id;
         $employee = Employee::with([
             'bloodGroup',
             'country',
@@ -86,9 +89,11 @@ class EmployeeController extends Controller
             'drivingLicenseType',
             'language',
             'files',
+            'employeeFixedAllowances'
         ])->findOrFail($id);
 
-        return view('admin.employees.modal_details', compact('employee'));
+        $allowances = AllowanceType::select('id', 'name')->where('company_id', $company_id)->where('status', 1)->get();
+        return view('admin.employees.modal_details', ['employee' => $employee, 'allowances' => $allowances]);
     }
 
     /**
@@ -255,7 +260,12 @@ class EmployeeController extends Controller
                 $validatedData['cv'] = uploadImage('employees/cv', $request->file('cv'));
             }
 
-            $employee->update($validatedData);
+            $flag = $employee->update($validatedData);
+            if($flag){
+               if($validatedData['fixed_allowance'] == 0) {
+                //later
+               }
+            }
             return redirect()->route('admin.employees.index')->with(['success' => 'تم تحديث بيانات الموظف بنجاح']);
         } catch (\Exception $e) {
             return redirect()->back()->with(['error' => 'حدث خطأ أثناء تحديث بيانات الموظف ' . $e->getMessage()])->withInput();
@@ -508,6 +518,145 @@ class EmployeeController extends Controller
 
         } catch (\Exception $e) {
             return redirect()->route('admin.employees.index')->with(['error' => 'حدث خطأ أثناء إضافة الملف ' . $e->getMessage()]);
+        }
+    }
+
+    public function addFixedAllowances(Request $request)
+    {
+        if ($request->ajax()) {
+            $company_id = Auth::user()->company_id;
+            
+            $request->validate([
+                'employee_id' => 'required|exists:employees,id',
+                'allowance_type_id' => 'required|exists:allowance_types,id',
+                'amount' => 'required|numeric|min:0',
+            ]);
+
+            $checkIfExists = getColsWhereRow(EmployeeFixedAllowance::class, ['id'], [
+                'employee_id' => $request->employee_id,
+                'allowance_type_id' => $request->allowance_type_id,
+                'company_id' => $company_id
+            ]);
+
+            if ($checkIfExists) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'هذا البدل مضاف بالفعل للموظف'
+                ], 422);
+            }
+
+            $data = [
+                'employee_id' => $request->employee_id,
+                'allowance_type_id' => $request->allowance_type_id,
+                'amount' => $request->amount,
+                'company_id' => $company_id,
+                'added_by' => Auth::id()
+            ];
+
+            insert(EmployeeFixedAllowance::class, $data);
+
+            $fixedAllowances = EmployeeFixedAllowance::with('allowanceType')
+                ->where('employee_id', $request->employee_id)
+                ->where('company_id', $company_id)
+                ->get();
+
+            $html = view('admin.employees.allowances_rows', compact('fixedAllowances'))->render();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'تم إضافة البدل بنجاح',
+                'html' => $html
+            ]);
+        }
+    }
+
+    public function deleteFixedAllowance(Request $request)
+    {
+        if ($request->ajax()) {
+            $company_id = Auth::user()->company_id;
+            
+            $request->validate([
+                'id' => 'required|exists:employee_fixed_allowances,id',
+                'employee_id' => 'required|exists:employees,id',
+            ]);
+
+            $allowance = getColsWhereRow(EmployeeFixedAllowance::class, ['*'], [
+                'id' => $request->id,
+                'employee_id' => $request->employee_id,
+                'company_id' => $company_id
+            ]);
+
+            if ($allowance) {
+                destroy($allowance);
+            }
+
+            $fixedAllowances = EmployeeFixedAllowance::with('allowanceType')
+                ->where('employee_id', $request->employee_id)
+                ->where('company_id', $company_id)
+                ->get();
+
+            $html = view('admin.employees.allowances_rows', compact('fixedAllowances'))->render();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'تم حذف البدل بنجاح',
+                'html' => $html
+            ]);
+        }
+    }
+
+    public function updateFixedAllowance(Request $request)
+    {
+        if ($request->ajax()) {
+            $company_id = Auth::user()->company_id;
+            
+            $request->validate([
+                'id' => 'required|exists:employee_fixed_allowances,id',
+                'employee_id' => 'required|exists:employees,id',
+                'allowance_type_id' => 'required|exists:allowance_types,id',
+                'amount' => 'required|numeric|min:0',
+            ]);
+
+            // Check if there is another record for the same employee and same allowance type (excluding current id)
+            $checkIfExists = EmployeeFixedAllowance::where('employee_id', $request->employee_id)
+                ->where('allowance_type_id', $request->allowance_type_id)
+                ->where('company_id', $company_id)
+                ->where('id', '!=', $request->id)
+                ->first();
+
+            if ($checkIfExists) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'هذا البدل مضاف بالفعل للموظف مسبقاً'
+                ], 422);
+            }
+
+            $allowance = getColsWhereRow(EmployeeFixedAllowance::class, ['*'], [
+                'id' => $request->id,
+                'employee_id' => $request->employee_id,
+                'company_id' => $company_id
+            ]);
+
+            if ($allowance) {
+                $allowance->update([
+                    'allowance_type_id' => $request->allowance_type_id,
+                    'amount' => $request->amount,
+                    'updated_by' => Auth::id()
+                ]);
+            }
+
+            $fixedAllowances = EmployeeFixedAllowance::with('allowanceType')
+                ->where('employee_id', $request->employee_id)
+                ->where('company_id', $company_id)
+                ->get();
+
+            $html = view('admin.employees.allowances_rows', compact('fixedAllowances'))->render();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'تم تعديل البدل بنجاح',
+                'html' => $html
+            ]);
         }
     }
 }
