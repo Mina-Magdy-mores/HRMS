@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $address
  * @property string $email
  * @property int $created_by
- * @property int $updated_by
+ * @property int|null $updated_by
  * @property int $company_id
  * @property numeric $after_minute_calculate_delay بعد كم عدد دقيقة نحسب تاخير حضور
  * @property numeric $after_minute_calculate_early_departure بعد كم عدد دقيقة نحسب انصراف مبكر
@@ -32,7 +32,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Admin $addedBy
- * @property-read \App\Models\Admin $updatedBy
+ * @property-read \App\Models\Admin|null $updatedBy
  * @method static \Database\Factories\AdminPanelSettingFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminPanelSetting newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminPanelSetting newQuery()

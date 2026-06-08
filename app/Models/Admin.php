@@ -21,40 +21,150 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property int $company_id
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AdminPanelSetting> $addedAdminPanels
  * @property-read int|null $added_admin_panels_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AllowanceType> $addedAllowanceTypes
+ * @property-read int|null $added_allowance_types_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BloodGroup> $addedBloodGroup
+ * @property-read int|null $added_blood_group_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Bonus> $addedBonuses
+ * @property-read int|null $added_bonuses_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\City> $addedCities
+ * @property-read int|null $added_cities_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Country> $addedCountries
+ * @property-read int|null $added_countries_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\DeductionType> $addedDeductionTypes
+ * @property-read int|null $added_deduction_types_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Department> $addedDepartments
  * @property-read int|null $added_departments_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $addedEmployees
+ * @property-read int|null $added_employees_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\File> $addedFiles
+ * @property-read int|null $added_files_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FinanceCalendar> $addedFinanceCalendars
  * @property-read int|null $added_finance_calendars_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FinanceMonthlyCalendar> $addedFinanceMonthlyCalendars
  * @property-read int|null $added_finance_monthly_calendars_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Governorate> $addedGovernorates
+ * @property-read int|null $added_governorates_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JobsCategory> $addedJobsCategoies
  * @property-read int|null $added_jobs_categoies_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeAbsence> $addedMainSalaryEmployeeAbsences
+ * @property-read int|null $added_main_salary_employee_absences_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeAddition> $addedMainSalaryEmployeeAdditions
+ * @property-read int|null $added_main_salary_employee_additions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeAllowance> $addedMainSalaryEmployeeAllowances
+ * @property-read int|null $added_main_salary_employee_allowances_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeBonus> $addedMainSalaryEmployeeBonuses
+ * @property-read int|null $added_main_salary_employee_bonuses_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeDeductionType> $addedMainSalaryEmployeeDeductionTypes
+ * @property-read int|null $added_main_salary_employee_deduction_types_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeDeduction> $addedMainSalaryEmployeeDeductions
+ * @property-read int|null $added_main_salary_employee_deductions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeLoan> $addedMainSalaryEmployeeLoans
+ * @property-read int|null $added_main_salary_employee_loans_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeePLoanInstallment> $addedMainSalaryEmployeePLoanInstallments
+ * @property-read int|null $added_main_salary_employee_p_loan_installments_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeePLoan> $addedMainSalaryEmployeePLoans
+ * @property-read int|null $added_main_salary_employee_p_loans_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployee> $addedMainSalaryEmployees
+ * @property-read int|null $added_main_salary_employees_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Nationality> $addedNationality
+ * @property-read int|null $added_nationality_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Occasion> $addedOccasions
  * @property-read int|null $added_occasions_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Qualification> $addedQualifications
  * @property-read int|null $added_qualifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Religion> $addedReligion
+ * @property-read int|null $added_religion_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Resignation> $addedResignation
+ * @property-read int|null $added_resignation_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ShiftsType> $addedShiftsTypes
  * @property-read int|null $added_shifts_types_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeAddition> $archivedMainSalaryEmployeeAdditions
+ * @property-read int|null $archived_main_salary_employee_additions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeAllowance> $archivedMainSalaryEmployeeAllowances
+ * @property-read int|null $archived_main_salary_employee_allowances_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeBonus> $archivedMainSalaryEmployeeBonuses
+ * @property-read int|null $archived_main_salary_employee_bonuses_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeDeductionType> $archivedMainSalaryEmployeeDeductionTypes
+ * @property-read int|null $archived_main_salary_employee_deduction_types_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeDeduction> $archivedMainSalaryEmployeeDeductions
+ * @property-read int|null $archived_main_salary_employee_deductions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeLoan> $archivedMainSalaryEmployeeLoans
+ * @property-read int|null $archived_main_salary_employee_loans_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeePLoanInstallment> $archivedMainSalaryEmployeePLoanInstallments
+ * @property-read int|null $archived_main_salary_employee_p_loan_installments_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeePLoan> $archivedMainSalaryEmployeePLoans
+ * @property-read int|null $archived_main_salary_employee_p_loans_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Branche> $branches
  * @property-read int|null $branches_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeePLoan> $disbursedMainSalaryEmployeePLoans
+ * @property-read int|null $disbursed_main_salary_employee_p_loans_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\EmployeeFixedAllowance> $employeeFixedAllowances
+ * @property-read int|null $employee_fixed_allowances_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AdminPanelSetting> $updatedAdminPanels
  * @property-read int|null $updated_admin_panels_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AllowanceType> $updatedAllowanceTypes
+ * @property-read int|null $updated_allowance_types_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\BloodGroup> $updatedBloodGroup
+ * @property-read int|null $updated_blood_group_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Bonus> $updatedBonuses
+ * @property-read int|null $updated_bonuses_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Branche> $updatedBranches
  * @property-read int|null $updated_branches_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\City> $updatedCities
+ * @property-read int|null $updated_cities_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Country> $updatedCountries
+ * @property-read int|null $updated_countries_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\DeductionType> $updatedDeductionTypes
+ * @property-read int|null $updated_deduction_types_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Department> $updatedDepartments
  * @property-read int|null $updated_departments_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\EmployeeFixedAllowance> $updatedEmployeeFixedAllowances
+ * @property-read int|null $updated_employee_fixed_allowances_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $updatedEmployees
+ * @property-read int|null $updated_employees_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\File> $updatedFiles
+ * @property-read int|null $updated_files_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FinanceCalendar> $updatedFinanceCalendars
  * @property-read int|null $updated_finance_calendars_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\FinanceMonthlyCalendar> $updatedFinanceMonthlyCalendars
  * @property-read int|null $updated_finance_monthly_calendars_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Governorate> $updatedGovernorates
+ * @property-read int|null $updated_governorates_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\JobsCategory> $updatedJobsCategoies
  * @property-read int|null $updated_jobs_categoies_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeAbsence> $updatedMainSalaryEmployeeAbsences
+ * @property-read int|null $updated_main_salary_employee_absences_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeAddition> $updatedMainSalaryEmployeeAdditions
+ * @property-read int|null $updated_main_salary_employee_additions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeAllowance> $updatedMainSalaryEmployeeAllowances
+ * @property-read int|null $updated_main_salary_employee_allowances_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeBonus> $updatedMainSalaryEmployeeBonuses
+ * @property-read int|null $updated_main_salary_employee_bonuses_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeDeductionType> $updatedMainSalaryEmployeeDeductionTypes
+ * @property-read int|null $updated_main_salary_employee_deduction_types_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeDeduction> $updatedMainSalaryEmployeeDeductions
+ * @property-read int|null $updated_main_salary_employee_deductions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeLoan> $updatedMainSalaryEmployeeLoans
+ * @property-read int|null $updated_main_salary_employee_loans_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeePLoanInstallment> $updatedMainSalaryEmployeePLoanInstallments
+ * @property-read int|null $updated_main_salary_employee_p_loan_installments_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeePLoan> $updatedMainSalaryEmployeePLoans
+ * @property-read int|null $updated_main_salary_employee_p_loans_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployee> $updatedMainSalaryEmployees
+ * @property-read int|null $updated_main_salary_employees_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Nationality> $updatedNationality
+ * @property-read int|null $updated_nationality_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Occasion> $updatedOccasions
  * @property-read int|null $updated_occasions_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Qualification> $updatedQualifications
  * @property-read int|null $updated_qualifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Religion> $updatedReligion
+ * @property-read int|null $updated_religion_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Resignation> $updatedResignation
+ * @property-read int|null $updated_resignation_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ShiftsType> $updatedShiftsTypes
  * @property-read int|null $updated_shifts_types_count
  * @method static \Database\Factories\AdminFactory factory($count = null, $state = [])

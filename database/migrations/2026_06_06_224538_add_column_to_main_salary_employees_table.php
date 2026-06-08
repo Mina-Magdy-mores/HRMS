@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('main_salary_employees', function (Blueprint $table) {
             $table->decimal('employee_net_salary_after_close_for_roll_over', 15, 2)->nullable()->after('employee_net_salary');
-            $table->tinyInteger('is_disbursed')->nullable()->after('employee_net_salary_after_close_for_roll_over');
+            $table->tinyInteger('is_disbursed')->nullable()->default(0)->after('employee_net_salary_after_close_for_roll_over');
         });
     }
 

@@ -12,11 +12,13 @@ use App\Models\Admin;
  * @property int $status
  * @property int $company_id
  * @property int $added_by
- * @property int $updated_by
+ * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read Admin $addedBy
- * @property-read Admin $updatedBy
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
+ * @property-read int|null $employees_count
+ * @property-read Admin|null $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification query()

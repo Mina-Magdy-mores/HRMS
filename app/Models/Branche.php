@@ -14,12 +14,16 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $email
  * @property int $status
  * @property int $created_by
- * @property int $updated_by
+ * @property int|null $updated_by
  * @property int $company_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Admin $createdBy
- * @property-read \App\Models\Admin $updatedBy
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
+ * @property-read int|null $employees_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployee> $mainSalaryEmployee
+ * @property-read int|null $main_salary_employee_count
+ * @property-read \App\Models\Admin|null $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche query()

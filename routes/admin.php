@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\MainSalaryEmployeeAllowanceController;
 use App\Http\Controllers\Admin\MainSalaryEmployeeDeductionController;
 use App\Http\Controllers\Admin\MainSalaryEmployeeDeductionTypeController;
 use App\Http\Controllers\Admin\MainSalaryEmployeeBonusController;
+use App\Http\Controllers\Admin\MainSalaryEmployeeController;
 use App\Http\Controllers\Admin\MainSalaryEmployeeLoanController;
 use App\Http\Controllers\Admin\MainSalaryEmployeePLoanController;
 use App\Http\Controllers\Admin\MainSalaryRecordController;
@@ -298,7 +299,16 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/main-salary-employee-ploans/edit', [MainSalaryEmployeePLoanController::class, 'edit'])->name('main-salary-employee-ploans.edit');
         Route::put('/main-salary-employee-ploans', [MainSalaryEmployeePLoanController::class, 'update'])->name('main-salary-employee-ploans.update');
         Route::post('/main-salary-employee-ploans/disbursed', [MainSalaryEmployeePLoanController::class, 'disbursed'])->name('main-salary-employee-ploans.disbursed');
-        
+
+        //main_salary_employee
+        Route::get('/main-salary-employee', [MainSalaryEmployeeController::class, 'index'])->name('main-salary-employee.index');
+        Route::get('/main-salary-employee/{id}/show', [MainSalaryEmployeeController::class, 'show'])->name('main-salary-employee.show');
+        Route::post('/main-salary-employee/store', [MainSalaryEmployeeController::class, 'store'])->name('main-salary-employee.store');
+        Route::post('/main-salary-employee/ajax-search', [MainSalaryEmployeeController::class, 'ajaxSearch'])->name('main-salary-employee.ajax-search');
+        Route::post('/main-salary-employee/destroy', [MainSalaryEmployeeController::class, 'destroy'])->name('main-salary-employee.destroy');
+        // Route::post('/main-salary-employee/edit', [MainSalaryEmployeeController::class, 'edit'])->name('main-salary-employee.edit');
+        // Route::put('/main-salary-employee', [MainSalaryEmployeeController::class, 'update'])->name('main-salary-employee.update');
+        Route::post('/main-salary-employee/print-search', [MainSalaryEmployeeController::class, 'printSearch'])->name('main-salary-employee.print-search');
     });
 
     // guest routes

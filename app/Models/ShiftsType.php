@@ -7,18 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int $id
- * @property int|null $type 1: Day Shift, 2: Night Shift
+ * @property int|null $type 1: Day Shift, 2: Night Shift, 3: Full day Shift
  * @property string $start_time
  * @property string $end_time
  * @property numeric $total_hours
  * @property int $status
  * @property int $company_id
  * @property int $created_by
- * @property int $updated_by
+ * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Admin $createdBy
- * @property-read \App\Models\Admin $updatedBy
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Employee> $employees
+ * @property-read int|null $employees_count
+ * @property-read \App\Models\Admin|null $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType query()

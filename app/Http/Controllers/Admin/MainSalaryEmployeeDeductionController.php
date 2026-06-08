@@ -273,7 +273,7 @@ class MainSalaryEmployeeDeductionController extends Controller
             }
 
             try {
-                return DB::transaction(function () use ($request, $mainSalaryEmployeeDeduction,$mainSalaryEmployee) {
+                return DB::transaction(function () use ($request, $mainSalaryEmployeeDeduction, $mainSalaryEmployee) {
                     $dataToUpdate = [
                         'deduction_type' => $request->deduction_type,
                         'days_amount' => $request->days_amount,

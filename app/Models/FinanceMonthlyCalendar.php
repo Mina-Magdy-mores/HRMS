@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $month_id
  * @property string $start_date
  * @property string $end_date
- * @property int $status واحد مفعل - صفر معطل
+ * @property int $status واحد مفعل - صفر معطل - اتنين مغلق و مؤرشف
  * @property string $start_date_for_calculation
  * @property string $end_date_for_calculation
  * @property int $company_id
@@ -24,6 +24,22 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Admin $addedBy
  * @property-read \App\Models\FinanceCalendar $financeCalendar
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployee> $mainSalaryEmployee
+ * @property-read int|null $main_salary_employee_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeAbsence> $mainSalaryEmployeeAbsences
+ * @property-read int|null $main_salary_employee_absences_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeAddition> $mainSalaryEmployeeAdditions
+ * @property-read int|null $main_salary_employee_additions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeAllowance> $mainSalaryEmployeeAllowances
+ * @property-read int|null $main_salary_employee_allowances_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeBonus> $mainSalaryEmployeeBonuses
+ * @property-read int|null $main_salary_employee_bonuses_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeDeductionType> $mainSalaryEmployeeDeductionTypes
+ * @property-read int|null $main_salary_employee_deduction_types_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeDeduction> $mainSalaryEmployeeDeductions
+ * @property-read int|null $main_salary_employee_deductions_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MainSalaryEmployeeLoan> $mainSalaryEmployeeLoans
+ * @property-read int|null $main_salary_employee_loans_count
  * @property-read \App\Models\Month $month
  * @property-read \App\Models\Admin|null $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar newModelQuery()

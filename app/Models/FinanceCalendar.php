@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $finance_yr_desc
  * @property string $start_date
  * @property string $end_date
- * @property int $status واحد مفعل - صفر معطل
+ * @property int $status واحد مفعل - صفر معطل - اتنين مغلق و مؤرشف
  * @property int $company_id
  * @property int $added_by
  * @property int|null $updated_by

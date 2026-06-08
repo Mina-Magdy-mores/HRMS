@@ -239,7 +239,8 @@
                     request()->routeIs('admin.main-salary-employee-deduction-types.*') ||
                     request()->routeIs('admin.main-salary-employee-bonuses.*') ||
                     request()->routeIs('admin.main-salary-employee-loans.*') ||
-                    request()->routeIs('admin.main-salary-employee-ploans.*')
+                    request()->routeIs('admin.main-salary-employee-ploans.*') ||
+                    request()->routeIs('admin.main-salary-employee.*')
                         ? 'menu-open'
                         : '' }}">
                     <a href="#"
@@ -251,7 +252,8 @@
                         request()->routeIs('admin.main-salary-employee-deduction-types.*') ||
                         request()->routeIs('admin.main-salary-employee-bonuses.*') ||
                         request()->routeIs('admin.main-salary-employee-loans.*') ||
-                        request()->routeIs('admin.main-salary-employee-ploans.*')
+                        request()->routeIs('admin.main-salary-employee-ploans.*') ||
+                        request()->routeIs('admin.main-salary-employee.*')
                             ? 'active'
                             : '' }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -326,8 +328,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('admin.main-salary-records.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
+                            <a href="{{ route('admin.main-salary-employee.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-employee.*')) active @endif ">
                                 <i class="fas fa-print"></i>
                                 <p>رواتب الموظفين مفصله</p>
                             </a>

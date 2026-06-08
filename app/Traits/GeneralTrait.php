@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\Employee;
+use App\Models\EmployeeFixedAllowance;
 use App\Models\FinanceMonthlyCalendar;
 use App\Models\MainSalaryEmployee;
 use App\Models\MainSalaryEmployeeAbsence;
@@ -100,12 +101,14 @@ trait GeneralTrait
                         $query->where('employee_id', $main_salary_employee['employee_id']);
                     })
                     ->update($dataToUpdateIn_main_salary_employee_p_loans);
-
+                $employee_fixed_allowances = EmployeeFixedAllowance::select(['id', 'amount'])
+                    ->where('employee_id', $main_salary_employee['employee_id'])
+                    ->where('company_id', $company_id)
+                    ->sum('amount');
                 $dataToUpdate['employee_per_day_salary'] = $employee['payment_per_day'] ?? 0;
                 $dataToUpdate['employee_salary'] = $employee['salary'] ?? 0;
                 $dataToUpdate['motivation_amount'] = $employee['motivation_amount'] ?? 0;
-                $dataToUpdate['fixed_allowance'] = 0;
-                // $dataToUpdate['fixed_allowance'] = $employee['fixed_allowance'] ?? 0;
+                $dataToUpdate['fixed_allowance'] = $employee_fixed_allowances ?? 0;
                 $dataToUpdate['employee_total_allowance'] = $main_salary_employee_allowance['amount'] ?? 0;
                 $dataToUpdate['employee_total_bonus'] = $main_salary_employee_bonus['amount'] ?? 0;
                 $dataToUpdate['employee_additions_days_counter'] = $main_salary_employee_additions['days_amount'] ?? 0;

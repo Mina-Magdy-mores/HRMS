@@ -14,11 +14,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $status
  * @property int $company_id
  * @property int $added_by
- * @property int $updated_by
+ * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Admin $addedBy
- * @property-read \App\Models\Admin $updatedBy
+ * @property-read \App\Models\Admin|null $updatedBy
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion query()
