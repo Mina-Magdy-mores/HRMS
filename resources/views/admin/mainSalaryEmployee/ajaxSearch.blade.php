@@ -110,9 +110,25 @@
                                             data-additions-days-counter="{{ $record->employee_additions_days_counter ?? 0 }}"
                                             data-absences-days-counter="{{ $record->employee_absences_days_counter ?? 0 }}"
                                             data-deductions-days-counter="{{ $record->employee_deductions_days_counter ?? 0 }}"
-                                            data-penalty-days-counter="{{ $record->employee_total_penalty_days ?? 0 }}">
+                                            data-penalty-days-counter="{{ $record->employee_total_penalty_days ?? 0 }}"
+                                            title="تفاصيل الراتب">
                                             <i class="fas fa-eye"></i>
                                         </button>
+                                        @if ($record->is_archived == 0 && $financeMonthlyCalendar->status == 1)
+                                            @if ($record->payment_on_hold == 0)
+                                                <button class="btn btn-warning btn-sm toggle-payment-status m-2 shadow-sm"
+                                                    data-id="{{ $record->id }}"
+                                                    title="إيقاف صرف راتب الموظف">
+                                                    <i class="fas fa-pause mr-1"></i>
+                                                </button>
+                                            @else
+                                                <button class="btn btn-success btn-sm toggle-payment-status m-2 shadow-sm"
+                                                    data-id="{{ $record->id }}"
+                                                    title="تفعيل صرف راتب الموظف">
+                                                    <i class="fas fa-play mr-1"></i>
+                                                </button>
+                                            @endif
+                                        @endif
                                         @if ($record->is_archived == 0)
                                         <button class="btn btn-danger btn-sm deleteMainSalaryRecord m-2" data-id="{{ $record->id }}"
                                             data-employee-id="{{ $record->employee_id }}"

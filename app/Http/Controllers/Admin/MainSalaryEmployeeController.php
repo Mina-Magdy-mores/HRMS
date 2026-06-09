@@ -73,7 +73,6 @@ class MainSalaryEmployeeController extends Controller
             ->where('finance_monthly_calendar_id', $id)
             ->orderBy('id', 'asc')
             ->paginate(PAGEINATION_COUNTER);
-
         $mainSalaryEmployees2 = MainSalaryEmployee::select('*')->where('company_id', $company_id)
             ->where('finance_monthly_calendar_id', $id)
             ->orderBy('id', 'asc')
@@ -207,11 +206,13 @@ class MainSalaryEmployeeController extends Controller
                 'company_id' => $company_id,
                 'employee_id' => $employee_id,
                 'finance_monthly_calendar_id' => $finance_monthly_calendar_id,
-                'is_archived' => 0
+                'is_archived' => 0,
+                'is_disbursed' => 0,
+                'payment_on_hold' => 0,
             ]);
 
             if (empty($mainSalaryEmployee)) {
-                return response()->json(['status' => 'false', 'message' => 'عفوا، لا يوجد سجل مالي مفتوح بالفعل لهذا الموظف في هذا الشهر']);
+                return response()->json(['status' => 'false', 'message' => 'عذرا، لا يمكن حذف الراتب لأنه محذوف بالفعل او مؤرشف او تم صرف']);
             }
 
             try {
@@ -366,7 +367,15 @@ class MainSalaryEmployeeController extends Controller
                 ->paginate(PAGEINATION_COUNTER);
 
 
-            return view('admin.mainSalaryEmployee.ajaxSearch', ['mainSalaryEmployees' => $mainSalaryEmployees]);
+            $financeMonthlyCalendar = FinanceMonthlyCalendar::select(['id', 'status'])->where([
+                'company_id' => $company_id,
+                'id' => $request->finance_monthly_calendar_id
+            ])->first();
+
+            return view('admin.mainSalaryEmployee.ajaxSearch', [
+                'mainSalaryEmployees' => $mainSalaryEmployees,
+                'financeMonthlyCalendar' => $financeMonthlyCalendar
+            ]);
         }
     }
 
@@ -560,5 +569,26 @@ class MainSalaryEmployeeController extends Controller
             'record' => $record,
             'systemData' => $systemData,
         ]);
+    }
+
+    public function togglePaymentStatus(Request $request)
+    {
+        if ($request->ajax()) {
+            $company_id = Auth::user()->company_id;
+            $id = $request->id;
+
+            $record = MainSalaryEmployee::where('company_id', $company_id)->where('id', $id)->first();
+            if (empty($record)) {
+                return response()->json(['status' => 'false', 'message' => 'عفواً، السجل غير موجود']);
+            }
+
+            // Toggle payment_on_hold
+            $record->payment_on_hold = $record->payment_on_hold == 1 ? 0 : 1;
+            $record->updated_by = Auth::id();
+            $record->save();
+
+            $message = $record->payment_on_hold == 1 ? 'تم إيقاف صرف الراتب بنجاح' : 'تم تفعيل صرف الراتب بنجاح';
+            return response()->json(['status' => 'true', 'message' => $message]);
+        }
     }
 }
