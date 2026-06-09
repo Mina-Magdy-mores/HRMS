@@ -5,14 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AdminPanelSetting;
 use App\Models\Employee;
+use App\Models\MainSalaryEmployee;
 use App\Models\MainSalaryEmployeePLoan;
 use App\Models\MainSalaryEmployeePLoanInstallment;
+use App\Traits\GeneralTrait;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class MainSalaryEmployeePLoanController extends Controller
 {
+    use GeneralTrait;
     public function index()
     {
         $company_id = Auth::user()->company_id;
@@ -376,11 +379,11 @@ class MainSalaryEmployeePLoanController extends Controller
         }
     }
 
-     public function disbursed(Request $request)
+    public function disbursed(Request $request)
     {
         if ($request->ajax()) {
             $company_id = Auth::user()->company_id;
-            $mainSalaryEmployeePLoan = getColsWhereRow(MainSalaryEmployeePLoan::class, ['id', 'is_archived', 'is_disbursed'], ['company_id' => $company_id, 'id' => $request->id]);
+            $mainSalaryEmployeePLoan = getColsWhereRow(MainSalaryEmployeePLoan::class, ['id', 'is_archived', 'is_disbursed','employee_id'], ['company_id' => $company_id, 'id' => $request->id]);
             if (empty($mainSalaryEmployeePLoan)) {
                 return response()->json(['status' => 'false', 'message' => 'عفوا غير قادر للوصول الى بيانات السلفة']);
             }
@@ -388,24 +391,32 @@ class MainSalaryEmployeePLoanController extends Controller
                 return response()->json(['status' => 'false', 'message' => 'عفوا لا يمكن صرف السلفة']);
             }
             try {
-                return DB::transaction(function () use ($mainSalaryEmployeePLoan) {
+                return DB::transaction(function () use ($mainSalaryEmployeePLoan, $company_id) {
                     $updateData = $mainSalaryEmployeePLoan->update([
                         'is_disbursed' => 1,
                         'disbursed_by' => Auth::user()->id,
-                        'disbursed_at   ' => date('Y-m-d'),
+                        'disbursed_at' => date('Y-m-d H:i:s'),
                         'updated_by' => Auth::user()->id,
                     ]);
                     if ($updateData) {
+                        $mainSalaryEmployee = MainSalaryEmployee::where([
+                            'employee_id' => $mainSalaryEmployeePLoan['employee_id'],
+                            'company_id' => $company_id,
+                            'is_archived' => 0
+                        ])->first();
+                        
+                        if (!empty($mainSalaryEmployee)) {
+                            $this->recalculate_main_salary($mainSalaryEmployee->id);
+                        }
+                        
                         return response()->json(['status' => 'true', 'message' => 'تم صرف السلفة بنجاح']);
                     } else {
                         return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم صرف السلفة']);
                     }
                 });
             } catch (\Exception $e) {
-                return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم صرف السلفة']);
+                return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم صرف السلفة ' . $e->getMessage()]);
             }
         }
     }
-
-    
 }

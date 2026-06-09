@@ -216,7 +216,15 @@ class MainSalaryEmployeeController extends Controller
 
             try {
                 return DB::transaction(function () use ($mainSalaryEmployee) {
-                  
+                    $mainSalaryEmployee->mainSalaryEmployeeDeductions()->delete();
+                    $mainSalaryEmployee->mainSalaryEmployeeAbsences()->delete();
+                    $mainSalaryEmployee->mainSalaryEmployeeDeductionTypes()->delete();
+                    $mainSalaryEmployee->mainSalaryEmployeeAdditions()->delete();
+                    $mainSalaryEmployee->mainSalaryEmployeeLoans()->delete();
+                    $mainSalaryEmployee->mainSalaryEmployeeBonuses()->delete();
+                    $mainSalaryEmployee->mainSalaryEmployeeAllowances()->delete();
+                    $mainSalaryEmployee->mainSalaryEmployeePLoanInstallments()->delete();
+
                     $flag = destroy($mainSalaryEmployee);
                     if (!empty($flag)) {
                         return response()->json(['status' => 'true', 'message' => 'تم حذف سجل الراتب للموظف بنجاح']);
@@ -518,6 +526,39 @@ class MainSalaryEmployeeController extends Controller
             'total_benefits_sum'  => $total_benefits_sum,
             'total_deductions_sum' => $total_deductions_sum,
             'total_net_salary_sum' => $total_net_salary_sum,
+        ]);
+    }
+
+    public function printDetails($id)
+    {
+        $company_id = Auth::user()->company_id;
+        $adminPanelSetting = AdminPanelSetting::where('company_id', $company_id)->first();
+        $systemData = [
+            'system_name' => $adminPanelSetting->company_name ?? '',
+            'photo'       => $adminPanelSetting->image ?? '',
+            'address'     => $adminPanelSetting->address ?? '',
+            'phone'       => $adminPanelSetting->phone ?? '',
+            'email'       => $adminPanelSetting->email ?? '',
+        ];
+
+        $record = MainSalaryEmployee::with([
+            'employee',
+            'financeMonthlyCalendar.month',
+            'branch',
+            'department',
+            'job'
+        ])
+        ->where('company_id', $company_id)
+        ->where('id', $id)
+        ->first();
+
+        if (empty($record)) {
+            return redirect()->back()->with('error', 'عفوا غير قادر للوصول الى البيانات');
+        }
+
+        return view('admin.mainSalaryEmployee.print_details', [
+            'record' => $record,
+            'systemData' => $systemData,
         ]);
     }
 }

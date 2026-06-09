@@ -85,6 +85,7 @@
                                       <td>
                                         <div class="d-flex ">
                                             <button class="btn btn-info btn-sm show-details shadow-sm m-2"
+                                            data-id="{{ $record->id }}"
                                             data-employee-name="{{ $record->employee_name }}"
                                             data-employee-code="{{ $record->employee->employee_code ?? '---' }}"
                                             data-employee-salary="{{ $record->employee_salary ?? 0.0 }}"
@@ -105,7 +106,11 @@
                                             data-employee-net-salary="{{ $record->employee_net_salary ?? 0.0 }}"
                                             data-employee-rollover-amount="{{ $record->employee_rollover_amount ?? 0.0 }}"
                                             data-is-disbursed="{{ $record->is_disbursed ?? 0 }}"
-                                            data-payment-on-hold="{{ $record->payment_on_hold ?? 0 }}">
+                                            data-payment-on-hold="{{ $record->payment_on_hold ?? 0 }}"
+                                            data-additions-days-counter="{{ $record->employee_additions_days_counter ?? 0 }}"
+                                            data-absences-days-counter="{{ $record->employee_absences_days_counter ?? 0 }}"
+                                            data-deductions-days-counter="{{ $record->employee_deductions_days_counter ?? 0 }}"
+                                            data-penalty-days-counter="{{ $record->employee_total_penalty_days ?? 0 }}">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                         @if ($record->is_archived == 0)

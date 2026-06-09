@@ -13,7 +13,6 @@ use App\Models\MainSalaryEmployeeBonus;
 use App\Models\MainSalaryEmployeeDeduction;
 use App\Models\MainSalaryEmployeeDeductionType;
 use App\Models\MainSalaryEmployeeLoan;
-use App\Models\MainSalaryEmployeePLoan;
 use App\Models\MainSalaryEmployeePLoanInstallment;
 use Illuminate\Support\Facades\Auth;
 

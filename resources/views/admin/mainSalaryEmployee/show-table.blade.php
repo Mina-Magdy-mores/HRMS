@@ -146,8 +146,7 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>الفرع</label>
-                            <select name="branch_id_search" id="branch_id_search"
-                                class="form-control select2">
+                            <select name="branch_id_search" id="branch_id_search" class="form-control select2">
                                 <option value="">اختر الفرع</option>
                                 @foreach ($branches as $branch)
                                     <option value="{{ $branch->id }}">
@@ -160,8 +159,7 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>الإدارة</label>
-                            <select name="department_id_search" id="department_id_search"
-                                class="form-control select2">
+                            <select name="department_id_search" id="department_id_search" class="form-control select2">
                                 <option value="">اختر الإدارة</option>
                                 @foreach ($departments as $department)
                                     <option value="{{ $department->id }}">
@@ -174,8 +172,7 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>الوظيفة</label>
-                            <select name="job_id_search" id="job_id_search"
-                                class="form-control select2">
+                            <select name="job_id_search" id="job_id_search" class="form-control select2">
                                 <option value="">اختر الوظيفة</option>
                                 @foreach ($jobs as $job)
                                     <option value="{{ $job->id }}">
@@ -300,14 +297,15 @@
                                     <td class="small font-weight-bold">
                                         {{ $record->job->name ?? '---' }}
                                     </td>
-                                     <td>
-                                    @if($record->employee->image)
-                                    <img src="{{ asset('storage/' . $record->employee->image) }}" alt="صورة الموظف"
-                                        class="img-thumbnail" style="max-width: 90px; max-height: 90px;">
-                                    @else
-                                    <span>---</span>
-                                    @endif
-                                </td>
+                                    <td>
+                                        @if ($record->employee->image)
+                                            <img src="{{ asset('storage/' . $record->employee->image) }}"
+                                                alt="صورة الموظف" class="img-thumbnail"
+                                                style="max-width: 90px; max-height: 90px;">
+                                        @else
+                                            <span>---</span>
+                                        @endif
+                                    </td>
                                     <td class="font-weight-bold">
                                         {{ number_format($record->employee_salary, 2) }} ج.م
                                     </td>
@@ -356,36 +354,42 @@
                                     <td>
                                         <div class="d-flex ">
                                             <button class="btn btn-info btn-sm show-details shadow-sm m-2"
-                                            data-employee-name="{{ $record->employee_name }}"
-                                            data-employee-code="{{ $record->employee->employee_code ?? '---' }}"
-                                            data-employee-salary="{{ $record->employee_salary ?? 0.0 }}"
-                                            data-motivation-amount="{{ $record->motivation_amount ?? 0.0 }}"
-                                            data-fixed-allowance="{{ $record->fixed_allowance ?? 0.0 }}"
-                                            data-employee-total-allowance="{{ $record->employee_total_allowance ?? 0.0 }}"
-                                            data-employee-total-bonus="{{ $record->employee_total_bonus ?? 0.0 }}"
-                                            data-employee-additions-payment-total="{{ $record->employee_additions_payment_total ?? 0.0 }}"
-                                            data-total-benefits="{{ $record->total_benefits ?? 0.0 }}"
-                                            data-social-insurance-amount="{{ $record->social_insurance_amount ?? 0.0 }}"
-                                            data-medical-insurance-amount="{{ $record->medical_insurance_amount ?? 0.0 }}"
-                                            data-employee-deductions-payment-total="{{ $record->employee_deductions_payment_total ?? 0.0 }}"
-                                            data-employee-absences-payment-total="{{ $record->employee_absences_payment_total ?? 0.0 }}"
-                                            data-employee-total-deduction-type="{{ $record->employee_total_deduction_type ?? 0.0 }}"
-                                            data-monthly-loan-amount="{{ $record->monthly_loan_amount ?? 0.0 }}"
-                                            data-permanent-loan-amount="{{ $record->permanent_loan_amount ?? 0.0 }}"
-                                            data-total-deductions="{{ $record->total_deductions ?? 0.0 }}"
-                                            data-employee-net-salary="{{ $record->employee_net_salary ?? 0.0 }}"
-                                            data-employee-rollover-amount="{{ $record->employee_rollover_amount ?? 0.0 }}"
-                                            data-is-disbursed="{{ $record->is_disbursed ?? 0 }}"
-                                            data-payment-on-hold="{{ $record->payment_on_hold ?? 0 }}">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        @if ($record->is_archived == 0)
-                                        <button class="btn btn-danger btn-sm deleteMainSalaryRecord m-2" data-id="{{ $record->id }}"
-                                            data-employee-id="{{ $record->employee_id }}"
-                                            data-finance-monthly-calendar-id="{{ $record->finance_monthly_calendar_id }}">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                        @endif
+                                                data-id="{{ $record->id }}"
+                                                data-employee-name="{{ $record->employee_name }}"
+                                                data-employee-code="{{ $record->employee->employee_code ?? '---' }}"
+                                                data-employee-salary="{{ $record->employee_salary ?? 0.0 }}"
+                                                data-motivation-amount="{{ $record->motivation_amount ?? 0.0 }}"
+                                                data-fixed-allowance="{{ $record->fixed_allowance ?? 0.0 }}"
+                                                data-employee-total-allowance="{{ $record->employee_total_allowance ?? 0.0 }}"
+                                                data-employee-total-bonus="{{ $record->employee_total_bonus ?? 0.0 }}"
+                                                data-employee-additions-payment-total="{{ $record->employee_additions_payment_total ?? 0.0 }}"
+                                                data-total-benefits="{{ $record->total_benefits ?? 0.0 }}"
+                                                data-social-insurance-amount="{{ $record->social_insurance_amount ?? 0.0 }}"
+                                                data-medical-insurance-amount="{{ $record->medical_insurance_amount ?? 0.0 }}"
+                                                data-employee-deductions-payment-total="{{ $record->employee_deductions_payment_total ?? 0.0 }}"
+                                                data-employee-absences-payment-total="{{ $record->employee_absences_payment_total ?? 0.0 }}"
+                                                data-employee-total-deduction-type="{{ $record->employee_total_deduction_type ?? 0.0 }}"
+                                                data-monthly-loan-amount="{{ $record->monthly_loan_amount ?? 0.0 }}"
+                                                data-permanent-loan-amount="{{ $record->permanent_loan_amount ?? 0.0 }}"
+                                                data-total-deductions="{{ $record->total_deductions ?? 0.0 }}"
+                                                data-employee-net-salary="{{ $record->employee_net_salary ?? 0.0 }}"
+                                                data-employee-rollover-amount="{{ $record->employee_rollover_amount ?? 0.0 }}"
+                                                data-is-disbursed="{{ $record->is_disbursed ?? 0 }}"
+                                                data-payment-on-hold="{{ $record->payment_on_hold ?? 0 }}"
+                                                data-additions-days-counter="{{ $record->employee_additions_days_counter ?? 0 }}"
+                                                data-absences-days-counter="{{ $record->employee_absences_days_counter ?? 0 }}"
+                                                data-deductions-days-counter="{{ $record->employee_deductions_days_counter ?? 0 }}"
+                                                data-penalty-days-counter="{{ $record->employee_total_penalty_days ?? 0 }}">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            @if ($record->is_archived == 0)
+                                                <button class="btn btn-danger btn-sm deleteMainSalaryRecord m-2"
+                                                    data-id="{{ $record->id }}"
+                                                    data-employee-id="{{ $record->employee_id }}"
+                                                    data-finance-monthly-calendar-id="{{ $record->finance_monthly_calendar_id }}">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
@@ -476,7 +480,7 @@
                                             <td id="detail_bonus" class="font-weight-bold text-success">0.00</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-right pr-3">إضافي الأيام</td>
+                                            <td class="text-right pr-3">إضافي الأيام (<span id="detail_additions_days" class="text-muted small">0</span> يوم)</td>
                                             <td id="detail_additions" class="font-weight-bold text-success">0.00</td>
                                         </tr>
                                     </tbody>
@@ -513,15 +517,15 @@
                                                 0.00</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-right pr-3">غياب الموظف</td>
+                                            <td class="text-right pr-3">غياب الموظف (<span id="detail_absences_days" class="text-muted small">0</span> يوم)</td>
                                             <td id="detail_absences" class="font-weight-bold text-danger">0.00</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-right pr-3">الخصومات العامة</td>
+                                            <td class="text-right pr-3">الجزاءات العامة (<span id="detail_deductions_days" class="text-muted small">0</span> يوم)</td>
                                             <td id="detail_deductions" class="font-weight-bold text-danger">0.00</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-right pr-3">الجزاءات (العقوبات)</td>
+                                            <td class="text-right pr-3">الخصومات المالية (العقوبات)</td>
                                             <td id="detail_penalty" class="font-weight-bold text-danger">0.00</td>
                                         </tr>
                                         <tr>
@@ -561,7 +565,10 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer bg-light border-top-0">
+            <div class="modal-footer border-top-0">
+                <a href="#" target="_blank" class="btn btn-success" id="print_modal_details">
+                    <i class="fas fa-print mr-1"></i> طباعة التفاصيل
+                </a>
                 <button type="button" class="btn btn-primary" data-dismiss="modal">
                     <i class="fas fa-times-circle mr-1"></i> إغلاق النافذة
                 </button>
@@ -589,7 +596,9 @@
                     <select name="add_employee_id" id="add_employee_id" class="form-control select2 w-100">
                         <option value="">-- اختر الموظف --</option>
                         @foreach ($employees_does_not_have_opened_monthly_record as $emp)
-                            <option value="{{ $emp->id }}" data-salary="{{ $emp->salary }}" data-payment-per-day="{{ $emp->payment_per_day }}" data-code="{{ $emp->employee_code }}">
+                            <option value="{{ $emp->id }}" data-salary="{{ $emp->salary }}"
+                                data-payment-per-day="{{ $emp->payment_per_day }}"
+                                data-code="{{ $emp->employee_code }}">
                                 {{ $emp->name }} (كود: {{ $emp->employee_code }})
                             </option>
                         @endforeach
@@ -605,13 +614,15 @@
                         </div>
                         <div class="col-6 text-center">
                             <span class="text-muted d-block small">الراتب الأساسي</span>
-                            <strong id="add_modal_employee_salary" class="text-success font-weight-bold"></strong> <small class="text-muted">ج.م</small>
+                            <strong id="add_modal_employee_salary" class="text-success font-weight-bold"></strong>
+                            <small class="text-muted">ج.م</small>
                         </div>
                     </div>
                     <div class="row mt-2">
                         <div class="col-12 text-center border-top pt-2">
                             <span class="text-muted d-block small">أجر اليوم المالي</span>
-                            <strong id="add_modal_employee_per_day" class="text-primary font-weight-bold"></strong> <small class="text-muted">ج.م</small>
+                            <strong id="add_modal_employee_per_day" class="text-primary font-weight-bold"></strong>
+                            <small class="text-muted">ج.م</small>
                         </div>
                     </div>
                 </div>
@@ -657,16 +668,16 @@
             $(document).on('change', '#branch_id_search', function() {
                 ajax_search();
             })
-            $(document).on('change', '#department_id_search', function () {
+            $(document).on('change', '#department_id_search', function() {
                 ajax_search();
             })
-            $(document).on('change', '#job_id_search', function () {
+            $(document).on('change', '#job_id_search', function() {
                 ajax_search();
             })
-            $(document).on('change', '#employment_status_search', function () {
+            $(document).on('change', '#employment_status_search', function() {
                 ajax_search();
             })
-            $(document).on('change', '#payment_method_search', function () {
+            $(document).on('change', '#payment_method_search', function() {
                 ajax_search();
             })
             $(document).on('change', '#is_disbursed_search', function() {
@@ -678,9 +689,9 @@
             $(document).on('change', '#is_archived_search', function() {
                 ajax_search();
             });
-            
 
-            
+
+
             function ajax_search() {
                 var employee_id_search = $('#employee_id_search').val();
                 var branch_id_search = $('#branch_id_search').val();
@@ -801,6 +812,16 @@
                 modal.find('#detail_net_salary').text(parseFloat(btn.data('employee-net-salary')).toFixed(
                     2));
 
+                modal.find('#detail_additions_days').text(btn.data('additions-days-counter') * 1);
+                modal.find('#detail_absences_days').text(btn.data('absences-days-counter') * 1);
+                modal.find('#detail_deductions_days').text(btn.data('deductions-days-counter') * 1);
+                modal.find('#detail_penalty_days').text(btn.data('penalty-days-counter') * 1);
+
+                var recordId = btn.data('id');
+                var printUrl = "{{ route('admin.main-salary-employee.print-details', ':id') }}";
+                printUrl = printUrl.replace(':id', recordId);
+                modal.find('#print_modal_details').attr('href', printUrl);
+
                 modal.modal('show');
             });
 
@@ -823,7 +844,7 @@
             });
 
             // Re-initialize select2 with dropdownParent when modal is shown
-            $('#addMainSalaryRecordModal').on('shown.bs.modal', function () {
+            $('#addMainSalaryRecordModal').on('shown.bs.modal', function() {
                 $('#add_employee_id').select2({
                     theme: 'bootstrap4',
                     dropdownParent: $('#addMainSalaryRecordModal')
@@ -863,7 +884,7 @@
                 });
             });
 
-             // Delete Main Salary Record
+            // Delete Main Salary Record
             $(document).on('click', '.deleteMainSalaryRecord', function() {
                 if (!confirm('هل أنت متأكد من حذف هذا الراتب الاساسي؟')) {
                     return;

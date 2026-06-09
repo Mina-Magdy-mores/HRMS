@@ -309,6 +309,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         // Route::post('/main-salary-employee/edit', [MainSalaryEmployeeController::class, 'edit'])->name('main-salary-employee.edit');
         // Route::put('/main-salary-employee', [MainSalaryEmployeeController::class, 'update'])->name('main-salary-employee.update');
         Route::post('/main-salary-employee/print-search', [MainSalaryEmployeeController::class, 'printSearch'])->name('main-salary-employee.print-search');
+        Route::get('/main-salary-employee/{id}/print-details', [MainSalaryEmployeeController::class, 'printDetails'])->name('main-salary-employee.print-details');
     });
 
     // guest routes
