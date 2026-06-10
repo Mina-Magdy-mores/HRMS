@@ -351,8 +351,14 @@
                             ج.م</td>
                         <td style="color:#c0392b; font-weight:bold;">{{ number_format($record->total_deductions, 2) }}
                             ج.م</td>
-                        <td style="color:#2980b9; font-weight:bold; font-size: 14px;">
-                            {{ number_format($record->employee_net_salary, 2) }} ج.م</td>
+                        <td style="font-weight:bold; font-size: 13px;">
+                            <div style="color:#2980b9; font-size: 14px; margin-bottom: 2px;">{{ number_format(abs($record->employee_net_salary), 2) }} ج.م</div>
+                            @if ($record->employee_net_salary >= 0)
+                                <span class="badge-type badge-active" style="padding: 1px 5px; font-size: 10px; line-height: 1;">دائن</span>
+                            @else
+                                <span class="badge-type badge-hold" style="padding: 1px 5px; font-size: 10px; line-height: 1;">مدين</span>
+                            @endif
+                        </td>
                         <td>
                             @if ($record->payment_on_hold == 1)
                                 <span class="badge-type badge-hold">موقوف</span>

@@ -77,24 +77,25 @@ trait GeneralTrait
                     ['id', 'amount'],
                     ['main_salary_employee_id' => $main_salary_employee_id, 'company_id' => $company_id]
                 );
-                $main_salary_employee_p_loans = MainSalaryEmployeePLoanInstallment::select('id', 'amount')
+                $main_salary_employee_p_loans = MainSalaryEmployeePLoanInstallment::select('amount')
                     ->where('next_installment_year_and_month', $finance_monthly_calender['year_and_month'])
                     ->where('company_id', $company_id)
                     ->where('is_archived', 0)
-                    ->where('installment_status', '=', '0')
+                    ->where('installment_status', '!=', '2')
+                    ->where('employee_id', $main_salary_employee['employee_id'])
                     ->whereHas('mainSalaryEmployeePLoan', function ($query) use ($main_salary_employee) {
                         $query->where('is_disbursed', 1);
                         $query->where('employee_id', $main_salary_employee['employee_id']);
                     })
                     ->sum('installment_amount_monthly');
-
                 $dataToUpdateIn_main_salary_employee_p_loans['installment_status'] = 1;
                 $dataToUpdateIn_main_salary_employee_p_loans['main_salary_employee_id'] = $main_salary_employee_id;
 
                 MainSalaryEmployeePLoanInstallment::where('next_installment_year_and_month', $finance_monthly_calender['year_and_month'])
                     ->where('company_id', $company_id)
                     ->where('is_archived', 0)
-                    ->where('installment_status', '=', '0')
+                    ->where('installment_status', '!=', '2')
+                    ->where('employee_id', $main_salary_employee['employee_id'])
                     ->whereHas('mainSalaryEmployeePLoan', function ($query) use ($main_salary_employee) {
                         $query->where('is_disbursed', 1);
                         $query->where('employee_id', $main_salary_employee['employee_id']);
@@ -134,8 +135,6 @@ trait GeneralTrait
 
                 $dataToUpdate['employee_net_salary'] = $main_salary_employee['employee_rollover_amount'] + ($dataToUpdate['total_benefits'] - $dataToUpdate['total_deductions']);
                 update($main_salary_employee, $dataToUpdate);
-                if ($main_salary_employee['employee_id'] == 2) {
-                }
             }
         }
     }

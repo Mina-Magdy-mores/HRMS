@@ -386,10 +386,17 @@
         <strong>{{ number_format($record->employee_rollover_amount, 2) }} ج.م</strong>
     </div>
 
-    <div class="net-salary-box">
-        <span class="net-salary-title">صافي الراتب المستحق:</span>
-        <span class="net-salary-value">{{ number_format($record->employee_net_salary, 2) }} ج.م</span>
-    </div>
+    @if ($record->employee_net_salary >= 0)
+        <div class="net-salary-box" style="background: #f0fdf4; border: 2px dashed #22c55e;">
+            <span class="net-salary-title" style="color: #15803d;">صافي الراتب المستحق (دائن - مستحق له):</span>
+            <span class="net-salary-value" style="color: #16a34a; font-size: 18px;">{{ number_format(abs($record->employee_net_salary), 2) }} ج.م</span>
+        </div>
+    @else
+        <div class="net-salary-box" style="background: #fef2f2; border: 2px dashed #ef4444;">
+            <span class="net-salary-title" style="color: #b91c1c;">صافي الراتب المستحق (مدين - مستحق عليه):</span>
+            <span class="net-salary-value" style="color: #dc2626; font-size: 18px;">{{ number_format(abs($record->employee_net_salary), 2) }} ج.م</span>
+        </div>
+    @endif
 
     {{-- ===== FOOTER ===== --}}
     <div class="print-footer">

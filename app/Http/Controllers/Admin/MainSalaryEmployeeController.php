@@ -155,10 +155,12 @@ class MainSalaryEmployeeController extends Controller
                     $dataToInsert['employee_job_id'] = $employee->job_id;
                     $dataToInsert['employee_salary'] = $employee->salary;
 
-                    $employee_rollover_amount = get_cols_where_row_orderby(MainSalaryEmployee::class,
-                        ['employee_net_salary_after_close_for_roll_over'], 
-                        ['employee_id' => $employee->id, 'company_id' => $company_id, 'is_archived' => 1], 
-                        'id', 'desc'
+                    $employee_rollover_amount = get_cols_where_row_orderby(
+                        MainSalaryEmployee::class,
+                        ['employee_net_salary_after_close_for_roll_over'],
+                        ['employee_id' => $employee->id, 'company_id' => $company_id, 'is_archived' => 1],
+                        'id',
+                        'desc'
                     );
 
                     if (!empty($employee_rollover_amount)) {
@@ -185,7 +187,7 @@ class MainSalaryEmployeeController extends Controller
             }
         }
     }
-        public function destroy(Request $request)
+    public function destroy(Request $request)
     {
         if ($request->ajax()) {
             $company_id = Auth::user()->company_id;
@@ -202,7 +204,7 @@ class MainSalaryEmployeeController extends Controller
                 return response()->json(['status' => 'false', 'message' => 'عفوا، الموظف غير موجود أو غير نشط']);
             }
 
-            $mainSalaryEmployee = getColsWhereRow(MainSalaryEmployee::class, ['id'],[
+            $mainSalaryEmployee = getColsWhereRow(MainSalaryEmployee::class, ['id'], [
                 'company_id' => $company_id,
                 'employee_id' => $employee_id,
                 'finance_monthly_calendar_id' => $finance_monthly_calendar_id,
@@ -557,9 +559,9 @@ class MainSalaryEmployeeController extends Controller
             'department',
             'job'
         ])
-        ->where('company_id', $company_id)
-        ->where('id', $id)
-        ->first();
+            ->where('company_id', $company_id)
+            ->where('id', $id)
+            ->first();
 
         if (empty($record)) {
             return redirect()->back()->with('error', 'عفوا غير قادر للوصول الى البيانات');
@@ -577,6 +579,7 @@ class MainSalaryEmployeeController extends Controller
             $company_id = Auth::user()->company_id;
             $id = $request->id;
 
+
             $record = MainSalaryEmployee::where('company_id', $company_id)->where('id', $id)->first();
             if (empty($record)) {
                 return response()->json(['status' => 'false', 'message' => 'عفواً، السجل غير موجود']);
@@ -589,6 +592,125 @@ class MainSalaryEmployeeController extends Controller
 
             $message = $record->payment_on_hold == 1 ? 'تم إيقاف صرف الراتب بنجاح' : 'تم تفعيل صرف الراتب بنجاح';
             return response()->json(['status' => 'true', 'message' => $message]);
+        }
+    }
+    public function openArchiveModal(Request $request)
+    {
+        if ($request->ajax()) {
+            $company_id = Auth::user()->company_id;
+            $id = $request->id;
+            $employee_id = $request->employee_id;
+            $finance_monthly_calendar_id = $request->finance_monthly_calendar_id;
+
+            $financeMonthlyCalendar = getColsWhereRow(FinanceMonthlyCalendar::class, ['*'], ['company_id' => $company_id, 'id' => $finance_monthly_calendar_id, 'status' => 1]);
+            if (empty($financeMonthlyCalendar)) {
+                return response()->json(['status' => 'false', 'message' => 'عفوا، الشهر المالي غير مفتوح أو غير موجود']);
+            }
+
+            $employee = getColsWhereRow(Employee::class, ['*'], ['company_id' => $company_id, 'id' => $employee_id, 'employment_status' => 1]);
+            if (empty($employee)) {
+                return response()->json(['status' => 'false', 'message' => 'عفوا، الموظف غير موجود أو غير نشط']);
+            }
+
+            $record = MainSalaryEmployee::where('company_id', $company_id)->where('id', $id)->first();
+            if (empty($record)) {
+                return response()->json(['status' => 'false', 'message' => 'عفواً، السجل غير موجود']);
+            }
+            $this->recalculate_main_salary($id);
+            $record = $record->fresh();
+
+            $html = view('admin.mainSalaryEmployee.openArchiveModal', [
+                'record' => $record,
+                'financeMonthlyCalendar' => $financeMonthlyCalendar,
+                'employee' => $employee
+            ])->render();
+            return response()->json(['status' => 'true', 'html' => $html]);
+        }
+    }
+
+    public function archive(Request $request)
+    {
+        if ($request->ajax()) {
+            $company_id = Auth::user()->company_id;
+            $id = $request->id;
+
+            $record = MainSalaryEmployee::where('company_id', $company_id)->where('id', $id)->first();
+            if (empty($record)) {
+                return response()->json(['status' => 'false', 'message' => 'عفواً، السجل غير موجود']);
+            }
+
+            if ($record->is_archived == 1) {
+                return response()->json(['status' => 'false', 'message' => 'عفواً، هذا السجل مؤرشف بالفعل']);
+            }
+
+            $financeMonthlyCalendar = getColsWhereRow(FinanceMonthlyCalendar::class, ['*'], ['company_id' => $company_id, 'id' => $record->finance_monthly_calendar_id, 'status' => 1]);
+            if (empty($financeMonthlyCalendar)) {
+                return response()->json(['status' => 'false', 'message' => 'عفوا، الشهر المالي مغلق أو غير موجود ولا يمكن أرشفة رواتب الموظفين فيه']);
+            }
+
+            try {
+                return DB::transaction(function () use ($record) {
+                    $archiveData = [
+                        'is_archived' => 1,
+                        'archived_by' => Auth::id(),
+                        'archived_at' => now(),
+                    ];
+
+                    $record->is_archived = 1;
+                    $record->archived_by = Auth::id();
+                    $record->archived_at = now();
+                    $record->employee_net_salary_after_close_for_roll_over = $record->employee_net_salary;
+                    $record->save();
+
+                    $record->mainSalaryEmployeeDeductions()->update($archiveData);
+                    $record->mainSalaryEmployeeAbsences()->update($archiveData);
+                    $record->mainSalaryEmployeeDeductionTypes()->update($archiveData);
+                    $record->mainSalaryEmployeeAdditions()->update($archiveData);
+                    $record->mainSalaryEmployeeLoans()->update($archiveData);
+                    $record->mainSalaryEmployeeBonuses()->update($archiveData);
+                    $record->mainSalaryEmployeeAllowances()->update($archiveData);
+                    $record->mainSalaryEmployeePLoanInstallments()->update($archiveData);
+
+                    return response()->json(['status' => 'true', 'message' => 'تم أرشفة وتثبيت الراتب للموظف بنجاح']);
+                });
+            } catch (\Exception $e) {
+                return response()->json(['status' => 'false', 'message' => 'حدث خطأ أثناء الأرشفة: ' . $e->getMessage()]);
+            }
+        }
+    }
+    public function recalculateMainSalary(Request $request)
+    {
+        if ($request->ajax()) {
+            $company_id = Auth::user()->company_id;
+            $id = $request->id;
+
+            $record = MainSalaryEmployee::where('company_id', $company_id)->where('id', $id)->first();
+            if (empty($record)) {
+                return response()->json(['status' => 'false', 'message' => 'عفواً، السجل غير موجود']);
+            }
+
+            try {
+                return DB::transaction(function () use ($id, $record) {
+
+                    if ($record->is_archived == 1) {
+                        return response()->json([
+                            'status' => 'true',
+                            'message' => 'الراتب مؤرشف بالفعل',
+                            'data' => $record
+                        ]);
+                    } else {
+                        $this->recalculate_main_salary($id);
+                        $record = MainSalaryEmployee::with('employee')->findOrFail($id);
+                        return response()->json([
+                            'status' => 'true',
+                            'message' => 'تم إعادة حساب الراتب للموظف بنجاح',
+                            'data' => $record
+                        ]);
+                    }
+                });
+            } catch (\Exception $e) {
+                return response()->json(['status' => 'false', 'message' => 'حدث خطأ أثناء إعادة حساب الراتب للموظف']);
+            }
         }
     }
 }

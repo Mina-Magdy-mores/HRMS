@@ -104,6 +104,7 @@ class MainSalaryEmployeePLoanController extends Controller
                         $next_installment_year_and_month = date('Y-m', strtotime($request->next_installment_date));
                         for ($i = 1; $i <= $request->number_of_installment_months; $i++) {
                             $dataToInsertInstallment = [
+                                'employee_id' => $request->employee_id,
                                 'main_salary_employee_p_loan_id' => $insertData->id,
                                 'amount' => $request->amount,
                                 'installment_amount_monthly' => $request->installment_amount_monthly,
@@ -135,9 +136,6 @@ class MainSalaryEmployeePLoanController extends Controller
             return response()->json(['status' => 'false', 'message' => 'عفوا، لا توجد بيانات راتب مسجلة لهذا الموظف في هذا الشهر المالي.']);
         }
     }
-
-
-
 
 
     public function ajaxSearch(Request $request)
@@ -353,6 +351,7 @@ class MainSalaryEmployeePLoanController extends Controller
                     $next_installment_year_and_month = date('Y-m', strtotime($request->year_and_month_started));
                     for ($i = 1; $i <= $request->number_of_installment_months; $i++) {
                         $dataToInsertInstallment = [
+                            'employee_id' => $request->employee_id,
                             'main_salary_employee_p_loan_id' => $updateData->id,
                             'amount' => $request->amount,
                             'installment_amount_monthly' => $request->installment_amount_monthly,

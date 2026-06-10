@@ -306,11 +306,13 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/main-salary-employee/store', [MainSalaryEmployeeController::class, 'store'])->name('main-salary-employee.store');
         Route::post('/main-salary-employee/ajax-search', [MainSalaryEmployeeController::class, 'ajaxSearch'])->name('main-salary-employee.ajax-search');
         Route::post('/main-salary-employee/destroy', [MainSalaryEmployeeController::class, 'destroy'])->name('main-salary-employee.destroy');
-        // Route::post('/main-salary-employee/edit', [MainSalaryEmployeeController::class, 'edit'])->name('main-salary-employee.edit');
-        // Route::put('/main-salary-employee', [MainSalaryEmployeeController::class, 'update'])->name('main-salary-employee.update');
         Route::post('/main-salary-employee/print-search', [MainSalaryEmployeeController::class, 'printSearch'])->name('main-salary-employee.print-search');
         Route::get('/main-salary-employee/{id}/print-details', [MainSalaryEmployeeController::class, 'printDetails'])->name('main-salary-employee.print-details');
         Route::post('/main-salary-employee/toggle-payment-status', [MainSalaryEmployeeController::class, 'togglePaymentStatus'])->name('main-salary-employee.toggle-payment-status');
+        Route::post('/main-salary-employee/openArchiveModal', [MainSalaryEmployeeController::class, 'openArchiveModal'])->name('main-salary-employee.openArchiveModal');
+        Route::post('/main-salary-employee/archive', [MainSalaryEmployeeController::class, 'archive'])->name('main-salary-employee.archive');
+        Route::post('/main-salary-employee/recalculate_main_salary', [MainSalaryEmployeeController::class, 'recalculateMainSalary'])->name('main-salary-employee.recalculate_main_salary');
+
     });
 
     // guest routes

@@ -315,8 +315,20 @@
                                     <td class="text-danger font-weight-bold">
                                         {{ number_format($record->total_deductions, 2) }} ج.م
                                     </td>
-                                    <td class="text-primary font-weight-bold" style="font-size: 15px;">
-                                        {{ number_format($record->employee_net_salary, 2) }} ج.م
+                                    <td>
+                                        <div class="font-weight-bold text-nowrap text-primary"
+                                            style="font-size: 15px;">
+                                            {{ number_format(abs($record->employee_net_salary), 2) }} ج.م
+                                        </div>
+                                        @if ($record->employee_net_salary >= 0)
+                                            <span class="badge badge-success px-2 py-0" style="font-size: 11px;">
+                                                دائن (مستحق له)
+                                            </span>
+                                        @else
+                                            <span class="badge badge-danger px-2 py-0" style="font-size: 11px;">
+                                                مدين (مستحق عليه)
+                                            </span>
+                                        @endif
                                     </td>
                                     <td>
                                         @if ($record->payment_on_hold == 1)
@@ -355,45 +367,29 @@
                                         <div class="d-flex ">
                                             <button class="btn btn-info btn-sm show-details shadow-sm m-2"
                                                 data-id="{{ $record->id }}"
-                                                data-employee-name="{{ $record->employee_name }}"
-                                                data-employee-code="{{ $record->employee->employee_code ?? '---' }}"
-                                                data-employee-salary="{{ $record->employee_salary ?? 0.0 }}"
-                                                data-motivation-amount="{{ $record->motivation_amount ?? 0.0 }}"
-                                                data-fixed-allowance="{{ $record->fixed_allowance ?? 0.0 }}"
-                                                data-employee-total-allowance="{{ $record->employee_total_allowance ?? 0.0 }}"
-                                                data-employee-total-bonus="{{ $record->employee_total_bonus ?? 0.0 }}"
-                                                data-employee-additions-payment-total="{{ $record->employee_additions_payment_total ?? 0.0 }}"
-                                                data-total-benefits="{{ $record->total_benefits ?? 0.0 }}"
-                                                data-social-insurance-amount="{{ $record->social_insurance_amount ?? 0.0 }}"
-                                                data-medical-insurance-amount="{{ $record->medical_insurance_amount ?? 0.0 }}"
-                                                data-employee-deductions-payment-total="{{ $record->employee_deductions_payment_total ?? 0.0 }}"
-                                                data-employee-absences-payment-total="{{ $record->employee_absences_payment_total ?? 0.0 }}"
-                                                data-employee-total-deduction-type="{{ $record->employee_total_deduction_type ?? 0.0 }}"
-                                                data-monthly-loan-amount="{{ $record->monthly_loan_amount ?? 0.0 }}"
-                                                data-permanent-loan-amount="{{ $record->permanent_loan_amount ?? 0.0 }}"
-                                                data-total-deductions="{{ $record->total_deductions ?? 0.0 }}"
-                                                data-employee-net-salary="{{ $record->employee_net_salary ?? 0.0 }}"
-                                                data-employee-rollover-amount="{{ $record->employee_rollover_amount ?? 0.0 }}"
-                                                data-is-disbursed="{{ $record->is_disbursed ?? 0 }}"
-                                                data-payment-on-hold="{{ $record->payment_on_hold ?? 0 }}"
-                                                data-additions-days-counter="{{ $record->employee_additions_days_counter ?? 0 }}"
-                                                data-absences-days-counter="{{ $record->employee_absences_days_counter ?? 0 }}"
-                                                data-deductions-days-counter="{{ $record->employee_deductions_days_counter ?? 0 }}"
-                                                data-penalty-days-counter="{{ $record->employee_total_penalty_days ?? 0 }}"
+                                                data-employee-id="{{ $record->employee_id }}"
                                                 title="تفاصيل الراتب">
                                                 <i class="fas fa-eye"></i>
                                             </button>
                                             @if ($record->is_archived == 0 && $financeMonthlyCalendar->status == 1)
                                                 @if ($record->payment_on_hold == 0)
-                                                    <button class="btn btn-warning btn-sm toggle-payment-status m-2 shadow-sm"
-                                                        data-id="{{ $record->id }}"
-                                                        title="إيقاف صرف راتب الموظف">
+                                                    <button
+                                                        class="btn btn-warning btn-sm toggle-payment-status m-2 shadow-sm"
+                                                        data-id="{{ $record->id }}" title="إيقاف صرف راتب الموظف">
                                                         <i class="fas fa-pause mr-1"></i>
                                                     </button>
-                                                @else
-                                                    <button class="btn btn-success btn-sm toggle-payment-status m-2 shadow-sm"
+                                                    <button
+                                                        class="btn btn-primary btn-sm openArchiveModal m-2 shadow-sm"
                                                         data-id="{{ $record->id }}"
-                                                        title="تفعيل صرف راتب الموظف">
+                                                        data-employee-id="{{ $record->employee_id }}"
+                                                        data-finance-monthly-calendar-id="{{ $record->finance_monthly_calendar_id }}"
+                                                        title="أرشفة سجل الراتب">
+                                                        <i class="fas fa-lock mr-1"></i>
+                                                    </button>
+                                                @else
+                                                    <button
+                                                        class="btn btn-success btn-sm toggle-payment-status m-2 shadow-sm"
+                                                        data-id="{{ $record->id }}" title="تفعيل صرف راتب الموظف">
                                                         <i class="fas fa-play mr-1"></i>
                                                     </button>
                                                 @endif
@@ -467,7 +463,7 @@
                     <div class="col-md-6 pr-md-3">
                         <div class="card card-outline card-success shadow-none border">
                             <div class="card-header bg-light">
-                                <h6 class="card-title text-success font-weight-bold mb-0">
+                                <h6 class="text-center text-success font-weight-bold mb-0">
                                     <i class="fas fa-plus-circle mr-1"></i> الاستحقاقات (+)
                                 </h6>
                             </div>
@@ -475,35 +471,36 @@
                                 <table class="table table-sm table-striped mb-0 text-center">
                                     <tbody>
                                         <tr>
-                                            <td class="text-right pr-3">الراتب الأساسي</td>
+                                            <td class="text-left pr-3">الراتب الأساسي</td>
                                             <td id="detail_salary" class="font-weight-bold">0.00</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-right pr-3">الحوافز</td>
+                                            <td class="text-left pr-3">الحوافز</td>
                                             <td id="detail_motivation" class="font-weight-bold text-success">0.00</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-right pr-3">بدلات ثابتة</td>
+                                            <td class="text-left pr-3">بدلات ثابتة</td>
                                             <td id="detail_fixed_allowance" class="font-weight-bold text-success">0.00
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-right pr-3">بدلات متغيرة</td>
+                                            <td class="text-left pr-3">بدلات متغيرة</td>
                                             <td id="detail_variable_allowance" class="font-weight-bold text-success">
                                                 0.00</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-right pr-3">المكافآت</td>
+                                            <td class="text-left pr-3">المكافآت</td>
                                             <td id="detail_bonus" class="font-weight-bold text-success">0.00</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-right pr-3">إضافي الأيام (<span id="detail_additions_days" class="text-muted small">0</span> يوم)</td>
+                                            <td class="text-left pr-3">إضافي الأيام (<span id="detail_additions_days"
+                                                    class="text-muted small">0</span> يوم)</td>
                                             <td id="detail_additions" class="font-weight-bold text-success">0.00</td>
                                         </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr class="bg-success-light font-weight-bold">
-                                            <td class="text-right pr-3 text-success">إجمالي الاستحقاقات</td>
+                                            <td class="text-left pr-3 text-success">إجمالي الاستحقاقات</td>
                                             <td id="detail_total_benefits" class="text-success text-center">0.00</td>
                                         </tr>
                                     </tfoot>
@@ -516,7 +513,7 @@
                     <div class="col-md-6 pl-md-3">
                         <div class="card card-outline card-danger shadow-none border">
                             <div class="card-header bg-light">
-                                <h6 class="card-title text-danger font-weight-bold mb-0">
+                                <h6 class="text-center text-danger font-weight-bold mb-0">
                                     <i class="fas fa-minus-circle mr-1"></i> الاستقطاعات (-)
                                 </h6>
                             </div>
@@ -524,41 +521,44 @@
                                 <table class="table table-sm table-striped mb-0 text-center">
                                     <tbody>
                                         <tr>
-                                            <td class="text-right pr-3">تأمينات اجتماعية</td>
+                                            <td class="text-left pr-3">تأمينات اجتماعية</td>
                                             <td id="detail_social_insurance" class="font-weight-bold text-danger">0.00
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-right pr-3">تأمين طبي</td>
+                                            <td class="text-left pr-3">تأمين طبي</td>
                                             <td id="detail_medical_insurance" class="font-weight-bold text-danger">
                                                 0.00</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-right pr-3">غياب الموظف (<span id="detail_absences_days" class="text-muted small">0</span> يوم)</td>
+                                            <td class="text-left pr-3">غياب الموظف (<span id="detail_absences_days"
+                                                    class="text-muted small">0</span> يوم)</td>
                                             <td id="detail_absences" class="font-weight-bold text-danger">0.00</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-right pr-3">الجزاءات العامة (<span id="detail_deductions_days" class="text-muted small">0</span> يوم)</td>
+                                            <td class="text-left pr-3">الجزاءات العامة (<span
+                                                    id="detail_deductions_days" class="text-muted small">0</span> يوم)
+                                            </td>
                                             <td id="detail_deductions" class="font-weight-bold text-danger">0.00</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-right pr-3">الخصومات المالية (العقوبات)</td>
+                                            <td class="text-left pr-3">الخصومات المالية (العقوبات)</td>
                                             <td id="detail_penalty" class="font-weight-bold text-danger">0.00</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-right pr-3">سلف شهرية</td>
+                                            <td class="text-left pr-3">سلف شهرية</td>
                                             <td id="detail_monthly_loan" class="font-weight-bold text-danger">0.00
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="text-right pr-3">سلف مستديمة</td>
+                                            <td class="text-left pr-3">سلف مستديمة</td>
                                             <td id="detail_permanent_loan" class="font-weight-bold text-danger">0.00
                                             </td>
                                         </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr class="bg-danger-light font-weight-bold">
-                                            <td class="text-right pr-3 text-danger">إجمالي الاستقطاعات</td>
+                                            <td class="text-left pr-3 text-danger">إجمالي الاستقطاعات</td>
                                             <td id="detail_total_deductions" class="text-danger text-center">0.00</td>
                                         </tr>
                                     </tfoot>
@@ -567,28 +567,34 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Summary Net Salary row -->
                 <div class="bg-light p-3 rounded d-flex justify-content-between align-items-center mt-3 border">
-                    <div>
-                        <span class="text-muted d-block small">الراتب المرحل من الشهر الماضي</span>
-                        <strong id="detail_rollover" class="text-secondary">0.00</strong> <small
-                            class="text-muted">ج.م</small>
+                    <div class="text-left">
+                        <span class="text-dark font-weight-bold d-block mb-1">صافي الراتب المستحق</span>
+                        <div class="d-flex align-items-center">
+                            <span id="detail_net_salary_badge" class="badge px-2 py-1 mr-2"
+                                style="font-size: 0.8rem;"></span>
+                            <h4 class="text-primary font-weight-bold mb-0 d-inline-block">
+                                <span id="detail_net_salary">0.00</span>
+                                <small class="text-muted" style="font-size: 11px;">ج.م</small>
+                            </h4>
+                        </div>
                     </div>
-                    <div class="text-right">
-                        <span class="text-dark font-weight-bold d-block">صافي الراتب المستحق</span>
-                        <h4 id="detail_net_salary" class="text-primary font-weight-bold mb-0">0.00</h4> <small
+                    <div>
+                        <span class="text-muted d-block small font-weight-bold">الراتب المرحل من الشهر الماضي</span>
+                        <strong id="detail_rollover" class="text-secondary">0.00</strong> <small
                             class="text-muted">ج.م</small>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer border-top-0">
+            <div class="modal-footer border-top-0 d-flex justify-content-between align-items-center">
                 <a href="#" target="_blank" class="btn btn-success" id="print_modal_details">
                     <i class="fas fa-print mr-1"></i> طباعة التفاصيل
                 </a>
                 <button type="button" class="btn btn-primary" data-dismiss="modal">
                     <i class="fas fa-times-circle mr-1"></i> إغلاق النافذة
                 </button>
+
             </div>
         </div>
     </div>
@@ -650,6 +656,27 @@
                     <i class="fas fa-save mr-1"></i> حفظ وإضافة الموظف
                 </button>
                 <button type="button" class="btn btn-secondary shadow-sm" data-dismiss="modal">إلغاء</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Open Archive Modal Skeleton -->
+<div class="modal fade" id="openArchiveModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content shadow-lg border-0 text-right" style="direction: rtl;">
+            <div class="modal-header bg-gradient-primary text-white">
+                <h5 class="modal-title font-weight-bold">
+                    <i class="fas fa-archive mr-1"></i>
+                    مراجعة وأرشفة الراتب للموظف
+                </h5>
+                <button type="button" class="close text-white ml-0 mr-auto" data-dismiss="modal"
+                    aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-0" id="openArchiveModalBody">
+                <!-- Content loaded via AJAX -->
             </div>
         </div>
     </div>
@@ -789,57 +816,80 @@
             $(document).on('click', '.show-details', function() {
                 var btn = $(this);
                 var modal = $('#salaryDetailsModal');
+                var id = btn.data('id');
+                $.ajax({
+                    url: '{{ route('admin.main-salary-employee.recalculate_main_salary') }}',
+                    type: 'POST',
+                    dataType: 'json',
+                    cache: false,
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        id: id,
+                        employee_id: btn.data('employee-id'),
+                    },
+                    success: function(response) {
+                        if (response.status == 'true') {
+                            alert(response.message);
+                            var data = response.data;
 
-                modal.find('#modal_employee_name').text(btn.data('employee-name'));
-                modal.find('#modal_employee_code').text(btn.data('employee-code'));
-                modal.find('#modal_employee_salary').text(parseFloat(btn.data('employee-salary')).toFixed(
-                    2));
+                            modal.find('#modal_employee_name').text(data.employee_name);
+                            modal.find('#modal_employee_code').text(data.employee ? data.employee.employee_code : '---');
+                            modal.find('#modal_employee_salary').text(parseFloat(data.employee_salary).toFixed(2));
 
-                modal.find('#detail_salary').text(parseFloat(btn.data('employee-salary')).toFixed(2));
-                modal.find('#detail_motivation').text(parseFloat(btn.data('motivation-amount')).toFixed(2));
-                modal.find('#detail_fixed_allowance').text(parseFloat(btn.data('fixed-allowance')).toFixed(
-                    2));
-                modal.find('#detail_variable_allowance').text(parseFloat(btn.data(
-                    'employee-total-allowance')).toFixed(2));
-                modal.find('#detail_bonus').text(parseFloat(btn.data('employee-total-bonus')).toFixed(2));
-                modal.find('#detail_additions').text(parseFloat(btn.data(
-                    'employee-additions-payment-total')).toFixed(2));
-                modal.find('#detail_total_benefits').text(parseFloat(btn.data('total-benefits')).toFixed(
-                    2));
+                            modal.find('#detail_salary').text(parseFloat(data.employee_salary).toFixed(2));
+                            modal.find('#detail_motivation').text(parseFloat(data.motivation_amount).toFixed(2));
+                            modal.find('#detail_fixed_allowance').text(parseFloat(data.fixed_allowance).toFixed(2));
+                            modal.find('#detail_variable_allowance').text(parseFloat(data.employee_total_allowance).toFixed(2));
+                            modal.find('#detail_bonus').text(parseFloat(data.employee_total_bonus).toFixed(2));
+                            modal.find('#detail_additions').text(parseFloat(data.employee_additions_payment_total).toFixed(2));
+                            modal.find('#detail_total_benefits').text(parseFloat(data.total_benefits).toFixed(2));
 
-                modal.find('#detail_social_insurance').text(parseFloat(btn.data('social-insurance-amount'))
-                    .toFixed(2));
-                modal.find('#detail_medical_insurance').text(parseFloat(btn.data(
-                    'medical-insurance-amount')).toFixed(2));
-                modal.find('#detail_absences').text(parseFloat(btn.data('employee-absences-payment-total'))
-                    .toFixed(2));
-                modal.find('#detail_deductions').text(parseFloat(btn.data(
-                    'employee-deductions-payment-total')).toFixed(2));
-                modal.find('#detail_penalty').text(parseFloat(btn.data('employee-total-deduction-type'))
-                    .toFixed(2));
-                modal.find('#detail_monthly_loan').text(parseFloat(btn.data('monthly-loan-amount')).toFixed(
-                    2));
-                modal.find('#detail_permanent_loan').text(parseFloat(btn.data('permanent-loan-amount'))
-                    .toFixed(2));
-                modal.find('#detail_total_deductions').text(parseFloat(btn.data('total-deductions'))
-                    .toFixed(2));
+                            modal.find('#detail_social_insurance').text(parseFloat(data.social_insurance_amount).toFixed(2));
+                            modal.find('#detail_medical_insurance').text(parseFloat(data.medical_insurance_amount).toFixed(2));
+                            modal.find('#detail_absences').text(parseFloat(data.employee_absences_payment_total).toFixed(2));
+                            modal.find('#detail_deductions').text(parseFloat(data.employee_deductions_payment_total).toFixed(2));
+                            modal.find('#detail_penalty').text(parseFloat(data.employee_total_deduction_type).toFixed(2));
+                            modal.find('#detail_monthly_loan').text(parseFloat(data.monthly_loan_amount).toFixed(2));
+                            modal.find('#detail_permanent_loan').text(parseFloat(data.permanent_loan_amount).toFixed(2));
+                            modal.find('#detail_total_deductions').text(parseFloat(data.total_deductions).toFixed(2));
 
-                modal.find('#detail_rollover').text(parseFloat(btn.data('employee-rollover-amount'))
-                    .toFixed(2));
-                modal.find('#detail_net_salary').text(parseFloat(btn.data('employee-net-salary')).toFixed(
-                    2));
+                            modal.find('#detail_rollover').text(parseFloat(data.employee_rollover_amount).toFixed(2));
+                            var netSalary = parseFloat(data.employee_net_salary) || 0;
+                            var absNetSalary = Math.abs(netSalary);
+                            modal.find('#detail_net_salary').text(absNetSalary.toFixed(2));
 
-                modal.find('#detail_additions_days').text(btn.data('additions-days-counter') * 1);
-                modal.find('#detail_absences_days').text(btn.data('absences-days-counter') * 1);
-                modal.find('#detail_deductions_days').text(btn.data('deductions-days-counter') * 1);
-                modal.find('#detail_penalty_days').text(btn.data('penalty-days-counter') * 1);
+                            if (netSalary >= 0) {
+                                modal.find('#detail_net_salary_badge')
+                                    .removeClass('badge-danger')
+                                    .addClass('badge-success')
+                                    .html('<i class="fas fa-arrow-down mr-1"></i> دائن (مستحق له)');
+                            } else {
+                                modal.find('#detail_net_salary_badge')
+                                    .removeClass('badge-success')
+                                    .addClass('badge-danger')
+                                    .html('<i class="fas fa-arrow-up mr-1"></i> مدين (مستحق عليه)');
+                            }
 
-                var recordId = btn.data('id');
-                var printUrl = "{{ route('admin.main-salary-employee.print-details', ':id') }}";
-                printUrl = printUrl.replace(':id', recordId);
-                modal.find('#print_modal_details').attr('href', printUrl);
+                            modal.find('#detail_additions_days').text(data.employee_additions_days_counter * 1);
+                            modal.find('#detail_absences_days').text(data.employee_absences_days_counter * 1);
+                            modal.find('#detail_deductions_days').text(data.employee_deductions_days_counter * 1);
+                            modal.find('#detail_penalty_days').text(data.employee_total_penalty_days * 1);
 
-                modal.modal('show');
+                            var recordId = data.id;
+                            var printUrl = "{{ route('admin.main-salary-employee.print-details', ':id') }}";
+                            printUrl = printUrl.replace(':id', recordId);
+                            modal.find('#print_modal_details').attr('href', printUrl);
+
+                            modal.modal('show');
+                        } else {
+                            alert(response.message || 'حدث خطأ ما');
+                        }
+                    },
+                    error: function(xhr) {
+                        console.log('Error during pagination');
+                    }
+                });
+
             });
 
             // Handle Employee Select change in Add Modal
@@ -940,8 +990,9 @@
                 var id = $(this).data('id');
                 var btn = $(this);
                 var isPause = btn.hasClass('btn-warning');
-                var confirmMsg = isPause ? 'هل أنت متأكد من إيقاف صرف راتب هذا الموظف؟' : 'هل أنت متأكد من تفعيل صرف راتب هذا الموظف؟';
-                
+                var confirmMsg = isPause ? 'هل أنت متأكد من إيقاف صرف راتب هذا الموظف؟' :
+                    'هل أنت متأكد من تفعيل صرف راتب هذا الموظف؟';
+
                 if (!confirm(confirmMsg)) {
                     return;
                 }
@@ -968,6 +1019,71 @@
                     }
                 });
             });
+
+            $(document).on('click', '.openArchiveModal', function() {
+                var id = $(this).data('id');
+                var employee_id = $(this).data('employee-id');
+                var finance_monthly_calendar_id = $(this).data('finance-monthly-calendar-id');
+
+                $.ajax({
+                    url: "{{ route('admin.main-salary-employee.openArchiveModal') }}",
+                    type: 'POST',
+                    dataType: 'json',
+                    cache: false,
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        id: id,
+                        employee_id: employee_id,
+                        finance_monthly_calendar_id: finance_monthly_calendar_id
+                    },
+                    success: function(response) {
+                        if (response.status == 'true') {
+                            $('#openArchiveModalBody').html(response.html);
+                            $('#openArchiveModal').modal('show');
+                        } else {
+                            alert(response.message || 'حدث خطأ ما');
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('حدث خطأ غير متوقع أثناء الاتصال بالخادم');
+                    }
+                });
+            });
+
+            $(document).on('click', '#submit_archive_salary_btn', function() {
+                var id = $(this).data('id');
+                var disbursed_amount = $('#disbursed_amount').val() || 0;
+                if (!confirm(
+                        'هل أنت متأكد من أرشفة وتثبيت هذا الراتب بشكل نهائي؟ لن تتمكن من تعديل أو حذف السجل بعد هذه الخطوة.'
+                    )) {
+                    return;
+                }
+
+                $.ajax({
+                    url: "{{ route('admin.main-salary-employee.archive') }}",
+                    type: 'POST',
+                    dataType: 'json',
+                    cache: false,
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        id: id,
+                        disbursed_amount: disbursed_amount
+                    },
+                    success: function(response) {
+                        if (response.status == 'true') {
+                            alert(response.message);
+                            $('#openArchiveModal').modal('hide');
+                            ajax_search();
+                        } else {
+                            alert(response.message || 'حدث خطأ ما');
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('حدث خطأ غير متوقع أثناء الاتصال بالخادم');
+                    }
+                });
+            });
+
         });
     </script>
 @endsection

@@ -46,8 +46,19 @@
                                     <td class="text-danger font-weight-bold">
                                         {{ number_format($record->total_deductions, 2) }} ج.م
                                     </td>
-                                    <td class="text-primary font-weight-bold" style="font-size: 15px;">
-                                        {{ number_format($record->employee_net_salary, 2) }} ج.م
+                                    <td>
+                                        <div class="font-weight-bold text-nowrap text-primary" style="font-size: 15px;">
+                                            {{ number_format(abs($record->employee_net_salary), 2) }} ج.م
+                                        </div>
+                                        @if ($record->employee_net_salary >= 0)
+                                            <span class="badge badge-success px-2 py-0" style="font-size: 11px;">
+                                                دائن (مستحق له)
+                                            </span>
+                                        @else
+                                            <span class="badge badge-danger px-2 py-0" style="font-size: 11px;">
+                                                مدين (مستحق عليه)
+                                            </span>
+                                        @endif
                                     </td>
                                     <td>
                                         @if ($record->payment_on_hold == 1)
@@ -86,31 +97,7 @@
                                         <div class="d-flex ">
                                             <button class="btn btn-info btn-sm show-details shadow-sm m-2"
                                             data-id="{{ $record->id }}"
-                                            data-employee-name="{{ $record->employee_name }}"
-                                            data-employee-code="{{ $record->employee->employee_code ?? '---' }}"
-                                            data-employee-salary="{{ $record->employee_salary ?? 0.0 }}"
-                                            data-motivation-amount="{{ $record->motivation_amount ?? 0.0 }}"
-                                            data-fixed-allowance="{{ $record->fixed_allowance ?? 0.0 }}"
-                                            data-employee-total-allowance="{{ $record->employee_total_allowance ?? 0.0 }}"
-                                            data-employee-total-bonus="{{ $record->employee_total_bonus ?? 0.0 }}"
-                                            data-employee-additions-payment-total="{{ $record->employee_additions_payment_total ?? 0.0 }}"
-                                            data-total-benefits="{{ $record->total_benefits ?? 0.0 }}"
-                                            data-social-insurance-amount="{{ $record->social_insurance_amount ?? 0.0 }}"
-                                            data-medical-insurance-amount="{{ $record->medical_insurance_amount ?? 0.0 }}"
-                                            data-employee-deductions-payment-total="{{ $record->employee_deductions_payment_total ?? 0.0 }}"
-                                            data-employee-absences-payment-total="{{ $record->employee_absences_payment_total ?? 0.0 }}"
-                                            data-employee-total-deduction-type="{{ $record->employee_total_deduction_type ?? 0.0 }}"
-                                            data-monthly-loan-amount="{{ $record->monthly_loan_amount ?? 0.0 }}"
-                                            data-permanent-loan-amount="{{ $record->permanent_loan_amount ?? 0.0 }}"
-                                            data-total-deductions="{{ $record->total_deductions ?? 0.0 }}"
-                                            data-employee-net-salary="{{ $record->employee_net_salary ?? 0.0 }}"
-                                            data-employee-rollover-amount="{{ $record->employee_rollover_amount ?? 0.0 }}"
-                                            data-is-disbursed="{{ $record->is_disbursed ?? 0 }}"
-                                            data-payment-on-hold="{{ $record->payment_on_hold ?? 0 }}"
-                                            data-additions-days-counter="{{ $record->employee_additions_days_counter ?? 0 }}"
-                                            data-absences-days-counter="{{ $record->employee_absences_days_counter ?? 0 }}"
-                                            data-deductions-days-counter="{{ $record->employee_deductions_days_counter ?? 0 }}"
-                                            data-penalty-days-counter="{{ $record->employee_total_penalty_days ?? 0 }}"
+                                            data-employee-id="{{ $record->employee_id }}"
                                             title="تفاصيل الراتب">
                                             <i class="fas fa-eye"></i>
                                         </button>
@@ -121,6 +108,14 @@
                                                     title="إيقاف صرف راتب الموظف">
                                                     <i class="fas fa-pause mr-1"></i>
                                                 </button>
+                                                 <button
+                                                        class="btn btn-primary btn-sm openArchiveModal m-2 shadow-sm"
+                                                        data-id="{{ $record->id }}"
+                                                        data-employee-id="{{ $record->employee_id }}"
+                                                        data-finance-monthly-calendar-id="{{ $record->finance_monthly_calendar_id }}"
+                                                        title="أرشفة سجل الراتب">
+                                                        <i class="fas fa-lock mr-1"></i>
+                                                    </button>
                                             @else
                                                 <button class="btn btn-success btn-sm toggle-payment-status m-2 shadow-sm"
                                                     data-id="{{ $record->id }}"
