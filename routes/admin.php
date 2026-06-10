@@ -307,6 +307,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/main-salary-employee/ajax-search', [MainSalaryEmployeeController::class, 'ajaxSearch'])->name('main-salary-employee.ajax-search');
         Route::post('/main-salary-employee/destroy', [MainSalaryEmployeeController::class, 'destroy'])->name('main-salary-employee.destroy');
         Route::post('/main-salary-employee/print-search', [MainSalaryEmployeeController::class, 'printSearch'])->name('main-salary-employee.print-search');
+        Route::post('/main-salary-employee/print-search-detailed', [MainSalaryEmployeeController::class, 'printSearchDetailed'])->name('main-salary-employee.print-search-detailed');
         Route::get('/main-salary-employee/{id}/print-details', [MainSalaryEmployeeController::class, 'printDetails'])->name('main-salary-employee.print-details');
         Route::post('/main-salary-employee/toggle-payment-status', [MainSalaryEmployeeController::class, 'togglePaymentStatus'])->name('main-salary-employee.toggle-payment-status');
         Route::post('/main-salary-employee/openArchiveModal', [MainSalaryEmployeeController::class, 'openArchiveModal'])->name('main-salary-employee.openArchiveModal');

@@ -246,11 +246,20 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-3 d-flex align-items-end">
+                    <div class="col-md-6 d-flex align-items-end">
                         <div class="form-group w-100 mb-3">
-                            <button type="submit" class="btn btn-success btn-block shadow-sm" id="print_button">
-                                <i class="fas fa-print mr-1"></i> طباعة كشف الرواتب
-                            </button>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <button type="submit" class="btn btn-success btn-block shadow-sm" id="print_button">
+                                        <i class="fas fa-print mr-1"></i> طباعة كشف الرواتب
+                                    </button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button type="submit" formaction="{{ route('admin.main-salary-employee.print-search-detailed') }}" class="btn btn-info btn-block shadow-sm" id="print_button_detailed">
+                                        <i class="fas fa-file-invoice mr-1"></i> طباعة التفاصيل الكاملة للبحث
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -378,6 +387,7 @@
                                                         data-id="{{ $record->id }}" title="إيقاف صرف راتب الموظف">
                                                         <i class="fas fa-pause mr-1"></i>
                                                     </button>
+                                                    @else
                                                     <button
                                                         class="btn btn-primary btn-sm openArchiveModal m-2 shadow-sm"
                                                         data-id="{{ $record->id }}"
@@ -386,7 +396,6 @@
                                                         title="أرشفة سجل الراتب">
                                                         <i class="fas fa-lock mr-1"></i>
                                                     </button>
-                                                @else
                                                     <button
                                                         class="btn btn-success btn-sm toggle-payment-status m-2 shadow-sm"
                                                         data-id="{{ $record->id }}" title="تفعيل صرف راتب الموظف">
@@ -584,6 +593,26 @@
                         <span class="text-muted d-block small font-weight-bold">الراتب المرحل من الشهر الماضي</span>
                         <strong id="detail_rollover" class="text-secondary">0.00</strong> <small
                             class="text-muted">ج.م</small>
+                    </div>
+                </div>
+
+                <!-- Archive Details Section -->
+                <div id="archive_details_section" class="p-3 rounded mt-3 border border-warning shadow-sm" style="display: none; background-color: #fffbeb;">
+                    <h6 class="text-warning font-weight-bold mb-3 text-right">
+                        <i class="fas fa-archive mr-1"></i> بيانات إغلاق وأرشفة الراتب:
+                    </h6>
+                    <div class="row text-center">
+                        <div class="col-md-6 border-right">
+                            <span class="text-muted d-block small mb-1" id="archive_settlement_label">المبلغ المسوى عند الأرشفة</span>
+                            <strong class="text-dark font-weight-bold" style="font-size: 1.25rem;"><span id="archive_settlement_val">0.00</span> <small class="text-muted" style="font-size: 11px;">ج.م</small></strong>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="text-muted d-block small mb-1">المبلغ المتبقي للترحيل للشهر القادم</span>
+                            <div class="d-flex align-items-center justify-content-center">
+                                <span id="archive_next_rollover_badge" class="badge px-2 py-1 mr-2" style="font-size: 0.8rem;"></span>
+                                <strong class="text-primary font-weight-bold" style="font-size: 1.25rem;"><span id="archive_next_rollover_val">0.00</span> <small class="text-muted" style="font-size: 11px;">ج.م</small></strong>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -874,6 +903,43 @@
                             modal.find('#detail_absences_days').text(data.employee_absences_days_counter * 1);
                             modal.find('#detail_deductions_days').text(data.employee_deductions_days_counter * 1);
                             modal.find('#detail_penalty_days').text(data.employee_total_penalty_days * 1);
+
+                            if (data.is_archived == 1) {
+                                modal.find('#archive_details_section').show();
+                                var settlementText = "";
+                                if (data.archive_status_type == 1) {
+                                    settlementText = "المبلغ الذي تم صرفه للموظف عند الأرشفة:";
+                                } else if (data.archive_status_type == 2) {
+                                    settlementText = "المبلغ الذي تم تحصيله من الموظف عند الأرشفة:";
+                                } else {
+                                    settlementText = "المبلغ المسوى عند الأرشفة:";
+                                }
+                                modal.find('#archive_settlement_label').text(settlementText);
+                                modal.find('#archive_settlement_val').text(parseFloat(data.archive_settlement_amount || 0).toFixed(2));
+                                
+                                var nextRollover = parseFloat(data.employee_net_salary_after_close_for_roll_over) || 0;
+                                var absNextRollover = Math.abs(nextRollover);
+                                modal.find('#archive_next_rollover_val').text(absNextRollover.toFixed(2));
+                                
+                                if (absNextRollover === 0) {
+                                    modal.find('#archive_next_rollover_badge')
+                                        .removeClass('badge-success badge-danger')
+                                        .addClass('badge-secondary')
+                                        .html('<i class="fas fa-check-circle mr-1"></i> صافي (تمت التسوية)');
+                                } else if (nextRollover > 0) {
+                                    modal.find('#archive_next_rollover_badge')
+                                        .removeClass('badge-danger badge-secondary')
+                                        .addClass('badge-success')
+                                        .html('<i class="fas fa-arrow-down mr-1"></i> دائن (مستحق له مرحل)');
+                                } else {
+                                    modal.find('#archive_next_rollover_badge')
+                                        .removeClass('badge-success badge-secondary')
+                                        .addClass('badge-danger')
+                                        .html('<i class="fas fa-arrow-up mr-1"></i> مدين (مستحق عليه مرحل)');
+                                }
+                            } else {
+                                modal.find('#archive_details_section').hide();
+                            }
 
                             var recordId = data.id;
                             var printUrl = "{{ route('admin.main-salary-employee.print-details', ':id') }}";

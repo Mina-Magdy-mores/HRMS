@@ -7,6 +7,7 @@
     <title>طباعة تفاصيل راتب الموظف {{ $record->employee_name }}</title>
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap_rtl-v4.2.1/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body {
             font-family: 'Tahoma', sans-serif;
@@ -262,37 +263,61 @@
 
     {{-- ===== EMPLOYEE CARD ===== --}}
     <div class="employee-card">
-        <table class="table-sm">
-            <tr>
-                <td style="width: 15%; font-weight: bold; color: #4a5568;">اسم الموظف:</td>
-                <td style="width: 35%; font-weight: bold;">{{ $record->employee_name }}</td>
-                <td style="width: 15%; font-weight: bold; color: #4a5568;">كود الموظف:</td>
-                <td style="width: 35%; font-weight: bold;">{{ $record->employee->employee_code ?? '---' }}</td>
-            </tr>
-            <tr>
-                <td style="font-weight: bold; color: #4a5568;">الفرع / القسم:</td>
-                <td>{{ $record->branch->name ?? '---' }} / {{ $record->department->name ?? '---' }}</td>
-                <td style="font-weight: bold; color: #4a5568;">الوظيفة:</td>
-                <td>{{ $record->job->name ?? '---' }}</td>
-            </tr>
-            <tr>
-                <td style="font-weight: bold; color: #4a5568;">الراتب الأساسي:</td>
-                <td style="font-weight: bold; color: #2b6cb0;">{{ number_format($record->employee_salary, 2) }} ج.م
-                </td>
-                <td style="font-weight: bold; color: #4a5568;">طريقة الدفع:</td>
-                <td>
-                    @if ($record->payment_method == 1)
-                        نقداً
-                    @elseif($record->payment_method == 2)
-                        تحويل بنكي
-                    @elseif($record->payment_method == 3)
-                        شيك
-                    @else
-                        ---
-                    @endif
-                </td>
-            </tr>
-        </table>
+        <div style="display: flex; gap: 20px; align-items: start;">
+            @if(!empty($record->employee->image))
+                <div style="width: 110px; height: 110px; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fff; flex-shrink: 0;">
+                    <img src="{{ asset('/storage/' . $record->employee->image) }}" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+            @else
+                <div style="width: 110px; height: 110px; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #f1f5f9; color: #94a3b8; flex-shrink: 0;">
+                    <i class="fas fa-user-circle" style="font-size: 80px;"></i>
+                </div>
+            @endif
+            <div style="flex: 1;">
+                <table class="table-sm">
+                    <tr>
+                        <td style="width: 18%; font-weight: bold; color: #4a5568;">اسم الموظف:</td>
+                        <td style="width: 32%; font-weight: bold;">{{ $record->employee_name }}</td>
+                        <td style="width: 18%; font-weight: bold; color: #4a5568;">كود الموظف:</td>
+                        <td style="width: 32%; font-weight: bold;">{{ $record->employee->employee_code ?? '---' }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #4a5568;">الفرع / القسم:</td>
+                        <td>{{ $record->branch->name ?? '---' }} / {{ $record->department->name ?? '---' }}</td>
+                        <td style="font-weight: bold; color: #4a5568;">الوظيفة:</td>
+                        <td>{{ $record->job->name ?? '---' }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #4a5568;">تاريخ التعيين:</td>
+                        <td>{{ $record->employee->hire_date ?? '---' }}</td>
+                        <td style="font-weight: bold; color: #4a5568;">الرقم القومي:</td>
+                        <td>{{ $record->employee->nationality_number ?? '---' }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #4a5568;">الهاتف / البريد:</td>
+                        <td>{{ $record->employee->work_telephone ?? $record->employee->home_telephone ?? '---' }} / {{ $record->employee->email ?? '---' }}</td>
+                        <td style="font-weight: bold; color: #4a5568;">العنوان:</td>
+                        <td>{{ $record->employee->stable_address ?? '---' }}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: bold; color: #4a5568;">الراتب الأساسي:</td>
+                        <td style="font-weight: bold; color: #2b6cb0;">{{ number_format($record->employee_salary, 2) }} ج.م</td>
+                        <td style="font-weight: bold; color: #4a5568;">طريقة الدفع / الحساب:</td>
+                        <td>
+                            @if ($record->payment_method == 1)
+                                نقداً
+                            @elseif($record->payment_method == 2)
+                                تحويل بنكي ({{ $record->employee->bank_account_number ?? '---' }})
+                            @elseif($record->payment_method == 3)
+                                شيك
+                            @else
+                                ---
+                            @endif
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
     </div>
 
     {{-- ===== DETAILS CONTAINER ===== --}}
@@ -395,6 +420,46 @@
         <div class="net-salary-box" style="background: #fef2f2; border: 2px dashed #ef4444;">
             <span class="net-salary-title" style="color: #b91c1c;">صافي الراتب المستحق (مدين - مستحق عليه):</span>
             <span class="net-salary-value" style="color: #dc2626; font-size: 18px;">{{ number_format(abs($record->employee_net_salary), 2) }} ج.م</span>
+        </div>
+    @endif
+
+    @if ($record->is_archived == 1)
+        <div style="background: #fffbeb; border: 1px solid #fef08a; border-radius: 6px; padding: 15px; margin-top: 15px; margin-bottom: 15px;">
+            <h5 style="color: #b45309; font-weight: bold; margin-top: 0; margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid #fef08a; padding-bottom: 5px;">
+                ⚙️ بيانات إغلاق وأرشفة الراتب:
+            </h5>
+            <table style="width: 100%; font-size: 13px;">
+                <tr>
+                    <td style="font-weight: bold; color: #4a5568;">
+                        @if ($record->archive_status_type == 1)
+                            المبلغ الذي تم صرفه للموظف عند الأرشفة:
+                        @elseif ($record->archive_status_type == 2)
+                            المبلغ الذي تم تحصيله من الموظف عند الأرشفة:
+                        @else
+                            المبلغ المسوى عند الأرشفة:
+                        @endif
+                    </td>
+                    <td style="font-weight: bold; text-align: left;">
+                        {{ number_format($record->archive_settlement_amount, 2) }} ج.م
+                    </td>
+                </tr>
+                <tr style="height: 10px;"></tr>
+                <tr>
+                    <td style="font-weight: bold; color: #4a5568;">
+                        المبلغ المتبقي للترحيل للشهر القادم:
+                    </td>
+                    <td style="font-weight: bold; text-align: left; color: #2563eb;">
+                        {{ number_format(abs($record->employee_net_salary_after_close_for_roll_over), 2) }} ج.م
+                        @if ($record->employee_net_salary_after_close_for_roll_over == 0)
+                            <span style="font-size: 11px; background-color: #e2e8f0; color: #475569; padding: 2px 5px; border-radius: 4px; margin-right: 5px;">صافي (تمت التسوية)</span>
+                        @elseif ($record->employee_net_salary_after_close_for_roll_over > 0)
+                            <span style="font-size: 11px; background-color: #d4edda; color: #155724; padding: 2px 5px; border-radius: 4px; margin-right: 5px;">دائن (مستحق له مرحل)</span>
+                        @else
+                            <span style="font-size: 11px; background-color: #f8d7da; color: #721c24; padding: 2px 5px; border-radius: 4px; margin-right: 5px;">مدين (مستحق عليه مرحل)</span>
+                        @endif
+                    </td>
+                </tr>
+            </table>
         </div>
     @endif
 

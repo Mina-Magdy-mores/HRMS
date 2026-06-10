@@ -237,6 +237,11 @@
             margin: 15px 0;
         }
 
+        @page {
+            size: landscape;
+            margin: 6mm;
+        }
+
         @media print {
             .print-btn-area {
                 display: none;
@@ -244,6 +249,15 @@
 
             body {
                 padding: 0;
+                font-size: 11px;
+            }
+
+            table.print-table {
+                font-size: 10.5px;
+            }
+
+            table.print-table th, table.print-table td {
+                padding: 4px 3px !important;
             }
 
             table.print-table tbody tr:hover {
@@ -294,6 +308,19 @@
         <span>📋 <strong>إجمالي الموظفين:</strong> {{ $mainSalaryEmployees->count() }}</span>
     </div>
 
+    @if (!empty($searchFilters))
+        <div
+            style="background: #f8fafc; border: 1px solid #cdd8e3; border-radius: 6px; padding: 10px 15px; margin-bottom: 15px; font-size: 13px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <strong style="color: #2c3e50;"><i class="fas fa-filter mr-1"></i> فلاتر البحث المطبقة:</strong>
+            @foreach ($searchFilters as $filterName => $filterVal)
+                <span
+                    style="background: #e2e8f0; color: #334155; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; border: 1px solid #cbd5e1;">
+                    {{ $filterName }}: <span style="color: #0f172a;">{{ $filterVal }}</span>
+                </span>
+            @endforeach
+        </div>
+    @endif
+
     @if ($mainSalaryEmployees->count() > 0)
 
         {{-- ===== SUMMARY CARDS ===== --}}
@@ -330,6 +357,10 @@
                     <th>اسم الموظف</th>
                     <th>الفرع</th>
                     <th>القسم</th>
+                    <th>الوظيفة</th>
+                    <th>طريقة الدفع</th>
+                    <th>حالة التوظيف</th>
+                    <th>حالة الأرشفة</th>
                     <th>الراتب الأساسي</th>
                     <th>إجمالي الاستحقاقات</th>
                     <th>إجمالي الاستقطاعات</th>
@@ -343,20 +374,49 @@
                     <tr>
                         <td>{{ $index + 1 }}</td>
                         <td>{{ optional($record->employee)->employee_code ?? '---' }}</td>
-                        <td style="text-align:right; font-weight:bold;">{{ $record->employee_name }}</td>
+                        <td style="text-align:right; font-weight:bold; white-space:nowrap;">{{ $record->employee_name }}</td>
                         <td>{{ $record->branch->name ?? '---' }}</td>
                         <td>{{ $record->department->name ?? '---' }}</td>
+                        <td>{{ $record->job->name ?? '---' }}</td>
+                        <td>
+                            @if ($record->payment_method == 1)
+                                نقداً
+                            @elseif ($record->payment_method == 2)
+                                تحويل بنكي
+                            @elseif ($record->payment_method == 3)
+                                شيك
+                            @else
+                                ---
+                            @endif
+                        </td>
+                        <td>
+                            @if ($record->employee_status == 1)
+                                <span class="badge-type badge-active" style="padding: 1px 4px; font-size: 9.5px;">نشط</span>
+                            @else
+                                <span class="badge-type badge-hold" style="padding: 1px 4px; font-size: 9.5px;">غير نشط</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if ($record->is_archived == 1)
+                                <span class="badge-type badge-active" style="padding: 1px 4px; font-size: 9.5px;">مؤرشف</span>
+                            @else
+                                <span class="badge-type badge-pending" style="padding: 1px 4px; font-size: 9.5px;">غير مؤرشف</span>
+                            @endif
+                        </td>
                         <td>{{ number_format($record->employee_salary, 2) }} ج.م</td>
                         <td style="color:#27ae60; font-weight:bold;">{{ number_format($record->total_benefits, 2) }}
                             ج.م</td>
                         <td style="color:#c0392b; font-weight:bold;">{{ number_format($record->total_deductions, 2) }}
                             ج.م</td>
                         <td style="font-weight:bold; font-size: 13px;">
-                            <div style="color:#2980b9; font-size: 14px; margin-bottom: 2px;">{{ number_format(abs($record->employee_net_salary), 2) }} ج.م</div>
+                            <div style="color:#2980b9; font-size: 14px; margin-bottom: 2px;">
+                                {{ number_format(abs($record->employee_net_salary), 2) }} ج.م</div>
                             @if ($record->employee_net_salary >= 0)
-                                <span class="badge-type badge-active" style="padding: 1px 5px; font-size: 10px; line-height: 1;">دائن</span>
+                                <span class="badge-type badge-active"
+                                    style="padding: 1px 5px; font-size: 10px; line-height: 1;">دائن</span>
                             @else
-                                <span class="badge-type badge-hold" style="padding: 1px 5px; font-size: 10px; line-height: 1;">مدين</span>
+                                <span class="badge-type badge-hold"
+                                    style="padding: 1px 5px; font-size: 10px; line-height: 1;">مدين</span>
                             @endif
                         </td>
                         <td>
@@ -378,11 +438,11 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="5" style="text-align:right; padding-right:10px;">الإجمالي</td>
+                    <td colspan="9" style="text-align:right; padding-right:10px; font-weight:bold;">الإجمالي</td>
                     <td>{{ number_format($total_salary_sum, 2) }} ج.م</td>
-                    <td style="color:#27ae60;">{{ number_format($total_benefits_sum, 2) }} ج.م</td>
-                    <td style="color:#c0392b;">{{ number_format($total_deductions_sum, 2) }} ج.m</td>
-                    <td style="color:#2980b9;">{{ number_format($total_net_salary_sum, 2) }} ج.م</td>
+                    <td style="color:#27ae60; font-weight:bold;">{{ number_format($total_benefits_sum, 2) }} ج.م</td>
+                    <td style="color:#c0392b; font-weight:bold;">{{ number_format($total_deductions_sum, 2) }} ج.م</td>
+                    <td style="color:#2980b9; font-weight:bold;">{{ number_format($total_net_salary_sum, 2) }} ج.م</td>
                     <td colspan="2"></td>
                 </tr>
             </tfoot>

@@ -92,23 +92,23 @@
                                                 <i class="fas fa-archive mr-1"></i> لم يؤرشف
                                             </span>
                                         @endif
-                                    </td>
-                                      <td>
+                                    <td>
                                         <div class="d-flex ">
                                             <button class="btn btn-info btn-sm show-details shadow-sm m-2"
-                                            data-id="{{ $record->id }}"
-                                            data-employee-id="{{ $record->employee_id }}"
-                                            title="تفاصيل الراتب">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        @if ($record->is_archived == 0 && $financeMonthlyCalendar->status == 1)
-                                            @if ($record->payment_on_hold == 0)
-                                                <button class="btn btn-warning btn-sm toggle-payment-status m-2 shadow-sm"
-                                                    data-id="{{ $record->id }}"
-                                                    title="إيقاف صرف راتب الموظف">
-                                                    <i class="fas fa-pause mr-1"></i>
-                                                </button>
-                                                 <button
+                                                data-id="{{ $record->id }}"
+                                                data-employee-id="{{ $record->employee_id }}"
+                                                title="تفاصيل الراتب">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            @if ($record->is_archived == 0 && $financeMonthlyCalendar->status == 1)
+                                                @if ($record->payment_on_hold == 0)
+                                                    <button
+                                                        class="btn btn-warning btn-sm toggle-payment-status m-2 shadow-sm"
+                                                        data-id="{{ $record->id }}" title="إيقاف صرف راتب الموظف">
+                                                        <i class="fas fa-pause mr-1"></i>
+                                                    </button>
+                                                    @else
+                                                    <button
                                                         class="btn btn-primary btn-sm openArchiveModal m-2 shadow-sm"
                                                         data-id="{{ $record->id }}"
                                                         data-employee-id="{{ $record->employee_id }}"
@@ -116,21 +116,22 @@
                                                         title="أرشفة سجل الراتب">
                                                         <i class="fas fa-lock mr-1"></i>
                                                     </button>
-                                            @else
-                                                <button class="btn btn-success btn-sm toggle-payment-status m-2 shadow-sm"
+                                                    <button
+                                                        class="btn btn-success btn-sm toggle-payment-status m-2 shadow-sm"
+                                                        data-id="{{ $record->id }}" title="تفعيل صرف راتب الموظف">
+                                                        <i class="fas fa-play mr-1"></i>
+                                                    </button>
+                                                @endif
+                                            @endif
+                                            @if ($record->is_archived == 0)
+                                                <button class="btn btn-danger btn-sm deleteMainSalaryRecord m-2"
                                                     data-id="{{ $record->id }}"
-                                                    title="تفعيل صرف راتب الموظف">
-                                                    <i class="fas fa-play mr-1"></i>
+                                                    data-employee-id="{{ $record->employee_id }}"
+                                                    data-finance-monthly-calendar-id="{{ $record->finance_monthly_calendar_id }}"
+                                                    title="حذف سجل الراتب">
+                                                    <i class="fas fa-trash"></i>
                                                 </button>
                                             @endif
-                                        @endif
-                                        @if ($record->is_archived == 0)
-                                        <button class="btn btn-danger btn-sm deleteMainSalaryRecord m-2" data-id="{{ $record->id }}"
-                                            data-employee-id="{{ $record->employee_id }}"
-                                            data-finance-monthly-calendar-id="{{ $record->finance_monthly_calendar_id }}">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                        @endif
                                         </div>
                                     </td>
                                 </tr>

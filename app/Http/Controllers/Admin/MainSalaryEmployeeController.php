@@ -214,7 +214,7 @@ class MainSalaryEmployeeController extends Controller
             ]);
 
             if (empty($mainSalaryEmployee)) {
-                return response()->json(['status' => 'false', 'message' => 'عذرا، لا يمكن حذف الراتب لأنه محذوف بالفعل او مؤرشف او تم صرف']);
+                return response()->json(['status' => 'false', 'message' => ' عذرا، لا يمكن حذف الراتب لأنه محذوف بالفعل او موقوفمش او مؤرشف او تم صرف']);
             }
 
             try {
@@ -226,7 +226,10 @@ class MainSalaryEmployeeController extends Controller
                     $mainSalaryEmployee->mainSalaryEmployeeLoans()->delete();
                     $mainSalaryEmployee->mainSalaryEmployeeBonuses()->delete();
                     $mainSalaryEmployee->mainSalaryEmployeeAllowances()->delete();
-                    $mainSalaryEmployee->mainSalaryEmployeePLoanInstallments()->delete();
+                    $mainSalaryEmployee->mainSalaryEmployeePLoanInstallments()->update([
+                        'installment_status' => '0',
+                        'main_salary_employee_id' => null,
+                    ]);
 
                     $flag = destroy($mainSalaryEmployee);
                     if (!empty($flag)) {
@@ -516,7 +519,8 @@ class MainSalaryEmployeeController extends Controller
             'addedBy',
             'updatedBy',
             'branch',
-            'department'
+            'department',
+            'job'
         ])
             ->where('company_id', $company_id)
             ->where('finance_monthly_calendar_id', $finance_monthly_calendar_id)
@@ -529,6 +533,39 @@ class MainSalaryEmployeeController extends Controller
         $total_deductions_sum = $mainSalaryEmployees->sum('total_deductions');
         $total_net_salary_sum = $mainSalaryEmployees->sum('employee_net_salary');
 
+        $searchFilters = [];
+        if (!empty($employee_id_search)) {
+            $emp = Employee::find($employee_id_search);
+            if ($emp) $searchFilters['اسم الموظف'] = $emp->name;
+        }
+        if (!empty($branch_id_search)) {
+            $br = Branche::find($branch_id_search);
+            if ($br) $searchFilters['الفرع'] = $br->name;
+        }
+        if (!empty($department_id_search)) {
+            $dep = Department::find($department_id_search);
+            if ($dep) $searchFilters['الإدارة'] = $dep->name;
+        }
+        if (!empty($job_id_search)) {
+            $jb = JobsCategory::find($job_id_search);
+            if ($jb) $searchFilters['الوظيفة'] = $jb->name;
+        }
+        if ($employment_status_search !== null && $employment_status_search !== '') {
+            $searchFilters['حالة التوظيف'] = $employment_status_search == 1 ? 'نشط' : 'غير نشط';
+        }
+        if ($payment_method_search !== null && $payment_method_search !== '') {
+            $searchFilters['طريقة الدفع'] = $payment_method_search == 1 ? 'نقداً' : ($payment_method_search == 2 ? 'تحويل بنكي' : 'شيك');
+        }
+        if ($is_disbursed_search !== null && $is_disbursed_search !== '') {
+            $searchFilters['حالة الصرف'] = $is_disbursed_search == 1 ? 'تم الصرف' : 'لم يتم الصرف';
+        }
+        if ($payment_on_hold_search !== null && $payment_on_hold_search !== '') {
+            $searchFilters['حالة الراتب'] = $payment_on_hold_search == 1 ? 'موقوف' : 'نشط';
+        }
+        if ($is_archived_search !== null && $is_archived_search !== '') {
+            $searchFilters['حالة الأرشفة'] = $is_archived_search == 1 ? 'مؤرشف' : 'غير مؤرشف';
+        }
+
         return view('admin.mainSalaryEmployee.print_search', [
             'mainSalaryEmployees' => $mainSalaryEmployees,
             'systemData'          => $systemData,
@@ -537,6 +574,202 @@ class MainSalaryEmployeeController extends Controller
             'total_benefits_sum'  => $total_benefits_sum,
             'total_deductions_sum' => $total_deductions_sum,
             'total_net_salary_sum' => $total_net_salary_sum,
+            'searchFilters'       => $searchFilters,
+        ]);
+    }
+
+    public function printSearchDetailed(Request $request)
+    {
+        $finance_monthly_calendar_id = $request->finance_monthly_calendar_id_search;
+        $employee_id_search = $request->employee_id_search;
+        $is_disbursed_search = $request->is_disbursed_search;
+        $payment_on_hold_search = $request->payment_on_hold_search;
+        $branch_id_search = $request->branch_id_search;
+        $department_id_search = $request->department_id_search;
+        $job_id_search = $request->job_id_search;
+        $employment_status_search = $request->employment_status_search;
+        $payment_method_search = $request->payment_method_search;
+        $is_archived_search = $request->is_archived_search;
+
+        $where = [];
+
+        if ($employee_id_search == '') {
+            $field1 = "id";
+            $operator1 = ">=";
+            $value1 = 0;
+        } else {
+            $field1 = "employee_id";
+            $operator1 = "=";
+            $value1 = $employee_id_search;
+        }
+        if ($is_disbursed_search == '') {
+            $field2 = "id";
+            $operator2 = ">=";
+            $value2 = 0;
+        } else {
+            $field2 = "is_disbursed";
+            $operator2 = "=";
+            $value2 = $is_disbursed_search;
+        }
+
+        if ($payment_on_hold_search == '') {
+            $field3 = "id";
+            $operator3 = ">=";
+            $value3 = 0;
+        } else {
+            $field3 = "payment_on_hold";
+            $operator3 = "=";
+            $value3 = $payment_on_hold_search;
+        }
+
+        if ($is_archived_search == '') {
+            $field4 = "id";
+            $operator4 = ">=";
+            $value4 = 0;
+        } else {
+            $field4 = "is_archived";
+            $operator4 = "=";
+            $value4 = $is_archived_search;
+        }
+
+        if ($branch_id_search == '') {
+            $field5 = "id";
+            $operator5 = ">=";
+            $value5 = 0;
+        } else {
+            $field5 = "employee_branch_id ";
+            $operator5 = "=";
+            $value5 = $branch_id_search;
+        }
+        if ($department_id_search == '') {
+            $field6 = "id";
+            $operator6 = ">=";
+            $value6 = 0;
+        } else {
+            $field6 = "employee_department_id";
+            $operator6 = "=";
+            $value6 = $department_id_search;
+        }
+        if ($job_id_search == '') {
+            $field7 = "id";
+            $operator7 = ">=";
+            $value7 = 0;
+        } else {
+            $field7 = "employee_job_id";
+            $operator7 = "=";
+            $value7 = $job_id_search;
+        }
+        if ($employment_status_search == '') {
+            $field8 = "id";
+            $operator8 = ">=";
+            $value8 = 0;
+        } else {
+            $field8 = "employee_status";
+            $operator8 = "=";
+            $value8 = $employment_status_search;
+        }
+        if ($payment_method_search == '') {
+            $field9 = "id";
+            $operator9 = ">=";
+            $value9 = 0;
+        } else {
+            $field9 = "payment_method";
+            $operator9 = "=";
+            $value9 = $payment_method_search;
+        }
+
+
+        $where = [
+            [$field1, $operator1, $value1],
+            [$field2, $operator2, $value2],
+            [$field3, $operator3, $value3],
+            [$field4, $operator4, $value4],
+            [$field5, $operator5, $value5],
+            [$field6, $operator6, $value6],
+            [$field7, $operator7, $value7],
+            [$field8, $operator8, $value8],
+            [$field9, $operator9, $value9],
+        ];
+        $where = collect($where)->unique()->values()->toArray();
+
+        $company_id = Auth::user()->company_id;
+
+        $adminPanelSetting = AdminPanelSetting::where('company_id', $company_id)->first();
+        $systemData = [
+            'system_name' => $adminPanelSetting->company_name ?? '',
+            'photo'       => $adminPanelSetting->image ?? '',
+            'address'     => $adminPanelSetting->address ?? '',
+            'phone'       => $adminPanelSetting->phone ?? '',
+            'email'       => $adminPanelSetting->email ?? '',
+        ];
+
+        $financeMonthlyCalendar = FinanceMonthlyCalendar::with('financeCalendar')
+            ->where('company_id', $company_id)
+            ->where('id', $finance_monthly_calendar_id)
+            ->first();
+
+        $mainSalaryEmployees = MainSalaryEmployee::with([
+            'employee',
+            'financeMonthlyCalendar',
+            'addedBy',
+            'updatedBy',
+            'branch',
+            'department',
+            'job'
+        ])
+            ->where('company_id', $company_id)
+            ->where('finance_monthly_calendar_id', $finance_monthly_calendar_id)
+            ->where($where)
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $total_salary_sum = $mainSalaryEmployees->sum('employee_salary');
+        $total_benefits_sum = $mainSalaryEmployees->sum('total_benefits');
+        $total_deductions_sum = $mainSalaryEmployees->sum('total_deductions');
+        $total_net_salary_sum = $mainSalaryEmployees->sum('employee_net_salary');
+
+        $searchFilters = [];
+        if (!empty($employee_id_search)) {
+            $emp = Employee::find($employee_id_search);
+            if ($emp) $searchFilters['اسم الموظف'] = $emp->name;
+        }
+        if (!empty($branch_id_search)) {
+            $br = Branche::find($branch_id_search);
+            if ($br) $searchFilters['الفرع'] = $br->name;
+        }
+        if (!empty($department_id_search)) {
+            $dep = Department::find($department_id_search);
+            if ($dep) $searchFilters['الإدارة'] = $dep->name;
+        }
+        if (!empty($job_id_search)) {
+            $jb = JobsCategory::find($job_id_search);
+            if ($jb) $searchFilters['الوظيفة'] = $jb->name;
+        }
+        if ($employment_status_search !== null && $employment_status_search !== '') {
+            $searchFilters['حالة التوظيف'] = $employment_status_search == 1 ? 'نشط' : 'غير نشط';
+        }
+        if ($payment_method_search !== null && $payment_method_search !== '') {
+            $searchFilters['طريقة الدفع'] = $payment_method_search == 1 ? 'نقداً' : ($payment_method_search == 2 ? 'تحويل بنكي' : 'شيك');
+        }
+        if ($is_disbursed_search !== null && $is_disbursed_search !== '') {
+            $searchFilters['حالة الصرف'] = $is_disbursed_search == 1 ? 'تم الصرف' : 'لم يتم الصرف';
+        }
+        if ($payment_on_hold_search !== null && $payment_on_hold_search !== '') {
+            $searchFilters['حالة الراتب'] = $payment_on_hold_search == 1 ? 'موقوف' : 'نشط';
+        }
+        if ($is_archived_search !== null && $is_archived_search !== '') {
+            $searchFilters['حالة الأرشفة'] = $is_archived_search == 1 ? 'مؤرشف' : 'غير مؤرشف';
+        }
+
+        return view('admin.mainSalaryEmployee.print_search_detailed', [
+            'mainSalaryEmployees' => $mainSalaryEmployees,
+            'systemData'          => $systemData,
+            'financeMonthlyCalendar' => $financeMonthlyCalendar,
+            'total_salary_sum'    => $total_salary_sum,
+            'total_benefits_sum'  => $total_benefits_sum,
+            'total_deductions_sum' => $total_deductions_sum,
+            'total_net_salary_sum' => $total_net_salary_sum,
+            'searchFilters'       => $searchFilters,
         ]);
     }
 
@@ -633,6 +866,7 @@ class MainSalaryEmployeeController extends Controller
         if ($request->ajax()) {
             $company_id = Auth::user()->company_id;
             $id = $request->id;
+            $disbursed_amount = (float)$request->input('disbursed_amount', 0.00);
 
             $record = MainSalaryEmployee::where('company_id', $company_id)->where('id', $id)->first();
             if (empty($record)) {
@@ -649,17 +883,50 @@ class MainSalaryEmployeeController extends Controller
             }
 
             try {
-                return DB::transaction(function () use ($record) {
+                return DB::transaction(function () use ($record, $disbursed_amount) {
                     $archiveData = [
                         'is_archived' => 1,
                         'archived_by' => Auth::id(),
                         'archived_at' => now(),
                     ];
 
+                    $netSalary = (float)$record->employee_net_salary;
+                    $absNetSalary = abs($netSalary);
+
+                    if ($disbursed_amount > $absNetSalary) {
+                        $disbursed_amount = $absNetSalary;
+                    }
+                    if ($disbursed_amount < 0) {
+                        $disbursed_amount = 0.00;
+                    }
+
+                    $remaining = $absNetSalary - $disbursed_amount;
+                    if ($netSalary >= 0) {
+                        $rolloverForNextMonth = $remaining;
+                    } else {
+                        $rolloverForNextMonth = -$remaining;
+                    }
+
+                    $statusType = 3; // 3 = صافي
+                    if ($netSalary > 0) {
+                        $statusType = 1; // 1 = دائن
+                    } elseif ($netSalary < 0) {
+                        $statusType = 2; // 2 = مدين
+                    }
+
                     $record->is_archived = 1;
                     $record->archived_by = Auth::id();
                     $record->archived_at = now();
-                    $record->employee_net_salary_after_close_for_roll_over = $record->employee_net_salary;
+                    $record->archive_status_type = $statusType;
+                    $record->archive_settlement_amount = $disbursed_amount;
+                    $record->employee_net_salary_after_close_for_roll_over = $rolloverForNextMonth;
+
+                    if ($netSalary >= 0 && $disbursed_amount > 0) {
+                        $record->is_disbursed = 1;
+                    } else {
+                        $record->is_disbursed = 0;
+                    }
+
                     $record->save();
 
                     $record->mainSalaryEmployeeDeductions()->update($archiveData);
@@ -684,7 +951,7 @@ class MainSalaryEmployeeController extends Controller
             $company_id = Auth::user()->company_id;
             $id = $request->id;
 
-            $record = MainSalaryEmployee::where('company_id', $company_id)->where('id', $id)->first();
+            $record = MainSalaryEmployee::with('employee')->where('company_id', $company_id)->where('id', $id)->first();
             if (empty($record)) {
                 return response()->json(['status' => 'false', 'message' => 'عفواً، السجل غير موجود']);
             }
