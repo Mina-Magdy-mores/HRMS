@@ -183,20 +183,25 @@
                                             </span>
                                         @endif
                                     </td>
-                                    <td>
-                                        @if (
-                                                $month->financeCalendar->status == 1 &&
-                                                $month->status == 0 &&
-                                                $month->total_prev_months_waiting_to_open == 0 &&
-                                                $month->total_opened_months == 0
-                                            )
-                                            <button data-id="{{ $month->id }}" class="btn load-modal btn-sm btn-primary">
-                                                <i class="fa fa-folder-open"></i>
-                                                فتح الشهر المالى
-                                            </button>
-                                        @else
-                                        @endif
-                                    </td>
+                                     <td>
+                                         @if (
+                                                 $month->financeCalendar->status == 1 &&
+                                                 $month->status == 0 &&
+                                                 $month->total_prev_months_waiting_to_open == 0 &&
+                                                 $month->total_opened_months == 0
+                                             )
+                                             <button data-id="{{ $month->id }}" class="btn load-modal btn-sm btn-primary">
+                                                 <i class="fa fa-folder-open"></i>
+                                                 فتح الشهر المالى
+                                             </button>
+                                         @elseif ($month->status == 1)
+                                             <button type="button" class="btn btn-sm btn-warning archive_entire_month_btn"
+                                                 data-id="{{ $month->id }}" title="أرشفة وإغلاق الشهر بالكامل لكافة الموظفين">
+                                                 <i class="fas fa-archive mr-1"></i>
+                                                 أرشفة وإغلاق الشهر بالكامل
+                                             </button>
+                                         @endif
+                                     </td>
                                 </tr>
                             @empty
                                 <tr>
@@ -330,8 +335,45 @@
                 });
 
 
-            })
-        })
+            });
+
+            $(document).on('click', '.archive_entire_month_btn', function() {
+                var id = $(this).data('id');
+                var message = "⚠️ تنبيه هام جداً!\n\n" +
+                    "أنت على وشك أرشفة وإغلاق الشهر المالي الحالي بالكامل لكافة الموظفين.\n" +
+                    "سيتم تطبيق القواعد التالية:\n" +
+                    "1. الموظفون المستحقون لرواتب (دائن): سيتم افتراض استلامهم لكامل رواتبهم نقداً، وتصفية رصيدهم المرحل إلى 0.00.\n" +
+                    "2. الموظفون المستحق عليهم مديونيات (مدين): لن يتم دفع أي مبالغ، وسيتم ترحيل كامل مديونياتهم إلى الشهر المالي التالي.\n" +
+                    "3. سيتم إغلاق الشهر المالي الحالي بالكامل ولا يمكن التعديل أو الحذف بعد ذلك.\n\n" +
+                    "هل أنت متأكد تماماً من المتابعة وأرشفة الشهر بالكامل؟";
+
+                if (!confirm(message)) {
+                    return;
+                }
+
+                $.ajax({
+                    url: "{{ route('admin.main-salary-employee.archive-month') }}",
+                    type: 'POST',
+                    dataType: 'json',
+                    cache: false,
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        id: id
+                    },
+                    success: function(response) {
+                        if (response.status == 'true') {
+                            alert(response.message);
+                            window.location.reload();
+                        } else {
+                            alert(response.message || 'حدث خطأ ما');
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('حدث خطأ غير متوقع أثناء الاتصال بالخادم');
+                    }
+                });
+            });
+        });
 
 
 

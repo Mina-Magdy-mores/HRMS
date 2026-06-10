@@ -101,21 +101,21 @@
                                                 <i class="fas fa-eye"></i>
                                             </button>
                                             @if ($record->is_archived == 0 && $financeMonthlyCalendar->status == 1)
+                                                <button
+                                                    class="btn btn-primary btn-sm openArchiveModal m-2 shadow-sm"
+                                                    data-id="{{ $record->id }}"
+                                                    data-employee-id="{{ $record->employee_id }}"
+                                                    data-finance-monthly-calendar-id="{{ $record->finance_monthly_calendar_id }}"
+                                                    title="أرشفة سجل الراتب">
+                                                    <i class="fas fa-lock mr-1"></i>
+                                                </button>
                                                 @if ($record->payment_on_hold == 0)
                                                     <button
                                                         class="btn btn-warning btn-sm toggle-payment-status m-2 shadow-sm"
                                                         data-id="{{ $record->id }}" title="إيقاف صرف راتب الموظف">
                                                         <i class="fas fa-pause mr-1"></i>
                                                     </button>
-                                                    @else
-                                                    <button
-                                                        class="btn btn-primary btn-sm openArchiveModal m-2 shadow-sm"
-                                                        data-id="{{ $record->id }}"
-                                                        data-employee-id="{{ $record->employee_id }}"
-                                                        data-finance-monthly-calendar-id="{{ $record->finance_monthly_calendar_id }}"
-                                                        title="أرشفة سجل الراتب">
-                                                        <i class="fas fa-lock mr-1"></i>
-                                                    </button>
+                                                @else
                                                     <button
                                                         class="btn btn-success btn-sm toggle-payment-status m-2 shadow-sm"
                                                         data-id="{{ $record->id }}" title="تفعيل صرف راتب الموظف">

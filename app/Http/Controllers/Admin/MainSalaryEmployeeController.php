@@ -945,6 +945,97 @@ class MainSalaryEmployeeController extends Controller
             }
         }
     }
+
+    public function archiveMonth(Request $request)
+    {
+        $company_id = Auth::user()->company_id;
+        $calendar_id = $request->id;
+        
+        $financeMonthlyCalendar = FinanceMonthlyCalendar::where('company_id', $company_id)
+            ->where('id', $calendar_id)
+            ->where('status', 1)
+            ->first();
+
+        if (empty($financeMonthlyCalendar)) {
+            return response()->json(['status' => 'false', 'message' => 'عفواً، لا يوجد شهر مالي مفتوح بهذا المعرف']);
+        }
+
+        // Check if there are any employees whose salaries are on hold
+        $hasHold = MainSalaryEmployee::where('company_id', $company_id)
+            ->where('finance_monthly_calendar_id', $calendar_id)
+            ->where('is_archived', 0)
+            ->where('payment_on_hold', 1)
+            ->exists();
+
+        if ($hasHold) {
+            return response()->json([
+                'status' => 'false',
+                'message' => 'عفواً، لا يمكن أرشفة وإغلاق الشهر بالكامل لوجود موظفين رواتبهم موقوفة. يرجى تفعيل رواتبهم أولاً أو معالجة حالتهم.'
+            ]);
+        }
+
+        // Get all unarchived records for this month
+        $records = MainSalaryEmployee::where('company_id', $company_id)
+            ->where('finance_monthly_calendar_id', $calendar_id)
+            ->where('is_archived', 0)
+            ->get();
+
+        if ($records->isEmpty()) {
+            $financeMonthlyCalendar->status = 2; // closed/archived
+            $financeMonthlyCalendar->updated_by = Auth::id();
+            $financeMonthlyCalendar->save();
+            return response()->json(['status' => 'true', 'message' => 'تم إغلاق الشهر المالي بنجاح']);
+        }
+
+        try {
+            DB::transaction(function () use ($records, $financeMonthlyCalendar) {
+                $archiveData = [
+                    'is_archived' => 1,
+                    'archived_by' => Auth::id(),
+                    'archived_at' => now(),
+                ];
+
+                foreach ($records as $record) {
+                    $net = (float)$record->employee_net_salary;
+
+                    if ($net >= 0) {
+                        $record->archive_status_type = $net == 0 ? 3 : 1; // 3 = صافي, 1 = دائن
+                        $record->archive_settlement_amount = $net;
+                        $record->employee_net_salary_after_close_for_roll_over = 0.00;
+                        $record->is_disbursed = $net > 0 ? 1 : 0;
+                    } else {
+                        $record->archive_status_type = 2; // 2 = مدين
+                        $record->archive_settlement_amount = 0.00;
+                        $record->employee_net_salary_after_close_for_roll_over = $net; // stores negative balance
+                        $record->is_disbursed = 0;
+                    }
+
+                    $record->is_archived = 1;
+                    $record->archived_by = Auth::id();
+                    $record->archived_at = now();
+                    $record->save();
+
+                    $record->mainSalaryEmployeeDeductions()->update($archiveData);
+                    $record->mainSalaryEmployeeAbsences()->update($archiveData);
+                    $record->mainSalaryEmployeeDeductionTypes()->update($archiveData);
+                    $record->mainSalaryEmployeeAdditions()->update($archiveData);
+                    $record->mainSalaryEmployeeLoans()->update($archiveData);
+                    $record->mainSalaryEmployeeBonuses()->update($archiveData);
+                    $record->mainSalaryEmployeeAllowances()->update($archiveData);
+                    $record->mainSalaryEmployeePLoanInstallments()->update($archiveData);
+                }
+
+                $financeMonthlyCalendar->status = 2; // closed/archived
+                $financeMonthlyCalendar->updated_by = Auth::id();
+                $financeMonthlyCalendar->save();
+            });
+
+            return response()->json(['status' => 'true', 'message' => 'تمت أرشفة وإغلاق الشهر المالي بالكامل بنجاح لكافة الموظفين']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'false', 'message' => 'حدث خطأ أثناء أرشفة الشهر المالي: ' . $e->getMessage()]);
+        }
+    }
+
     public function recalculateMainSalary(Request $request)
     {
         if ($request->ajax()) {

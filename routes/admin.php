@@ -312,6 +312,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/main-salary-employee/toggle-payment-status', [MainSalaryEmployeeController::class, 'togglePaymentStatus'])->name('main-salary-employee.toggle-payment-status');
         Route::post('/main-salary-employee/openArchiveModal', [MainSalaryEmployeeController::class, 'openArchiveModal'])->name('main-salary-employee.openArchiveModal');
         Route::post('/main-salary-employee/archive', [MainSalaryEmployeeController::class, 'archive'])->name('main-salary-employee.archive');
+        Route::post('/main-salary-employee/archive-month', [MainSalaryEmployeeController::class, 'archiveMonth'])->name('main-salary-employee.archive-month');
         Route::post('/main-salary-employee/recalculate_main_salary', [MainSalaryEmployeeController::class, 'recalculateMainSalary'])->name('main-salary-employee.recalculate_main_salary');
 
     });

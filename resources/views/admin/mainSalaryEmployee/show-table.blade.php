@@ -92,10 +92,14 @@
             <div class="card-tools">
 
                 @if ($financeMonthlyCalendar->status == 1)
+                    <button type="button" class="btn btn-warning btn-sm shadow-sm ml-2" id="archive_entire_month_btn"
+                        data-id="{{ $financeMonthlyCalendar->id }}" title="أرشفة وإغلاق الشهر بالكامل لكافة الموظفين">
+                        <i class="fas fa-archive mr-1"></i>
+                        أرشفة وإغلاق الشهر بالكامل
+                    </button>
                     <button type="button" class="btn btn-primary btn-sm shadow-sm" data-toggle="modal"
                         data-target="#addMainSalaryRecordModal">
-
-                        <i class="fas fa-list-plus"></i>
+                        <i class="fas fa-plus mr-1"></i>
                         إضافة راتب للموظف
                     </button>
                 @endif
@@ -381,21 +385,21 @@
                                                 <i class="fas fa-eye"></i>
                                             </button>
                                             @if ($record->is_archived == 0 && $financeMonthlyCalendar->status == 1)
+                                                <button
+                                                    class="btn btn-primary btn-sm openArchiveModal m-2 shadow-sm"
+                                                    data-id="{{ $record->id }}"
+                                                    data-employee-id="{{ $record->employee_id }}"
+                                                    data-finance-monthly-calendar-id="{{ $record->finance_monthly_calendar_id }}"
+                                                    title="أرشفة سجل الراتب">
+                                                    <i class="fas fa-lock mr-1"></i>
+                                                </button>
                                                 @if ($record->payment_on_hold == 0)
                                                     <button
                                                         class="btn btn-warning btn-sm toggle-payment-status m-2 shadow-sm"
                                                         data-id="{{ $record->id }}" title="إيقاف صرف راتب الموظف">
                                                         <i class="fas fa-pause mr-1"></i>
                                                     </button>
-                                                    @else
-                                                    <button
-                                                        class="btn btn-primary btn-sm openArchiveModal m-2 shadow-sm"
-                                                        data-id="{{ $record->id }}"
-                                                        data-employee-id="{{ $record->employee_id }}"
-                                                        data-finance-monthly-calendar-id="{{ $record->finance_monthly_calendar_id }}"
-                                                        title="أرشفة سجل الراتب">
-                                                        <i class="fas fa-lock mr-1"></i>
-                                                    </button>
+                                                @else
                                                     <button
                                                         class="btn btn-success btn-sm toggle-payment-status m-2 shadow-sm"
                                                         data-id="{{ $record->id }}" title="تفعيل صرف راتب الموظف">
@@ -620,10 +624,14 @@
                 <a href="#" target="_blank" class="btn btn-success" id="print_modal_details">
                     <i class="fas fa-print mr-1"></i> طباعة التفاصيل
                 </a>
+                @if ($financeMonthlyCalendar->status == 1)
+                    <button type="button" class="btn btn-warning openArchiveModal shadow-sm" id="details_modal_archive_btn" style="display: none;">
+                        <i class="fas fa-lock mr-1"></i> أرشفة الراتب
+                    </button>
+                @endif
                 <button type="button" class="btn btn-primary" data-dismiss="modal">
                     <i class="fas fa-times-circle mr-1"></i> إغلاق النافذة
                 </button>
-
             </div>
         </div>
     </div>
@@ -883,6 +891,53 @@
                             modal.find('#detail_total_deductions').text(parseFloat(data.total_deductions).toFixed(2));
 
                             modal.find('#detail_rollover').text(parseFloat(data.employee_rollover_amount).toFixed(2));
+                            
+                            if (data.is_archived == 1) {
+                                 modal.find('#archive_details_section').show();
+                                 modal.find('#details_modal_archive_btn').hide();
+                                 var settlementText = "";
+                                 if (data.archive_status_type == 1) {
+                                     settlementText = "المبلغ الذي تم صرفه للموظف عند الأرشفة:";
+                                 } else if (data.archive_status_type == 2) {
+                                     settlementText = "المبلغ الذي تم تحصيله من الموظف عند الأرشفة:";
+                                 } else {
+                                     settlementText = "المبلغ المسوى عند الأرشفة:";
+                                 }
+                                 modal.find('#archive_settlement_label').text(settlementText);
+                                 modal.find('#archive_settlement_val').text(parseFloat(data.archive_settlement_amount || 0).toFixed(2));
+                                 
+                                 var nextRollover = parseFloat(data.employee_net_salary_after_close_for_roll_over) || 0;
+                                 var absNextRollover = Math.abs(nextRollover);
+                                 modal.find('#archive_next_rollover_val').text(absNextRollover.toFixed(2));
+                                 
+                                 if (absNextRollover === 0) {
+                                     modal.find('#archive_next_rollover_badge')
+                                         .removeClass('badge-success badge-danger')
+                                         .addClass('badge-secondary')
+                                         .html('<i class="fas fa-check-circle mr-1"></i> صافي (تمت التسوية)');
+                                 } else if (nextRollover > 0) {
+                                     modal.find('#archive_next_rollover_badge')
+                                         .removeClass('badge-danger badge-secondary')
+                                         .addClass('badge-success')
+                                         .html('<i class="fas fa-arrow-down mr-1"></i> دائن (مستحق له مرحل)');
+                                 } else {
+                                     modal.find('#archive_next_rollover_badge')
+                                         .removeClass('badge-success badge-secondary')
+                                         .addClass('badge-danger')
+                                         .html('<i class="fas fa-arrow-up mr-1"></i> مدين (مستحق عليه مرحل)');
+                                 }
+                             } else {
+                                 modal.find('#archive_details_section').hide();
+                                 modal.find('#details_modal_archive_btn')
+                                     .data('id', data.id)
+                                     .data('employee-id', data.employee_id)
+                                     .data('finance-monthly-calendar-id', data.finance_monthly_calendar_id)
+                                     .attr('data-id', data.id)
+                                     .attr('data-employee-id', data.employee_id)
+                                     .attr('data-finance-monthly-calendar-id', data.finance_monthly_calendar_id)
+                                     .show();
+                             }
+                            
                             var netSalary = parseFloat(data.employee_net_salary) || 0;
                             var absNetSalary = Math.abs(netSalary);
                             modal.find('#detail_net_salary').text(absNetSalary.toFixed(2));
@@ -903,43 +958,6 @@
                             modal.find('#detail_absences_days').text(data.employee_absences_days_counter * 1);
                             modal.find('#detail_deductions_days').text(data.employee_deductions_days_counter * 1);
                             modal.find('#detail_penalty_days').text(data.employee_total_penalty_days * 1);
-
-                            if (data.is_archived == 1) {
-                                modal.find('#archive_details_section').show();
-                                var settlementText = "";
-                                if (data.archive_status_type == 1) {
-                                    settlementText = "المبلغ الذي تم صرفه للموظف عند الأرشفة:";
-                                } else if (data.archive_status_type == 2) {
-                                    settlementText = "المبلغ الذي تم تحصيله من الموظف عند الأرشفة:";
-                                } else {
-                                    settlementText = "المبلغ المسوى عند الأرشفة:";
-                                }
-                                modal.find('#archive_settlement_label').text(settlementText);
-                                modal.find('#archive_settlement_val').text(parseFloat(data.archive_settlement_amount || 0).toFixed(2));
-                                
-                                var nextRollover = parseFloat(data.employee_net_salary_after_close_for_roll_over) || 0;
-                                var absNextRollover = Math.abs(nextRollover);
-                                modal.find('#archive_next_rollover_val').text(absNextRollover.toFixed(2));
-                                
-                                if (absNextRollover === 0) {
-                                    modal.find('#archive_next_rollover_badge')
-                                        .removeClass('badge-success badge-danger')
-                                        .addClass('badge-secondary')
-                                        .html('<i class="fas fa-check-circle mr-1"></i> صافي (تمت التسوية)');
-                                } else if (nextRollover > 0) {
-                                    modal.find('#archive_next_rollover_badge')
-                                        .removeClass('badge-danger badge-secondary')
-                                        .addClass('badge-success')
-                                        .html('<i class="fas fa-arrow-down mr-1"></i> دائن (مستحق له مرحل)');
-                                } else {
-                                    modal.find('#archive_next_rollover_badge')
-                                        .removeClass('badge-success badge-secondary')
-                                        .addClass('badge-danger')
-                                        .html('<i class="fas fa-arrow-up mr-1"></i> مدين (مستحق عليه مرحل)');
-                                }
-                            } else {
-                                modal.find('#archive_details_section').hide();
-                            }
 
                             var recordId = data.id;
                             var printUrl = "{{ route('admin.main-salary-employee.print-details', ':id') }}";
@@ -1091,6 +1109,8 @@
                 var employee_id = $(this).data('employee-id');
                 var finance_monthly_calendar_id = $(this).data('finance-monthly-calendar-id');
 
+                $('#salaryDetailsModal').modal('hide');
+
                 $.ajax({
                     url: "{{ route('admin.main-salary-employee.openArchiveModal') }}",
                     type: 'POST',
@@ -1149,6 +1169,45 @@
                     }
                 });
             });
+
+            $(document).on('click', '#archive_entire_month_btn', function() {
+                var id = $(this).data('id');
+                var message = "⚠️ تنبيه هام جداً!\n\n" +
+                    "أنت على وشك أرشفة وإغلاق الشهر المالي الحالي بالكامل لكافة الموظفين.\n" +
+                    "سيتم تطبيق القواعد التالية:\n" +
+                    "1. الموظفون المستحقون لرواتب (دائن): سيتم افتراض استلامهم لكامل رواتبهم نقداً، وتصفية رصيدهم المرحل إلى 0.00.\n" +
+                    "2. الموظفون المستحق عليهم مديونيات (مدين): لن يتم دفع أي مبالغ، وسيتم ترحيل كامل مديونياتهم إلى الشهر المالي التالي.\n" +
+                    "3. سيتم إغلاق الشهر المالي الحالي بالكامل ولا يمكن التعديل أو الحذف بعد ذلك.\n\n" +
+                    "هل أنت متأكد تماماً من المتابعة وأرشفة الشهر بالكامل؟";
+
+                if (!confirm(message)) {
+                    return;
+                }
+
+                $.ajax({
+                    url: "{{ route('admin.main-salary-employee.archive-month') }}",
+                    type: 'POST',
+                    dataType: 'json',
+                    cache: false,
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                        id: id
+                    },
+                    success: function(response) {
+                        if (response.status == 'true') {
+                            alert(response.message);
+                            window.location.reload();
+                        } else {
+                            alert(response.message || 'حدث خطأ ما');
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('حدث خطأ غير متوقع أثناء الاتصال بالخادم');
+                    }
+                });
+            });
+            
+
 
         });
     </script>
