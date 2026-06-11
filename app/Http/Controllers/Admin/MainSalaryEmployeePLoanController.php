@@ -20,6 +20,24 @@ class MainSalaryEmployeePLoanController extends Controller
     {
         $company_id = Auth::user()->company_id;
 
+        // Auto-archive parent loans if all their installments are paid and archived
+        $activeLoans = MainSalaryEmployeePLoan::where('company_id', $company_id)->where('is_archived', 0)->get();
+        foreach ($activeLoans as $loan) {
+            $totalInstallments = MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $loan->id)->count();
+            $paidAndArchived = MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $loan->id)
+                ->whereIn('installment_status', ['1', '2'])
+                ->where('is_archived', 1)
+                ->count();
+
+            if ($totalInstallments > 0 && $totalInstallments === $paidAndArchived) {
+                $loan->update([
+                    'is_archived' => 1,
+                    'archived_by' => Auth::user()->id,
+                    'archived_at' => date('Y-m-d H:i:s'),
+                ]);
+            }
+        }
+
         // Fetch statistics for info boxes
         $total_count = MainSalaryEmployeePLoan::where('company_id', $company_id)->count();
         $disbursed_count = MainSalaryEmployeePLoan::where('company_id', $company_id)->where('is_disbursed', 1)->count();
@@ -54,6 +72,17 @@ class MainSalaryEmployeePLoanController extends Controller
             'desc',
             PAGEINATION_COUNTER
         );
+
+        foreach ($mainSalaryEmployeePLoans as $loan) {
+            $totalPaid = MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $loan->id)
+                ->whereIn('installment_status', ['1', '2'])
+                ->sum('installment_amount_monthly');
+
+            $loan->update([
+                'paid_amount' => $totalPaid,
+                'remaining_amount' => max(0, $loan->amount - $totalPaid)
+            ]);
+        }
 
         return view('admin.mainSalaryRecordPLoan.index', compact(
             'mainSalaryEmployeePLoans',
@@ -95,6 +124,7 @@ class MainSalaryEmployeePLoanController extends Controller
                         'installment_amount_monthly' => $request->installment_amount_monthly,
                         'next_installment_date'   => $request->next_installment_date,
                         'next_installment_year_and_month'  => date('Y-m', strtotime($request->next_installment_date)),
+                        'remaining_amount'        => $request->amount,
                         'company_id'              => $company_id,
                         'added_by'                => Auth::user()->id,
                         'notes'                   => $request->notes,
@@ -141,6 +171,26 @@ class MainSalaryEmployeePLoanController extends Controller
     public function ajaxSearch(Request $request)
     {
         if ($request->ajax()) {
+            $company_id = Auth::user()->company_id;
+
+            // Auto-archive parent loans if all their installments are paid and archived
+            $activeLoans = MainSalaryEmployeePLoan::where('company_id', $company_id)->where('is_archived', 0)->get();
+            foreach ($activeLoans as $loan) {
+                $totalInstallments = MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $loan->id)->count();
+                $paidAndArchived = MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $loan->id)
+                    ->whereIn('installment_status', ['1', '2'])
+                    ->where('is_archived', 1)
+                    ->count();
+
+                if ($totalInstallments > 0 && $totalInstallments === $paidAndArchived) {
+                    $loan->update([
+                        'is_archived' => 1,
+                        'archived_by' => Auth::user()->id,
+                        'archived_at' => date('Y-m-d H:i:s'),
+                    ]);
+                }
+            }
+
             $employee_id_search = $request->employee_id_search;
             $is_archived_search = $request->is_archived_search;
             $is_disbursed_search = $request->is_disbursed_search;
@@ -178,7 +228,6 @@ class MainSalaryEmployeePLoanController extends Controller
                 [$field2, $operator2, $value2],
                 [$field3, $operator3, $value3],
             ];
-            $company_id = Auth::user()->company_id;
             $mainSalaryEmployeePLoans = MainSalaryEmployeePLoan::with([
                 'employee',
                 'addedBy',
@@ -190,6 +239,18 @@ class MainSalaryEmployeePLoanController extends Controller
                 ->where($where)
                 ->orderBy('id', 'desc')
                 ->paginate(PAGEINATION_COUNTER);
+
+            foreach ($mainSalaryEmployeePLoans as $loan) {
+                $totalPaid = MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $loan->id)
+                    ->whereIn('installment_status', ['1', '2'])
+                    ->sum('installment_amount_monthly');
+
+                $loan->update([
+                    'paid_amount' => $totalPaid,
+                    'remaining_amount' => max(0, $loan->amount - $totalPaid)
+                ]);
+            }
+
             return view('admin.mainSalaryRecordPLoan.ajaxSearch', ['mainSalaryEmployeePLoans' => $mainSalaryEmployeePLoans]);
         }
     }
@@ -272,9 +333,40 @@ class MainSalaryEmployeePLoanController extends Controller
     {
         if ($request->ajax()) {
             $company_id = Auth::user()->company_id;
-            $mainSalaryEmployeePLoans = getColsWhereRow(MainSalaryEmployeePLoan::class, ['*'], ['id' => $request->id, 'company_id' => $company_id]);
+            $mainSalaryEmployeePLoan = getColsWhereRow(MainSalaryEmployeePLoan::class, ['*'], ['id' => $request->id, 'company_id' => $company_id]);
+
+            if ($mainSalaryEmployeePLoan) {
+                // Check if it should be archived now
+                if ($mainSalaryEmployeePLoan->is_archived == 0) {
+                    $totalInstallments = MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $mainSalaryEmployeePLoan->id)->count();
+                    $paidAndArchived = MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $mainSalaryEmployeePLoan->id)
+                        ->whereIn('installment_status', ['1', '2'])
+                        ->where('is_archived', 1)
+                        ->count();
+
+                    if ($totalInstallments > 0 && $totalInstallments === $paidAndArchived) {
+                        $mainSalaryEmployeePLoan->update([
+                            'is_archived' => 1,
+                            'archived_by' => Auth::user()->id,
+                            'archived_at' => date('Y-m-d H:i:s'),
+                        ]);
+                    }
+                }
+
+                $totalPaid = MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $mainSalaryEmployeePLoan->id)
+                    ->whereIn('installment_status', ['1', '2'])
+                    ->sum('installment_amount_monthly');
+
+                $mainSalaryEmployeePLoan->update([
+                    'paid_amount' => $totalPaid,
+                    'remaining_amount' => max(0, $mainSalaryEmployeePLoan->amount - $totalPaid)
+                ]);
+
+                $mainSalaryEmployeePLoan->refresh();
+            }
+
             return view('admin.mainSalaryRecordPLoan.show', [
-                'mainSalaryEmployeePLoans' => $mainSalaryEmployeePLoans,
+                'mainSalaryEmployeePLoans' => $mainSalaryEmployeePLoan,
             ]);
         }
     }
@@ -341,6 +433,8 @@ class MainSalaryEmployeePLoanController extends Controller
                     'installment_amount_monthly' => $request->installment_amount_monthly,
                     'next_installment_date'   => $request->year_and_month_started,
                     'next_installment_year_and_month'  => date('Y-m', strtotime($request->year_and_month_started)),
+                    'remaining_amount'        => $request->amount,
+                    'paid_amount'             => 0,
                     'updated_by'                => Auth::user()->id,
                     'notes'                   => $request->notes,
                 ];

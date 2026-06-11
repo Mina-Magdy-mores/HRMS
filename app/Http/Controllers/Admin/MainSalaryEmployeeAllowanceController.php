@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 
 class MainSalaryEmployeeAllowanceController extends Controller
 {
-        use GeneralTrait;
+    use GeneralTrait;
 
     /**
      * Display a listing of the resource.
@@ -71,7 +71,7 @@ class MainSalaryEmployeeAllowanceController extends Controller
                         ];
                         $insertData = insert(MainSalaryEmployeeAllowance::class, $dataToInsert);
                         if ($insertData) {
-                                                                                    $this->recalculate_main_salary($mainSalaryEmployee['id']);
+                            $this->recalculate_main_salary($mainSalaryEmployee['id']);
 
                             return response()->json(['status' => 'true', 'message' => 'تم اضافة البدل بنجاح']);
                         } else {
@@ -231,7 +231,7 @@ class MainSalaryEmployeeAllowanceController extends Controller
             }
             $destroy = destroy($mainSalaryEmployeeAllowance);
             if ($destroy) {
-                                                                        $this->recalculate_main_salary($mainSalaryEmployee['id']);
+                $this->recalculate_main_salary($mainSalaryEmployee['id']);
 
                 return response()->json(['status' => 'true', 'message' => 'تم حذف البدل بنجاح']);
             } else {
@@ -288,7 +288,7 @@ class MainSalaryEmployeeAllowanceController extends Controller
             }
 
             try {
-                return DB::transaction(function () use ($request, $mainSalaryEmployeeAllowance,$mainSalaryEmployee) {
+                return DB::transaction(function () use ($request, $mainSalaryEmployeeAllowance, $mainSalaryEmployee) {
                     $dataToUpdate = [
                         'allowance_type_id' => $request->allowance_type_id,
                         'amount'            => $request->amount,
@@ -297,7 +297,7 @@ class MainSalaryEmployeeAllowanceController extends Controller
                     ];
                     $updateData = update($mainSalaryEmployeeAllowance, $dataToUpdate);
                     if ($updateData) {
-                                                                                $this->recalculate_main_salary($mainSalaryEmployee['id']);
+                        $this->recalculate_main_salary($mainSalaryEmployee['id']);
 
                         return response()->json(['status' => 'true', 'message' => 'تم تعديل البدل بنجاح']);
                     } else {

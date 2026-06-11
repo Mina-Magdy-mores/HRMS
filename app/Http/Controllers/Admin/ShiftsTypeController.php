@@ -94,6 +94,7 @@ class ShiftsTypeController extends Controller
                 [$field3, $operator3, $value3],
             ];
             $shiftsTypes = getColsWhereP(ShiftsType::class, ['createdBy', 'updatedBy'], ['*'], $where, 'id', 'asc', PAGEINATION_COUNTER);
+            $shiftsTypes->getCollection()->loadCount('employees');
             return view('admin.shifts-types.ajaxSearch', compact('shiftsTypes'));
         }
     }

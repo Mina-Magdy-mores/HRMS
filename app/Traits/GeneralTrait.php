@@ -13,6 +13,7 @@ use App\Models\MainSalaryEmployeeBonus;
 use App\Models\MainSalaryEmployeeDeduction;
 use App\Models\MainSalaryEmployeeDeductionType;
 use App\Models\MainSalaryEmployeeLoan;
+use App\Models\MainSalaryEmployeePLoan;
 use App\Models\MainSalaryEmployeePLoanInstallment;
 use Illuminate\Support\Facades\Auth;
 
@@ -88,10 +89,7 @@ trait GeneralTrait
                         $query->where('employee_id', $main_salary_employee['employee_id']);
                     })
                     ->sum('installment_amount_monthly');
-                $dataToUpdateIn_main_salary_employee_p_loans['installment_status'] = 1;
-                $dataToUpdateIn_main_salary_employee_p_loans['main_salary_employee_id'] = $main_salary_employee_id;
-
-                MainSalaryEmployeePLoanInstallment::where('next_installment_year_and_month', $finance_monthly_calender['year_and_month'])
+                $installmentsToUpdate = MainSalaryEmployeePLoanInstallment::where('next_installment_year_and_month', $finance_monthly_calender['year_and_month'])
                     ->where('company_id', $company_id)
                     ->where('is_archived', 0)
                     ->where('installment_status', '!=', '2')
@@ -100,7 +98,32 @@ trait GeneralTrait
                         $query->where('is_disbursed', 1);
                         $query->where('employee_id', $main_salary_employee['employee_id']);
                     })
-                    ->update($dataToUpdateIn_main_salary_employee_p_loans);
+                    ->get();
+
+                foreach ($installmentsToUpdate as $installment) {
+                    $installment->update([
+                        'installment_status' => '1',
+                        'main_salary_employee_id' => $main_salary_employee_id
+                    ]);
+                }
+
+                // Update all disbursed, active parent loans of this employee to keep them fully in sync
+                $allPLoans = MainSalaryEmployeePLoan::where('employee_id', $main_salary_employee['employee_id'])
+                    ->where('company_id', $company_id)
+                    ->where('is_disbursed', 1)
+                    ->where('is_archived', 0)
+                    ->get();
+
+                foreach ($allPLoans as $pLoan) {
+                    $totalPaid = MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $pLoan->id)
+                        ->whereIn('installment_status', ['1', '2'])
+                        ->sum('installment_amount_monthly');
+
+                    $pLoan->update([
+                        'paid_amount' => $totalPaid,
+                        'remaining_amount' => max(0, $pLoan->amount - $totalPaid)
+                    ]);
+                }
                 $employee_fixed_allowances = EmployeeFixedAllowance::select(['id', 'amount'])
                     ->where('employee_id', $main_salary_employee['employee_id'])
                     ->where('company_id', $company_id)

@@ -18,6 +18,16 @@ min-height: calc(100vh - 150px);
 background: url('{{ asset('assets/images/login.jpg') }}') no-repeat center center fixed;
 background-size: cover;
 ">
-     <h1 class="text-white">Dashboard Page</h1>
+    <div class=" p-4 w-25" style="background-color: rgba(0, 0, 0, 0.25); border-radius: 10px;">
+        <div class="d-flex justify-content-center align-items-center">
+            <span class="badge bg-info">HRM</span>
+            <h2 class="brand-text font-weight-light text-white">HRMS V1</h2>
+        </div>
+        <hr>
+        <p class="text-center text-white">Welcome to HRMS V1</p>
+        <div class="d-flex justify-content-center align-items-center">
+            <a href="{{ route('admin.general-settings') }}" class="btn btn-primary">Get Started</a>
+        </div>
+    </div>
 </div>
 @endsection

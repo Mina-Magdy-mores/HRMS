@@ -109,7 +109,7 @@
                                     <td colspan="12">
                                         <div class="alert alert-warning mb-0 text-center py-3">
                                             <i class="fas fa-exclamation-triangle fa-2x mb-2 d-block"></i>
-                                            لا توجد سجلات جزاءات للموظفين في هذا الشهر المالي حالياً.
+                                            لا توجد سجلات غياب للموظفين في هذا الشهر المالي حالياً.
                                         </div>
                                     </td>
                                 </tr>

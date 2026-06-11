@@ -226,10 +226,25 @@ class MainSalaryEmployeeController extends Controller
                     $mainSalaryEmployee->mainSalaryEmployeeLoans()->delete();
                     $mainSalaryEmployee->mainSalaryEmployeeBonuses()->delete();
                     $mainSalaryEmployee->mainSalaryEmployeeAllowances()->delete();
-                    $mainSalaryEmployee->mainSalaryEmployeePLoanInstallments()->update([
-                        'installment_status' => '0',
-                        'main_salary_employee_id' => null,
-                    ]);
+                    $installmentsToReset = $mainSalaryEmployee->mainSalaryEmployeePLoanInstallments;
+                    foreach ($installmentsToReset as $installment) {
+                        $installment->update([
+                            'installment_status' => '0',
+                            'main_salary_employee_id' => null,
+                        ]);
+
+                        $parentLoan = $installment->mainSalaryEmployeePLoan;
+                        if ($parentLoan) {
+                            $totalPaid = \App\Models\MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $parentLoan->id)
+                                ->whereIn('installment_status', ['1', '2'])
+                                ->sum('installment_amount_monthly');
+
+                            $parentLoan->update([
+                                'paid_amount' => $totalPaid,
+                                'remaining_amount' => max(0, $parentLoan->amount - $totalPaid)
+                            ]);
+                        }
+                    }
 
                     $flag = destroy($mainSalaryEmployee);
                     if (!empty($flag)) {

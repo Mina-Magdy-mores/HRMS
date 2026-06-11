@@ -34,7 +34,9 @@ use App\Http\Controllers\Admin\ShiftsTypeController;
 use Illuminate\Support\Facades\Route;
 
 
-define('PAGEINATION_COUNTER', 3);
+if (!defined('PAGEINATION_COUNTER')) {
+    define('PAGEINATION_COUNTER', 3);
+}
 // Admin
 Route::prefix('/admin')->name('admin.')->group(function () {
 

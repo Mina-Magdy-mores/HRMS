@@ -275,4 +275,129 @@ class ArchiveMonthTest extends TestCase
         // 5. Calendar Archiving Rule
         $this->assertEquals(2, $calendar->status); // 2 = Closed & Archived
     }
+
+    public function test_parent_loan_auto_archiving_when_loading_index()
+    {
+        \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+        \Illuminate\Support\Facades\DB::statement('PRAGMA foreign_keys = OFF;');
+
+        // 1. Create Admin
+        $admin = Admin::create([
+            'id' => 1,
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
+            'username' => 'admin',
+            'password' => bcrypt('password'),
+            'status' => 1,
+            'company_id' => 1,
+            'date' => '2026-06-10',
+            'added_by' => 1,
+            'updated_by' => 1,
+        ]);
+
+        // Create Branch, Job, Department, Nationality
+        $branch = Branche::create([
+            'name' => 'Main Branch',
+            'address' => 'Branch Address',
+            'phone' => '1234567890',
+            'status' => 1,
+            'company_id' => 1,
+            'created_by' => $admin->id,
+        ]);
+
+        $job = JobsCategory::create([
+            'name' => 'Software Engineer',
+            'status' => 1,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        $department = Department::create([
+            'name' => 'Engineering',
+            'number' => 'ENG-101',
+            'status' => 1,
+            'company_id' => 1,
+            'created_by' => $admin->id,
+        ]);
+
+        $nationality = Nationality::create([
+            'id' => 1,
+            'name' => 'Egyptian',
+            'status' => 1,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        // 2. Create Employee
+        $employee = Employee::create([
+            'id' => 1,
+            'employee_code' => 1001,
+            'name' => 'Test Employee',
+            'gender' => 1,
+            'nationality_id' => $nationality->id,
+            'job_id' => $job->id,
+            'department_id' => $department->id,
+            'branch_id' => $branch->id,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+            'employment_status' => 1,
+        ]);
+
+        // 3. Create parent loan
+        $loan = \App\Models\MainSalaryEmployeePLoan::create([
+            'employee_id' => $employee->id,
+            'employee_basic_salary' => 5000,
+            'amount' => 2000,
+            'number_of_installment_months' => 2,
+            'installment_amount_monthly' => 1000,
+            'next_installment_date' => '2026-06-01',
+            'next_installment_year_and_month' => '2026-06',
+            'paid_amount' => 0,
+            'remaining_amount' => 2000,
+            'is_disbursed' => 1,
+            'is_archived' => 0,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        // 4. Create 2 installments, both paid and archived
+        \App\Models\MainSalaryEmployeePLoanInstallment::create([
+            'employee_id' => $employee->id,
+            'main_salary_employee_p_loan_id' => $loan->id,
+            'amount' => 2000,
+            'installment_amount_monthly' => 1000,
+            'next_installment_year_and_month' => '2026-06',
+            'installment_status' => '1', // paid
+            'is_archived' => 1, // archived
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        \App\Models\MainSalaryEmployeePLoanInstallment::create([
+            'employee_id' => $employee->id,
+            'main_salary_employee_p_loan_id' => $loan->id,
+            'amount' => 2000,
+            'installment_amount_monthly' => 1000,
+            'next_installment_year_and_month' => '2026-07',
+            'installment_status' => '1', // paid
+            'is_archived' => 1, // archived
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        // Act: log in as admin and hit index
+        $this->actingAs($admin, 'admin');
+
+        $response = $this->get(route('admin.main-salary-employee-ploans.index'));
+
+        $response->assertStatus(200);
+
+        // Assert parent loan is now archived in db
+        $loan->refresh();
+        $this->assertEquals(1, $loan->is_archived);
+        $this->assertEquals($admin->id, $loan->archived_by);
+        $this->assertNotNull($loan->archived_at);
+        $this->assertEquals(2000, $loan->paid_amount);
+        $this->assertEquals(0, $loan->remaining_amount);
+    }
 }
