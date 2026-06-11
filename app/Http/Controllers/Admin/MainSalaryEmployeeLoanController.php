@@ -65,7 +65,7 @@ class MainSalaryEmployeeLoanController extends Controller
                             'is_auto'                 => 0,
                             'status'                  => 1,
                             'added_by'                => Auth::user()->id,
-                            'notes'                   => $request->notes,
+                            'notes'                   => $request->notes ?: 'سلفة مؤقتة مضافة تلقائياً',
                         ];
                         $insertData = insert(MainSalaryEmployeeLoan::class, $dataToInsert);
                         if ($insertData) {
@@ -262,7 +262,7 @@ class MainSalaryEmployeeLoanController extends Controller
                 return DB::transaction(function () use ($request, $mainSalaryEmployeeLoan,$mainSalaryEmployee) {
                     $dataToUpdate = [
                         'amount'     => $request->amount,
-                        'notes'      => $request->notes,
+                        'notes'      => $request->notes ?: 'تم تعديل السلفة المؤقتة تلقائياً',
                         'updated_by' => Auth::user()->id,
                     ];
                     $updateData = update($mainSalaryEmployeeLoan, $dataToUpdate);

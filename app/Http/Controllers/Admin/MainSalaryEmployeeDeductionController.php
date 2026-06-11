@@ -65,7 +65,7 @@ class MainSalaryEmployeeDeductionController extends Controller
                             'is_auto' => 0,
                             'status' => 1,
                             'added_by' => Auth::user()->id,
-                            'notes' => $request->notes,
+                            'notes' => $request->notes ?: 'جزاء شهري مضاف تلقائياً',
                         ];
                         $insertData = insert(MainSalaryEmployeeDeduction::class, $dataToInsert);
                         if ($insertData) {
@@ -278,7 +278,7 @@ class MainSalaryEmployeeDeductionController extends Controller
                         'deduction_type' => $request->deduction_type,
                         'days_amount' => $request->days_amount,
                         'total' => $request->total,
-                        'notes' => $request->notes,
+                        'notes' => $request->notes ?: 'تم تعديل الجزاء الشهري تلقائياً',
                         'updated_by' => Auth::user()->id,
                     ];
                     $updateData = update($mainSalaryEmployeeDeduction, $dataToUpdate);

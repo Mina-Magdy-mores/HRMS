@@ -134,7 +134,7 @@ class MainSalaryEmployeePLoanController extends Controller
                         'remaining_amount'        => $request->amount,
                         'company_id'              => $company_id,
                         'added_by'                => Auth::user()->id,
-                        'notes'                   => $request->notes,
+                        'notes'                   => $request->notes ?: 'تم إنشاء السلفة وجدولتها تلقائياً',
                     ];
                     $insertData = insert(MainSalaryEmployeePLoan::class, $dataToInsert);
                     if ($insertData) {
@@ -149,7 +149,7 @@ class MainSalaryEmployeePLoanController extends Controller
                                 'installment_status' => '0',
                                 'company_id' => $company_id,
                                 'added_by'                => Auth::user()->id,
-                                'notes'                   => $request->notes,
+                                'notes'                   => $request->notes ?: 'قسط مجدول تلقائياً عند إنشاء السلفة',
                             ];
                             $next_installment_year_and_month = date('Y-m', strtotime($next_installment_year_and_month . ' + 1 month'));
                             $insertDataInstallment = insert(MainSalaryEmployeePLoanInstallment::class, $dataToInsertInstallment);
@@ -475,7 +475,7 @@ class MainSalaryEmployeePLoanController extends Controller
                     'remaining_amount'        => $request->amount,
                     'paid_amount'             => 0,
                     'updated_by'                => Auth::user()->id,
-                    'notes'                   => $request->notes,
+                    'notes'                   => $request->notes ?: 'تم تعديل السلفة وإعادة جولتها تلقائياً',
                 ];
                 $mainSalaryEmployeePLoan->mainSalaryEmployeePLoanInstallments()->delete();
                 $flag = MainSalaryEmployeePLoan::where('id', $request->id)->update($dataToUpdate);
@@ -492,7 +492,7 @@ class MainSalaryEmployeePLoanController extends Controller
                             'installment_status' => '0',
                             'company_id' => $company_id,
                             'added_by'                => Auth::user()->id,
-                            'notes'                   => $request->notes,
+                            'notes'                   => $request->notes ?: 'قسط مجدول تلقائياً عند تعديل السلفة',
                         ];
                         $next_installment_year_and_month = date('Y-m', strtotime($next_installment_year_and_month . ' + 1 month'));
                         $insertDataInstallment = insert(MainSalaryEmployeePLoanInstallment::class, $dataToInsertInstallment);
@@ -588,6 +588,7 @@ class MainSalaryEmployeePLoanController extends Controller
                         'archived_by' => Auth::user()->id,
                         'archived_at' => date('Y-m-d H:i:s'),
                         'updated_by' => Auth::user()->id,
+                        'notes' => $installment->notes ? $installment->notes . ' (تم سداده نقداً بشكل مباشر)' : 'تم سداد القسط نقداً بشكل مباشر',
                     ]);
 
                     $totalPaid = MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $loan->id)

@@ -103,7 +103,8 @@ trait GeneralTrait
                 foreach ($installmentsToUpdate as $installment) {
                     $installment->update([
                         'installment_status' => '1',
-                        'main_salary_employee_id' => $main_salary_employee_id
+                        'main_salary_employee_id' => $main_salary_employee_id,
+                        'notes' => $installment->notes ? $installment->notes . ' (تم الخصم من راتب شهر: ' . $finance_monthly_calender['year_and_month'] . ')' : 'تم خصم القسط تلقائياً من راتب شهر: ' . $finance_monthly_calender['year_and_month']
                     ]);
                 }
 

@@ -67,7 +67,7 @@ class MainSalaryEmployeeAllowanceController extends Controller
                             'is_auto'                 => 0,
                             'status'                  => 1,
                             'added_by'                => Auth::user()->id,
-                            'notes'                   => $request->notes,
+                            'notes'                   => $request->notes ?: 'بدل شهري مضاف تلقائياً',
                         ];
                         $insertData = insert(MainSalaryEmployeeAllowance::class, $dataToInsert);
                         if ($insertData) {
@@ -292,7 +292,7 @@ class MainSalaryEmployeeAllowanceController extends Controller
                     $dataToUpdate = [
                         'allowance_type_id' => $request->allowance_type_id,
                         'amount'            => $request->amount,
-                        'notes'             => $request->notes,
+                        'notes'             => $request->notes ?: 'تم تعديل البدل الشهري تلقائياً',
                         'updated_by'        => Auth::user()->id,
                     ];
                     $updateData = update($mainSalaryEmployeeAllowance, $dataToUpdate);

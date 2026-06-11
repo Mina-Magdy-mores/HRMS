@@ -864,4 +864,254 @@ class ArchiveMonthTest extends TestCase
         $this->assertEquals(800, $newDeferred[1]->installment_amount_monthly);
         $this->assertEquals('2026-08', $newDeferred[1]->next_installment_year_and_month);
     }
+
+    public function test_default_arabic_notes_features()
+    {
+        \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+        \Illuminate\Support\Facades\DB::statement('PRAGMA foreign_keys = OFF;');
+
+        // 1. Create Admin
+        $admin = Admin::create([
+            'id' => 1,
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
+            'username' => 'admin',
+            'password' => bcrypt('password'),
+            'status' => 1,
+            'company_id' => 1,
+            'date' => '2026-06-10',
+            'added_by' => 1,
+            'updated_by' => 1,
+        ]);
+
+        // 2. Create Finance Calendar & Month
+        $financeCalendar = FinanceCalendar::create([
+            'finance_yr' => 2026,
+            'finance_yr_desc' => 'Financial Year 2026',
+            'start_date' => '2026-01-01',
+            'end_date' => '2026-12-31',
+            'status' => 1,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        $month = Month::create([
+            'name' => 'يناير',
+            'name_en' => 'January',
+            'status' => 1,
+        ]);
+
+        $calendar = FinanceMonthlyCalendar::create([
+            'financeCalendar_id' => $financeCalendar->id,
+            'number_of_days' => 31,
+            'year_and_month' => '2026-01',
+            'finance_yr' => 2026,
+            'month_id' => $month->id,
+            'start_date' => '2026-01-01',
+            'end_date' => '2026-01-31',
+            'status' => 1,
+            'start_date_for_calculation' => '2026-01-01',
+            'end_date_for_calculation' => '2026-01-31',
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        // 3. Create employee
+        $branch = Branche::create([
+            'name' => 'Main Branch',
+            'address' => 'Branch Address',
+            'phone' => '1234567890',
+            'status' => 1,
+            'company_id' => 1,
+            'created_by' => $admin->id,
+        ]);
+
+        $job = JobsCategory::create([
+            'name' => 'Software Engineer',
+            'status' => 1,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        $department = Department::create([
+            'name' => 'Engineering',
+            'number' => 'ENG-101',
+            'status' => 1,
+            'company_id' => 1,
+            'created_by' => $admin->id,
+        ]);
+
+        $nationality = Nationality::create([
+            'id' => 1,
+            'name' => 'Egyptian',
+            'status' => 1,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        $employee = Employee::create([
+            'employee_code' => 555,
+            'name' => 'Employee Test',
+            'gender' => 1,
+            'nationality_id' => 1,
+            'job_id' => $job->id,
+            'department_id' => $department->id,
+            'branch_id' => $branch->id,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+            'employment_status' => 1,
+            'salary' => 5000,
+            'payment_per_day' => 150,
+        ]);
+
+        // 4. Create MainSalaryEmployee
+        $mainSalaryEmployee = MainSalaryEmployee::create([
+            'finance_monthly_calendar_id' => $calendar->id,
+            'employee_id' => $employee->id,
+            'employee_name' => $employee->name,
+            'employee_status' => 1,
+            'employee_job_id' => $job->id,
+            'employee_branch_id' => $branch->id,
+            'employee_department_id' => $department->id,
+            'employee_net_salary' => 5000.00,
+            'is_archived' => 0,
+            'is_disbursed' => 0,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        $this->actingAs($admin, 'admin');
+
+        // Test 1: Store Permanent Loan with empty notes
+        $response = $this->postJson(route('admin.main-salary-employee-ploans.store'), [
+            'employee_id' => $employee->id,
+            'employee_basic_salary' => 5000,
+            'amount' => 3000,
+            'number_of_installment_months' => 3,
+            'installment_amount_monthly' => 1000,
+            'next_installment_date' => '2026-06-12',
+            'notes' => '',
+        ], ['X-Requested-With' => 'XMLHttpRequest']);
+
+        $response->assertStatus(200);
+        $response->assertJson(['status' => 'true']);
+        $loan = \App\Models\MainSalaryEmployeePLoan::where('employee_id', $employee->id)->first();
+        $this->assertNotNull($loan);
+        $this->assertEquals('تم إنشاء السلفة وجدولتها تلقائياً', $loan->notes);
+
+        $installments = \App\Models\MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $loan->id)->get();
+        $this->assertCount(3, $installments);
+        foreach ($installments as $installment) {
+            $this->assertEquals('قسط مجدول تلقائياً عند إنشاء السلفة', $installment->notes);
+        }
+
+        // Test 2: Update Permanent Loan with empty notes
+        $response = $this->putJson(route('admin.main-salary-employee-ploans.update'), [
+            'id' => $loan->id,
+            'employee_id' => $employee->id,
+            'amount' => 2000,
+            'number_of_installment_months' => 2,
+            'installment_amount_monthly' => 1000,
+            'year_and_month_started' => '2026-07-01',
+            'notes' => '',
+        ], ['X-Requested-With' => 'XMLHttpRequest']);
+
+        $response->assertStatus(200);
+        $response->assertJson(['status' => 'true']);
+        $loan->refresh();
+        $this->assertEquals('تم تعديل السلفة وإعادة جولتها تلقائياً', $loan->notes);
+
+        $installments = \App\Models\MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $loan->id)->get();
+        $this->assertCount(2, $installments);
+        foreach ($installments as $installment) {
+            $this->assertEquals('قسط مجدول تلقائياً عند تعديل السلفة', $installment->notes);
+        }
+
+        // Test 3: Disburse the loan first
+        $loan->update(['is_disbursed' => 1]);
+
+        // Test 4: payInstallmentCash and check notes
+        $firstInstallment = $installments->first();
+        $response = $this->postJson(route('admin.main-salary-employee-ploans.pay-installment-cash'), [
+            'id' => $firstInstallment->id,
+        ], ['X-Requested-With' => 'XMLHttpRequest']);
+
+        $response->assertStatus(200);
+        $response->assertJson(['status' => 'true']);
+        $firstInstallment->refresh();
+        $this->assertEquals('قسط مجدول تلقائياً عند تعديل السلفة (تم سداده نقداً بشكل مباشر)', $firstInstallment->notes);
+
+        // Test 5: Temporary loan store
+        $response = $this->postJson(route('admin.main-salary-employee-loans.store'), [
+            'employee_id' => $employee->id,
+            'finance_monthly_calendar_id' => $calendar->id,
+            'amount' => 500,
+            'notes' => '',
+        ], ['X-Requested-With' => 'XMLHttpRequest']);
+        $response->assertStatus(200);
+        $tempLoan = \App\Models\MainSalaryEmployeeLoan::where('employee_id', $employee->id)->first();
+        $this->assertEquals('سلفة مؤقتة مضافة تلقائياً', $tempLoan->notes);
+
+        // Test 6: Temporary loan update
+        $response = $this->putJson(route('admin.main-salary-employee-loans.update'), [
+            'id' => $tempLoan->id,
+            'main_salary_employee_id' => $mainSalaryEmployee->id,
+            'finance_monthly_calendar_id' => $calendar->id,
+            'amount' => 600,
+            'notes' => '',
+        ], ['X-Requested-With' => 'XMLHttpRequest']);
+        $response->assertStatus(200);
+        $tempLoan->refresh();
+        $this->assertEquals('تم تعديل السلفة المؤقتة تلقائياً', $tempLoan->notes);
+
+        // Test 7: Deduction store & update
+        $response = $this->postJson(route('admin.main-salary-employee-deductions.store'), [
+            'employee_id' => $employee->id,
+            'finance_monthly_calendar_id' => $calendar->id,
+            'deduction_type' => 1,
+            'days_amount' => 1,
+            'total' => 150,
+            'notes' => '',
+        ], ['X-Requested-With' => 'XMLHttpRequest']);
+        $response->assertStatus(200);
+        $deduction = \App\Models\MainSalaryEmployeeDeduction::where('employee_id', $employee->id)->first();
+        $this->assertEquals('جزاء شهري مضاف تلقائياً', $deduction->notes);
+
+        $response = $this->putJson(route('admin.main-salary-employee-deductions.update'), [
+            'id' => $deduction->id,
+            'main_salary_employee_id' => $mainSalaryEmployee->id,
+            'finance_monthly_calendar_id' => $calendar->id,
+            'deduction_type' => 1,
+            'days_amount' => 2,
+            'total' => 300,
+            'notes' => '',
+        ], ['X-Requested-With' => 'XMLHttpRequest']);
+        $response->assertStatus(200);
+        $deduction->refresh();
+        $this->assertEquals('تم تعديل الجزاء الشهري تلقائياً', $deduction->notes);
+
+        // Test 8: Addition store & update
+        $response = $this->postJson(route('admin.main-salary-employee-additions.store'), [
+            'employee_id' => $employee->id,
+            'finance_monthly_calendar_id' => $calendar->id,
+            'days_amount' => 1,
+            'total' => 150,
+            'notes' => '',
+        ], ['X-Requested-With' => 'XMLHttpRequest']);
+        $response->assertStatus(200);
+        $addition = \App\Models\MainSalaryEmployeeAddition::where('employee_id', $employee->id)->first();
+        $this->assertEquals('إضافة شهري مضاف تلقائياً', $addition->notes);
+
+        $response = $this->putJson(route('admin.main-salary-employee-additions.update'), [
+            'id' => $addition->id,
+            'main_salary_employee_id' => $mainSalaryEmployee->id,
+            'finance_monthly_calendar_id' => $calendar->id,
+            'days_amount' => 2,
+            'total' => 300,
+            'notes' => '',
+        ], ['X-Requested-With' => 'XMLHttpRequest']);
+        $response->assertStatus(200);
+        $addition->refresh();
+        $this->assertEquals('تم تعديل الإضافة الشهري تلقائياً', $addition->notes);
+    }
 }

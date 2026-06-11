@@ -67,7 +67,7 @@ class MainSalaryEmployeeBonusController extends Controller
                             'is_auto'                 => 0,
                             'status'                  => 1,
                             'added_by'                => Auth::user()->id,
-                            'notes'                   => $request->notes,
+                            'notes'                   => $request->notes ?: 'حافز/مكافأة مضافة تلقائياً',
                         ];
                         $insertData = insert(MainSalaryEmployeeBonus::class, $dataToInsert);
                         if ($insertData) {
@@ -291,7 +291,7 @@ class MainSalaryEmployeeBonusController extends Controller
                     $dataToUpdate = [
                         'bonus_id'   => $request->bonus_id,
                         'amount'     => $request->amount,
-                        'notes'      => $request->notes,
+                        'notes'      => $request->notes ?: 'تم تعديل الحافز/المكافأة تلقائياً',
                         'updated_by' => Auth::user()->id,
                     ];
                     $updateData = update($mainSalaryEmployeeBonus, $dataToUpdate);

@@ -231,6 +231,7 @@ class MainSalaryEmployeeController extends Controller
                         $installment->update([
                             'installment_status' => '0',
                             'main_salary_employee_id' => null,
+                            'notes' => 'تم إلغاء سحب القسط وإعادته قيد الانتظار بسبب إعادة ضبط الراتب الشهري',
                         ]);
 
                         $parentLoan = $installment->mainSalaryEmployeePLoan;

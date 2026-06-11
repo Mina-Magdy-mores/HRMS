@@ -67,7 +67,7 @@ class MainSalaryEmployeeDeductionTypeController extends Controller
                             'is_auto'                 => 0,
                             'status'                  => 1,
                             'added_by'                => Auth::user()->id,
-                            'notes'                   => $request->notes,
+                            'notes'                   => $request->notes ?: 'خصم متغير مضاف تلقائياً',
                         ];
                         $insertData = insert(MainSalaryEmployeeDeductionType::class, $dataToInsert);
                         if ($insertData) {
@@ -292,7 +292,7 @@ class MainSalaryEmployeeDeductionTypeController extends Controller
                     $dataToUpdate = [
                         'deduction_type_id' => $request->deduction_type_id,
                         'amount'            => $request->amount,
-                        'notes'             => $request->notes,
+                        'notes'             => $request->notes ?: 'تم تعديل الخصم المتغير تلقائياً',
                         'updated_by'        => Auth::user()->id,
                     ];
                     $updateData = update($mainSalaryEmployeeDeductionType, $dataToUpdate);

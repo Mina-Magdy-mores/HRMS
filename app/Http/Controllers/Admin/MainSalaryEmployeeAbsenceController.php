@@ -65,7 +65,7 @@ class MainSalaryEmployeeAbsenceController extends Controller
                             'is_auto' => 0,
                             'status' => 1,
                             'added_by' => Auth::user()->id,
-                            'notes' => $request->notes,
+                            'notes' => $request->notes ?: 'غياب شهري مضاف تلقائياً',
                         ];
                         $insertData = insert(MainSalaryEmployeeAbsence::class, $dataToInsert);
                         if ($insertData) {
@@ -266,7 +266,7 @@ class MainSalaryEmployeeAbsenceController extends Controller
                     $dataToUpdate = [
                         'days_amount' => $request->days_amount,
                         'total' => $request->total,
-                        'notes' => $request->notes,
+                        'notes' => $request->notes ?: 'تم تعديل الغياب الشهري تلقائياً',
                         'updated_by' => Auth::user()->id,
                     ];
                     $updateData = update($mainSalaryEmployeeAbsence, $dataToUpdate);

@@ -65,7 +65,7 @@ class MainSalaryEmployeeAdditionController extends Controller
                             'is_auto'                 => 0,
                             'status'                  => 1,
                             'added_by'                => Auth::user()->id,
-                            'notes'                   => $request->notes,
+                            'notes'                   => $request->notes ?: 'إضافة شهري مضاف تلقائياً',
                         ];
                         $insertData = insert(MainSalaryEmployeeAddition::class, $dataToInsert);
                         if ($insertData) {
@@ -263,7 +263,7 @@ class MainSalaryEmployeeAdditionController extends Controller
                     $dataToUpdate = [
                         'days_amount' => $request->days_amount,
                         'total'       => $request->total,
-                        'notes'       => $request->notes,
+                        'notes'       => $request->notes ?: 'تم تعديل الإضافة الشهري تلقائياً',
                         'updated_by'  => Auth::user()->id,
                     ];
                     $updateData = update($mainSalaryEmployeeAddition, $dataToUpdate);
