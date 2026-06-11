@@ -147,6 +147,7 @@
                                         <i class="fas fa-edit"></i>
                                     </a>
 
+                                    @if ($deductionType->main_salary_employee_deduction_types_count == 0)
                                     <form action="{{ route('admin.deduction-types.destroy', $deductionType->id) }}"
                                         method="POST">
                                         @csrf
@@ -156,6 +157,7 @@
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
+                                    @endif
 
                                 </div>
                             </td>

@@ -145,6 +145,7 @@
                                         <i class="fas fa-edit"></i>
                                     </a>
 
+                                    @if ($bloodGroup->employees_count == 0)
                                     <form action="{{ route('admin.blood-groups.destroy', $bloodGroup->id) }}"
                                         method="POST">
                                         @csrf
@@ -154,6 +155,7 @@
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
+                                    @endif
 
                                 </div>
                             </td>

@@ -197,7 +197,12 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <strong>الراتب:</strong>
-                    <p class="mb-0 mt-1">{{ number_format($employee->salary, 2) ?? '---' }}</p>
+                    <div class="d-flex align-items-center mt-1">
+                        <p class="mb-0" style="margin-left: 8px; margin-right: 8px;">{{ number_format($employee->salary, 2) ?? '---' }}</p>
+                        <button type="button" class="btn btn-xs btn-outline-info" data-toggle="modal" data-target="#salaryArchiveModal" title="أرشيف الرواتب">
+                            <i class="fas fa-history"></i> أرشيف الرواتب
+                        </button>
+                    </div>
                 </div>
                 <div class="col-md-3 mb-3">
                     <strong>الدفع اليومي:</strong>
@@ -794,6 +799,64 @@
                     </div>
                 </div>
 
+            </div>
+        </div>
+    </div>
+
+    <!-- Salary Archive Modal -->
+    <div class="modal fade" id="salaryArchiveModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content shadow">
+                <!-- Header -->
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-history"></i>
+                        أرشيف الرواتب القديمة للموظف: {{ $employee->name }}
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <!-- Body -->
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover text-center align-middle">
+                            <thead class="bg-info text-white">
+                                <tr>
+                                    <th>#</th>
+                                    <th>قيمة الراتب القديم</th>
+                                    <th>أضيف بواسطة</th>
+                                    <th>آخر تحديث بواسطة</th>
+                                    <th>تاريخ التعديل (الأرشفة)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($employee->employeeSalaryArchives as $archive)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td class="text-success font-weight-bold">{{ number_format($archive->amount, 2) }}</td>
+                                        <td>{{ optional($archive->addedBy)->name ?? '---' }}</td>
+                                        <td>{{ optional($archive->updatedBy)->name ?? '---' }}</td>
+                                        <td>{{ $archive->created_at->format('Y-m-d h:i A') }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="alert alert-warning mb-0 text-center">
+                                                <i class="fas fa-exclamation-circle"></i>
+                                                لا توجد رواتب مؤرشفة مسبقاً لهذا الموظف
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">إغلاق</button>
+                </div>
             </div>
         </div>
     </div>

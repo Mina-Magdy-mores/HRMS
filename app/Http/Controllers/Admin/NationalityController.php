@@ -13,6 +13,7 @@ class NationalityController extends Controller
     {
         $company_id = Auth::user()->company_id;
         $nationalities = getColsWhereP(Nationality::class, ['addedBy','updatedBy'], ['*'], ['company_id' => $company_id],'id','desc',PAGEINATION_COUNTER);
+        $nationalities->getCollection()->loadCount('employees');
         return view('admin.nationality.index', ['nationalities' => $nationalities]);
     }
 
@@ -87,6 +88,9 @@ class NationalityController extends Controller
             $nationality = getColsWhereRow(Nationality::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
             if (!$nationality) {
                 return redirect()->route('admin.nationalities.index')->with('error', 'الجنسية غير موجودة');
+            }
+            if ($nationality->employees()->exists()) {
+                return redirect()->route('admin.nationalities.index')->with('error', 'لا يمكن حذف هذه الجنسية لوجود موظفين مرتبطة بها');
             }
             destroy($nationality);
             return redirect()->route('admin.nationalities.index')->with('success', 'تم حذف الجنسية بنجاح');

@@ -21,6 +21,7 @@ use App\Http\Requests\FileRequest;
 use App\Models\AllowanceType;
 use App\Models\DrivingLicenseType;
 use App\Models\EmployeeFixedAllowance;
+use App\Models\EmployeeSalaryArchive;
 use App\Models\File;
 use App\Models\Language;
 use App\Models\MainSalaryEmployee;
@@ -57,7 +58,9 @@ class EmployeeController extends Controller
                 'branch',
                 'country',
                 'governorate',
-                'city'
+                'city',
+                'mainSalaryEmployee',
+                'mainSalaryEmployeePLoans'
             ],
             ['*'],
             ['company_id' => $company_id],
@@ -66,8 +69,8 @@ class EmployeeController extends Controller
             PAGEINATION_COUNTER
         );
         $branches = get_cols_where(Branche::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
-                $departments = get_cols_where(Department::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
-                        $jobs = get_cols_where(JobsCategory::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $departments = get_cols_where(Department::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $jobs = get_cols_where(JobsCategory::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
         return view('admin.employees.index', compact('employees', 'branches', 'departments', 'jobs'));
     }
     public function getDetails($id)
@@ -92,7 +95,8 @@ class EmployeeController extends Controller
             'drivingLicenseType',
             'language',
             'files',
-            'employeeFixedAllowances'
+            'employeeFixedAllowances',
+            'employeeSalaryArchives'
         ])->findOrFail($id);
 
         $allowances = AllowanceType::select('id', 'name')->where('company_id', $company_id)->where('status', 1)->get();
@@ -192,6 +196,7 @@ class EmployeeController extends Controller
         if (!$employee) {
             return redirect()->route('admin.employees.index')->with(['error' => 'الموظف غير موجود']);
         }
+        $employee->load('employeeSalaryArchives');
         $religions = get_cols_where(Religion::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
         $qualifications = get_cols_where(Qualification::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
         $resignations = get_cols_where(Resignation::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
@@ -263,9 +268,21 @@ class EmployeeController extends Controller
                 $validatedData['cv'] = uploadImage('employees/cv', $request->file('cv'));
             }
 
-            DB::transaction(function () use ($employee, $validatedData, $id, $company_id) {
+            DB::transaction(function () use ($employee, $validatedData, $id, $company_id, $request) {
+                $oldSalary = $employee->salary;
+                $isSalaryChanged = !empty($oldSalary) && !empty($request->salary) && $request->salary != $oldSalary;
+
                 $flag = $employee->update($validatedData);
                 if ($flag) {
+                    if ($isSalaryChanged) {
+                        insert(EmployeeSalaryArchive::class, [
+                            'employee_id' => $id,
+                            'amount' => $oldSalary,
+                            'company_id' => $company_id,
+                            'added_by' => Auth::id(),
+                            'updated_by' => Auth::id(),
+                        ]);
+                    }
                     if ($validatedData['fixed_allowance'] == 0) {
                         EmployeeFixedAllowance::where('employee_id', $id)->where('company_id', $company_id)->delete();
                     }
@@ -293,6 +310,12 @@ class EmployeeController extends Controller
         }
         if ($employee->employment_status == 1) {
             return redirect()->route('admin.employees.index')->with(['error' => 'لا يمكن حذف الموظف لأنه لديه حالة توظيف نشطة']);
+        }
+        if ($employee->mainSalaryEmployee->count() > 0) {
+            return redirect()->route('admin.employees.index')->with(['error' => 'لا يمكن حذف الموظف لأنه لديه بيانات رواتب']);
+        }
+        if ($employee->mainSalaryEmployeePLoans->count() > 0) {
+            return redirect()->route('admin.employees.index')->with(['error' => 'لا يمكن حذف الموظف لأنه لديه بيانات سلف']);
         }
         DB::transaction(function () use ($employee) {
             if (!empty($employee->image)) {
@@ -462,7 +485,9 @@ class EmployeeController extends Controller
                 'branch',
                 'country',
                 'governorate',
-                'city'
+                'city',
+                'mainSalaryEmployee',
+                'mainSalaryEmployeePLoans'
             ], ['*'], $where, 'id', 'asc', PAGEINATION_COUNTER);
             return view('admin.employees.ajaxSearch', compact('employees'));
         }
@@ -607,16 +632,16 @@ class EmployeeController extends Controller
                 ]);
                 DB::transaction(function () use ($allowance, $company_id, $request) {
 
-                if ($allowance) {
-                    $flag = destroy($allowance);
-                    if ($flag) {
-                        $main_salary_employee = getColsWhereRow(MainSalaryEmployee::class, ['id'], ['employee_id' => $request->employee_id, 'company_id' => $company_id, 'is_archived' => 0]);
-                        if (!empty($main_salary_employee)) {
-                            $this->recalculate_main_salary($main_salary_employee->id);
+                    if ($allowance) {
+                        $flag = destroy($allowance);
+                        if ($flag) {
+                            $main_salary_employee = getColsWhereRow(MainSalaryEmployee::class, ['id'], ['employee_id' => $request->employee_id, 'company_id' => $company_id, 'is_archived' => 0]);
+                            if (!empty($main_salary_employee)) {
+                                $this->recalculate_main_salary($main_salary_employee->id);
+                            }
                         }
                     }
-                }
-            });
+                });
                 $fixedAllowances = EmployeeFixedAllowance::with('allowanceType')
                     ->where('employee_id', $request->employee_id)
                     ->where('company_id', $company_id)
@@ -668,20 +693,20 @@ class EmployeeController extends Controller
                     'company_id' => $company_id
                 ]);
                 DB::transaction(function () use ($allowance, $company_id, $request) {
-                if ($allowance) {
-                    $flag = $allowance->update([
-                        'allowance_type_id' => $request->allowance_type_id,
-                        'amount' => $request->amount,
-                        'updated_by' => Auth::id()
-                    ]);
-                    if ($flag) {
-                        $main_salary_employee = getColsWhereRow(MainSalaryEmployee::class, ['id'], ['employee_id' => $request->employee_id, 'company_id' => $company_id, 'is_archived' => 0]);
-                        if (!empty($main_salary_employee)) {
-                            $this->recalculate_main_salary($main_salary_employee->id);
+                    if ($allowance) {
+                        $flag = $allowance->update([
+                            'allowance_type_id' => $request->allowance_type_id,
+                            'amount' => $request->amount,
+                            'updated_by' => Auth::id()
+                        ]);
+                        if ($flag) {
+                            $main_salary_employee = getColsWhereRow(MainSalaryEmployee::class, ['id'], ['employee_id' => $request->employee_id, 'company_id' => $company_id, 'is_archived' => 0]);
+                            if (!empty($main_salary_employee)) {
+                                $this->recalculate_main_salary($main_salary_employee->id);
+                            }
                         }
                     }
-                }
-            });
+                });
                 $fixedAllowances = EmployeeFixedAllowance::with('allowanceType')
                     ->where('employee_id', $request->employee_id)
                     ->where('company_id', $company_id)

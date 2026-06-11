@@ -43,9 +43,9 @@ class BloodGroup extends Model
     {
         return $this->belongsTo(Admin::class, 'updated_by');
     }
-        public function employees()
+    public function employees()
     {
-        return $this->hasMany(Employee::class, 'qualifications_id');
+        return $this->hasMany(Employee::class, 'blood_group_id');
     }
 
 }

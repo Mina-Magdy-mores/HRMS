@@ -42,4 +42,9 @@ class DeductionType extends Model
     {
         return $this->belongsTo(Admin::class, 'updated_by');
     }
+
+    public function mainSalaryEmployeeDeductionTypes()
+    {
+        return $this->hasMany(MainSalaryEmployeeDeductionType::class, 'deduction_type_id');
+    }
 }

@@ -17,6 +17,7 @@ class DeductionTypeController extends Controller
     {
         $company_id = Auth::user()->company_id;
         $deductionTypes = getColsWhereP(DeductionType::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id]);
+        $deductionTypes->getCollection()->loadCount('mainSalaryEmployeeDeductionTypes');
         return view('admin.deductionType.index', ['deductionTypes' => $deductionTypes]);
     }
 
@@ -97,6 +98,9 @@ class DeductionTypeController extends Controller
             $deductionType = getColsWhereRow(DeductionType::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
             if (!$deductionType) {
                 return redirect()->route('admin.deduction-types.index')->with('error', 'نوع الخصم غير موجود');
+            }
+            if ($deductionType->mainSalaryEmployeeDeductionTypes()->exists()) {
+                return redirect()->route('admin.deduction-types.index')->with('error', 'لا يمكن حذف هذا النوع لارتباطه بخصومات موظفين');
             }
             destroy($deductionType);
             return redirect()->route('admin.deduction-types.index')->with('success', 'تم حذف نوع الخصم بنجاح');

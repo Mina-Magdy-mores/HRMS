@@ -147,6 +147,7 @@
                                             <i class="fas fa-edit"></i>
                                         </a>
 
+                                        @if ($allowanceType->employee_fixed_allowances_count == 0 && $allowanceType->main_salary_employee_allowances_count == 0)
                                         <form action="{{ route('admin.allowance-types.destroy', $allowanceType->id) }}"
                                             method="POST">
                                             @csrf
@@ -156,6 +157,7 @@
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
+                                        @endif
 
                                     </div>
                                 </td>

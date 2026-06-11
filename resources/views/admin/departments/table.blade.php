@@ -156,6 +156,7 @@
                                         <i class="fas fa-edit"></i>
                                     </a>
 
+                                    @if ($department->employees_count == 0)
                                     <form action="{{ route('admin.departments.destroy', $department->id) }}"
                                         method="POST">
                                         @csrf
@@ -165,6 +166,7 @@
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
+                                    @endif
 
                                 </div>
                             </td>

@@ -17,6 +17,7 @@ class ShiftsTypeController extends Controller
     {
         $company_id = Auth::user()->company_id;
         $shiftsTypes = getColsWhereP(ShiftsType::class, ['createdBy', 'updatedBy'], ['*'], ['company_id' => $company_id], 'id', 'asc', PAGEINATION_COUNTER);
+        $shiftsTypes->getCollection()->loadCount('employees');
         return view('admin.shifts-types.index', ['shiftsTypes' => $shiftsTypes]);
     }
 
@@ -146,6 +147,9 @@ class ShiftsTypeController extends Controller
         $shiftsType = getColsWhereRow(ShiftsType::class, ['*'], ['id' => $id, 'company_id' => $campany_id]);
         if (empty($shiftsType)) {
             return redirect()->route('admin.shifts-types.index')->with('error', 'هذا النوع غير موجود');
+        }
+        if ($shiftsType->employees()->exists()) {
+            return redirect()->route('admin.shifts-types.index')->with('error', 'لا يمكن حذف هذا الشفت لوجود موظفين مرتبطة به');
         }
         try {
             destroy($shiftsType);

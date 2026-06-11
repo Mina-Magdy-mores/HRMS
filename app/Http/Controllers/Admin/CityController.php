@@ -14,6 +14,7 @@ class CityController extends Controller
     {
         $company_id = Auth::user()->company_id;
         $cities = getColsWhereP(City::class, ['addedBy', 'updatedBy', 'governorate'], ['*'], ['company_id' => $company_id]);
+        $cities->getCollection()->loadCount('employees');
         return view('admin.city.index', ['cities' => $cities]);
     }
 
@@ -91,6 +92,9 @@ class CityController extends Controller
             $city = getColsWhereRow(City::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
             if (!$city) {
                 return redirect()->route('admin.cities.index')->with('error', 'المدينة غير موجودة');
+            }
+            if ($city->employees()->exists()) {
+                return redirect()->route('admin.cities.index')->with('error', 'لا يمكن حذف هذه المدينة لوجود موظفين مرتبطة بها');
             }
             destroy($city);
             return redirect()->route('admin.cities.index')->with('success', 'تم حذف المدينة بنجاح');

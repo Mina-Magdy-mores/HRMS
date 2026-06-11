@@ -1,12 +1,18 @@
 <div class="container-fluid">
 
     @php
-    $genderLabels = [1 => 'ذكر', 2 => 'أنثى'];
-    $employmentStatusLabels = [1 => '<span class="badge badge-success px-3 py-2"><i class="fas fa-check-circle"></i>
-        نشط</span>', 0 => '<span class="badge badge-danger px-3 py-2"><i class="fas fa-times-circle"></i> غير
-        نشط</span>'];
-    $yesNoLabels = [0 => '<span class="badge badge-secondary">لا</span>', 1 => '<span
-        class="badge badge-success">نعم</span>'];
+        $genderLabels = [1 => 'ذكر', 2 => 'أنثى'];
+        $employmentStatusLabels = [
+            1 => '<span class="badge badge-success px-3 py-2"><i class="fas fa-check-circle"></i>
+        نشط</span>',
+            0 => '<span class="badge badge-danger px-3 py-2"><i class="fas fa-times-circle"></i> غير
+        نشط</span>',
+        ];
+        $yesNoLabels = [
+            0 => '<span class="badge badge-secondary">لا</span>',
+            1 => '<span
+        class="badge badge-success">نعم</span>',
+        ];
     @endphp
 
     <!-- Info Boxes -->
@@ -55,8 +61,8 @@
                 </span>
                 <div class="info-box-content">
                     <span class="info-box-text">الذكور / الإناث</span>
-                    <span class="info-box-number">{{ $employees->where('gender', 1)->count() }} / {{
-                        $employees->where('gender', 2)->count() }}</span>
+                    <span class="info-box-number">{{ $employees->where('gender', 1)->count() }} /
+                        {{ $employees->where('gender', 2)->count() }}</span>
                 </div>
             </div>
         </div>
@@ -84,36 +90,36 @@
 
         <div class="card-body">
             @if ($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show">
-                <h5>
-                    <i class="fas fa-exclamation-circle"></i>
-                    يوجد أخطاء في البيانات
-                </h5>
-                <ul class="mb-0 mt-2">
-                    @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <h5>
+                        <i class="fas fa-exclamation-circle"></i>
+                        يوجد أخطاء في البيانات
+                    </h5>
+                    <ul class="mb-0 mt-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
             @endif
-            @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show">
-                <i class="fas fa-check-circle"></i>
-                {{ session('success') }}
-                <button type="button" class="close text-white text-right" data-dismiss="alert">
-                    <span>&times;</span>
-                </button>
-            </div>
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show">
+                    <i class="fas fa-check-circle"></i>
+                    {{ session('success') }}
+                    <button type="button" class="close text-white text-right" data-dismiss="alert">
+                        <span>&times;</span>
+                    </button>
+                </div>
             @endif
 
-            @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show">
-                <i class="fas fa-times-circle"></i>
-                {{ session('error') }}
-                <button type="button" class="close text-white text-right" data-dismiss="alert">
-                    <span>&times;</span>
-                </button>
-            </div>
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <i class="fas fa-times-circle"></i>
+                    {{ session('error') }}
+                    <button type="button" class="close text-white text-right" data-dismiss="alert">
+                        <span>&times;</span>
+                    </button>
+                </div>
             @endif
             <div class="row">
                 <div class="col-md-12">
@@ -151,10 +157,10 @@
                         <select name="branch_id_search" id="branch_id_search"
                             class="form-control select2 {{ $errors->has('branch_id_search') ? 'is-invalid' : '' }}">
                             <option value="">اختر الفرع</option>
-                            @foreach($branches as $branch)
-                            <option value="{{ $branch->id }}">
-                                {{ $branch->name }}
-                            </option>
+                            @foreach ($branches as $branch)
+                                <option value="{{ $branch->id }}">
+                                    {{ $branch->name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -165,10 +171,10 @@
                         <select name="department_id_search" id="department_id_search"
                             class="form-control select2 {{ $errors->has('department_id_search') ? 'is-invalid' : '' }}">
                             <option value="">اختر الإدارة</option>
-                            @foreach($departments as $department)
-                            <option value="{{ $department->id }}">
-                                {{ $department->name }}
-                            </option>
+                            @foreach ($departments as $department)
+                                <option value="{{ $department->id }}">
+                                    {{ $department->name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -179,10 +185,10 @@
                         <select name="job_id_search" id="job_id_search"
                             class="form-control select2 {{ $errors->has('job_id_search') ? 'is-invalid' : '' }}">
                             <option value="">اختر الوظيفة</option>
-                            @foreach($jobs as $job)
-                            <option value="{{ $job->id }}">
-                                {{ $job->name }}
-                            </option>
+                            @foreach ($jobs as $job)
+                                <option value="{{ $job->id }}">
+                                    {{ $job->name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -260,54 +266,57 @@
 
                         <tbody>
                             @forelse ($employees as $employee)
-                            <tr>
-                                <td>{{ $employee->id }}</td>
-                                <td>{{ $employee->employee_code ?? '---' }}</td>
-                                <td>{{ $employee->fingerprint_code ?? '---' }}</td>
-                                <td class="text-right">{{ $employee->name ?? '---' }}</td>
-                                <td>{{ optional($employee->department)->name ?? '---' }}</td>
-                                <td>{{ optional($employee->job)->name ?? '---' }}</td>
-                                <td>{{ optional($employee->branch)->name ?? '---' }}</td>
-                                <td>
-                                    @if($employee->image)
-                                    <img src="{{ asset('storage/' . $employee->image) }}" alt="صورة الموظف"
-                                        class="img-thumbnail" style="max-width: 90px; max-height: 90px;">
-                                    @else
-                                    <span>---</span>
-                                    @endif
-                                </td>
-                                <td>{!! $employmentStatusLabels[$employee->employment_status] ?? '---' !!}</td>
-                                <td>
-                                    <div class="d-flex justify-content-center align-items-center gap-1">
-                                        <button type="button" class="btn btn-sm btn-info m-1 show_employee_details"
-                                            data-id="{{ $employee->id }}" title="عرض">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <a href="{{ route('admin.employees.edit', $employee->id) }}"
-                                            class="btn btn-sm btn-warning m-1" title="تعديل">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <form action="{{ route('admin.employees.destroy', $employee->id) }}"
-                                            method="POST" class="m-0">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger are_you_sure m-1"
-                                                title="حذف">
-                                                <i class="fas fa-trash"></i>
+                                <tr>
+                                    <td>{{ $employee->id }}</td>
+                                    <td>{{ $employee->employee_code ?? '---' }}</td>
+                                    <td>{{ $employee->fingerprint_code ?? '---' }}</td>
+                                    <td class="text-right">{{ $employee->name ?? '---' }}</td>
+                                    <td>{{ optional($employee->department)->name ?? '---' }}</td>
+                                    <td>{{ optional($employee->job)->name ?? '---' }}</td>
+                                    <td>{{ optional($employee->branch)->name ?? '---' }}</td>
+                                    <td>
+                                        @if ($employee->image)
+                                            <img src="{{ asset('storage/' . $employee->image) }}" alt="صورة الموظف"
+                                                class="img-thumbnail" style="max-width: 90px; max-height: 90px;">
+                                        @else
+                                            <span>---</span>
+                                        @endif
+                                    </td>
+                                    <td>{!! $employmentStatusLabels[$employee->employment_status] ?? '---' !!}</td>
+                                    <td>
+                                        <div class="d-flex justify-content-center align-items-center gap-1">
+                                            <button type="button"
+                                                class="btn btn-sm btn-info m-1 show_employee_details"
+                                                data-id="{{ $employee->id }}" title="عرض">
+                                                <i class="fas fa-eye"></i>
                                             </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
+                                            <a href="{{ route('admin.employees.edit', $employee->id) }}"
+                                                class="btn btn-sm btn-warning m-1" title="تعديل">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            @if ($employee->mainSalaryEmployee->isEmpty() && $employee->mainSalaryEmployeePLoans->isEmpty())
+                                                <form action="{{ route('admin.employees.destroy', $employee->id) }}"
+                                                    method="POST" class="m-0">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                        class="btn btn-sm btn-danger are_you_sure m-1" title="حذف">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
                             @empty
-                            <tr>
-                                <td colspan="12">
-                                    <div class="alert alert-warning mb-0">
-                                        <i class="fas fa-exclamation-circle"></i>
-                                        لا توجد بيانات موظفين حالياً
-                                    </div>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td colspan="12">
+                                        <div class="alert alert-warning mb-0">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            لا توجد بيانات موظفين حالياً
+                                        </div>
+                                    </td>
+                                </tr>
                             @endforelse
                         </tbody>
 
@@ -351,33 +360,33 @@
 </div>
 
 @section('js')
-<script src="{{ asset('assets/plugins/select2/js/select2.full.min.js') }}"></script>
-<script>
-    function initSelect2() {
-        $('.select2').each(function() {
-            var $select = $(this);
-            if ($select.hasClass('select2-hidden-accessible')) {
-                return;
-            }
-            var $modal = $select.closest('.modal');
-            if ($modal.length) {
-                $select.select2({
-                    theme: 'bootstrap4',
-                    dropdownParent: $modal
-                });
-            } else {
-                $select.select2({
-                    theme: 'bootstrap4'
-                });
-            }
-        });
-    }
-    $(document).ready(function() {
+    <script src="{{ asset('assets/plugins/select2/js/select2.full.min.js') }}"></script>
+    <script>
+        function initSelect2() {
+            $('.select2').each(function() {
+                var $select = $(this);
+                if ($select.hasClass('select2-hidden-accessible')) {
+                    return;
+                }
+                var $modal = $select.closest('.modal');
+                if ($modal.length) {
+                    $select.select2({
+                        theme: 'bootstrap4',
+                        dropdownParent: $modal
+                    });
+                } else {
+                    $select.select2({
+                        theme: 'bootstrap4'
+                    });
+                }
+            });
+        }
+        $(document).ready(function() {
 
-                    initSelect2();
-        $(document).on('click', '.show_employee_details', function() {
-            var id = $(this).data('id');
-            $('#employee_details_modal_body').html(`
+            initSelect2();
+            $(document).on('click', '.show_employee_details', function() {
+                var id = $(this).data('id');
+                $('#employee_details_modal_body').html(`
                 <div class="text-center py-5">
                     <div class="spinner-border text-primary" role="status">
                         <span class="sr-only">جاري التحميل...</span>
@@ -386,56 +395,57 @@
                 </div>
             `);
 
-            $.ajax({
-                url: `/admin/employees/${id}/details`,
-                type: 'GET',
-                dataType: 'html',
-                cache: false,
-                success: function(response) {
-                    $('#employee_details_modal_body').html(response);
-                    $('#employeeDetailsModal').modal('show');
-                    initSelect2();
-                },
-                error: function(xhr) {
-                    $('#employee_details_modal_body').html(`
+                $.ajax({
+                    url: `/admin/employees/${id}/details`,
+                    type: 'GET',
+                    dataType: 'html',
+                    cache: false,
+                    success: function(response) {
+                        $('#employee_details_modal_body').html(response);
+                        $('#employeeDetailsModal').modal('show');
+                        initSelect2();
+                    },
+                    error: function(xhr) {
+                        $('#employee_details_modal_body').html(`
                         <div class="alert alert-danger text-center m-3">
                             <i class="fas fa-exclamation-circle fa-2x mb-2 d-block"></i>
                             <strong>حدث خطأ!</strong><br>
                             ${xhr.responseText || 'لم يتم تحميل البيانات'}
                         </div>
                     `);
-                    $('#employeeDetailsModal').modal('show');
-                }
+                        $('#employeeDetailsModal').modal('show');
+                    }
+                });
             });
-        });
 
-            $(document).on('input', '#code_search', function () {
+            $(document).on('input', '#code_search', function() {
                 ajax_search();
             })
-            $(document).on('input', '#name_search', function () {
+            $(document).on('input', '#name_search', function() {
                 ajax_search();
             })
-            $(document).on('change', '#branch_id_search', function () {
+            $(document).on('change', '#branch_id_search', function() {
                 ajax_search();
             })
-            $(document).on('change', '#department_id_search', function () {
+            $(document).on('change', '#department_id_search', function() {
                 ajax_search();
             })
-            $(document).on('change', '#job_id_search', function () {
+            $(document).on('change', '#job_id_search', function() {
                 ajax_search();
             })
-            $(document).on('change', '#employment_status_search', function () {
+            $(document).on('change', '#employment_status_search', function() {
                 ajax_search();
             })
-            $(document).on('change', '#payment_method_search', function () {
+            $(document).on('change', '#payment_method_search', function() {
                 ajax_search();
             })
-            $(document).on('change', '#gender_search', function () {
+            $(document).on('change', '#gender_search', function() {
                 ajax_search();
             })
-            $('input[type=radio][name=code_type]').change( function () {
+            $('input[type=radio][name=code_type]').change(function() {
                 ajax_search();
             })
+
             function ajax_search() {
                 var code_search = $('#code_search').val();
                 var name_search = $('#name_search').val();
@@ -465,16 +475,16 @@
                         gender: gender_search,
                         code_type: code_type
                     },
-                    success: function (employees) {
+                    success: function(employees) {
                         $('#ajax_responce_search').html(employees);
                     },
-                    error: function (xhr) {
+                    error: function(xhr) {
                         {{--  alert('حدث خطأ');  --}}
                     }
                 });
             }
 
-            $(document).on('click', '#ajax-pagination a', function (e) {
+            $(document).on('click', '#ajax-pagination a', function(e) {
                 e.preventDefault();
                 var code_search = $('#code_search').val();
                 var name_search = $('#name_search').val();
@@ -504,15 +514,15 @@
                         gender: gender_search,
                         code_type: code_type
                     },
-                    success: function (employees) {
+                    success: function(employees) {
                         $('#ajax_responce_search').html(employees);
                     },
-                    error: function (xhr) {
+                    error: function(xhr) {
                         alert('حدث خطأ');
                     }
                 });
             });
 
-    });
-</script>
+        });
+    </script>
 @endsection

@@ -337,4 +337,8 @@ class Employee extends Model
     {
         return $this->hasMany(EmployeeFixedAllowance::class, 'employee_id');
     }
+    public function employeeSalaryArchives()
+    {
+        return $this->hasMany(EmployeeSalaryArchive::class, 'employee_id');
+    }
 }

@@ -16,6 +16,7 @@ class QualificationController extends Controller
     {
         $company_id = Auth::user()->company_id;
         $qualifications = getColsWhereP(Qualification::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id]);
+        $qualifications->getCollection()->loadCount('employees');
         return view('admin.qualification.index', ['qualifications' => $qualifications]);
     }
 
@@ -104,6 +105,9 @@ class QualificationController extends Controller
             $qualification = getColsWhereRow(Qualification::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
             if (!$qualification) {
                 return redirect()->route('admin.qualifications.index')->with('error', 'المؤهل غير موجود');
+            }
+            if ($qualification->employees()->exists()) {
+                return redirect()->route('admin.qualifications.index')->with('error', 'لا يمكن حذف هذا المؤهل لوجود موظفين مرتبطة به');
             }
             destroy($qualification);
             return redirect()->route('admin.qualifications.index')->with('success', 'تم حذف المؤهل بنجاح');

@@ -17,6 +17,7 @@ class AllowanceTypeController extends Controller
     {
         $company_id = Auth::user()->company_id;
         $allowanceTypes = getColsWhereP(AllowanceType::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id]);
+        $allowanceTypes->getCollection()->loadCount(['employeeFixedAllowances', 'mainSalaryEmployeeAllowances']);
         return view('admin.allowanceType.index', ['allowanceTypes' => $allowanceTypes]);
     }
 
@@ -88,6 +89,9 @@ class AllowanceTypeController extends Controller
             $allowanceType = getColsWhereRow(AllowanceType::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
             if (!$allowanceType) {
                 return redirect()->route('admin.allowance-types.index')->with('error', 'النوع غير موجود');
+            }
+            if ($allowanceType->employeeFixedAllowances()->exists() || $allowanceType->mainSalaryEmployeeAllowances()->exists()) {
+                return redirect()->route('admin.allowance-types.index')->with('error', 'لا يمكن حذف هذا البدل لارتباطه بموظفين أو بسجلات رواتب');
             }
             destroy($allowanceType);
             return redirect()->route('admin.allowance-types.index')->with('success', 'تم حذف النوع بنجاح');

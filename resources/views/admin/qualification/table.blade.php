@@ -149,6 +149,7 @@
                                         <i class="fas fa-edit"></i>
                                     </a>
 
+                                    @if ($qualification->employees_count == 0)
                                     <form action="{{ route('admin.qualifications.destroy', $qualification->id) }}"
                                         method="POST">
                                         @csrf
@@ -158,6 +159,7 @@
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
+                                    @endif
 
                                 </div>
                             </td>

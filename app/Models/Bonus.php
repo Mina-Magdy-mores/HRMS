@@ -42,4 +42,9 @@ class Bonus extends Model
     {
         return $this->belongsTo(Admin::class, 'updated_by');
     }
+
+    public function mainSalaryEmployeeBonuses()
+    {
+        return $this->hasMany(MainSalaryEmployeeBonus::class, 'bonus_id');
+    }
 }

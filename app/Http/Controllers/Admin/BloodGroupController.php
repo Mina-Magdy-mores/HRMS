@@ -13,6 +13,7 @@ class BloodGroupController extends Controller
     {
         $company_id = Auth::user()->company_id;
         $bloodGroups = getColsWhereP(BloodGroup::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id]);
+        $bloodGroups->getCollection()->loadCount('employees');
         return view('admin.blood_group.index', ['bloodGroups' => $bloodGroups]);
     }
 
@@ -87,6 +88,9 @@ class BloodGroupController extends Controller
             $bloodGroup = getColsWhereRow(BloodGroup::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
             if (!$bloodGroup) {
                 return redirect()->route('admin.blood-groups.index')->with('error', 'فصيلة الدم غير موجودة');
+            }
+            if ($bloodGroup->employees()->exists()) {
+                return redirect()->route('admin.blood-groups.index')->with('error', 'لا يمكن حذف فصيلة الدم لوجود موظفين مرتبطة بها');
             }
             destroy($bloodGroup);
             return redirect()->route('admin.blood-groups.index')->with('success', 'تم حذف فصيلة الدم بنجاح');

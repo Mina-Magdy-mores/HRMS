@@ -15,6 +15,7 @@ class BrancheController extends Controller
         $company_id = Auth::user()->company_id;
 
         $branches = getColsWhereP(Branche::class, ['updatedBy', 'createdBy'], ['*'], ['company_id' => $company_id], 'id', 'asc', PAGEINATION_COUNTER);
+        $branches->getCollection()->loadCount('employees');
         return view('admin.branches.index', compact('branches'));
     }
     public function create()
@@ -74,9 +75,12 @@ class BrancheController extends Controller
     public function destroy($id)
     {
         $company_id = Auth::user()->company_id;
-        $branche = getColsWhereRow(Branche::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
+        $branche = getColsWhereRow(Branche::class, ['id'], ['id' => $id, 'company_id' => $company_id]);
         if (empty($branche)) {
             return redirect()->route('admin.branches.index')->with('error', 'هذا الفرع غير موجود');
+        }
+        if ($branche->employees()->exists()) {
+            return redirect()->route('admin.branches.index')->with('error', 'لا يمكن حذف هذا الفرع لوجود موظفين');
         }
         try {
             destroy($branche);

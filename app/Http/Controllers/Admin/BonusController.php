@@ -14,6 +14,7 @@ class BonusController extends Controller
     {
         $company_id = Auth::user()->company_id;
         $bonuses = getColsWhereP(Bonus::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id]);
+        $bonuses->getCollection()->loadCount('mainSalaryEmployeeBonuses');
         return view('admin.bonus.index', ['bonuses' => $bonuses]);
     }
 
@@ -79,6 +80,9 @@ class BonusController extends Controller
             $bonus = getColsWhereRow(Bonus::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
             if (!$bonus) {
                 return redirect()->route('admin.bonuses.index')->with('error', 'المكافأة غير موجودة');
+            }
+            if ($bonus->mainSalaryEmployeeBonuses()->exists()) {
+                return redirect()->route('admin.bonuses.index')->with('error', 'لا يمكن حذف هذه المكافأة لارتباطها بمكافآت موظفين');
             }
             destroy($bonus);
             return redirect()->route('admin.bonuses.index')->with('success', 'تم حذف المكافأة بنجاح');

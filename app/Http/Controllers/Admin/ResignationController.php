@@ -13,6 +13,7 @@ class ResignationController extends Controller
     {
         $company_id = Auth::user()->company_id;
         $resignations = getColsWhereP(Resignation::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id]);
+        $resignations->getCollection()->loadCount('employees');
         return view('admin.resignations.index', ['resignations' => $resignations]);
     }
 
@@ -87,6 +88,9 @@ class ResignationController extends Controller
             $resignation = getColsWhereRow(Resignation::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
             if (!$resignation) {
                 return redirect()->route('admin.resignations.index')->with('error', 'الاستقالة غير موجودة');
+            }
+            if ($resignation->employees()->exists()) {
+                return redirect()->route('admin.resignations.index')->with('error', 'لا يمكن حذف هذه الاستقالة لوجود موظفين مرتبطة بها');
             }
             destroy($resignation);
             return redirect()->route('admin.resignations.index')->with('success', 'تم حذف الاستقالة بنجاح');

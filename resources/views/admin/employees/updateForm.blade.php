@@ -869,7 +869,12 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>الراتب</label>
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <label class="mb-0">الراتب</label>
+                                                <button type="button" class="btn btn-xs btn-link p-0 text-info" data-toggle="modal" data-target="#salaryArchiveModal" style="text-decoration: none;">
+                                                    <i class="fas fa-history"></i> أرشيف الرواتب
+                                                </button>
+                                            </div>
                                             <input type="number" step="0.01" name="salary"
                                                 value="{{ old('salary', $employee->salary ?? 0.0) }}"
                                                 class="form-control {{ $errors->has('salary') ? 'is-invalid' : '' }}"
@@ -1321,6 +1326,64 @@
                 </a>
             </div>
         </form>
+    </div>
+
+    <!-- Salary Archive Modal -->
+    <div class="modal fade" id="salaryArchiveModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content shadow">
+                <!-- Header -->
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-history"></i>
+                        أرشيف الرواتب القديمة للموظف: {{ $employee->name }}
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <!-- Body -->
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover text-center align-middle">
+                            <thead class="bg-info text-white">
+                                <tr>
+                                    <th>#</th>
+                                    <th>قيمة الراتب القديم</th>
+                                    <th>أضيف بواسطة</th>
+                                    <th>آخر تحديث بواسطة</th>
+                                    <th>تاريخ التعديل (الأرشفة)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($employee->employeeSalaryArchives as $archive)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td class="text-success font-weight-bold">{{ number_format($archive->amount, 2) }}</td>
+                                        <td>{{ optional($archive->addedBy)->name ?? '---' }}</td>
+                                        <td>{{ optional($archive->updatedBy)->name ?? '---' }}</td>
+                                        <td>{{ $archive->created_at->format('Y-m-d h:i A') }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="alert alert-warning mb-0 text-center">
+                                                <i class="fas fa-exclamation-circle"></i>
+                                                لا توجد رواتب مؤرشفة مسبقاً لهذا الموظف
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
     </div>
 
 </div>

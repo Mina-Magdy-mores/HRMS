@@ -13,6 +13,7 @@ class CountryController extends Controller
     {
         $company_id = Auth::user()->company_id;
         $countries = getColsWhereP(Country::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id]);
+        $countries->getCollection()->loadCount('employees');
         return view('admin.country.index', ['countries' => $countries]);
     }
 
@@ -87,6 +88,9 @@ class CountryController extends Controller
             $country = getColsWhereRow(Country::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
             if (!$country) {
                 return redirect()->route('admin.countries.index')->with('error', 'الدولة غير موجودة');
+            }
+            if ($country->employees()->exists()) {
+                return redirect()->route('admin.countries.index')->with('error', 'لا يمكن حذف هذه الدولة لوجود موظفين مرتبطة بها');
             }
             destroy($country);
             return redirect()->route('admin.countries.index')->with('success', 'تم حذف الدولة بنجاح');

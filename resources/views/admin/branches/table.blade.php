@@ -176,6 +176,7 @@
                                         <i class="fas fa-edit"></i>
                                     </a>
 
+                                    @if ($branch->employees_count == 0)
                                     <form action="{{ route('admin.branches.destroy', $branch->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
@@ -184,6 +185,7 @@
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
+                                    @endif
 
                                 </div>
                             </td>

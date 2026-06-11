@@ -14,6 +14,7 @@ class GovernorateController extends Controller
     {
         $company_id = Auth::user()->company_id;
         $governorates = getColsWhereP(Governorate::class, ['addedBy', 'updatedBy', 'country'], ['*'], ['company_id' => $company_id]);
+        $governorates->getCollection()->loadCount('employees');
         return view('admin.governorate.index', ['governorates' => $governorates]);
     }
 
@@ -91,6 +92,9 @@ class GovernorateController extends Controller
             $governorate = getColsWhereRow(Governorate::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
             if (!$governorate) {
                 return redirect()->route('admin.governorates.index')->with('error', 'المحافظة غير موجودة');
+            }
+            if ($governorate->employees()->exists()) {
+                return redirect()->route('admin.governorates.index')->with('error', 'لا يمكن حذف هذه المحافظة لوجود موظفين مرتبطة بها');
             }
             destroy($governorate);
             return redirect()->route('admin.governorates.index')->with('success', 'تم حذف المحافظة بنجاح');

@@ -13,6 +13,7 @@ class ReligionController extends Controller
     {
         $company_id = Auth::user()->company_id;
         $religions = getColsWhereP(Religion::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id]);
+        $religions->getCollection()->loadCount('employees');
         return view('admin.religion.index', ['religions' => $religions]);
     }
 
@@ -87,6 +88,9 @@ class ReligionController extends Controller
             $religion = getColsWhereRow(Religion::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
             if (!$religion) {
                 return redirect()->route('admin.religions.index')->with('error', 'الدين غير موجود');
+            }
+            if ($religion->employees()->exists()) {
+                return redirect()->route('admin.religions.index')->with('error', 'لا يمكن حذف هذه الديانة لوجود موظفين مرتبطة بها');
             }
             destroy($religion);
             return redirect()->route('admin.religions.index')->with('success', 'تم حذف الدين بنجاح');

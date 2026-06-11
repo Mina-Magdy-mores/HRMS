@@ -17,6 +17,7 @@ class JobsCategoryController extends Controller
     {
         $company_id = Auth::user()->company_id;
         $jobCategories = getColsWhereP(JobsCategory::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id]);
+        $jobCategories->getCollection()->loadCount('employees');
         return view('admin.JobsCategories.index', ['jobCategories' => $jobCategories]);
     }
 
@@ -93,16 +94,19 @@ class JobsCategoryController extends Controller
      */
     public function destroy($id)
     {
-               try {
+        try {
             $company_id = Auth::user()->company_id;
             $jobCategory = getColsWhereRow(JobsCategory::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
             if (!$jobCategory) {
                 return redirect()->route('admin.jobCategories.index')->with('error', 'فئة الوظائف غير موجودة');
             }
+            if ($jobCategory->employees()->exists()) {
+                return redirect()->route('admin.jobCategories.index')->with('error', 'لا يمكن حذف هذه الوظيفة لوجود موظفين مرتبطة بها');
+            }
             destroy($jobCategory);
             return redirect()->route('admin.jobCategories.index')->with('success', 'تم حذف فئة الوظائف بنجاح');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث فئة الوظائف ' . $e->getMessage());
+            return redirect()->back()->with('error', 'حدث خطأ أثناء حذف فئة الوظائف ' . $e->getMessage());
         }
     }
 }

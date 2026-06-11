@@ -488,6 +488,12 @@ class Admin extends User
     {
         return $this->hasMany(EmployeeFixedAllowance::class, 'updated_by');
     }
-
-
+    public function addedEmployeeSalaryArchives()
+    {
+        return $this->hasMany(EmployeeSalaryArchive::class, 'added_by');
+    }
+    public function updatedEmployeeSalaryArchives()
+    {
+        return $this->hasMany(EmployeeSalaryArchive::class, 'updated_by');
+    }
 }

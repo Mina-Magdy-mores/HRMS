@@ -147,6 +147,7 @@
                                         <i class="fas fa-edit"></i>
                                     </a>
 
+                                    @if ($bonus->main_salary_employee_bonuses_count == 0)
                                     <form action="{{ route('admin.bonuses.destroy', $bonus->id) }}"
                                         method="POST">
                                         @csrf
@@ -156,6 +157,7 @@
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
+                                    @endif
 
                                 </div>
                             </td>

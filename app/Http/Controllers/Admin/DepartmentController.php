@@ -17,6 +17,7 @@ class DepartmentController extends Controller
     {
         $company_id = Auth::user()->company_id;
         $departments = getColsWhereP(Department::class, ['createdBy', 'updatedBy'], ['*'], ['company_id' => $company_id], 'id', 'asc', PAGEINATION_COUNTER);
+        $departments->getCollection()->loadCount('employees');
         return view('admin.departments.index', compact('departments'));
     }
 
@@ -94,17 +95,20 @@ class DepartmentController extends Controller
      */
     public function destroy($id)
     {
-                try {
-        $company_id = Auth::user()->company_id;
-        $department = getColsWhereRow(Department::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-        if (!$department) {
-            return redirect()->route('admin.departments.index')->with('error', 'القسم غير موجود');
-        }
-        destroy($department);
-        return redirect()->route('admin.departments.index')->with('success', 'Department deleted successfully');
-            } catch (\Exception $e) {
+        try {
+            $company_id = Auth::user()->company_id;
+            $department = getColsWhereRow(Department::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
+            if (!$department) {
+                return redirect()->route('admin.departments.index')->with('error', 'القسم غير موجود');
+            }
+            if ($department->employees()->exists()) {
+                return redirect()->route('admin.departments.index')->with('error', 'لا يمكن حذف القسم لوجود موظفين مرتبطة به');
+            }
+            destroy($department);
+            return redirect()->route('admin.departments.index')->with('success', 'Department deleted successfully');
+        } catch (\Exception $e) {
             return redirect()->back()->with('error', 'حدث خطا ما برجاء المحاوله لاحقا ' . $e->getMessage())->withInput();
         }
-            }
+    }
 
 }
