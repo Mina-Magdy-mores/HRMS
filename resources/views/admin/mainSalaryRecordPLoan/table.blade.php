@@ -547,6 +547,80 @@
     </div>
 </div>
 
+<!-- Reschedule Modal -->
+<div class="modal fade" id="rescheduleMainSalaryRecordLoanModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content shadow">
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-calendar-alt"></i>
+                    تأجيل وإعادة جدولة أقساط السلفة
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body text-right" dir="rtl">
+                <form id="rescheduleLoanForm">
+                    <input type="hidden" name="loan_id" id="reschedule_loan_id">
+                    
+                    <div class="row">
+                        <div class="col-md-6 text-right">
+                            <div class="form-group">
+                                <label>المبلغ الإجمالي للسلفة</label>
+                                <input type="text" id="reschedule_total_amount" class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <div class="form-group">
+                                <label>المبلغ المتبقي الحالي</label>
+                                <input type="text" id="reschedule_remaining_amount" class="form-control" readonly>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 text-right">
+                            <div class="form-group">
+                                <label>دفعة نقدية فورية (اختياري)</label>
+                                <input type="number" name="cash_payment" id="reschedule_cash_payment" class="form-control" placeholder="أدخل مبلغ السداد الفوري إن وجد" min="0" value="0" step="0.01">
+                                <small class="text-muted">سيتم خصم هذا المبلغ من المتبقي وجدولته كـ (مدفوع نقداً) فوراً.</small>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 text-right">
+                            <div class="form-group">
+                                <label>عدد أشهر الجدولة الجديدة للأقساط المتبقية</label>
+                                <input type="number" name="number_of_months" id="reschedule_number_of_months" class="form-control" placeholder="أدخل عدد الأشهر الجديد" min="1">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 text-right">
+                            <div class="form-group">
+                                <label>تاريخ بدء أول قسط جديد</label>
+                                <input type="date" name="start_date" id="reschedule_start_date" class="form-control">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 text-right">
+                            <div class="form-group">
+                                <label>قيمة القسط الشهري الجديد المتوقعة</label>
+                                <input type="text" id="reschedule_new_monthly_installment" class="form-control text-primary font-weight-bold" readonly value="0.00 ج.م">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-12 mt-3 text-right">
+                            <button type="submit" class="btn btn-warning shadow px-4" id="submit_reschedule_loan">
+                                <i class="fas fa-save"></i>
+                                حفظ الجدولة الجديدة
+                            </button>
+                            <button type="button" class="btn btn-secondary shadow px-4" data-dismiss="modal">إلغاء</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @section('js')
     <script src="{{ asset('assets/plugins/select2/js/select2.full.min.js') }}"></script>
@@ -606,6 +680,22 @@
         }
         $(document).ready(function() {
             initSelect2();
+            
+            // Set min date to today for all loan date inputs to prevent choosing past dates
+            const todayStr = new Date().toISOString().split('T')[0];
+            $('#year_and_month_started').attr('min', todayStr);
+            $('#edit_year_and_month_started').attr('min', todayStr);
+            $('#reschedule_start_date').attr('min', todayStr);
+
+            $(document).on('change', '#year_and_month_started, #edit_year_and_month_started, #reschedule_start_date', function(e) {
+                const selectedDate = $(this).val();
+                const today = new Date().toISOString().split('T')[0];
+                if (selectedDate && selectedDate < today) {
+                    alert('عفواً، لا يمكن اختيار تاريخ قبل تاريخ اليوم.');
+                    $(this).val(today);
+                }
+            });
+
             $(document).on('change', '#employee_id', function() {
                 var employee_id = $(this).val();
                 var salary = $(this).find(':selected').data('salary');
@@ -628,15 +718,7 @@
             $(document).on('input', '#number_of_installment_months', function() {
                 installment_amount_monthly_calc();
             });
-            $(document).on('change', '#year_and_month_started', function(e) {
-                const date = new Date($(this).val());
-                date.setDate(date.getDate() + 1);
-                const today = new Date();
-                if (date < today) {
-                    alert('من فضلك اختر تاريخ صحيح');
-                    $(this).val(today.toISOString().split('T')[0]);
-                }
-            });
+            
 
             $(document).on('click', '#submit_add_loan', function(e) {
                 var employee_id = $('#employee_id').val();
@@ -955,15 +1037,7 @@
             $(document).on('input', '#edit_number_of_installment_months', function() {
                 installment_amount_monthly_calc_edit();
             });
-            $(document).on('change', '#edit_year_and_month_started', function(e) {
-                const date = new Date($(this).val());
-                date.setDate(date.getDate() + 1);
-                const today = new Date();
-                if (date < today) {
-                    alert('من فضلك اختر تاريخ صحيح');
-                    $(this).val(today.toISOString().split('T')[0]);
-                }
-            });
+            
             
             $(document).on('click', '#submit_edit_loan', function(e) {
                 var id = $('#edit_main_salary_employee_p_loan_id').val();
@@ -1051,6 +1125,144 @@
                         }
                     })
                 }
+            });
+
+
+            $(document).on('click', '#rescheduleLoanBtn', function() {
+                var loanId = $(this).data('id');
+                var amount = $(this).data('amount');
+                var remaining = $(this).data('remaining');
+                var firstDate = $(this).data('first-date');
+                var remainingCount = $(this).data('remaining-count') || 1;
+
+                $('#reschedule_loan_id').val(loanId);
+                $('#reschedule_total_amount').val(parseFloat(amount).toFixed(2) + ' ج.م');
+                $('#reschedule_remaining_amount').val(parseFloat(remaining).toFixed(2) + ' ج.م');
+
+                // Reset input fields
+                $('#reschedule_cash_payment').val(0);
+                $('#reschedule_number_of_months').val('');
+                $('#reschedule_start_date').val(firstDate);
+
+                // Save remaining count of installments on the form for fallback calculation
+                $('#rescheduleLoanForm').data('remaining-count', remainingCount);
+
+                // Initial calculation
+                recalculate_new_monthly_installment();
+
+                // Show reschedule modal (keep details modal open)
+                $('#rescheduleMainSalaryRecordLoanModal').modal('show');
+            });
+
+            // Handle multi-modal stacking and backdrop issues for Bootstrap 4
+            $(document).on('show.bs.modal', '#rescheduleMainSalaryRecordLoanModal', function() {
+                // Ensure reschedule modal has a higher z-index
+                $(this).css('z-index', 1060);
+                // Adjust the backdrop z-index
+                setTimeout(function() {
+                    $('.modal-backdrop').not('.reschedule-backdrop-stacked').last().css('z-index', 1059).addClass('reschedule-backdrop-stacked');
+                }, 10);
+            });
+
+            $(document).on('hidden.bs.modal', '#rescheduleMainSalaryRecordLoanModal', function() {
+                // Restore body scroll when closing the top modal if details modal is still open
+                if ($('#mainSalaryEmployeePLoanDetailsModal').hasClass('show')) {
+                    $('body').addClass('modal-open');
+                }
+            });
+
+            function recalculate_new_monthly_installment() {
+                var remaining = parseFloat($('#reschedule_remaining_amount').val()) || 0;
+                var cashPayment = parseFloat($('#reschedule_cash_payment').val()) || 0;
+                
+                var monthsInput = $('#reschedule_number_of_months').val();
+                var defaultMonths = $('#rescheduleLoanForm').data('remaining-count') || 1;
+                var months = (monthsInput !== '' && monthsInput !== undefined) ? parseInt(monthsInput) : defaultMonths;
+
+                if (cashPayment < 0) {
+                    cashPayment = 0;
+                    $('#reschedule_cash_payment').val(0);
+                }
+
+                if (cashPayment > remaining) {
+                    alert('عفواً، الدفعة النقدية لا يمكن أن تتجاوز المبلغ المتبقي.');
+                    cashPayment = 0;
+                    $('#reschedule_cash_payment').val(0);
+                }
+
+                var newRemaining = remaining - cashPayment;
+                if (months > 0 && newRemaining >= 0) {
+                    var installment = (newRemaining / months).toFixed(2);
+                    if (newRemaining == 0) {
+                        $('#reschedule_new_monthly_installment').val('0.00 ج.م');
+                    } else {
+                        $('#reschedule_new_monthly_installment').val(installment + ' ج.م');
+                    }
+                } else {
+                    $('#reschedule_new_monthly_installment').val('0.00 ج.م');
+                }
+            }
+
+            $(document).on('input', '#reschedule_cash_payment, #reschedule_number_of_months', function() {
+                recalculate_new_monthly_installment();
+            });
+
+            $(document).on('submit', '#rescheduleLoanForm', function(e) {
+                e.preventDefault();
+
+                var loanId = $('#reschedule_loan_id').val();
+                var cashPayment = $('#reschedule_cash_payment').val();
+                var numberOfMonths = $('#reschedule_number_of_months').val();
+                var startDate = $('#reschedule_start_date').val();
+
+                var submitBtn = $('#submit_reschedule_loan');
+                submitBtn.prop('disabled', true);
+
+                $.ajax({
+                    url: '{{ route('admin.main-salary-employee-ploans.reschedule') }}',
+                    type: 'POST',
+                    dataType: 'json',
+                    cache: false,
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        loan_id: loanId,
+                        cash_payment: cashPayment,
+                        number_of_months: numberOfMonths,
+                        start_date: startDate
+                    },
+                    success: function(response) {
+                        if (response.status == 'true') {
+                            alert(response.message);
+                            $('#rescheduleMainSalaryRecordLoanModal').modal('hide');
+                            
+                            // Reload Details Modal Content so user sees the newly generated installments instantly
+                            $.ajax({
+                                url: '{{ route('admin.main-salary-employee-ploans.show') }}',
+                                type: 'POST',
+                                dataType: 'html',
+                                cache: false,
+                                data: {
+                                    _token: '{{ csrf_token() }}',
+                                    id: loanId,
+                                },
+                                success: function(mainSalaryEmployeePLoans) {
+                                    $('#mainSalaryEmployeePLoanDetailsModalBody').html(mainSalaryEmployeePLoans);
+                                    ajax_search();
+                                },
+                                error: function(xhr) {
+                                    window.location.reload();
+                                }
+                            });
+                        } else {
+                            alert(response.message || 'عفواً، حدث خطأ أثناء الحفظ.');
+                            submitBtn.prop('disabled', false);
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('عفواً، حدث خطأ غير متوقع أثناء الاتصال بالخادم.');
+                        submitBtn.prop('disabled', false);
+                    }
+                });
             });
 
 

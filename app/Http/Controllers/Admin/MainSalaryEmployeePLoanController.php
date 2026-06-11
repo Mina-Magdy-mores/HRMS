@@ -114,6 +114,13 @@ class MainSalaryEmployeePLoanController extends Controller
             if ($checkIfExists == null) {
                 return response()->json(['status' => 'false', 'message' => 'عفوا، لا توجد بيانات راتب مسجلة لهذا الموظف في هذا الشهر المالي.']);
             }
+
+            if (date('Y-m-d', strtotime($request->next_installment_date)) < date('Y-m-d')) {
+                if (date('Y-m', strtotime($request->next_installment_date)) < date('Y-m')) {
+                    return response()->json(['status' => 'false', 'message' => 'عفواً، لا يمكن أن يكون تاريخ بدء القسط في شهر سابق للشهر الحالي']);
+                }
+            }
+
             try {
                 return DB::transaction(function () use ($request, $company_id) {
                     $dataToInsert = [
@@ -450,6 +457,13 @@ class MainSalaryEmployeePLoanController extends Controller
         if ($mainSalaryEmployeePLoan['is_archived'] == 1 || $mainSalaryEmployeePLoan['is_disbursed'] == 1) {
             return response()->json(['status' => 'false', 'message' => 'عفوا لا يمكن تعديل السلفة']);
         }
+
+        if (date('Y-m-d', strtotime($request->year_and_month_started)) < date('Y-m-d')) {
+            if (date('Y-m', strtotime($request->year_and_month_started)) < date('Y-m')) {
+                return response()->json(['status' => 'false', 'message' => 'عفواً، لا يمكن أن يكون تاريخ بدء القسط في شهر سابق للشهر الحالي']);
+            }
+        }
+
         try {
             return DB::transaction(function () use ($request, $company_id, $mainSalaryEmployeePLoan) {
                 $dataToUpdate = [
@@ -614,6 +628,156 @@ class MainSalaryEmployeePLoanController extends Controller
                     return response()->json([
                         'status' => 'true',
                         'message' => 'تم دفع القسط نقداً بنجاح وتحديث السلفة والراتب',
+                        'parent_loan_id' => $loan->id
+                    ]);
+                });
+            } catch (\Exception $e) {
+                return response()->json(['status' => 'false', 'message' => 'عفواً، حدث خطأ: ' . $e->getMessage()]);
+            }
+        }
+    }
+
+    public function reschedule(Request $request)
+    {
+        if ($request->ajax()) {
+            $company_id = Auth::user()->company_id;
+
+            $loan = MainSalaryEmployeePLoan::where('id', $request->loan_id)
+                ->where('company_id', $company_id)
+                ->where('is_archived', 0)
+                ->where('is_disbursed', 1)
+                ->first();
+
+            if (empty($loan)) {
+                return response()->json(['status' => 'false', 'message' => 'عفواً، السلفة غير صالحة أو مؤرشفة بالفعل']);
+            }
+
+            $firstAvailableInstallment = $loan->mainSalaryEmployeePLoanInstallments()
+                ->where('is_archived', 0)
+                ->where('installment_status', '0')
+                ->orderBy('id', 'asc')
+                ->first();
+
+            $start_date = $request->start_date;
+            if (empty($start_date)) {
+                if ($firstAvailableInstallment) {
+                    $start_date = $firstAvailableInstallment->next_installment_year_and_month . '-01';
+                } else {
+                    $start_date = date('Y-m-d');
+                }
+            }
+
+            $remainingInstallmentsCount = $loan->mainSalaryEmployeePLoanInstallments()
+                ->where('is_archived', 0)
+                ->where('installment_status', '0')
+                ->count();
+
+            $number_of_months = $request->filled('number_of_months') ? intval($request->number_of_months) : $remainingInstallmentsCount;
+            if ($number_of_months < 1) {
+                $number_of_months = 1;
+            }
+
+            $cash_payment = floatval($request->cash_payment ?? 0);
+
+            if ($cash_payment < 0 || $cash_payment > floatval($loan->remaining_amount)) {
+                return response()->json(['status' => 'false', 'message' => 'عفواً، مبلغ السداد النقدي غير صحيح أو يتجاوز المبلغ المتبقي للسلفة']);
+            }
+
+            if (date('Y-m-d', strtotime($start_date)) < date('Y-m-d')) {
+                if (date('Y-m', strtotime($start_date)) < date('Y-m')) {
+                    return response()->json(['status' => 'false', 'message' => 'عفواً، لا يمكن أن يكون تاريخ بدء الأقساط في شهر سابق للشهر الحالي']);
+                }
+            }
+
+            try {
+                return DB::transaction(function () use ($loan, $cash_payment, $number_of_months, $start_date, $company_id, $firstAvailableInstallment) {
+
+                    // 1. Delete all unarchived installments (is_archived = 0)
+                    $loan->mainSalaryEmployeePLoanInstallments()->where('is_archived', 0)->delete();
+
+                    // 2. Handle immediate cash payment if specified
+                    if ($cash_payment > 0) {
+                        $cash_payment_month = $firstAvailableInstallment ? $firstAvailableInstallment->next_installment_year_and_month : date('Y-m');
+                        MainSalaryEmployeePLoanInstallment::create([
+                            'employee_id' => $loan->employee_id,
+                            'main_salary_employee_p_loan_id' => $loan->id,
+                            'amount' => $loan->amount,
+                            'installment_amount_monthly' => $cash_payment,
+                            'next_installment_year_and_month' => $cash_payment_month,
+                            'installment_status' => '2', // Paid cash
+                            'is_archived' => 1, // Archived immediately
+                            'archived_by' => Auth::user()->id,
+                            'archived_at' => date('Y-m-d H:i:s'),
+                            'company_id' => $company_id,
+                            'added_by' => Auth::user()->id,
+                            'notes' => 'دفعة نقدية فورية عند إعادة الجدولة',
+                        ]);
+                    }
+
+                    // 3. Calculate new remaining balance and installment amount
+                    $remainingBalance = floatval($loan->remaining_amount) - $cash_payment;
+
+                    if ($remainingBalance > 0) {
+                        $newInstallmentAmount = round($remainingBalance / $number_of_months, 2);
+
+                        // 4. Create new installments starting from start_date
+                        $next_installment_year_and_month = date('Y-m', strtotime($start_date));
+                        for ($i = 1; $i <= $number_of_months; $i++) {
+                            MainSalaryEmployeePLoanInstallment::create([
+                                'employee_id' => $loan->employee_id,
+                                'main_salary_employee_p_loan_id' => $loan->id,
+                                'amount' => $loan->amount,
+                                'installment_amount_monthly' => $newInstallmentAmount,
+                                'next_installment_year_and_month' => $next_installment_year_and_month,
+                                'installment_status' => '0', // Pending
+                                'company_id' => $company_id,
+                                'added_by' => Auth::user()->id,
+                                'notes' => 'قسط مجدول جديد بعد إعادة الجدولة',
+                            ]);
+                            $next_installment_year_and_month = date('Y-m', strtotime($next_installment_year_and_month . ' + 1 month'));
+                        }
+                    }
+
+                    // 5. Recalculate parent loan fields
+                    $totalPaid = MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $loan->id)
+                        ->whereIn('installment_status', ['1', '2'])
+                        ->sum('installment_amount_monthly');
+
+                    $loan->update([
+                        'paid_amount' => $totalPaid,
+                        'remaining_amount' => max(0, floatval($loan->amount) - $totalPaid),
+                        'updated_by' => Auth::user()->id,
+                    ]);
+
+                    // 6. Check if parent loan should now be archived
+                    $totalInstallments = MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $loan->id)->count();
+                    $paidAndArchived = MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $loan->id)
+                        ->whereIn('installment_status', ['1', '2'])
+                        ->where('is_archived', 1)
+                        ->count();
+
+                    if ($totalInstallments > 0 && $totalInstallments === $paidAndArchived) {
+                        $loan->update([
+                            'is_archived' => 1,
+                            'archived_by' => Auth::user()->id,
+                            'archived_at' => date('Y-m-d H:i:s'),
+                        ]);
+                    }
+
+                    // 7. Recalculate open salary record for this employee (if any exists)
+                    $mainSalaryEmployee = MainSalaryEmployee::select('id')->where([
+                        'employee_id' => $loan->employee_id,
+                        'company_id' => $company_id,
+                        'is_archived' => 0
+                    ])->first();
+
+                    if (!empty($mainSalaryEmployee)) {
+                        $this->recalculate_main_salary($mainSalaryEmployee->id);
+                    }
+
+                    return response()->json([
+                        'status' => 'true',
+                        'message' => 'تمت إعادة جدولة الأقساط بنجاح وتحديث السلفة والراتب المفتوح إن وجد',
                         'parent_loan_id' => $loan->id
                     ]);
                 });

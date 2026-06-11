@@ -530,4 +530,338 @@ class ArchiveMonthTest extends TestCase
         $this->assertEquals(1000, $loan->paid_amount);
         $this->assertEquals(1000, $loan->remaining_amount);
     }
+
+    public function test_reschedule_loan_installments_action()
+    {
+        \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+        \Illuminate\Support\Facades\DB::statement('PRAGMA foreign_keys = OFF;');
+
+        // 1. Create Admin
+        $admin = Admin::create([
+            'id' => 1,
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
+            'username' => 'admin',
+            'password' => bcrypt('password'),
+            'status' => 1,
+            'company_id' => 1,
+            'date' => '2026-06-10',
+            'added_by' => 1,
+            'updated_by' => 1,
+        ]);
+
+        // Create Branch, Job, Department, Nationality
+        $branch = Branche::create([
+            'name' => 'Main Branch',
+            'address' => 'Branch Address',
+            'phone' => '1234567890',
+            'status' => 1,
+            'company_id' => 1,
+            'created_by' => $admin->id,
+        ]);
+
+        $job = JobsCategory::create([
+            'name' => 'Software Engineer',
+            'status' => 1,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        $department = Department::create([
+            'name' => 'Engineering',
+            'number' => 'ENG-101',
+            'status' => 1,
+            'company_id' => 1,
+            'created_by' => $admin->id,
+        ]);
+
+        $nationality = Nationality::create([
+            'id' => 1,
+            'name' => 'Egyptian',
+            'status' => 1,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        // 2. Create Employee
+        $employee = Employee::create([
+            'id' => 1,
+            'employee_code' => 1001,
+            'name' => 'Test Employee',
+            'gender' => 1,
+            'nationality_id' => $nationality->id,
+            'job_id' => $job->id,
+            'department_id' => $department->id,
+            'branch_id' => $branch->id,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+            'employment_status' => 1,
+        ]);
+
+        // 3. Create parent loan
+        $loan = \App\Models\MainSalaryEmployeePLoan::create([
+            'employee_id' => $employee->id,
+            'employee_basic_salary' => 5000,
+            'amount' => 3000,
+            'number_of_installment_months' => 3,
+            'installment_amount_monthly' => 1000,
+            'next_installment_date' => '2026-06-01',
+            'next_installment_year_and_month' => '2026-06',
+            'paid_amount' => 1000,
+            'remaining_amount' => 2000,
+            'is_disbursed' => 1,
+            'is_archived' => 0,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        // Installment 1: paid & archived (should NOT be deleted)
+        \App\Models\MainSalaryEmployeePLoanInstallment::create([
+            'employee_id' => $employee->id,
+            'main_salary_employee_p_loan_id' => $loan->id,
+            'amount' => 3000,
+            'installment_amount_monthly' => 1000,
+            'next_installment_year_and_month' => '2026-06',
+            'installment_status' => '1',
+            'is_archived' => 1,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        // Installment 2: pending, active (should be deleted)
+        \App\Models\MainSalaryEmployeePLoanInstallment::create([
+            'employee_id' => $employee->id,
+            'main_salary_employee_p_loan_id' => $loan->id,
+            'amount' => 3000,
+            'installment_amount_monthly' => 1000,
+            'next_installment_year_and_month' => '2026-07',
+            'installment_status' => '0',
+            'is_archived' => 0,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        // Installment 3: pending, active (should be deleted)
+        \App\Models\MainSalaryEmployeePLoanInstallment::create([
+            'employee_id' => $employee->id,
+            'main_salary_employee_p_loan_id' => $loan->id,
+            'amount' => 3000,
+            'installment_amount_monthly' => 1000,
+            'next_installment_year_and_month' => '2026-08',
+            'installment_status' => '0',
+            'is_archived' => 0,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        // Act: log in as admin and post reschedule request
+        $this->actingAs($admin, 'admin');
+
+        $response = $this->postJson(route('admin.main-salary-employee-ploans.reschedule'), [
+            'loan_id' => $loan->id,
+            'cash_payment' => 500,
+            'number_of_months' => 3,
+            'start_date' => '2026-08-01'
+        ], ['X-Requested-With' => 'XMLHttpRequest']);
+
+        $response->assertStatus(200);
+        $response->assertJson(['status' => 'true']);
+
+        // Assert parent loan and installments updates
+        $loan->refresh();
+
+        // 1. Total paid must be: 1000 (archived) + 500 (new cash) = 1500
+        $this->assertEquals(1500, $loan->paid_amount);
+        $this->assertEquals(1500, $loan->remaining_amount);
+
+        // 2. Installments count: 1 (original archived) + 1 (cash payment installment) + 3 (new deferred installments) = 5
+        $installments = \App\Models\MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $loan->id)->get();
+        $this->assertCount(5, $installments);
+
+        // 3. Verify the cash payment installment (should be recorded under the first available pending month = '2026-07')
+        $cashInstallment = $installments->where('installment_status', '2')->first();
+        $this->assertNotNull($cashInstallment);
+        $this->assertEquals(500, $cashInstallment->installment_amount_monthly);
+        $this->assertEquals('2026-07', $cashInstallment->next_installment_year_and_month);
+        $this->assertEquals(1, $cashInstallment->is_archived);
+
+        // 4. Verify the new deferred installments (amount should be 1500 / 3 = 500, starting from '2026-08')
+        $newDeferred = $installments->where('installment_status', '0')->sortBy('id')->values();
+        $this->assertCount(3, $newDeferred);
+        
+        $this->assertEquals(500, $newDeferred[0]->installment_amount_monthly);
+        $this->assertEquals('2026-08', $newDeferred[0]->next_installment_year_and_month);
+
+        $this->assertEquals(500, $newDeferred[1]->installment_amount_monthly);
+        $this->assertEquals('2026-09', $newDeferred[1]->next_installment_year_and_month);
+
+        $this->assertEquals(500, $newDeferred[2]->installment_amount_monthly);
+        $this->assertEquals('2026-10', $newDeferred[2]->next_installment_year_and_month);
+    }
+
+    public function test_reschedule_loan_installments_optional_parameters_action()
+    {
+        \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+        \Illuminate\Support\Facades\DB::statement('PRAGMA foreign_keys = OFF;');
+
+        // 1. Create Admin
+        $admin = Admin::create([
+            'id' => 1,
+            'name' => 'Admin User',
+            'email' => 'admin@example.com',
+            'username' => 'admin',
+            'password' => bcrypt('password'),
+            'status' => 1,
+            'company_id' => 1,
+            'date' => '2026-06-10',
+            'added_by' => 1,
+            'updated_by' => 1,
+        ]);
+
+        // Create Branch, Job, Department, Nationality
+        $branch = Branche::create([
+            'name' => 'Main Branch',
+            'address' => 'Branch Address',
+            'phone' => '1234567890',
+            'status' => 1,
+            'company_id' => 1,
+            'created_by' => $admin->id,
+        ]);
+
+        $job = JobsCategory::create([
+            'name' => 'Software Engineer',
+            'status' => 1,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        $department = Department::create([
+            'name' => 'Engineering',
+            'number' => 'ENG-101',
+            'status' => 1,
+            'company_id' => 1,
+            'created_by' => $admin->id,
+        ]);
+
+        $nationality = Nationality::create([
+            'id' => 1,
+            'name' => 'Egyptian',
+            'status' => 1,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        // 2. Create Employee
+        $employee = Employee::create([
+            'id' => 1,
+            'employee_code' => 1001,
+            'name' => 'Test Employee',
+            'gender' => 1,
+            'nationality_id' => $nationality->id,
+            'job_id' => $job->id,
+            'department_id' => $department->id,
+            'branch_id' => $branch->id,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+            'employment_status' => 1,
+        ]);
+
+        // 3. Create parent loan
+        $loan = \App\Models\MainSalaryEmployeePLoan::create([
+            'employee_id' => $employee->id,
+            'employee_basic_salary' => 5000,
+            'amount' => 3000,
+            'number_of_installment_months' => 3,
+            'installment_amount_monthly' => 1000,
+            'next_installment_date' => '2026-06-01',
+            'next_installment_year_and_month' => '2026-06',
+            'paid_amount' => 1000,
+            'remaining_amount' => 2000,
+            'is_disbursed' => 1,
+            'is_archived' => 0,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        // Installment 1: paid & archived (should NOT be deleted)
+        \App\Models\MainSalaryEmployeePLoanInstallment::create([
+            'employee_id' => $employee->id,
+            'main_salary_employee_p_loan_id' => $loan->id,
+            'amount' => 3000,
+            'installment_amount_monthly' => 1000,
+            'next_installment_year_and_month' => '2026-06',
+            'installment_status' => '1',
+            'is_archived' => 1,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        // Installment 2: pending, active (should be deleted, next_installment_year_and_month = '2026-07')
+        \App\Models\MainSalaryEmployeePLoanInstallment::create([
+            'employee_id' => $employee->id,
+            'main_salary_employee_p_loan_id' => $loan->id,
+            'amount' => 3000,
+            'installment_amount_monthly' => 1000,
+            'next_installment_year_and_month' => '2026-07',
+            'installment_status' => '0',
+            'is_archived' => 0,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        // Installment 3: pending, active (should be deleted, next_installment_year_and_month = '2026-08')
+        \App\Models\MainSalaryEmployeePLoanInstallment::create([
+            'employee_id' => $employee->id,
+            'main_salary_employee_p_loan_id' => $loan->id,
+            'amount' => 3000,
+            'installment_amount_monthly' => 1000,
+            'next_installment_year_and_month' => '2026-08',
+            'installment_status' => '0',
+            'is_archived' => 0,
+            'company_id' => 1,
+            'added_by' => $admin->id,
+        ]);
+
+        // Act: log in as admin and post reschedule request with ONLY cash_payment
+        // number_of_months and start_date are omitted, so:
+        // - number_of_months defaults to remaining count = 2
+        // - start_date defaults to first eligible installment's month = '2026-07-01'
+        $this->actingAs($admin, 'admin');
+
+        $response = $this->postJson(route('admin.main-salary-employee-ploans.reschedule'), [
+            'loan_id' => $loan->id,
+            'cash_payment' => 400
+        ], ['X-Requested-With' => 'XMLHttpRequest']);
+
+        $response->assertStatus(200);
+        $response->assertJson(['status' => 'true']);
+
+        // Assert parent loan and installments updates
+        $loan->refresh();
+
+        // Total paid must be: 1000 (archived) + 400 (new cash) = 1400
+        $this->assertEquals(1400, $loan->paid_amount);
+        $this->assertEquals(1600, $loan->remaining_amount);
+
+        // Installments count: 1 (original archived) + 1 (cash payment installment) + 2 (new deferred installments) = 4
+        $installments = \App\Models\MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $loan->id)->get();
+        $this->assertCount(4, $installments);
+
+        // Verify the cash payment installment (should be recorded under the first available pending month = '2026-07')
+        $cashInstallment = $installments->where('installment_status', '2')->first();
+        $this->assertNotNull($cashInstallment);
+        $this->assertEquals(400, $cashInstallment->installment_amount_monthly);
+        $this->assertEquals('2026-07', $cashInstallment->next_installment_year_and_month);
+
+        // Verify the new deferred installments (amount should be 1600 / 2 = 800)
+        // And they should start from '2026-07' and '2026-08'
+        $newDeferred = $installments->where('installment_status', '0')->sortBy('id')->values();
+        $this->assertCount(2, $newDeferred);
+        
+        $this->assertEquals(800, $newDeferred[0]->installment_amount_monthly);
+        $this->assertEquals('2026-07', $newDeferred[0]->next_installment_year_and_month);
+
+        $this->assertEquals(800, $newDeferred[1]->installment_amount_monthly);
+        $this->assertEquals('2026-08', $newDeferred[1]->next_installment_year_and_month);
+    }
 }

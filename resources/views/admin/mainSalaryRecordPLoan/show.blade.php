@@ -1,7 +1,33 @@
 <div class="row">
     <div class="col-md-12">
-        <h5 class="text-primary font-weight-bold mb-3 border-bottom pb-2">
-            <i class="fas fa-info-circle mr-1"></i> تفاصيل السلفة المستديمة للموظف: {{ $mainSalaryEmployeePLoans->employee->name ?? '---' }}
+        <h5 class="text-primary font-weight-bold mb-3 border-bottom pb-2 d-flex justify-content-between align-items-center">
+            <span>
+                <i class="fas fa-info-circle mr-1"></i> تفاصيل السلفة المستديمة للموظف: {{ $mainSalaryEmployeePLoans->employee->name ?? '---' }}
+            </span>
+            @if ($mainSalaryEmployeePLoans->is_archived == 0 && $mainSalaryEmployeePLoans->is_disbursed == 1)
+                @php
+                    $firstEligibleDate = null;
+                    $firstEligible = $mainSalaryEmployeePLoans->mainSalaryEmployeePLoanInstallments
+                        ->where('is_archived', 0)
+                        ->where('installment_status', '0')
+                        ->first();
+                    if ($firstEligible) {
+                        $firstEligibleDate = $firstEligible->next_installment_year_and_month . '-01';
+                    }
+                    $remainingCount = $mainSalaryEmployeePLoans->mainSalaryEmployeePLoanInstallments
+                        ->where('is_archived', 0)
+                        ->where('installment_status', '0')
+                        ->count();
+                @endphp
+                <button type="button" class="btn btn-warning btn-sm shadow-sm" id="rescheduleLoanBtn" 
+                    data-id="{{ $mainSalaryEmployeePLoans->id }}"
+                    data-amount="{{ $mainSalaryEmployeePLoans->amount }}"
+                    data-remaining="{{ $mainSalaryEmployeePLoans->remaining_amount }}"
+                    data-first-date="{{ $firstEligibleDate ?? date('Y-m-d') }}"
+                    data-remaining-count="{{ $remainingCount ?? 1 }}">
+                    <i class="fas fa-calendar-alt mr-1"></i> تأجيل / إعادة جدولة الأقساط
+                </button>
+            @endif
         </h5>
         
         <table class="table table-bordered table-striped text-center align-middle">
