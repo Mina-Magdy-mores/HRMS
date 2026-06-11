@@ -363,7 +363,32 @@ class MainSalaryEmployeePLoanController extends Controller
                 ]);
 
                 $mainSalaryEmployeePLoan->refresh();
+                $mainSalaryEmployeePLoan->load([
+                    'employee',
+                    'archivedBy',
+                    'mainSalaryEmployeePLoanInstallments' => function ($query) {
+                        $query->orderBy('id', 'asc');
+                    },
+                    'mainSalaryEmployeePLoanInstallments.archivedBy',
+                    'mainSalaryEmployeePLoanInstallments.mainSalaryEmployee',
+                    'mainSalaryEmployeePLoanInstallments.addedBy',
+                    'mainSalaryEmployeePLoanInstallments.updatedBy'
+                ]);
+
+                 // Determine which installment is eligible for cash payment
+                 $firstEligible = null;
+                 if ($mainSalaryEmployeePLoan->is_disbursed == 1 && $mainSalaryEmployeePLoan->is_archived == 0) {
+                     $firstEligible = $mainSalaryEmployeePLoan->mainSalaryEmployeePLoanInstallments
+                         ->where('is_archived', 0)
+                         ->where('installment_status', '0')
+                         ->first();
+                 }
+
+                 foreach ($mainSalaryEmployeePLoan->mainSalaryEmployeePLoanInstallments as $installment) {
+                     $installment->can_pay_cash = ($firstEligible && $installment->id === $firstEligible->id);
+                 }
             }
+            
 
             return view('admin.mainSalaryRecordPLoan.show', [
                 'mainSalaryEmployeePLoans' => $mainSalaryEmployeePLoan,
@@ -508,6 +533,92 @@ class MainSalaryEmployeePLoanController extends Controller
                 });
             } catch (\Exception $e) {
                 return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم صرف السلفة ' . $e->getMessage()]);
+            }
+        }
+    }
+
+    public function payInstallmentCash(Request $request)
+    {
+        if ($request->ajax()) {
+            $company_id = Auth::user()->company_id;
+            $installment = MainSalaryEmployeePLoanInstallment::where('company_id', $company_id)
+                ->where('id', $request->id)
+                ->where('is_archived', 0)
+                ->where('installment_status', '0')
+                ->first();
+
+            if (empty($installment)) {
+                return response()->json(['status' => 'false', 'message' => 'عفواً، القسط غير متاح للدفع كاش']);
+            }
+
+            $loan = $installment->mainSalaryEmployeePLoan;
+            if (!$loan || $loan->is_archived == 1 || $loan->is_disbursed == 0) {
+                return response()->json(['status' => 'false', 'message' => 'عفواً، السلفة الأساسية غير صالحة أو مغلقة']);
+            }
+
+            $firstEligible = $loan->mainSalaryEmployeePLoanInstallments()
+                ->where('is_archived', 0)
+                ->where('installment_status', '0')
+                ->orderBy('id', 'asc')
+                ->first();
+
+            if (!$firstEligible || $firstEligible->id !== $installment->id) {
+                return response()->json(['status' => 'false', 'message' => 'عفواً، يجب سداد الأقساط بالترتيب المستحق']);
+            }
+
+            try {
+                return DB::transaction(function () use ($installment, $loan, $company_id) {
+                    $installment->update([
+                        'installment_status' => '2',
+                        'is_archived' => 1,
+                        'archived_by' => Auth::user()->id,
+                        'archived_at' => date('Y-m-d H:i:s'),
+                        'updated_by' => Auth::user()->id,
+                    ]);
+
+                    $totalPaid = MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $loan->id)
+                        ->whereIn('installment_status', ['1', '2'])
+                        ->sum('installment_amount_monthly');
+
+                    $loan->update([
+                        'paid_amount' => $totalPaid,
+                        'remaining_amount' => max(0, $loan->amount - $totalPaid),
+                        'updated_by' => Auth::user()->id,
+                    ]);
+
+                    // Check if parent loan should now be archived
+                    $totalInstallments = MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $loan->id)->count();
+                    $paidAndArchived = MainSalaryEmployeePLoanInstallment::where('main_salary_employee_p_loan_id', $loan->id)
+                        ->whereIn('installment_status', ['1', '2'])
+                        ->where('is_archived', 1)
+                        ->count();
+
+                    if ($totalInstallments > 0 && $totalInstallments === $paidAndArchived) {
+                        $loan->update([
+                            'is_archived' => 1,
+                            'archived_by' => Auth::user()->id,
+                            'archived_at' => date('Y-m-d H:i:s'),
+                        ]);
+                    }
+
+                    $mainSalaryEmployee = MainSalaryEmployee::select('id')->where([
+                        'employee_id' => $loan->employee_id,
+                        'company_id' => $company_id,
+                        'is_archived' => 0
+                    ])->first();
+
+                    if (!empty($mainSalaryEmployee)) {
+                        $this->recalculate_main_salary($mainSalaryEmployee->id);
+                    }
+
+                    return response()->json([
+                        'status' => 'true',
+                        'message' => 'تم دفع القسط نقداً بنجاح وتحديث السلفة والراتب',
+                        'parent_loan_id' => $loan->id
+                    ]);
+                });
+            } catch (\Exception $e) {
+                return response()->json(['status' => 'false', 'message' => 'عفواً، حدث خطأ: ' . $e->getMessage()]);
             }
         }
     }

@@ -36,6 +36,28 @@
                 </td>
             </tr>
             <tr>
+                <th class="bg-light">حالة الأرشفة</th>
+                <td>
+                    @if ($mainSalaryEmployeePLoans->is_archived == 1)
+                        <span class="badge badge-danger px-2 py-1"><i class="fas fa-archive mr-1"></i> مؤرشف</span>
+                    @else
+                        <span class="badge badge-success px-2 py-1"><i class="fas fa-folder-open mr-1"></i> نشط</span>
+                    @endif
+                </td>
+                <th class="bg-light">تفاصيل الأرشفة</th>
+                <td>
+                    @if ($mainSalaryEmployeePLoans->is_archived == 1)
+                        <span class="small font-weight-bold text-muted">
+                            بواسطة: {{ $mainSalaryEmployeePLoans->archivedBy->name ?? '---' }}
+                            <br>
+                            بتاريخ: {{ $mainSalaryEmployeePLoans->archived_at }}
+                        </span>
+                    @else
+                        <span class="text-secondary">---</span>
+                    @endif
+                </td>
+            </tr>
+            <tr>
                 <th class="bg-light">ملاحظات</th>
                 <td colspan="3" class="text-right">{{ $mainSalaryEmployeePLoans->notes ?? 'لا يوجد' }}</td>
             </tr>
@@ -55,7 +77,11 @@
                         <th>الشهر المستحق</th>
                         <th>مبلغ القسط</th>
                         <th>الحالة</th>
+                        <th>حالة الأرشفة</th>
+                        <th>طريقة السداد / الدفع</th>
                         <th>ملاحظات</th>
+                        <th>تفاصيل الإدخال</th>
+                        <th>الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -88,14 +114,78 @@
                                 @endif
                             </td>
                             <td>
+                                @if ($installment->is_archived == 1)
+                                    <span class="badge badge-danger px-2 py-1 mb-1">
+                                        <i class="fas fa-archive mr-1"></i> مؤرشف
+                                    </span>
+                                    @if ($installment->archivedBy)
+                                        <small class="d-block text-muted">
+                                            بواسطة: {{ $installment->archivedBy->name }}
+                                        </small>
+                                    @endif
+                                    @if ($installment->archived_at)
+                                        <small class="d-block text-muted font-italic">
+                                            {{ date('Y-m-d h:i A', strtotime($installment->archived_at)) }}
+                                        </small>
+                                    @endif
+                                @else
+                                    <span class="badge badge-light border border-success text-success px-2 py-1">
+                                        <i class="fas fa-folder-open mr-1"></i> نشط
+                                    </span>
+                                @endif
+                            </td>
+                            <td>
+                                @if ($installment->installment_status == '1')
+                                    <span class="small font-weight-bold text-dark">
+                                        خصم من راتب شهر: {{ $installment->mainSalaryEmployee->year_and_month ?? '---' }}
+                                    </span>
+                                @elseif ($installment->installment_status == '2')
+                                    <span class="small font-weight-bold text-info">
+                                        سداد نقدي مباشر
+                                    </span>
+                                @else
+                                    <span class="small text-secondary">
+                                        لم يسدد بعد
+                                    </span>
+                                @endif
+                            </td>
+                            <td>
                                 <span class="small font-italic text-secondary">
                                     {{ $installment->notes ?? '---' }}
                                 </span>
                             </td>
+                            <td class="text-right" style="min-width: 150px;">
+                                <small class="d-block text-muted">
+                                    <strong>أضيف بواسطة:</strong> {{ $installment->addedBy->name ?? '---' }}
+                                </small>
+                                <small class="d-block text-muted">
+                                    <strong>بتاريخ:</strong> {{ $installment->created_at ? $installment->created_at->format('Y-m-d h:i A') : '---' }}
+                                </small>
+                                @if ($installment->updatedBy)
+                                    <hr class="my-1">
+                                    <small class="d-block text-muted">
+                                        <strong>تعديل بواسطة:</strong> {{ $installment->updatedBy->name }}
+                                    </small>
+                                    <small class="d-block text-muted">
+                                        <strong>بتاريخ:</strong> {{ $installment->updated_at ? $installment->updated_at->format('Y-m-d h:i A') : '---' }}
+                                    </small>
+                                @endif
+                            </td>
+                            <td>
+                                @if ($installment->can_pay_cash)
+                                    <button type="button" class="btn btn-sm btn-success pay_installment_cash_btn shadow-sm" 
+                                        data-id="{{ $installment->id }}" 
+                                        title="دفع نقداً">
+                                        <i class="fas fa-money-bill-wave"></i> دفع كاش
+                                    </button>
+                                @else
+                                    <span class="text-muted small">---</span>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5">
+                            <td colspan="9">
                                 <div class="alert alert-warning mb-0 py-2">
                                     لا توجد أقساط مسجلة لهذه السلفة.
                                 </div>
@@ -106,4 +196,4 @@
             </table>
         </div>
     </div>
-</div>  
+</div>

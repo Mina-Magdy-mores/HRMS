@@ -301,6 +301,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/main-salary-employee-ploans/edit', [MainSalaryEmployeePLoanController::class, 'edit'])->name('main-salary-employee-ploans.edit');
         Route::put('/main-salary-employee-ploans', [MainSalaryEmployeePLoanController::class, 'update'])->name('main-salary-employee-ploans.update');
         Route::post('/main-salary-employee-ploans/disbursed', [MainSalaryEmployeePLoanController::class, 'disbursed'])->name('main-salary-employee-ploans.disbursed');
+        Route::post('/main-salary-employee-ploans/pay-installment-cash', [MainSalaryEmployeePLoanController::class, 'payInstallmentCash'])->name('main-salary-employee-ploans.pay-installment-cash');
 
         //main_salary_employee
         Route::get('/main-salary-employee', [MainSalaryEmployeeController::class, 'index'])->name('main-salary-employee.index');

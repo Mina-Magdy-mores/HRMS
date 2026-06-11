@@ -814,6 +814,59 @@
                 });
             });
 
+            $(document).on('click', '.pay_installment_cash_btn', function(e) {
+                e.preventDefault();
+                var id = $(this).data('id');
+                var btn = $(this);
+
+                if (confirm('هل أنت متأكد من سداد هذا القسط نقداً؟')) {
+                    btn.prop('disabled', true);
+                    $.ajax({
+                        url: '{{ route('admin.main-salary-employee-ploans.pay-installment-cash') }}',
+                        type: 'POST',
+                        dataType: 'json',
+                        cache: false,
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            id: id,
+                        },
+                        success: function(response) {
+                            if (response.status == 'true') {
+                                alert(response.message);
+                                if (response.parent_loan_id) {
+                                    $.ajax({
+                                        url: '{{ route('admin.main-salary-employee-ploans.show') }}',
+                                        type: 'POST',
+                                        dataType: 'html',
+                                        cache: false,
+                                        data: {
+                                            _token: '{{ csrf_token() }}',
+                                            id: response.parent_loan_id,
+                                        },
+                                        success: function(mainSalaryEmployeePLoans) {
+                                            $('#mainSalaryEmployeePLoanDetailsModalBody').html(mainSalaryEmployeePLoans);
+                                            ajax_search();
+                                        },
+                                        error: function(xhr) {
+                                            window.location.reload();
+                                        }
+                                    });
+                                } else {
+                                    window.location.reload();
+                                }
+                            } else {
+                                alert(response.message || 'حدث خطأ أثناء سداد القسط.');
+                                btn.prop('disabled', false);
+                            }
+                        },
+                        error: function(xhr) {
+                            alert('عفواً، حدث خطأ أثناء الاتصال بالخادم.');
+                            btn.prop('disabled', false);
+                        }
+                    });
+                }
+            });
+
             $(document).on('click', '.delete_employee_loan_btn', function() {
                 var id = $(this).data('id');
                 var res = confirm('هل انت متاكد من حذف هذه السلفة؟');
