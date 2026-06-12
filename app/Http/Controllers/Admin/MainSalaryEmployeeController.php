@@ -789,6 +789,63 @@ class MainSalaryEmployeeController extends Controller
         ]);
     }
 
+    public function printAllDetailed($calendar_id)
+    {
+        $company_id = Auth::user()->company_id;
+
+        $adminPanelSetting = AdminPanelSetting::where('company_id', $company_id)->first();
+        $systemData = [
+            'system_name' => $adminPanelSetting->company_name ?? '',
+            'photo'       => $adminPanelSetting->image ?? '',
+            'address'     => $adminPanelSetting->address ?? '',
+            'phone'       => $adminPanelSetting->phone ?? '',
+            'email'       => $adminPanelSetting->email ?? '',
+        ];
+
+        $financeMonthlyCalendar = FinanceMonthlyCalendar::with('month')
+            ->where('company_id', $company_id)
+            ->where('id', $calendar_id)
+            ->first();
+
+        if (empty($financeMonthlyCalendar)) {
+            return redirect()->back()->with('error', 'عفوا غير قادر للوصول الى بيانات الشهر');
+        }
+
+        $mainSalaryEmployees = MainSalaryEmployee::with([
+            'employee',
+            'financeMonthlyCalendar',
+            'addedBy',
+            'updatedBy',
+            'branch',
+            'department',
+            'job'
+        ])
+            ->where('company_id', $company_id)
+            ->where('finance_monthly_calendar_id', $calendar_id)
+            ->orderBy('id', 'asc')
+            ->get();
+
+        $total_salary_sum = $mainSalaryEmployees->sum('employee_salary');
+        $total_benefits_sum = $mainSalaryEmployees->sum('total_benefits');
+        $total_deductions_sum = $mainSalaryEmployees->sum('total_deductions');
+        $total_net_salary_sum = $mainSalaryEmployees->sum('employee_net_salary');
+
+        $searchFilters = [
+            'التقرير' => 'كافة موظفي الشهر المالي (تفصيلي للإدارة)'
+        ];
+
+        return view('admin.mainSalaryEmployee.print_all_detailed', [
+            'mainSalaryEmployees' => $mainSalaryEmployees,
+            'systemData'          => $systemData,
+            'financeMonthlyCalendar' => $financeMonthlyCalendar,
+            'total_salary_sum'    => $total_salary_sum,
+            'total_benefits_sum'  => $total_benefits_sum,
+            'total_deductions_sum' => $total_deductions_sum,
+            'total_net_salary_sum' => $total_net_salary_sum,
+            'searchFilters'       => $searchFilters,
+        ]);
+    }
+
     public function printDetails($id)
     {
         $company_id = Auth::user()->company_id;

@@ -250,18 +250,23 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-6 d-flex align-items-end">
+                    <div class="col-md-9 d-flex align-items-end">
                         <div class="form-group w-100 mb-3">
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <button type="submit" class="btn btn-success btn-block shadow-sm" id="print_button">
-                                        <i class="fas fa-print mr-1"></i> طباعة كشف الرواتب
+                                        <i class="fas fa-print mr-1"></i> طباعة كشف الرواتب للبحث
                                     </button>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
                                     <button type="submit" formaction="{{ route('admin.main-salary-employee.print-search-detailed') }}" class="btn btn-info btn-block shadow-sm" id="print_button_detailed">
                                         <i class="fas fa-file-invoice mr-1"></i> طباعة التفاصيل الكاملة للبحث
                                     </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <a href="{{ route('admin.main-salary-employee.print-all-detailed', $financeMonthlyCalendar->id) }}" target="_blank" class="btn btn-primary btn-block shadow-sm" id="print_button_all_detailed">
+                                        <i class="fas fa-print mr-1"></i> طباعة كل الموظفين بالتفاصيل (للإدارة)
+                                    </a>
                                 </div>
                             </div>
                         </div>
