@@ -341,4 +341,16 @@ class Employee extends Model
     {
         return $this->hasMany(EmployeeSalaryArchive::class, 'employee_id');
     }
+    public function attendanceDepartureActionsExcel()
+    {
+        return $this->hasMany(AttendanceDepartureActionsExcel::class);
+    }
+    public function attendancesDepartures()
+    {
+        return $this->hasMany(AttendanceDeparture::class, 'employee_id');
+    }
+    public function attendancesDeparturesActions()
+    {
+        return $this->hasMany(AttendanceDepartureAction::class, 'employee_id');
+    }
 }

@@ -496,4 +496,28 @@ class Admin extends User
     {
         return $this->hasMany(EmployeeSalaryArchive::class, 'updated_by');
     }
+    public function addedAttendanceDepartureActionsExcel()
+    {
+        return $this->hasMany(AttendanceDepartureActionsExcel::class, 'added_by');
+    }
+    public function addedAttendancesDepartures()
+    {
+        return $this->hasMany(AttendanceDeparture::class, 'added_by');
+    }
+    public function updatedAttendancesDepartures()
+    {
+        return $this->hasMany(AttendanceDeparture::class, 'updated_by');
+    }
+    public function archivedAttendancesDepartures()
+    {
+        return $this->hasMany(AttendanceDeparture::class, 'archived_by');
+    }
+    public function addedAttendancesDeparturesActions()
+    {
+        return $this->hasMany(AttendanceDepartureAction::class, 'added_by');
+    }
+    public function updatedAttendancesDeparturesActions()
+    {
+        return $this->hasMany(AttendanceDepartureAction::class, 'updated_by');
+    }
 }

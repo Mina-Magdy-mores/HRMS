@@ -204,4 +204,12 @@ class MainSalaryEmployee extends Model
     {
         return $this->hasMany(MainSalaryEmployeePLoanInstallment::class, 'main_salary_employee_id');
     }
+    public function attendanceDepartureActionsExcel()
+    {
+        return $this->hasMany(AttendanceDepartureActionsExcel::class);
+    }
+    public function attendancesDepartures()
+    {
+        return $this->hasMany(AttendanceDeparture::class, 'main_salary_employee_id');
+    }
 }

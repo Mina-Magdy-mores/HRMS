@@ -48,4 +48,9 @@ class Occasion extends Model
     {
         return $this->belongsTo(Admin::class, 'updated_by');
     }
+
+    public function attendancesDepartures()
+    {
+        return $this->hasMany(AttendanceDeparture::class, 'occasion_id');
+    }
 }

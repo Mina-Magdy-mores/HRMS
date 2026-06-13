@@ -338,6 +338,32 @@
                     </ul>
                 </li>
 
+                                <li
+                    class="nav-item has-treeview  {{ request()->routeIs('admin.attendanceDepartures.*') 
+                        ? 'menu-open'
+                        : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->routeIs('admin.attendanceDepartures.*') 
+                            ? 'active'
+                            : '' }}">
+                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <p>
+                         الحضور والانصراف
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.attendanceDepartures.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.attendanceDepartures.*')) active @endif ">
+                                <i class="fas fa-fingerprint"></i>
+                                <p>سجلات البصمات</p>
+                            </a>
+                        </li>
+                       
+                    </ul>
+                </li>
+
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

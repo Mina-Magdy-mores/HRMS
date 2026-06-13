@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AttendanceDepartureController;
 use App\Http\Controllers\Admin\AdminPanelSettingController;
 use App\Http\Controllers\Admin\AllowanceTypeController;
 use App\Http\Controllers\Admin\BloodGroupController;
@@ -319,6 +320,18 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/main-salary-employee/archive', [MainSalaryEmployeeController::class, 'archive'])->name('main-salary-employee.archive');
         Route::post('/main-salary-employee/archive-month', [MainSalaryEmployeeController::class, 'archiveMonth'])->name('main-salary-employee.archive-month');
         Route::post('/main-salary-employee/recalculate_main_salary', [MainSalaryEmployeeController::class, 'recalculateMainSalary'])->name('main-salary-employee.recalculate_main_salary');
+        
+        //Finger print routes
+        Route::get('/attendanceDepartures', [AttendanceDepartureController::class, 'index'])->name('attendanceDepartures.index');
+        Route::get('/attendanceDepartures/{id}/show', [AttendanceDepartureController::class, 'show'])->name('attendanceDepartures.show');
+        Route::post('/attendanceDepartures/ajax-check', [AttendanceDepartureController::class, 'ajaxCheck'])->name('attendanceDepartures.ajax-check');
+        Route::post('/attendanceDepartures/store', [AttendanceDepartureController::class, 'store'])->name('attendanceDepartures.store');
+        Route::post('/attendanceDepartures/ajax-search', [AttendanceDepartureController::class, 'ajaxSearch'])->name('attendanceDepartures.ajax-search');
+        Route::post('/attendanceDepartures/destroy', [AttendanceDepartureController::class, 'destroy'])->name('attendanceDepartures.destroy');
+        Route::post('/attendanceDepartures/edit', [AttendanceDepartureController::class, 'edit'])->name('attendanceDepartures.edit');
+        Route::put('/attendanceDepartures', [AttendanceDepartureController::class, 'update'])->name('attendanceDepartures.update');
+        Route::post('/attendanceDepartures/print-search', [AttendanceDepartureController::class, 'printSearch'])->name('attendanceDepartures.print-search');
+        Route::get('/attendanceDepartures/upload-excel/{id}', [AttendanceDepartureController::class, 'uploadExcel'])->name('attendanceDepartures.upload-excel');
 
     });
 
