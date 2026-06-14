@@ -29,12 +29,20 @@
                         </span>
                     </td>
                     <td>
-                        @if ($employee->image)
-                            <img src="{{ asset('storage/' . $employee->image) }}" alt="صورة الموظف"
-                                class="img-thumbnail" style="width: 45px; height: 45px; border-radius: 50%;">
-                        @else
-                            <span class="text-muted">لا يوجد</span>
-                        @endif
+                        <div class="d-inline-flex align-items-center justify-content-center">
+                            @if ($employee->image)
+                                <img src="{{ asset('storage/' . $employee->image) }}" alt="صورة الموظف"
+                                    class="rounded-circle shadow-sm" style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #e9ecef;"
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+                                <div class="align-items-center justify-content-center bg-light text-muted rounded-circle shadow-sm" style="width: 40px; height: 40px; border: 2px solid #e9ecef; display: none;">
+                                    <i class="fas fa-user text-secondary"></i>
+                                </div>
+                            @else
+                                <div class="d-inline-flex align-items-center justify-content-center bg-light text-muted rounded-circle shadow-sm" style="width: 40px; height: 40px; border: 2px solid #e9ecef;">
+                                    <i class="fas fa-user text-secondary"></i>
+                                </div>
+                            @endif
+                        </div>
                     </td>
                     <td class="font-weight-bold text-right">
                         {{ $employee->name }}

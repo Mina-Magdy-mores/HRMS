@@ -29,12 +29,11 @@
                 بحث في موظفي الشهر المالي
             </h3>
             @if ($financeMonthlyCalendar->status == 1)
-                <a href="{{ route('admin.attendanceDepartures.upload-excel', $financeMonthlyCalendar->id) }}"
-                class="btn btn-success">
-                <i class="fas fa-upload"></i>
-                رفع ملف إكسل البصمة
-            </a>
-        @endif
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#uploadExcelModal">
+                    <i class="fas fa-upload"></i>
+                    رفع ملف إكسل البصمة
+                </button>
+            @endif
         </div>
         <div class="card-body">
             <form action="{{ route('admin.attendanceDepartures.print-search') }}" method="POST" target="_blank" id="searchForm">
@@ -108,10 +107,85 @@
             </h3>
         </div>
         <div class="card-body">
+            <style>
+                @media (min-width: 768px) {
+                    .border-md-right-custom {
+                        border-right: 1px solid #bbf7d0 !important;
+                    }
+                }
+            </style>
+            @if (!empty($lastUploadedFingerPrint) && !empty($latestActionRecord))
+                <div class="card border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-right: 5px solid #22c55e !important; border-radius: 8px;">
+                    <div class="card-body p-3">
+                        <div class="row align-items-center">
+                            <!-- Column 1: Header/Icon -->
+                            <div class="col-md-4 d-flex align-items-center mb-3 mb-md-0">
+                                <div class="rounded-circle bg-white d-flex align-items-center justify-content-center shadow-sm" style="width: 50px; height: 50px; min-width: 50px;">
+                                    <i class="fas fa-fingerprint text-success fa-2x"></i>
+                                </div>
+                                <div class="mx-3 text-right">
+                                    <h6 class="font-weight-bold mb-0 text-success" style="font-size: 1.1rem;">إحصائيات البصمة الحالية</h6>
+                                    <span class="text-muted small">آخر تحديثات حركات البصمة المرفوعة</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Column 2: Last Excel Upload -->
+                            <div class="col-md-4 mb-3 mb-md-0 text-right border-md-right-custom">
+                                <div class="pr-md-3">
+                                    <span class="d-block text-muted small font-weight-bold">تاريخ آخر رفع لملف الإكسل</span>
+                                    <span class="font-weight-bold text-dark" style="font-size: 0.95rem;">
+                                        <i class="far fa-calendar-alt text-success mr-1"></i>
+                                        {{ $lastUploadedFingerPrint->created_at->format('Y-m-d h:i A') }}
+                                    </span>
+                                    <span class="d-block text-muted small mt-1">
+                                        <i class="far fa-clock mr-1"></i>
+                                        منذ {{ $lastUploadedFingerPrint->created_at->diffForHumans() }}
+                                    </span>
+                                    @if (!empty($lastUploadedFingerPrint->addedBy))
+                                        <span class="d-block text-muted small mt-1">
+                                            <i class="fas fa-user-edit mr-1"></i>
+                                            بواسطة: <strong>{{ $lastUploadedFingerPrint->addedBy->name }}</strong>
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Column 3: Latest Fingerprint Action -->
+                            <div class="col-md-4 text-right border-md-right-custom">
+                                <div class="pr-md-3">
+                                    <span class="d-block text-muted small font-weight-bold">تاريخ أحدث بصمة مسجلة بالملف</span>
+                                    <span class="font-weight-bold text-dark" style="font-size: 0.95rem;">
+                                        <i class="fas fa-user-clock text-success mr-1"></i>
+                                        {{ \Carbon\Carbon::parse($latestActionRecord->dateTimeAction)->format('Y-m-d h:i A') }}
+                                    </span>
+                                    <span class="d-block text-muted small mt-1">
+                                        <i class="far fa-clock mr-1"></i>
+                                        منذ {{ \Carbon\Carbon::parse($latestActionRecord->dateTimeAction)->diffForHumans() }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="alert alert-danger alert-dismissible fade show shadow-sm mb-4 p-3" style="border-radius: 8px; border-right: 5px solid #dc3545 !important; background-color: #fff5f5; color: #b91c1c; border-left: none; border-top: none; border-bottom: none;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-circle fa-lg mr-2"></i>
+                        <div class="text-right mx-2">
+                            <strong>لم يتم رفع أي بصمات لهذا الشهر بعد.</strong> @if($financeMonthlyCalendar->status == 1 ) يمكنك الضغط على زر "رفع ملف إكسل البصمة" بالأعلى لاستيراد حركات الحضور والانصراف. @endif
+                        </div>
+                    </div>
+                    <button type="button" class="close text-danger text-right" data-dismiss="alert" style="opacity: 0.8;">
+                        <span>&times;</span>
+                    </button>
+                </div>
+            @endif
+
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show">
                     <i class="fas fa-check-circle mr-2"></i>
                     {{ session('success') }}
+                   
                     <button type="button" class="close text-white text-right" data-dismiss="alert">
                         <span>&times;</span>
                     </button>
@@ -122,6 +196,23 @@
                 <div class="alert alert-danger alert-dismissible fade show">
                     <i class="fas fa-times-circle mr-2"></i>
                     {{ session('error') }}
+                    <button type="button" class="close text-white text-right" data-dismiss="alert">
+                        <span>&times;</span>
+                    </button>
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <h5>
+                        <i class="fas fa-exclamation-circle mr-2"></i>
+                        يوجد أخطاء في البيانات
+                    </h5>
+                    <ul class="mb-0 mt-2">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                     <button type="button" class="close text-white text-right" data-dismiss="alert">
                         <span>&times;</span>
                     </button>
@@ -160,12 +251,20 @@
                                         </span>
                                     </td>
                                     <td>
-                                        @if ($employee->image)
-                                            <img src="{{ asset('storage/' . $employee->image) }}" alt="صورة الموظف"
-                                                class="img-thumbnail" style="width: 45px; height: 45px; border-radius: 50%;">
-                                        @else
-                                            <span class="text-muted">لا يوجد</span>
-                                        @endif
+                                        <div class="d-inline-flex align-items-center justify-content-center">
+                                            @if ($employee->image)
+                                                <img src="{{ asset('storage/' . $employee->image) }}" alt="صورة الموظف"
+                                                    class="rounded-circle shadow-sm" style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #e9ecef;"
+                                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+                                                <div class="align-items-center justify-content-center bg-light text-muted rounded-circle shadow-sm" style="width: 40px; height: 40px; border: 2px solid #e9ecef; display: none;">
+                                                    <i class="fas fa-user text-secondary"></i>
+                                                </div>
+                                            @else
+                                                <div class="d-inline-flex align-items-center justify-content-center bg-light text-muted rounded-circle shadow-sm" style="width: 40px; height: 40px; border: 2px solid #e9ecef;">
+                                                    <i class="fas fa-user text-secondary"></i>
+                                                </div>
+                                            @endif
+                                        </div>
                                     </td>
                                     <td class="font-weight-bold text-right">
                                         {{ $employee->name }}
@@ -177,7 +276,7 @@
                                     <td>
                                         <!-- Actions -->
                                         <div class="d-flex justify-content-center align-items-center">
-                                            <a href="#" class="btn btn-sm btn-info mr-1" title="تفاصيل البصمة">
+                                            <a href="{{ route('admin.attendanceDepartures.finger-print-details', ['id' => $employee->id, 'finance_monthly_calendar_id' => $financeMonthlyCalendar->id]) }}" class="btn btn-sm btn-info mr-1" title="تفاصيل البصمة">
                                                 <i class="fas fa-eye mr-1"></i> التفاصيل
                                             </a>
                                             <form action="{{ route('admin.attendanceDepartures.print-search') }}" method="POST" target="_blank" class="m-0">
@@ -214,6 +313,47 @@
     </div>
 </div>
 
+<!-- Upload Excel Modal -->
+<div class="modal fade" id="uploadExcelModal" tabindex="-1" role="dialog" aria-labelledby="uploadExcelModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title font-weight-bold" id="uploadExcelModalLabel">
+                    <i class="fas fa-file-excel mr-2"></i>
+                    رفع ملف إكسل البصمة لشهر: {{ $financeMonthlyCalendar->month->name }}
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ route('admin.attendanceDepartures.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" name="finance_monthly_calendar_id" value="{{ $financeMonthlyCalendar->id }}">
+                <div class="modal-body">
+                    <div class="form-group text-right">
+                        <label for="excel_file" class="font-weight-bold">اختر ملف الإكسل (.xlsx, .xls, .csv)</label>
+                        <input type="file" name="excel_file" id="excel_file" class="form-control-file border p-2 rounded w-100 {{ $errors->has('excel_file') ? 'is-invalid' : '' }}" accept=".xlsx,.xls" required>
+                        @include('admin.errors.errors', ['value' => 'excel_file'])
+                    </div>
+
+                    <div class="alert alert-warning text-left mt-3">
+                        <h6 class="font-weight-bold"><i class="fas fa-exclamation-triangle mr-1"></i> تنبيه هام:</h6>
+                        سيتم إهمال أي حركة بصمة تقع خارج فترة سحب البصمة من الشهر المالي المفتوح.
+                        <br>
+                        فترة سحب البصمة المعتمدة: من <strong>{{ $financeMonthlyCalendar->start_date_for_calculation }}</strong> إلى <strong>{{ $financeMonthlyCalendar->end_date_for_calculation }}</strong>.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success shadow-sm">
+                        <i class="fas fa-upload mr-1"></i> رفع وحفظ البيانات
+                    </button>
+                    <button type="button" class="btn btn-secondary shadow-sm" data-dismiss="modal">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @section('js')
     <script src="{{ asset('assets/plugins/select2/js/select2.full.min.js') }}"></script>
     <script>
@@ -224,6 +364,10 @@
         }
         $(document).ready(function() {
             initSelect2();
+
+            @if ($errors->any())
+                $('#uploadExcelModal').modal('show');
+            @endif
 
             // Search triggering elements
             $(document).on('change', '#employee_id_search', function() {

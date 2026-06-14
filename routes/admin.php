@@ -331,7 +331,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/attendanceDepartures/edit', [AttendanceDepartureController::class, 'edit'])->name('attendanceDepartures.edit');
         Route::put('/attendanceDepartures', [AttendanceDepartureController::class, 'update'])->name('attendanceDepartures.update');
         Route::post('/attendanceDepartures/print-search', [AttendanceDepartureController::class, 'printSearch'])->name('attendanceDepartures.print-search');
-        Route::get('/attendanceDepartures/upload-excel/{id}', [AttendanceDepartureController::class, 'uploadExcel'])->name('attendanceDepartures.upload-excel');
+        Route::get('/attendanceDepartures/finger-print-details/{id}/{finance_monthly_calendar_id}', [AttendanceDepartureController::class, 'fingerPrintDetails'])->name('attendanceDepartures.finger-print-details');
 
     });
 

@@ -3,14 +3,21 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AttendanceDepartureRequest;
+use App\Imports\AttendanceDepartureImport;
 use App\Models\FinanceMonthlyCalendar;
 use App\Models\Employee;
 use App\Models\Branche;
 use App\Models\Department;
 use App\Models\JobsCategory;
 use App\Models\AdminPanelSetting;
+use App\Models\AttendanceDeparture;
+use App\Models\AttendanceDepartureAction;
+use App\Models\AttendanceDepartureActionsExcel;
+use App\Models\MainSalaryEmployee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AttendanceDepartureController extends Controller
 {
@@ -22,6 +29,7 @@ class AttendanceDepartureController extends Controller
             $calendar->total_opened_months = get_count_where(FinanceMonthlyCalendar::class, ['company_id' => $company_id, 'status' => '1']);
             $calendar->total_prev_months_waiting_to_open = FinanceMonthlyCalendar::where(['company_id' => $company_id, 'status' => '0', 'finance_yr' => $calendar->finance_yr])->where('month_id', '<', $calendar->month_id)->count();
         }
+
         return view('admin.attendanceDepartures.index', ['financeMonthlyCalendars' => $financeMonthlyCalendars]);
     }
 
@@ -50,6 +58,11 @@ class AttendanceDepartureController extends Controller
         $branches = get_cols_where(Branche::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
         $departments = get_cols_where(Department::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
         $jobs = get_cols_where(JobsCategory::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1], 'id', 'asc');
+        $lastUploadedFingerPrint = get_cols_where_row_orderby(new AttendanceDepartureActionsExcel(), ['id', 'created_at', 'added_by'], ['company_id' => $company_id, 'finance_monthly_calendar_id' => $id], 'id', 'DESC');
+        if ($lastUploadedFingerPrint) {
+            $lastUploadedFingerPrint->load('addedBy');
+        }
+        $latestActionRecord = get_cols_where_row_orderby(new AttendanceDepartureActionsExcel(), ['id', 'dateTimeAction'], ['company_id' => $company_id, 'finance_monthly_calendar_id' => $id], 'dateTimeAction', 'DESC');
 
         return view('admin.attendanceDepartures.show', [
             'financeMonthlyCalendar' => $financeMonthlyCalendar,
@@ -58,6 +71,34 @@ class AttendanceDepartureController extends Controller
             'branches' => $branches,
             'departments' => $departments,
             'jobs' => $jobs,
+            'lastUploadedFingerPrint' => $lastUploadedFingerPrint,
+            'latestActionRecord' => $latestActionRecord
+        ]);
+    }
+    public function fingerPrintDetails($id, $finance_monthly_calendar_id)
+    {
+        $company_id = Auth::user()->company_id;
+        $financeMonthlyCalendar = FinanceMonthlyCalendar::with('month')
+            ->where('company_id', $company_id)
+            ->where('id', $finance_monthly_calendar_id)
+            ->first();
+
+        if (empty($financeMonthlyCalendar)) {
+            return redirect()->route('admin.attendanceDepartures.show',['id' => $finance_monthly_calendar_id])->with('error', 'عفوا غير قادر للوصول الى بيانات الشهر');
+        }
+
+        $employee = Employee::with(['job', 'branch', 'department'])
+            ->where('company_id', $company_id)
+            ->where('id', $id)
+            ->first();
+        if (empty($employee)) {
+            return redirect()->route('admin.attendanceDepartures.show', ['id' => $finance_monthly_calendar_id])->with('error', 'عفوا غير قادر للوصول الى بيانات الموظف');
+        }
+
+        return view('admin.attendanceDepartures.finger-print-details', [
+            'financeMonthlyCalendar' => $financeMonthlyCalendar,
+            'employee' => $employee,
+            
         ]);
     }
 
@@ -134,20 +175,39 @@ class AttendanceDepartureController extends Controller
 
         return view('admin.attendanceDepartures.print_search', compact('employees', 'financeMonthlyCalendar', 'systemData'));
     }
-        public function uploadExcel($id)
+
+    public function store(AttendanceDepartureRequest $request)
     {
+
         $company_id = Auth::user()->company_id;
-        $financeMonthlyCalendar = FinanceMonthlyCalendar::with('month')
-            ->where('company_id', $company_id)
-            ->where('id', $id)
-            ->first();
+        $finance_monthly_calendar_id = $request->finance_monthly_calendar_id;
+
+        $financeMonthlyCalendar = FinanceMonthlyCalendar::select(['id', 'status'])
+            ->where([
+                'company_id' => $company_id,
+                'id' => $finance_monthly_calendar_id
+            ])->first();
 
         if (empty($financeMonthlyCalendar)) {
-            return redirect()->route('admin.attendanceDepartures.index')->with('error', 'عفوا غير قادر للوصول الى بيانات الشهر');
+            return redirect()->back()->with('error', 'عفواً، لا يمكن العثور على الشهر المالي المحدد.');
         }
 
-        return view('admin.attendanceDepartures.upload-excel', [
-            'financeMonthlyCalendar' => $financeMonthlyCalendar
-        ]);
+        if ($financeMonthlyCalendar->status != 1) {
+            return redirect()->back()->with('error', 'عفواً، لا يمكن رفع البصمة لشهر مالي غير مفتوح.');
+        }
+
+        try {
+            Excel::import(new AttendanceDepartureImport($finance_monthly_calendar_id), $request->file('excel_file'));
+
+            $lastUploadedFingerPrint = get_cols_where_row_orderby(new AttendanceDepartureActionsExcel(), ['id', 'created_at', 'added_by'], ['company_id' => $company_id, 'finance_monthly_calendar_id' => $finance_monthly_calendar_id], 'id', 'DESC');
+            if ($lastUploadedFingerPrint) {
+                $lastUploadedFingerPrint->load('addedBy');
+            }
+            $latestActionRecord = get_cols_where_row_orderby(new AttendanceDepartureActionsExcel(), ['id', 'dateTimeAction'], ['company_id' => $company_id, 'finance_monthly_calendar_id' => $finance_monthly_calendar_id], 'dateTimeAction', 'DESC');
+
+            return redirect()->back()->with('success', 'تم رفع البصمات بنجاح.')->with('lastUploadedFingerPrint', $lastUploadedFingerPrint)->with('latestActionRecord', $latestActionRecord);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء معالجة ملف الإكسل: ' . $e->getMessage());
+        }
     }
 }
