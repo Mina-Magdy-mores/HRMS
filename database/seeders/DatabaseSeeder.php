@@ -44,6 +44,7 @@ class DatabaseSeeder extends Seeder
             ShiftsTypeSeeder::class,
             FinanceCalendarSeeder::class,
             MonthSeeder::class,
+            WeekDaySeeder::class,
             FinanceMonthlyCalendarSeeder::class,
             OccasionSeeder::class,
             ResignationSeeder::class,

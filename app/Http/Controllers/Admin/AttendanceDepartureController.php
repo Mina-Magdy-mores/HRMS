@@ -95,10 +95,24 @@ class AttendanceDepartureController extends Controller
             return redirect()->route('admin.attendanceDepartures.show', ['id' => $finance_monthly_calendar_id])->with('error', 'عفوا غير قادر للوصول الى بيانات الموظف');
         }
 
+        $fingerprintActions = AttendanceDepartureActionsExcel::with('addedBy')
+            ->where('company_id', $company_id)
+            ->where('employee_id', $id)
+            ->where('finance_monthly_calendar_id', $finance_monthly_calendar_id)
+            ->orderBy('dateTimeAction', 'asc')
+            ->get();
+
+        $allFingerprintArchive = AttendanceDepartureActionsExcel::with(['financeMonthlyCalendar.month', 'addedBy'])
+            ->where('company_id', $company_id)
+            ->where('employee_id', $id)
+            ->orderBy('dateTimeAction', 'desc')
+            ->get();
+
         return view('admin.attendanceDepartures.finger-print-details', [
             'financeMonthlyCalendar' => $financeMonthlyCalendar,
             'employee' => $employee,
-            
+            'fingerprintActions' => $fingerprintActions,
+            'allFingerprintArchive' => $allFingerprintArchive,
         ]);
     }
 
