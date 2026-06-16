@@ -744,7 +744,7 @@
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>شيفت ثابت</label>
+                                            <label>نوع الشيفت</label><span class="text-danger h4">*</span>
                                             <select name="fixed_shift" id="fixed_shift"
                                                 class="form-control select2 {{ $errors->has('fixed_shift') ? 'is-invalid' : '' }}">
                                                 <option value="">اختر نوع الشيفت</option>
@@ -762,7 +762,7 @@
                                     <div class="col-md-4" id="shift_type_id"
                                         @if (old('fixed_shift') != 1) style="display: none;" @endif>
                                         <div class="form-group">
-                                            <label>نوع الشيفت الثابت</label>
+                                            <label>نوع الشيفت الثابت</label><span class="text-danger h4">*</span>
                                             <select name="shift_type_id"
                                                 class="form-control select2 {{ $errors->has('shift_type_id') ? 'is-invalid' : '' }}">
                                                 <option value="">اختر نوع الشيفت</option>
@@ -798,9 +798,10 @@
                                             @include('admin.errors.errors', ['value' => 'shift_type_id'])
                                         </div>
                                     </div>
-                                    <div class="col-md-4" id="daily_work_hours_group" style="display: none;">
+                                    <div class="col-md-4" id="daily_work_hours_group"
+                                        @if (old('fixed_shift') !== '0') style="display: none;" @endif>
                                         <div class="form-group">
-                                            <label>عدد ساعات العمل اليومية</label>
+                                            <label>عدد ساعات العمل اليومية</label><span class="text-danger h4">*</span>
                                             <input type="number" step="0.01" name="daily_work_hours"
                                                 value="{{ old('daily_work_hours') }}"
                                                 class="form-control {{ $errors->has('daily_work_hours') ? 'is-invalid' : '' }}"

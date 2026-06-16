@@ -176,6 +176,14 @@ class EmployeeController extends Controller
             $validatedData['employee_code'] = $employee_code;
             $validatedData['company_id'] = $company_id;
             $validatedData['added_by'] = Auth::id();
+            if ($request->fixed_shift == 1) {
+                $shiftData = getColsWhereRow(ShiftsType::class, ['total_hours'], ['company_id' => $company_id, 'id' => $request->shift_type_id]);
+                if (!empty($shiftData)) {
+                    $validatedData['daily_work_hours'] = $shiftData['total_hours'];
+                } else {
+                    return redirect()->back()->with(['error' => 'عفواا لم يتم تحديد الشفت '])->withInput();
+                }
+            }
             $flag = insert(Employee::class, $validatedData);
             if ($flag) {
                 return redirect()->route('admin.employees.index')->with(['success' => 'تم إضافة الموظف بنجاح']);
@@ -271,7 +279,14 @@ class EmployeeController extends Controller
             DB::transaction(function () use ($employee, $validatedData, $id, $company_id, $request) {
                 $oldSalary = $employee->salary;
                 $isSalaryChanged = !empty($oldSalary) && !empty($request->salary) && $request->salary != $oldSalary;
-
+                if ($request->fixed_shift == 1) {
+                    $shiftData = getColsWhereRow(ShiftsType::class, ['total_hours'], ['company_id' => $company_id, 'id' => $request->shift_type_id]);
+                    if (!empty($shiftData)) {
+                        $validatedData['daily_work_hours'] = $shiftData['total_hours'];
+                    } else {
+                        return redirect()->back()->with(['error' => 'عفواا لم يتم تحديد الشفت '])->withInput();
+                    }
+                }
                 $flag = $employee->update($validatedData);
                 if ($flag) {
                     if ($isSalaryChanged) {

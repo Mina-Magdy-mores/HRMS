@@ -133,6 +133,12 @@ class ShiftsTypeController extends Controller
             $validated['status'] = $request->status;
             $validated['updated_by'] = Auth::user()->id;
             update($shiftsType, $validated);
+            
+            // تحديث ساعات العمل اليومية لجميع الموظفين المرتبطين بهذا الشفت ولديهم شيفت ثابت
+            $shiftsType->employees()
+                ->where('fixed_shift', 1)
+                ->update(['daily_work_hours' => $validated['total_hours']]);
+
             return redirect()->route('admin.shifts-types.index')->with('success', 'تم تحديث النوع بنجاح');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'حدث خطا ما برجاء المحاوله لاحقا ' . $e->getMessage())->withInput();

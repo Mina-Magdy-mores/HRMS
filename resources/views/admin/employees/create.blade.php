@@ -203,9 +203,23 @@
                     $('#medical_insurance_amount_group').hide().find('input, select, textarea').prop('disabled', true);
                     $('#medical_insurance_number_group').hide().find('input, select, textarea').prop('disabled', true);
                 }
-            })
+            });
 
-            })
+            $('#military_status').trigger('change');
+            $('#driving_license').trigger('change');
+            $('#fixed_shift').trigger('change');
+            $('#has_disability').trigger('change');
+            $('#has_relative').trigger('change');
+            $('#resignation_id').trigger('change');
+            $('#motivation_type').trigger('change');
+            $('#payment_method').trigger('change');
+            $('#has_social_insurance').trigger('change');
+            $('#has_medical_insurance').trigger('change');
+
+            if ($('#country_id').val()) {
+                getGovernorate();
+            }
+        });
 
 </script>
 @endsection

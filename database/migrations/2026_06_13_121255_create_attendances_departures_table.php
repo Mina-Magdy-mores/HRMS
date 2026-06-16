@@ -49,7 +49,7 @@ return new class extends Migration
             $table->bigInteger('vacation_id')->nullable();
             $table->foreignId('occasion_id')->nullable()->constrained('occasions')->cascadeOnUpdate();
             $table->tinyInteger('cutting_days')->nullable()->comment('0: No Cutting, 0.25: quarter day, 0.5: half day, 1: full day');
-            $table->string('year_and_month', 8)->nullable()->default('')->comment('Year and month for the salary record');
+            $table->string('year_and_month', 10)->nullable()->default('')->comment('Year and month for the salary record');
             $table->foreignId('employee_branch_id')->constrained('branches')->onUpdate('cascade')->comment('ID of the branch');
             $table->tinyInteger('employee_status')->comment('Status of the employee');
             $table->foreignId('main_salary_employee_id')->nullable();
@@ -57,7 +57,6 @@ return new class extends Migration
                 ->references('id')
                 ->on('main_salary_employees')
                 ->onUpdate('cascade')->noActionOnDelete();
-            $table->dateTime('dateTimeAction');
             $table->foreignId('added_by')->constrained('admins')->cascadeOnUpdate();
             $table->foreignId('updated_by')->nullable()->constrained('admins')->cascadeOnUpdate();
             $table->integer('company_id');

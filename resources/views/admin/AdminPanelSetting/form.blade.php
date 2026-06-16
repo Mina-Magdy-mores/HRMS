@@ -195,7 +195,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label>ربع يوم خصم بعد (دقيقة)</label>
+                            <label>ربع يوم خصم بعد (عدد مرات)</label>
                             <input type="number " name="after_minute_quarter_day_cut"
                                 class="form-control editable-input {{ $errors->has('after_minute_quarter_day_cut') ? 'is-invalid' : '' }}"
                                 value="{{ old('after_minute_quarter_day_cut', $general_settings->after_minute_quarter_day_cut) }}"

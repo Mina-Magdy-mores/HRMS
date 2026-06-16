@@ -196,7 +196,7 @@ class AttendanceDepartureController extends Controller
         $company_id = Auth::user()->company_id;
         $finance_monthly_calendar_id = $request->finance_monthly_calendar_id;
 
-        $financeMonthlyCalendar = FinanceMonthlyCalendar::select(['id', 'status'])
+        $financeMonthlyCalendar = FinanceMonthlyCalendar::select(['*'])
             ->where([
                 'company_id' => $company_id,
                 'id' => $finance_monthly_calendar_id
@@ -211,7 +211,7 @@ class AttendanceDepartureController extends Controller
         }
 
         try {
-            Excel::import(new AttendanceDepartureImport($finance_monthly_calendar_id), $request->file('excel_file'));
+            Excel::import(new AttendanceDepartureImport($financeMonthlyCalendar), $request->file('excel_file'));
 
             $lastUploadedFingerPrint = get_cols_where_row_orderby(new AttendanceDepartureActionsExcel(), ['id', 'created_at', 'added_by'], ['company_id' => $company_id, 'finance_monthly_calendar_id' => $finance_monthly_calendar_id], 'id', 'DESC');
             if ($lastUploadedFingerPrint) {
