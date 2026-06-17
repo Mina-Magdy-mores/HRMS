@@ -32,6 +32,7 @@ class AdminPanelSettingSeeder extends Seeder
                 'sanctions_value_second_absence' => 2.00,
                 'sanctions_value_third_absence' => 3.00,
                 'sanctions_value_fourth_absence' => 5.00,
+                'after_mins_neglect' => 0,
             ]
         );
 

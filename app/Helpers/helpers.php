@@ -92,6 +92,11 @@ function update($object = null, $data_to_update = [])
 {
     return $object->update($data_to_update);
 }
+function updateWhere($object = null, $data_to_update = [],$where=[])
+{
+    return $object::where($where)->update($data_to_update);
+}
+
 function destroy($object = null)
 {
     return $object->delete();

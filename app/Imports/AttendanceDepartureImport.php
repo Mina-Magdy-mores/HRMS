@@ -28,6 +28,8 @@ class AttendanceDepartureImport implements ToCollection
     public function collection(Collection $rows)
     {
         $company_id = Auth::user()->company_id;
+        $admin_panel_settings = AdminPanelSetting::select('*')
+            ->where('company_id', $company_id)->first();
         foreach ($rows as $row) {
             $dateTimeAction = null;
             if (!empty($row[3])) {
@@ -48,7 +50,7 @@ class AttendanceDepartureImport implements ToCollection
 
             // check for the financeMonthlyCalendar start and end date
             $dateForCheck = date('Y-m-d', strtotime($dateTimeAction));
-            if ($dateForCheck < $this->financeMonthlyCalendar->start_date_for_calculation || $dateForCheck > $this->financeMonthlyCalendar->end_date_for_calculation) {
+            if ($dateForCheck < $this->financeMonthlyCalendar->start_date || $dateForCheck > $this->financeMonthlyCalendar->end_date) {
                 continue;
             }
             $type = null;
@@ -60,7 +62,7 @@ class AttendanceDepartureImport implements ToCollection
                 }
             }
 
-            $employee = getColsWhereRow(new Employee(), ['id', 'fixed_shift', 'shift_type_id', 'daily_work_hours','branch_id','employment_status'], [
+            $employee = getColsWhereRow(new Employee(), ['id', 'fixed_shift', 'shift_type_id', 'daily_work_hours', 'branch_id', 'employment_status'], [
                 'company_id' => $company_id,
                 'employee_code' => $row[2]
             ]);
@@ -72,7 +74,7 @@ class AttendanceDepartureImport implements ToCollection
                     'employee_id' => $employee['id'],
                     'type' => $type
                 ]);
-                       
+
 
                 if (empty($checkExisitsBefore)) {
                     $checkExisitsMainSalaryEmployee  = getColsWhereRow(new MainSalaryEmployee(), ['id'], [
@@ -90,7 +92,7 @@ class AttendanceDepartureImport implements ToCollection
                     $dataToInsert['type'] = $type ?? null;
                     $dataToInsert['added_by'] = Auth::id();
                     $dataToInsert['notes'] = 'من خلال ملف Excel';
-                    $attendanceDepartureActionsExcel = insert(AttendanceDepartureActionsExcel::class,$dataToInsert,true);
+                    $attendanceDepartureActionsExcel = insert(AttendanceDepartureActionsExcel::class, $dataToInsert, true);
                     //check the shift type first
 
                     if ($employee['fixed_shift'] == 1) {
@@ -101,13 +103,13 @@ class AttendanceDepartureImport implements ToCollection
                         if (empty($shiftData)) {
                             continue;
                         } else {
-                            $total_hours = $shiftData['total_hours'] ?? null;
+                            $shiftHours = $shiftData['total_hours'] ?? null;
                         }
                     } else {
                         if ($employee['daily_work_hours'] == 0 || empty($employee['daily_work_hours']) || $employee['daily_work_hours'] == null) {
                             continue;
                         } else {
-                            $total_hours = $employee['daily_work_hours'] ?? null;
+                            $shiftHours = $employee['daily_work_hours'] ?? null;
                         }
                     }
                     //check if there is an empty record
@@ -133,12 +135,106 @@ class AttendanceDepartureImport implements ToCollection
                         ->where('checkInDateTime', '<=', date('Y-m-d', strtotime($dateTimeAction)))
                         ->orderBy('id', 'desc')->first();
                     if (!empty($last)) {
+                        $lastAttendance = $last->checkInDateTime;
+                        $diffInSeconds = strtotime($dateTimeAction) - strtotime($lastAttendance);
+                        $diffInMinutes = $diffInSeconds / 60;
+                        $diffInMinutes = number_format($diffInMinutes, 2, '.', '');
+                        $diffInHours = $diffInSeconds / 3600;
+                        $diffInHours = number_format($diffInHours, 2, '.', '');
+                        if ($diffInHours < 0) $diffInHours = $diffInHours * -1;
+                        if ($diffInMinutes < 0) $diffInMinutes = $diffInMinutes * -1;
+                        //check if the last record is the same current record
+                        if ($last->checkInDate == date('Y-m-d', strtotime($dateTimeAction))) {
+                            if ($diffInMinutes > $admin_panel_settings->after_mins_neglect) {
+                                $dataToUpdate['checkOutDateTime'] = date('Y-m-d H:i:s', strtotime($dateTimeAction));
+                                $dataToUpdate['checkOutTime'] = date('H:i:s', strtotime($dateTimeAction));
+                                $dataToUpdate['checkInDate'] = date('Y-m-d', strtotime($dateTimeAction));
+                                $dataToUpdate['total_hours'] = $diffInHours;
+                                if ($diffInHours < $shiftHours) {
+                                    $dataToUpdate['overtime_hours'] = 0;
+                                    $dataToUpdate['absence_hours'] = $shiftHours - $diffInHours;
+                                }
+                                if ($diffInHours > $shiftHours) {
+                                    $dataToUpdate['overtime_hours'] = $diffInHours - $shiftHours;
+                                    $dataToUpdate['absence_hours'] = 0;
+                                }
+                                if ($shiftData['end_time'] > $dataToUpdate['checkOutTime']) {
+                                    $diffInSeconds = strtotime($shiftData['end_time']) - strtotime($dataToUpdate['checkOutTime']);
+                                    $diffInMinutes = $diffInSeconds / 60;
+                                    $fromMinutesIntoDecimalNumber = number_format($diffInMinutes, 2, '.', '');
+                                    if ($fromMinutesIntoDecimalNumber >= $admin_panel_settings->after_minute_calculate_delay) {
+                                        $dataToUpdate['attendance_delay'] = $fromMinutesIntoDecimalNumber;
+                                        $counterCutQuarterDay = get_count_where(new AttendanceDeparture(), [
+                                            'company_id' => $company_id,
+                                            'finance_monthly_calendar_id' => $this->finance_monthly_calendar_id,
+                                            'employee_id' => $employee['id'],
+                                            'cutting_days' => .25
+                                        ]);
+                                        $counterCutHalfDay = get_count_where(new AttendanceDeparture(), [
+                                            'company_id' => $company_id,
+                                            'finance_monthly_calendar_id' => $this->finance_monthly_calendar_id,
+                                            'employee_id' => $employee['id'],
+                                            'cutting_days' => .5
+                                        ]);
+                                        $counterCutFullDay = get_count_where(new AttendanceDeparture(), [
+                                            'company_id' => $company_id,
+                                            'finance_monthly_calendar_id' => $this->finance_monthly_calendar_id,
+                                            'employee_id' => $employee['id'],
+                                            'cutting_days' => 1
+                                        ]);
+                                        if ($counterCutFullDay >= $admin_panel_settings->after_days_allday_day_cut) {
+                                            $dataToUpdate['cutting_days'] += 1;
+                                        } else {
+                                            if ($counterCutHalfDay >= $admin_panel_settings->after_days_half_day_cut) {
+                                                $dataToUpdate['cutting_days'] += .5;
+                                            } else {
+                                                if ($counterCutQuarterDay >= $admin_panel_settings->after_minute_quarter_day_cut) {
+                                                    $dataToUpdate['cutting_days'] += .25;
+                                                } else {
+                                                    // $dataToUpdate['cutting_days'] = 0;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            $dataToUpdate['vacation_id'] = 0;
+                            $flagUpdateParent = updateWhere(AttendanceDeparture::class, $dataToUpdate, [
+                                'id' => $last->id,
+                                'company_id' => $company_id,
 
+                            ]);
+                            if ($flagInsertParent) {
+                                $ActionDataToInsert['attendances_departure_id'] = $last->id;
+                                $ActionDataToInsert['finance_monthly_calendar_id'] = $this->finance_monthly_calendar_id;
+                                $ActionDataToInsert['employee_id'] = $employee['id'];
+                                $ActionDataToInsert['dateTimeAction'] = date('Y-m-d', strtotime($dateTimeAction));
+                                $ActionDataToInsert['company_id'] = $company_id;
+                                $ActionDataToInsert['type'] = $type;
+                                $activeRecord = getColsWhereRow(AttendanceDepartureAction::class, ['id'], [
+                                    'company_id' => $company_id,
+                                    'is_active_with_parent' => '1',
+                                    'type' => $type,
+                                    'attendances_departure_id' => $last->id
+                                ]);
+                                if (empty($activeRecord)) {
+                                    $ActionDataToInsert['is_active_with_parent'] = 1;
+                                }
+                                $ActionDataToInsert['added_method'] = '1';
+                                $ActionDataToInsert['company_id'] = $company_id;
+                                $ActionDataToInsert['added_by'] = Auth::id();
+                                $ActionDataToInsert['notes'] = 'من خلال ملف Excel';
+                                $ActionDataToInsert['attendance_departure_actions_excel_id'] = $attendanceDepartureActionsExcel['id'];
+                                insert(new AttendanceDepartureAction(), $ActionDataToInsert);
+                            }
+                        } else {
+                            // different records
+                        }
                     } else {
                         // will consider it as the first finger print in the current opened finance_monthly_calendar_id
                         // will prepare the insert array and will consider it as check in
                         $dataToInsert2['status_move'] = 1;
-                        $dataToInsert2['shift_hours'] = $total_hours ?? $employee['daily_work_hours'];
+                        $dataToInsert2['shift_hours'] = $shiftHours ?? $employee['daily_work_hours'];
                         $dataToInsert2['finance_monthly_calendar_id'] = $this->finance_monthly_calendar_id;
                         $dataToInsert2['employee_id'] = $employee['id'];
                         $dataToInsert2['checkInDate'] = date('Y-m-d', strtotime($dateTimeAction));
@@ -148,13 +244,12 @@ class AttendanceDepartureImport implements ToCollection
                         $dataToInsert2['added_by'] = Auth::id();
                         $dataToInsert2['notes'] = 'من خلال ملف Excel';
                         if ($employee['fixed_shift'] == 1) {
-                            $admin_panel_settings = AdminPanelSetting::select('*')
-                                ->where('company_id', $company_id)->first();
+
                             if ($shiftData['start_time'] < $dataToInsert2['checkInTime']) {
                                 $diffInSeconds = strtotime($dataToInsert2['checkInTime']) - strtotime($shiftData['start_time']);
                                 $diffInMinutes = $diffInSeconds / 60;
                                 $fromMinutesIntoDecimalNumber = number_format($diffInMinutes, 2, '.', '');
-                                if ($fromMinutesIntoDecimalNumber > $admin_panel_settings->after_minute_calculate_delay) {
+                                if ($fromMinutesIntoDecimalNumber >= $admin_panel_settings->after_minute_calculate_delay) {
                                     $dataToInsert2['attendance_delay'] = $fromMinutesIntoDecimalNumber;
                                     $counterCutQuarterDay = get_count_where(new AttendanceDeparture(), [
                                         'company_id' => $company_id,
@@ -174,14 +269,16 @@ class AttendanceDepartureImport implements ToCollection
                                         'employee_id' => $employee['id'],
                                         'cutting_days' => 1
                                     ]);
-                                    if($counterCutFullDay>= $admin_panel_settings->after_days_allday_day_cut){
+                                    if ($counterCutFullDay >= $admin_panel_settings->after_days_allday_day_cut) {
                                         $dataToInsert2['cutting_days'] = 1;
-                                    }else{
-                                        if($counterCutHalfDay>= $admin_panel_settings->after_days_half_day_cut){
+                                    } else {
+                                        if ($counterCutHalfDay >= $admin_panel_settings->after_days_half_day_cut) {
                                             $dataToInsert2['cutting_days'] = .5;
-                                        }else{
-                                            if($counterCutQuarterDay>= $admin_panel_settings->after_minute_quarter_day_cut){
+                                        } else {
+                                            if ($counterCutQuarterDay >= $admin_panel_settings->after_minute_quarter_day_cut) {
                                                 $dataToInsert2['cutting_days'] = .25;
+                                            } else {
+                                                $dataToInsert2['cutting_days'] = 0;
                                             }
                                         }
                                     }
@@ -193,16 +290,16 @@ class AttendanceDepartureImport implements ToCollection
                         $dataToInsert2['employee_branch_id'] = $employee->branch_id;
                         $dataToInsert2['employee_status'] = $employee->employment_status;
                         $dataToInsert2['day_of_finger_print'] = date('Y-m-d', strtotime($dateTimeAction));
-                            $mainSalaryEmployee = getColsWhereRow(new MainSalaryEmployee(), ['id'], [
+                        $mainSalaryEmployee = getColsWhereRow(new MainSalaryEmployee(), ['id'], [
                             'employee_id' => $employee['id'],
-                            'company_id'=> $company_id,
-                            'is_archived'=> 0,
+                            'company_id' => $company_id,
+                            'is_archived' => 0,
                         ]);
-                        if(!empty($mainSalaryEmployee)){
+                        if (!empty($mainSalaryEmployee)) {
                             $dataToInsert2['main_salary_employee_id'] = $mainSalaryEmployee->id;
                         }
-                        $flagInsertParent = insert(new AttendanceDeparture(), $dataToInsert2,true);
-                        if($flagInsertParent){
+                        $flagInsertParent = insert(new AttendanceDeparture(), $dataToInsert2, true);
+                        if ($flagInsertParent) {
                             $ActionDataToInsert['attendances_departure_id'] = $flagInsertParent->id;
                             $ActionDataToInsert['finance_monthly_calendar_id'] = $this->finance_monthly_calendar_id;
                             $ActionDataToInsert['employee_id'] = $employee['id'];
@@ -217,10 +314,7 @@ class AttendanceDepartureImport implements ToCollection
                             $ActionDataToInsert['notes'] = 'من خلال ملف Excel';
                             $ActionDataToInsert['attendance_departure_actions_excel_id'] = $attendanceDepartureActionsExcel['id'];
                             insert(new AttendanceDepartureAction(), $ActionDataToInsert);
-
-                            
                         }
-                        
                     }
                 }
             }

@@ -223,6 +223,16 @@
                             @include('admin.errors.errors', ['value' => 'after_days_allday_day_cut'])
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>بعد كم دقيقة يتم تجاهل البصمة المتكررة</label>
+                            <input type="number" name="after_mins_neglect"
+                                class="form-control editable-input {{ $errors->has('after_mins_neglect') ? 'is-invalid' : '' }}"
+                                value="{{ old('after_mins_neglect', $general_settings->after_mins_neglect) }}"
+                                readonly>
+                            @include('admin.errors.errors', ['value' => 'after_mins_neglect'])
+                        </div>
+                    </div>
                 </div>
 
                 <hr>

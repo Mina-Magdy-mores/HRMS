@@ -41,6 +41,7 @@ class AdminPanelSettingRequest extends FormRequest
             'sanctions_value_second_absence' => 'sometimes|numeric|min:0',
             'sanctions_value_third_absence' => 'sometimes|numeric|min:0',
             'sanctions_value_fourth_absence' => 'sometimes|numeric|min:0',
+            'after_mins_neglect' => 'sometimes|integer|min:0',
         ];
     }
 
@@ -75,6 +76,9 @@ class AdminPanelSettingRequest extends FormRequest
             'sanctions_value_third_absence.numeric' => 'قيمه خصم الايام بعد ثالث مرة غياب بدون اذن يجب ان يكون رقم',
             'sanctions_value_fourth_absence.required' => 'قيمه خصم الايام بعد رابع مرة غياب بدون اذن مطلوب',
             'sanctions_value_fourth_absence.numeric' => 'قيمه خصم الايام بعد رابع مرة غياب بدون اذن يجب ان يكون رقم',
+            'after_mins_neglect.required' => 'دقائق تجاهل البصمة المتكررة مطلوب',
+            'after_mins_neglect.integer' => 'دقائق تجاهل البصمة المتكررة يجب ان يكون رقم صحيح',
+            'after_mins_neglect.min' => 'دقائق تجاهل البصمة المتكررة يجب الا يقل عن 0',
         ];
     }
 }
