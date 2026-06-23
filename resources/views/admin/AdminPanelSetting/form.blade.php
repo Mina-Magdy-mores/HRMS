@@ -233,6 +233,16 @@
                             @include('admin.errors.errors', ['value' => 'after_mins_neglect'])
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>أقصى ساعات إضافية بعد الشيفت لتقفيل البصمة</label>
+                            <input type="number" name="after_shift_max_extra_hours"
+                                class="form-control editable-input {{ $errors->has('after_shift_max_extra_hours') ? 'is-invalid' : '' }}"
+                                value="{{ old('after_shift_max_extra_hours', $general_settings->after_shift_max_extra_hours) }}"
+                                readonly>
+                            @include('admin.errors.errors', ['value' => 'after_shift_max_extra_hours'])
+                        </div>
+                    </div>
                 </div>
 
                 <hr>

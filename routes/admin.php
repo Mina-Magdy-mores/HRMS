@@ -332,6 +332,10 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::put('/attendanceDepartures', [AttendanceDepartureController::class, 'update'])->name('attendanceDepartures.update');
         Route::post('/attendanceDepartures/print-search', [AttendanceDepartureController::class, 'printSearch'])->name('attendanceDepartures.print-search');
         Route::get('/attendanceDepartures/finger-print-details/{id}/{finance_monthly_calendar_id}', [AttendanceDepartureController::class, 'fingerPrintDetails'])->name('attendanceDepartures.finger-print-details');
+        Route::post('/attendanceDepartures/finger-print-details/load-grid', [AttendanceDepartureController::class, 'loadFingerPrintGrid'])->name('attendanceDepartures.finger-print-details.load-grid');
+        Route::post('/attendanceDepartures/finger-print-details/save-row', [AttendanceDepartureController::class, 'saveFingerPrintRow'])->name('attendanceDepartures.finger-print-details.save-row');
+        Route::post('/attendanceDepartures/finger-print-details/save-all', [AttendanceDepartureController::class, 'saveAllFingerPrintRows'])->name('attendanceDepartures.finger-print-details.save-all');
+        Route::post('/attendanceDepartures/finger-print-details/day-movements', [AttendanceDepartureController::class, 'getDayMovements'])->name('attendanceDepartures.finger-print-details.day-movements');
 
     });
 

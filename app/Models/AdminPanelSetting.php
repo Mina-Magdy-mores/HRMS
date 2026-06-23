@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property numeric $sanctions_value_second_absence قيمه خصم الايام بعد ثاني مرة غياب بدون اذن
  * @property numeric $sanctions_value_third_absence قيمه خصم الايام بعد ثالث مرة غياب بدون اذن
  * @property numeric $sanctions_value_fourth_absence قيمه خصم الايام بعد رابع مرة غياب بدون اذن
+ * @property int $after_shift_max_extra_hours أقصى عدد ساعات عمل إضافية بعد انتهاء الشيفت لتقفيل البصمة كـانصراف
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Admin $addedBy

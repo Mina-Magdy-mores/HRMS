@@ -369,6 +369,18 @@
                 $('#uploadExcelModal').modal('show');
             @endif
 
+            // Prevent double submit on Excel upload form
+            $('#uploadExcelModal form').on('submit', function() {
+                var btn = $(this).find('button[type="submit"]');
+                var cancelBtn = $(this).find('button[data-dismiss="modal"]');
+                btn.html('<i class="fas fa-spinner fa-spin mr-1"></i> جاري رفع وحفظ البيانات...');
+                setTimeout(function() {
+                    btn.prop('disabled', true);
+                    cancelBtn.prop('disabled', true);
+                }, 50);
+                return true;
+            });
+
             // Search triggering elements
             $(document).on('change', '#employee_id_search', function() {
                 ajax_search();

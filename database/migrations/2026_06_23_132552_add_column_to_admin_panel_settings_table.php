@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('admin_panel_settings', function (Blueprint $table) {
-            $table->integer('after_mins_neglect')->default(5)->comment('خلال هذا الوقت يتم تجاهل البصمة');
+            $table->integer('after_shift_max_extra_hours')->default(4)->comment('أقصى عدد ساعات عمل إضافية بعد انتهاء الشيفت لتقفيل البصمة كـانصراف');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('admin_panel_settings', function (Blueprint $table) {
-            $table->dropColumn('after_mins_neglect');
+            $table->dropColumn('after_shift_max_extra_hours');
         });
     }
 };

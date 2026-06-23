@@ -42,6 +42,7 @@ class AdminPanelSettingRequest extends FormRequest
             'sanctions_value_third_absence' => 'sometimes|numeric|min:0',
             'sanctions_value_fourth_absence' => 'sometimes|numeric|min:0',
             'after_mins_neglect' => 'sometimes|integer|min:0',
+            'after_shift_max_extra_hours' => 'sometimes|integer|min:0',
         ];
     }
 
@@ -79,6 +80,9 @@ class AdminPanelSettingRequest extends FormRequest
             'after_mins_neglect.required' => 'دقائق تجاهل البصمة المتكررة مطلوب',
             'after_mins_neglect.integer' => 'دقائق تجاهل البصمة المتكررة يجب ان يكون رقم صحيح',
             'after_mins_neglect.min' => 'دقائق تجاهل البصمة المتكررة يجب الا يقل عن 0',
+            'after_shift_max_extra_hours.required' => 'ساعات إضافية بعد الشيفت لتقفيل البصمة مطلوب',
+            'after_shift_max_extra_hours.integer' => 'ساعات إضافية بعد الشيفت لتقفيل البصمة يجب ان يكون رقم صحيح',
+            'after_shift_max_extra_hours.min' => 'ساعات إضافية بعد الشيفت لتقفيل البصمة يجب الا يقل عن 0',
         ];
     }
 }

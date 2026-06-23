@@ -15,6 +15,11 @@ class AttendanceDepartureAction extends Model
         return $this->belongsTo(AttendanceDeparture::class, 'attendances_departure_id');
     }
 
+    public function excelAction()
+    {
+        return $this->belongsTo(AttendanceDepartureActionsExcel::class, 'attendance_departure_actions_excel_id');
+    }
+
     public function financeMonthlyCalendar()
     {
         return $this->belongsTo(FinanceMonthlyCalendar::class);
