@@ -786,11 +786,12 @@
                                                         @endphp
 
                                                         {{ $start_time }}
-
+                                                        الى
                                                         @php
                                                             $end_time = new DateTime($shiftType->end_time);
                                                             $end_time = $end_time->format('h:i A');
                                                         @endphp
+
 
                                                         {{ $end_time }}
                                                         -عدد الساعات
@@ -871,7 +872,9 @@
                                         <div class="form-group">
                                             <div class="d-flex justify-content-between align-items-center mb-1">
                                                 <label class="mb-0">الراتب</label>
-                                                <button type="button" class="btn btn-xs btn-link p-0 text-info" data-toggle="modal" data-target="#salaryArchiveModal" style="text-decoration: none;">
+                                                <button type="button" class="btn btn-xs btn-link p-0 text-info"
+                                                    data-toggle="modal" data-target="#salaryArchiveModal"
+                                                    style="text-decoration: none;">
                                                     <i class="fas fa-history"></i> أرشيف الرواتب
                                                 </button>
                                             </div>
@@ -1359,7 +1362,8 @@
                                 @forelse ($employee->employeeSalaryArchives as $archive)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td class="text-success font-weight-bold">{{ number_format($archive->amount, 2) }}</td>
+                                        <td class="text-success font-weight-bold">
+                                            {{ number_format($archive->amount, 2) }}</td>
                                         <td>{{ optional($archive->addedBy)->name ?? '---' }}</td>
                                         <td>{{ optional($archive->updatedBy)->name ?? '---' }}</td>
                                         <td>{{ $archive->created_at->format('Y-m-d h:i A') }}</td>

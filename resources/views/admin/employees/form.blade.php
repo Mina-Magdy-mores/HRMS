@@ -783,7 +783,7 @@
                                                         @endphp
 
                                                         {{ $start_time }}
-                                                        الى
+                                                      الى  
                                                         @php
                                                             $end_time = new DateTime($shiftType->end_time);
                                                             $end_time = $end_time->format('h:i A');

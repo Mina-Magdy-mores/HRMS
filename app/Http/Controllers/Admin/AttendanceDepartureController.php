@@ -17,6 +17,7 @@ use App\Models\AttendanceDepartureActionsExcel;
 use App\Models\MainSalaryEmployee;
 use App\Models\DeductionType;
 use App\Models\Occasion;
+use App\Models\ShiftsType;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
