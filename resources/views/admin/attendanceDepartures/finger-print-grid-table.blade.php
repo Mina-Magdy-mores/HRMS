@@ -1,3 +1,11 @@
+<style>
+    #attendanceGridTable tbody tr.warning-row {
+        background-color: #ffe3e6b9 !important;
+    }
+    #attendanceGridTable tbody tr.warning-row:hover {
+        background-color: #ffd5d9ff !important;
+    }
+</style>
 <div class="table-responsive shadow-sm rounded">
     <table class="table table-striped table-bordered table-hover text-center align-middle mb-0" id="attendanceGridTable">
         <thead class="bg-primary text-white">
@@ -44,8 +52,10 @@
                     $check_out_display = ($has_record && $att->checkOutTime) ? date('h:i A', strtotime($att->checkOutTime)) : '---';
                     $check_in_24 = ($has_record && $att->checkInTime) ? date('H:i', strtotime($att->checkInTime)) : '---';
                     $check_out_24 = ($has_record && $att->checkOutTime) ? date('H:i', strtotime($att->checkOutTime)) : '---';
+                    
+                    $is_warning = ($vacation_id == 0 && $occasion_id == 0 && (!$has_record || !$att->checkInTime || !$att->checkOutTime));
                 @endphp
-                <tr data-date="{{ $day['date'] }}">
+                <tr data-date="{{ $day['date'] }}" class="{{ $is_warning ? 'warning-row' : '' }}">
                     <!-- Day & Date -->
                     <td class="align-middle" title="نظام 24 ساعة - الحضور: {{ $check_in_24 }} | الانصراف: {{ $check_out_24 }}">
                         <span class="d-block font-weight-bold text-dark">{{ $day['day_name'] }}</span>

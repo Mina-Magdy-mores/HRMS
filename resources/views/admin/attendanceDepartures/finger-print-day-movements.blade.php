@@ -97,6 +97,15 @@
                                 غير محدد
                             </span>
                         @endif
+
+                        @if ($excel && $excel->type && $excel->type != $action->type)
+                            <div class="mt-1">
+                                <span class="badge badge-warning text-dark px-2 py-1" style="font-size: 75%; font-weight: normal;" title="تم تعديل النوع تلقائياً ليناسب منطق الشيفت والوردية">
+                                    <i class="fas fa-exchange-alt mr-1"></i> 
+                                    الأصل: {{ $excel->type == 1 ? 'حضور' : ($excel->type == 2 ? 'انصراف' : 'غير محدد') }}
+                                </span>
+                            </div>
+                        @endif
                     </td>
                     <td>
                         @if ($action->added_method == 2)
