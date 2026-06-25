@@ -368,6 +368,18 @@
         initSelect2();
         loadGrid();
 
+        // Toggle occasion dropdown based on vacation type
+        $(document).on('change', '.select-vacation', function() {
+            var row = $(this).closest('tr');
+            var isOfficial = $(this).find('option:selected').data('is-official') == 1;
+            var occasionSelect = row.find('select[name="occasion_id"]');
+            if (isOfficial) {
+                occasionSelect.prop('disabled', false);
+            } else {
+                occasionSelect.val(0).prop('disabled', true);
+            }
+        });
+
         // Reload grid on switcher change
         $('#select_finance_monthly_calendar').on('change', function() {
             loadGrid();
@@ -389,8 +401,8 @@
             var total_hours = row.find('input[name="total_hours"]').val();
             var overtime_hours = row.find('input[name="overtime_hours"]').val();
             var absence_hours = row.find('input[name="absence_hours"]').val();
-            var cutting_days = row.find('select[name="cutting_days"]').val();
-            var variables = row.find('select[name="variables"]').val();
+            var cutting_days = row.find('input[name="cutting_days"]').val();
+            var variables = row.find('input[name="variables"]').val();
             var vacation_id = row.find('select[name="vacation_id"]').val();
             var occasion_id = row.find('select[name="occasion_id"]').val();
             var attendance_delay = row.find('input[name="attendance_delay"]').val();
@@ -459,8 +471,8 @@
                     total_hours: row.find('input[name="total_hours"]').val(),
                     overtime_hours: row.find('input[name="overtime_hours"]').val(),
                     absence_hours: row.find('input[name="absence_hours"]').val(),
-                    cutting_days: row.find('select[name="cutting_days"]').val(),
-                    variables: row.find('select[name="variables"]').val(),
+                    cutting_days: row.find('input[name="cutting_days"]').val(),
+                    variables: row.find('input[name="variables"]').val(),
                     vacation_id: row.find('select[name="vacation_id"]').val(),
                     occasion_id: row.find('select[name="occasion_id"]').val(),
                     attendance_delay: row.find('input[name="attendance_delay"]').val(),
@@ -532,12 +544,15 @@
             
             $('#dayMovementsModal').modal('show');
             
+            var calendarId = $('#select_finance_monthly_calendar').val();
+            
             $.ajax({
                 url: '{{ route('admin.attendanceDepartures.finger-print-details.day-movements') }}',
                 type: 'POST',
                 data: {
                     _token: '{{ csrf_token() }}',
                     employee_id: employeeId,
+                    finance_monthly_calendar_id: calendarId,
                     date: date
                 },
                 dataType: 'json',
@@ -553,6 +568,68 @@
                 }
             });
         });
+
+        // Update day movements manual override AJAX
+        $(document).on('click', '#btn_update_day_movements', function() {
+            var btn = $(this);
+            var form = $('#edit_day_movements_form');
+            var calendarId = $('#select_finance_monthly_calendar').val();
+            
+            var check_in_date = $('#edit_check_in_date').val();
+            var check_in_time = $('#edit_check_in_time').val();
+            var check_out_date = $('#edit_check_out_date').val();
+            var check_out_time = $('#edit_check_out_time').val();
+            
+            var originalHtml = btn.html();
+            btn.html('<i class="fas fa-spinner fa-spin"></i> جاري التحديث...').attr('disabled', true);
+            
+            $.ajax({
+                url: '{{ route('admin.attendanceDepartures.finger-print-details.update-day-movements') }}',
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    employee_id: '{{ $employee->id }}',
+                    finance_monthly_calendar_id: calendarId,
+                    date: form.find('input[name="date"]').val(),
+                    check_in_date: check_in_date,
+                    check_in_time: check_in_time,
+                    check_out_date: check_out_date,
+                    check_out_time: check_out_time
+                },
+                dataType: 'json',
+                success: function(response) {
+                    $('#dayMovementsModal').modal('hide');
+                    loadGrid(); // Refresh the main big table
+                    
+                    // Simple toast notification
+                    var alertDiv = $(`<div class="alert alert-success alert-dismissible fade show shadow" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; min-width: 300px;">
+                        <i class="fas fa-check-circle mr-2"></i> ${response.success}
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    </div>`).appendTo('body');
+                    setTimeout(function() {
+                        alertDiv.alert('close');
+                    }, 4000);
+                },
+                error: function(xhr) {
+                    btn.html(originalHtml).attr('disabled', false);
+                    var errMsg = 'حدث خطأ أثناء تحديث الحركات.';
+                    if (xhr.responseJSON && xhr.responseJSON.error) {
+                        errMsg = xhr.responseJSON.error;
+                    }
+                    alert(errMsg);
+                }
+            });
+        });
     });
+
+    function scrollGrid(direction) {
+        var container = document.getElementById('gridTableContainer');
+        if (!container) return;
+        var amount = direction === 'left' ? -350 : 350;
+        container.scrollBy({
+            left: amount,
+            behavior: 'smooth'
+        });
+    }
 </script>
 @endsection

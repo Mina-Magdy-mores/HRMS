@@ -1,3 +1,116 @@
+@if ($is_editable)
+<div class="card card-outline card-warning shadow-sm mb-4">
+    <div class="card-header py-2 bg-light">
+        <h6 class="card-title font-weight-bold text-dark mb-0">
+            <i class="fas fa-user-edit text-warning mr-1"></i>
+            تعديل توقيت البصمة والحركات اليدوية لليوم: <span class="text-primary">{{ $date }}</span>
+        </h6>
+    </div>
+    <div class="card-body p-3">
+        <form id="edit_day_movements_form">
+            <input type="hidden" name="date" value="{{ $date }}">
+            
+            <div class="row">
+                <!-- Check-in Section -->
+                <div class="col-md-6 border-left">
+                    <h6 class="font-weight-bold text-success mb-3">
+                        <i class="fas fa-sign-in-alt"></i> توقيت الحضور (Check-In)
+                    </h6>
+                    @php
+                        $check_in_dt = $attendance && $attendance->checkInDateTime ? date('Y-m-d', strtotime($attendance->checkInDateTime)) : '';
+                        $check_in_t = $attendance && $attendance->checkInDateTime ? date('H:i', strtotime($attendance->checkInDateTime)) : '';
+                    @endphp
+                    <div class="form-row align-items-center">
+                        <div class="col-6">
+                            <label class="small font-weight-bold text-muted">التاريخ</label>
+                            <input type="date" class="form-control form-control-sm" id="edit_check_in_date" name="check_in_date" value="{{ $check_in_dt }}">
+                        </div>
+                        <div class="col-6">
+                            <label class="small font-weight-bold text-muted">الوقت</label>
+                            <input type="time" class="form-control form-control-sm" id="edit_check_in_time" name="check_in_time" value="{{ $check_in_t }}">
+                        </div>
+                    </div>
+                    <div class="mt-2 d-flex justify-content-start">
+                        <button type="button" class="btn btn-xs btn-outline-secondary mr-2 shadow-sm" onclick="resetCheckIn()" title="إعادة تعيين للتاريخ الحالي">
+                            <i class="fas fa-undo-alt mr-1"></i> إعادة تعيين
+                        </button>
+                        <button type="button" class="btn btn-xs btn-outline-danger shadow-sm" onclick="clearCheckIn()" title="مسح التاريخ والوقت">
+                            <i class="fas fa-trash-alt mr-1"></i> مسح
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Check-out Section -->
+                <div class="col-md-6">
+                    <h6 class="font-weight-bold text-info mb-3">
+                        <i class="fas fa-sign-out-alt"></i> توقيت الانصراف (Check-Out)
+                    </h6>
+                    @php
+                        $check_out_dt = $attendance && $attendance->checkOutDateTime ? date('Y-m-d', strtotime($attendance->checkOutDateTime)) : '';
+                        $check_out_t = $attendance && $attendance->checkOutDateTime ? date('H:i', strtotime($attendance->checkOutDateTime)) : '';
+                    @endphp
+                    <div class="form-row align-items-center">
+                        <div class="col-6">
+                            <label class="small font-weight-bold text-muted">التاريخ</label>
+                            <input type="date" class="form-control form-control-sm" id="edit_check_out_date" name="check_out_date" value="{{ $check_out_dt }}">
+                        </div>
+                        <div class="col-6">
+                            <label class="small font-weight-bold text-muted">الوقت</label>
+                            <input type="time" class="form-control form-control-sm" id="edit_check_out_time" name="check_out_time" value="{{ $check_out_t }}">
+                        </div>
+                    </div>
+                    <div class="mt-2 d-flex justify-content-start">
+                        <button type="button" class="btn btn-xs btn-outline-secondary mr-2 shadow-sm" onclick="resetCheckOut()" title="إعادة تعيين للتاريخ الحالي">
+                            <i class="fas fa-undo-alt mr-1"></i> إعادة تعيين
+                        </button>
+                        <button type="button" class="btn btn-xs btn-outline-danger shadow-sm" onclick="clearCheckOut()" title="مسح التاريخ والوقت">
+                            <i class="fas fa-trash-alt mr-1"></i> مسح
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="my-3">
+            <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-sm btn-success mr-2 shadow-sm font-weight-bold" id="btn_update_day_movements">
+                    <i class="fas fa-save mr-1"></i> تحديث
+                </button>
+                <button type="button" class="btn btn-sm btn-secondary shadow-sm" data-dismiss="modal">
+                    <i class="fas fa-times mr-1"></i> إلغاء
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    var originalCheckInDate = "{{ $check_in_dt }}";
+    var originalCheckInTime = "{{ $check_in_t }}";
+    var originalCheckOutDate = "{{ $check_out_dt }}";
+    var originalCheckOutTime = "{{ $check_out_t }}";
+
+    function resetCheckIn() {
+        document.getElementById('edit_check_in_date').value = originalCheckInDate;
+        document.getElementById('edit_check_in_time').value = originalCheckInTime;
+    }
+
+    function clearCheckIn() {
+        document.getElementById('edit_check_in_date').value = '';
+        document.getElementById('edit_check_in_time').value = '';
+    }
+
+    function resetCheckOut() {
+        document.getElementById('edit_check_out_date').value = originalCheckOutDate;
+        document.getElementById('edit_check_out_time').value = originalCheckOutTime;
+    }
+
+    function clearCheckOut() {
+        document.getElementById('edit_check_out_date').value = '';
+        document.getElementById('edit_check_out_time').value = '';
+    }
+</script>
+@endif
+
 <div class="table-responsive">
     <table class="table table-striped table-bordered table-hover text-center align-middle mb-0">
         <thead class="bg-dark text-white">

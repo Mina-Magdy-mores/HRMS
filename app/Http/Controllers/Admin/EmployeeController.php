@@ -163,8 +163,14 @@ class EmployeeController extends Controller
                 $employee_code = 1;
             }
             $validatedData = $request->validated();
-            if (!empty($request->salary)) {
-                $validatedData['payment_per_day'] = $request->salary / 30; // Assuming 30 days in a month
+            if ($request->salary !== null && $request->salary !== '') {
+                if ($request->salary > 0) {
+                    $validatedData['payment_per_day'] = $request->salary / 30; // Assuming 30 days in a month
+                } else {
+                    $validatedData['payment_per_day'] = 0;
+                }
+            } else {
+                $validatedData['payment_per_day'] = null;
             }
             if ($request->has('image')) {
                 $validatedData['image'] = uploadImage('employees/profile', $request->file('image'));
@@ -183,6 +189,8 @@ class EmployeeController extends Controller
                 } else {
                     return redirect()->back()->with(['error' => 'عفواا لم يتم تحديد الشفت '])->withInput();
                 }
+            } else {
+                $validatedData['shift_type_id'] = null;
             }
             $flag = insert(Employee::class, $validatedData);
             if ($flag) {
@@ -256,8 +264,16 @@ class EmployeeController extends Controller
             $validatedData = $request->validated();
             $validatedData['company_id'] = $company_id;
             $validatedData['updated_by'] = Auth::id();
-            if (!empty($request->salary) && $request->salary != $employee->salary) {
-                $validatedData['payment_per_day'] = $request->salary / 30;
+            if ($request->has('salary')) {
+                if ($request->salary !== null && $request->salary !== '') {
+                    if ($request->salary > 0) {
+                        $validatedData['payment_per_day'] = $request->salary / 30;
+                    } else {
+                        $validatedData['payment_per_day'] = 0;
+                    }
+                } else {
+                    $validatedData['payment_per_day'] = null;
+                }
             }
             if ($request->hasFile('image')) {
                 if (!empty($employee->image)) {
@@ -286,6 +302,8 @@ class EmployeeController extends Controller
                     } else {
                         return redirect()->back()->with(['error' => 'عفواا لم يتم تحديد الشفت '])->withInput();
                     }
+                } else {
+                    $validatedData['shift_type_id'] = null;
                 }
                 $flag = $employee->update($validatedData);
                 if ($flag) {

@@ -48,6 +48,7 @@ class DatabaseSeeder extends Seeder
             FinanceMonthlyCalendarSeeder::class,
             OccasionSeeder::class,
             ResignationSeeder::class,
+            VacationTypeSeeder::class,
 
                 //4. بيانات الموظفين
             EmployeeSeeder::class,

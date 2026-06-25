@@ -126,6 +126,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a href="{{ route('admin.vacation-types.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.vacation-types.*')) active @endif">
+                                <i class="fas fa-calendar-alt"></i>
+                                <p>أنواع الإجازات</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="{{ route('admin.resignations.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.resignations.*')) active @endif">
                                 <i class="fas fa-sign-out-alt"></i>

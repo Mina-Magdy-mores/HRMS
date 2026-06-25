@@ -246,9 +246,9 @@ class AttendanceDepartureImport implements ToCollection
 
                                 // Calculate delay if fixed shift
                                 if ($employee['fixed_shift'] == 1 && !empty($shiftData)) {
-                                    $checkInTimeStr = date('H:i:s', strtotime($dateTimeAction));
-                                    if ($shiftData['start_time'] < $checkInTimeStr) {
-                                        $diffInSeconds = strtotime($checkInTimeStr) - strtotime($shiftData['start_time']);
+                                    $shiftStartDateTime = $targetDate . ' ' . $shiftData['start_time'];
+                                    if (strtotime($dateTimeAction) > strtotime($shiftStartDateTime)) {
+                                        $diffInSeconds = strtotime($dateTimeAction) - strtotime($shiftStartDateTime);
                                         $diffInMinutes = $diffInSeconds / 60;
                                         $fromMinutesIntoDecimalNumber = number_format($diffInMinutes, 2, '.', '');
                                         if ($fromMinutesIntoDecimalNumber >= $admin_panel_settings->after_minute_calculate_delay) {
@@ -348,9 +348,9 @@ class AttendanceDepartureImport implements ToCollection
                             ];
 
                             if ($employee['fixed_shift'] == 1 && !empty($shiftData)) {
-                                $checkInTimeStr = date('H:i:s', strtotime($dateTimeAction));
-                                if ($shiftData['start_time'] < $checkInTimeStr) {
-                                    $diffInSeconds = strtotime($checkInTimeStr) - strtotime($shiftData['start_time']);
+                                $shiftStartDateTime = $targetDate . ' ' . $shiftData['start_time'];
+                                if (strtotime($dateTimeAction) > strtotime($shiftStartDateTime)) {
+                                    $diffInSeconds = strtotime($dateTimeAction) - strtotime($shiftStartDateTime);
                                     $diffInMinutes = $diffInSeconds / 60;
                                     $fromMinutesIntoDecimalNumber = number_format($diffInMinutes, 2, '.', '');
                                     if ($fromMinutesIntoDecimalNumber >= $admin_panel_settings->after_minute_calculate_delay) {
@@ -449,61 +449,91 @@ class AttendanceDepartureImport implements ToCollection
                             }
 
                             if (!$is_duplicate_checkout && $diffInMinutes > $admin_panel_settings->after_mins_neglect) {
-                                // Update check-out of the last record
-                                $dataToUpdate = [
-                                    'checkOutDateTime' => date('Y-m-d H:i:s', strtotime($dateTimeAction)),
-                                    'checkOutTime' => date('H:i:s', strtotime($dateTimeAction)),
-                                    'checkOutDate' => date('Y-m-d', strtotime($dateTimeAction)),
-                                    'total_hours' => $diffInHours,
-                                    'vacation_id' => 0,
-                                ];
-
-                                if ($diffInHours < $shiftHours) {
-                                    $dataToUpdate['overtime_hours'] = 0;
-                                    $dataToUpdate['absence_hours'] = $shiftHours - $diffInHours;
-                                } else {
-                                    $dataToUpdate['overtime_hours'] = $diffInHours - $shiftHours;
-                                    $dataToUpdate['absence_hours'] = 0;
+                                $pairingWindow = $shiftHours + ($admin_panel_settings->after_shift_max_extra_hours ?? 0);
+                                $should_update_parent = true;
+                                if ($last->checkOutDateTime !== null && $diffInHours > $pairingWindow) {
+                                    $should_update_parent = false;
                                 }
 
-                                if ($employee['fixed_shift'] == 1 && !empty($shiftData)) {
-                                    $checkOutTimeStr = date('H:i:s', strtotime($dateTimeAction));
-                                    if ($shiftData['end_time'] > $checkOutTimeStr) {
-                                        $diffSeconds = strtotime($shiftData['end_time']) - strtotime($checkOutTimeStr);
-                                        $diffMins = $diffSeconds / 60;
-                                        $fromMinutesDecimal = number_format($diffMins, 2, '.', '');
-                                        if ($fromMinutesDecimal >= $admin_panel_settings->after_minute_calculate_delay) {
-                                            $dataToUpdate['early_departure'] = $fromMinutesDecimal;
+                                if ($should_update_parent) {
+                                    // Update check-out of the last record
+                                    $dataToUpdate = [
+                                        'checkOutDateTime' => date('Y-m-d H:i:s', strtotime($dateTimeAction)),
+                                        'checkOutTime' => date('H:i:s', strtotime($dateTimeAction)),
+                                        'checkOutDate' => date('Y-m-d', strtotime($dateTimeAction)),
+                                        'total_hours' => $diffInHours,
+                                        'vacation_id' => 0,
+                                    ];
+
+                                    if ($diffInHours < $shiftHours) {
+                                        $dataToUpdate['overtime_hours'] = 0;
+                                        $dataToUpdate['absence_hours'] = $shiftHours - $diffInHours;
+                                    } else {
+                                        $dataToUpdate['overtime_hours'] = $diffInHours - $shiftHours;
+                                        $dataToUpdate['absence_hours'] = 0;
+                                    }
+
+                                    if ($employee['fixed_shift'] == 1 && !empty($shiftData)) {
+                                        $targetDate = $last->day_of_finger_print;
+                                        $shiftEndDate = $targetDate;
+                                        if ($shiftData['end_time'] < $shiftData['start_time']) {
+                                            $shiftEndDate = date('Y-m-d', strtotime($targetDate . ' +1 day'));
+                                        }
+                                        $shiftEndDateTime = $shiftEndDate . ' ' . $shiftData['end_time'];
+                                        if (strtotime($shiftEndDateTime) > strtotime($dateTimeAction)) {
+                                            $diffSeconds = strtotime($shiftEndDateTime) - strtotime($dateTimeAction);
+                                            $diffMins = $diffSeconds / 60;
+                                            $fromMinutesDecimal = number_format($diffMins, 2, '.', '');
+                                            if ($fromMinutesDecimal >= $admin_panel_settings->after_minute_calculate_early_departure) {
+                                                $dataToUpdate['early_departure'] = $fromMinutesDecimal;
+                                            }
                                         }
                                     }
+
+                                    $last->update($dataToUpdate);
+
+                                    // Update existing active check-out actions on this record to be inactive
+                                    $ActionDataToUpdate['is_active_with_parent'] = '0';
+                                    updateWhere(AttendanceDepartureAction::class, $ActionDataToUpdate, [
+                                        'company_id' => $company_id,
+                                        'is_active_with_parent' => '1',
+                                        'type' => 2,
+                                        'attendances_departure_id' => $last->id
+                                    ]);
+
+                                    // Insert new active check-out action
+                                    $ActionDataToInsert = [
+                                        'attendances_departure_id' => $last->id,
+                                        'finance_monthly_calendar_id' => $this->finance_monthly_calendar_id,
+                                        'employee_id' => $employee['id'],
+                                        'dateTimeAction' => date('Y-m-d H:i:s', strtotime($dateTimeAction)),
+                                        'company_id' => $company_id,
+                                        'type' => 2,
+                                        'is_active_with_parent' => '1',
+                                        'added_method' => '1',
+                                        'added_by' => Auth::id(),
+                                        'notes' => 'من خلال ملف Excel',
+                                        'attendance_departure_actions_excel_id' => $attendanceDepartureActionsExcel['id'],
+                                    ];
+                                    insert(new AttendanceDepartureAction(), $ActionDataToInsert);
+                                } else {
+                                    // Last record is closed and new action is outside pairing window.
+                                    // Insert new inactive check-out action (unapproved/orphan)
+                                    $ActionDataToInsert = [
+                                        'attendances_departure_id' => $last->id,
+                                        'finance_monthly_calendar_id' => $this->finance_monthly_calendar_id,
+                                        'employee_id' => $employee['id'],
+                                        'dateTimeAction' => date('Y-m-d H:i:s', strtotime($dateTimeAction)),
+                                        'company_id' => $company_id,
+                                        'type' => 2,
+                                        'is_active_with_parent' => '0',
+                                        'added_method' => '1',
+                                        'added_by' => Auth::id(),
+                                        'notes' => 'من خلال ملف Excel (خارج نافذة الشيفت)',
+                                        'attendance_departure_actions_excel_id' => $attendanceDepartureActionsExcel['id'],
+                                    ];
+                                    insert(new AttendanceDepartureAction(), $ActionDataToInsert);
                                 }
-
-                                $last->update($dataToUpdate);
-
-                                // Update existing active check-out actions on this record to be inactive
-                                $ActionDataToUpdate['is_active_with_parent'] = '0';
-                                updateWhere(AttendanceDepartureAction::class, $ActionDataToUpdate, [
-                                    'company_id' => $company_id,
-                                    'is_active_with_parent' => '1',
-                                    'type' => 2,
-                                    'attendances_departure_id' => $last->id
-                                ]);
-
-                                // Insert new active check-out action
-                                $ActionDataToInsert = [
-                                    'attendances_departure_id' => $last->id,
-                                    'finance_monthly_calendar_id' => $this->finance_monthly_calendar_id,
-                                    'employee_id' => $employee['id'],
-                                    'dateTimeAction' => date('Y-m-d H:i:s', strtotime($dateTimeAction)),
-                                    'company_id' => $company_id,
-                                    'type' => 2,
-                                    'is_active_with_parent' => '1',
-                                    'added_method' => '1',
-                                    'added_by' => Auth::id(),
-                                    'notes' => 'من خلال ملف Excel',
-                                    'attendance_departure_actions_excel_id' => $attendanceDepartureActionsExcel['id'],
-                                ];
-                                insert(new AttendanceDepartureAction(), $ActionDataToInsert);
                             }
                         }
                     } else {
@@ -557,12 +587,18 @@ class AttendanceDepartureImport implements ToCollection
 
                                     if ($employee['fixed_shift'] == 1) {
 
-                                        if ($shiftData['end_time'] > $dataToUpdate['checkOutTime']) {
-                                            $diffInSeconds = strtotime($shiftData['end_time']) - strtotime($dataToUpdate['checkOutTime']);
-                                            $diffInMinutes = $diffInSeconds / 60;
-                                            $fromMinutesIntoDecimalNumber = number_format($diffInMinutes, 2, '.', '');
-                                            if ($fromMinutesIntoDecimalNumber >= $admin_panel_settings->after_minute_calculate_delay) {
-                                                $dataToUpdate['attendance_delay'] = $fromMinutesIntoDecimalNumber;
+                                           $targetDate = $last->day_of_finger_print;
+                                         $shiftEndDate = $targetDate;
+                                         if ($shiftData['end_time'] < $shiftData['start_time']) {
+                                             $shiftEndDate = date('Y-m-d', strtotime($targetDate . ' +1 day'));
+                                         }
+                                         $shiftEndDateTime = $shiftEndDate . ' ' . $shiftData['end_time'];
+                                         if (strtotime($shiftEndDateTime) > strtotime($dateTimeAction)) {
+                                             $diffInSeconds = strtotime($shiftEndDateTime) - strtotime($dateTimeAction);
+                                             $diffInMinutes = $diffInSeconds / 60;
+                                             $fromMinutesIntoDecimalNumber = number_format($diffInMinutes, 2, '.', '');
+                                             if ($fromMinutesIntoDecimalNumber >= $admin_panel_settings->after_minute_calculate_early_departure) {
+                                                 $dataToUpdate['early_departure'] = $fromMinutesIntoDecimalNumber;
                                                 $counterCutQuarterDay = get_count_where(new AttendanceDeparture(), [
                                                     'company_id' => $company_id,
                                                     'finance_monthly_calendar_id' => $this->finance_monthly_calendar_id,
@@ -646,12 +682,18 @@ class AttendanceDepartureImport implements ToCollection
                                         }
                                         if ($employee['fixed_shift'] == 1) {
 
-                                            if ($shiftData['end_time'] > $dataToUpdate['checkOutTime']) {
-                                                $diffInSeconds = strtotime($shiftData['end_time']) - strtotime($dataToUpdate['checkOutTime']);
-                                                $diffInMinutes = $diffInSeconds / 60;
-                                                $fromMinutesIntoDecimalNumber = number_format($diffInMinutes, 2, '.', '');
-                                                if ($fromMinutesIntoDecimalNumber >= $admin_panel_settings->after_minute_calculate_delay) {
-                                                    $dataToUpdate['attendance_delay'] = $fromMinutesIntoDecimalNumber;
+                                         $targetDate = $last->day_of_finger_print;
+                                         $shiftEndDate = $targetDate;
+                                         if ($shiftData['end_time'] < $shiftData['start_time']) {
+                                             $shiftEndDate = date('Y-m-d', strtotime($targetDate . ' +1 day'));
+                                         }
+                                         $shiftEndDateTime = $shiftEndDate . ' ' . $shiftData['end_time'];
+                                         if (strtotime($shiftEndDateTime) > strtotime($dateTimeAction)) {
+                                             $diffInSeconds = strtotime($shiftEndDateTime) - strtotime($dateTimeAction);
+                                             $diffInMinutes = $diffInSeconds / 60;
+                                             $fromMinutesIntoDecimalNumber = number_format($diffInMinutes, 2, '.', '');
+                                             if ($fromMinutesIntoDecimalNumber >= $admin_panel_settings->after_minute_calculate_early_departure) {
+                                                $dataToUpdate['early_departure'] = $fromMinutesIntoDecimalNumber;
                                                     $counterCutQuarterDay = get_count_where(new AttendanceDeparture(), [
                                                         'company_id' => $company_id,
                                                         'finance_monthly_calendar_id' => $this->finance_monthly_calendar_id,
@@ -734,12 +776,18 @@ class AttendanceDepartureImport implements ToCollection
                                             }
                                             if ($employee['fixed_shift'] == 1) {
 
-                                                if ($shiftData['end_time'] > $dataToUpdate['checkOutTime']) {
-                                                    $diffInSeconds = strtotime($shiftData['end_time']) - strtotime($dataToUpdate['checkOutTime']);
-                                                    $diffInMinutes = $diffInSeconds / 60;
-                                                    $fromMinutesIntoDecimalNumber = number_format($diffInMinutes, 2, '.', '');
-                                                    if ($fromMinutesIntoDecimalNumber >= $admin_panel_settings->after_minute_calculate_delay) {
-                                                        $dataToUpdate['attendance_delay'] = $fromMinutesIntoDecimalNumber;
+                                                   $targetDate = $last->day_of_finger_print;
+                                         $shiftEndDate = $targetDate;
+                                         if ($shiftData['end_time'] < $shiftData['start_time']) {
+                                             $shiftEndDate = date('Y-m-d', strtotime($targetDate . ' +1 day'));
+                                         }
+                                         $shiftEndDateTime = $shiftEndDate . ' ' . $shiftData['end_time'];
+                                         if (strtotime($shiftEndDateTime) > strtotime($dateTimeAction)) {
+                                             $diffInSeconds = strtotime($shiftEndDateTime) - strtotime($dateTimeAction);
+                                             $diffInMinutes = $diffInSeconds / 60;
+                                             $fromMinutesIntoDecimalNumber = number_format($diffInMinutes, 2, '.', '');
+                                             if ($fromMinutesIntoDecimalNumber >= $admin_panel_settings->after_minute_calculate_early_departure) {
+                                                 $dataToUpdate['early_departure'] = $fromMinutesIntoDecimalNumber;
                                                         $counterCutQuarterDay = get_count_where(new AttendanceDeparture(), [
                                                             'company_id' => $company_id,
                                                             'finance_monthly_calendar_id' => $this->finance_monthly_calendar_id,
@@ -818,8 +866,10 @@ class AttendanceDepartureImport implements ToCollection
                                         $dataToInsert2['notes'] = 'من خلال ملف Excel';
                                         if ($employee['fixed_shift'] == 1) {
 
-                                            if ($shiftData['start_time'] < $dataToInsert2['checkInTime']) {
-                                                $diffInSeconds = strtotime($dataToInsert2['checkInTime']) - strtotime($shiftData['start_time']);
+                                             $targetDate = date('Y-m-d', strtotime($dateTimeAction));
+                                             $shiftStartDateTime = $targetDate . ' ' . $shiftData['start_time'];
+                                             if (strtotime($dateTimeAction) > strtotime($shiftStartDateTime)) {
+                                                 $diffInSeconds = strtotime($dateTimeAction) - strtotime($shiftStartDateTime);
                                                 $diffInMinutes = $diffInSeconds / 60;
                                                 $fromMinutesIntoDecimalNumber = number_format($diffInMinutes, 2, '.', '');
                                                 if ($fromMinutesIntoDecimalNumber >= $admin_panel_settings->after_minute_calculate_delay) {
@@ -905,8 +955,10 @@ class AttendanceDepartureImport implements ToCollection
                             $dataToInsert2['added_by'] = Auth::id();
                             $dataToInsert2['notes'] = 'من خلال ملف Excel';
                             if ($employee['fixed_shift'] == 1) {
-                                if ($shiftData['start_time'] < $dataToInsert2['checkInTime']) {
-                                    $diffInSeconds = strtotime($dataToInsert2['checkInTime']) - strtotime($shiftData['start_time']);
+                                $targetDate = date('Y-m-d', strtotime($dateTimeAction));
+                                $shiftStartDateTime = $targetDate . ' ' . $shiftData['start_time'];
+                                if (strtotime($dateTimeAction) > strtotime($shiftStartDateTime)) {
+                                    $diffInSeconds = strtotime($dateTimeAction) - strtotime($shiftStartDateTime);
                                     $diffInMinutes = $diffInSeconds / 60;
                                     $fromMinutesIntoDecimalNumber = number_format($diffInMinutes, 2, '.', '');
                                     if ($fromMinutesIntoDecimalNumber >= $admin_panel_settings->after_minute_calculate_delay) {

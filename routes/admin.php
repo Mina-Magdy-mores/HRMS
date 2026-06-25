@@ -32,6 +32,7 @@ use App\Http\Controllers\Admin\QualificationController;
 use App\Http\Controllers\Admin\ReligionController;
 use App\Http\Controllers\Admin\ResignationController;
 use App\Http\Controllers\Admin\ShiftsTypeController;
+use App\Http\Controllers\Admin\VacationTypeController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -112,6 +113,14 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::get('/resignations/{id}/edit', [ResignationController::class, 'edit'])->name('resignations.edit');
         Route::put('/resignations/{id}', [ResignationController::class, 'update'])->name('resignations.update');
         Route::delete('/resignations/{id}', [ResignationController::class, 'destroy'])->name('resignations.destroy');
+
+        // Vacation Types routes
+        Route::get('/vacation-types', [VacationTypeController::class, 'index'])->name('vacation-types.index');
+        Route::get('/vacation-types/create', [VacationTypeController::class, 'create'])->name('vacation-types.create');
+        Route::post('/vacation-types', [VacationTypeController::class, 'store'])->name('vacation-types.store');
+        Route::get('/vacation-types/{id}/edit', [VacationTypeController::class, 'edit'])->name('vacation-types.edit');
+        Route::put('/vacation-types/{id}', [VacationTypeController::class, 'update'])->name('vacation-types.update');
+        Route::delete('/vacation-types/{id}', [VacationTypeController::class, 'destroy'])->name('vacation-types.destroy');
 
         // nationalities routes
         Route::get('/nationalities', [NationalityController::class, 'index'])->name('nationalities.index');
@@ -336,6 +345,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/attendanceDepartures/finger-print-details/save-row', [AttendanceDepartureController::class, 'saveFingerPrintRow'])->name('attendanceDepartures.finger-print-details.save-row');
         Route::post('/attendanceDepartures/finger-print-details/save-all', [AttendanceDepartureController::class, 'saveAllFingerPrintRows'])->name('attendanceDepartures.finger-print-details.save-all');
         Route::post('/attendanceDepartures/finger-print-details/day-movements', [AttendanceDepartureController::class, 'getDayMovements'])->name('attendanceDepartures.finger-print-details.day-movements');
+        Route::post('/attendanceDepartures/finger-print-details/update-day-movements', [AttendanceDepartureController::class, 'updateDayMovements'])->name('attendanceDepartures.finger-print-details.update-day-movements');
 
     });
 
