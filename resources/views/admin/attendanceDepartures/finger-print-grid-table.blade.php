@@ -47,10 +47,10 @@
 </style>
 
 <!-- Fixed Scroll Buttons on Viewport Sides -->
-<button type="button" class="fixed-scroll-btn fixed-scroll-right" onclick="scrollGrid('right')" title="تحريك لليمين">
+<button type="button" class="fixed-scroll-btn fixed-scroll-right d-print-none" onclick="scrollGrid('right')" title="تحريك لليمين">
     <i class="fas fa-chevron-right"></i>
 </button>
-<button type="button" class="fixed-scroll-btn fixed-scroll-left" onclick="scrollGrid('left')" title="تحريك لليسار">
+<button type="button" class="fixed-scroll-btn fixed-scroll-left d-print-none" onclick="scrollGrid('left')" title="تحريك لليسار">
     <i class="fas fa-chevron-left"></i>
 </button>
 
@@ -76,7 +76,7 @@
                     <th style="min-width: 100px; vertical-align: middle;">اتخاذ إجراء</th>
                     <th style="min-width: 150px; vertical-align: middle;">ملاحظات</th>
                     @if ($is_editable)
-                        <th style="min-width: 80px; vertical-align: middle;">حفظ</th>
+                        <th style="min-width: 80px; vertical-align: middle;" class="actions-column">حفظ</th>
                     @endif
                 </tr>
             </thead>
@@ -213,7 +213,7 @@
                     
                     <!-- Action buttons (Row level save) -->
                     @if ($is_editable)
-                        <td class="align-middle">
+                        <td class="align-middle actions-column">
                             @if (!$is_row_archived)
                                 <button type="button" class="btn btn-success btn-xs save-row-btn shadow-sm" title="حفظ هذا اليوم">
                                     <i class="fas fa-save"></i> حفظ
@@ -246,7 +246,7 @@
                 <td class="align-middle font-weight-bold" style="color: #17a2b8 !important;">{{ number_format($totals['approved_attendance_delay_early_departure'], 2) }}</td>
                 <td class="align-middle" colspan="2"></td>
                 @if ($is_editable)
-                    <td class="align-middle"></td>
+                    <td class="align-middle actions-column"></td>
                 @endif
             </tr>
         </tfoot>
@@ -255,7 +255,7 @@
 </div>
 
 @if ($is_editable)
-    <div class="d-flex justify-content-start mt-3 p-3 bg-light border rounded">
+    <div class="d-flex justify-content-start mt-3 p-3 bg-light border rounded d-print-none">
         <button type="button" id="btn_save_all" class="btn btn-success shadow-sm font-weight-bold ml-2">
             <i class="fas fa-check-double mr-1"></i> حفظ جميع التعديلات دفعة واحدة
         </button>

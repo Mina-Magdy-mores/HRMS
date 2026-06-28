@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\MainSalaryEmployeeDeductionController;
 use App\Http\Controllers\Admin\MainSalaryEmployeeDeductionTypeController;
 use App\Http\Controllers\Admin\MainSalaryEmployeeBonusController;
 use App\Http\Controllers\Admin\MainSalaryEmployeeController;
+use App\Http\Controllers\Admin\MainEmployeesVacationsBalancesController;
 use App\Http\Controllers\Admin\MainSalaryEmployeeLoanController;
 use App\Http\Controllers\Admin\MainSalaryEmployeePLoanController;
 use App\Http\Controllers\Admin\MainSalaryRecordController;
@@ -173,6 +174,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         //employees routs
         Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
         Route::get('/employees/{id}/details', [EmployeeController::class, 'getDetails'])->name('employees.details');
+        Route::get('/employees/{id}/show', [EmployeeController::class, 'show'])->name('employees.show');
         Route::get('/employees/create', [EmployeeController::class, 'create'])->name('employees.create');
         Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
         Route::get('/employees/{id}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
@@ -329,7 +331,13 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/main-salary-employee/archive', [MainSalaryEmployeeController::class, 'archive'])->name('main-salary-employee.archive');
         Route::post('/main-salary-employee/archive-month', [MainSalaryEmployeeController::class, 'archiveMonth'])->name('main-salary-employee.archive-month');
         Route::post('/main-salary-employee/recalculate_main_salary', [MainSalaryEmployeeController::class, 'recalculateMainSalary'])->name('main-salary-employee.recalculate_main_salary');
-        
+
+        //Main employees vacations balances routes
+        Route::get('/main-employees-vacations-balances', [MainEmployeesVacationsBalancesController::class, 'index'])->name('main-employees-vacations-balances.index');
+        Route::post('/main-employees-vacations-balances/search', [MainEmployeesVacationsBalancesController::class, 'search'])->name('main-employees-vacations-balances.search');
+        Route::get('/main-employees-vacations-balances/{id}/show', [MainEmployeesVacationsBalancesController::class, 'show'])->name('main-employees-vacations-balances.show');
+        Route::post('/main-employees-vacations-balances/{id}/ajax-search-show', [MainEmployeesVacationsBalancesController::class, 'ajaxSearchShow'])->name('main-employees-vacations-balances.ajax-search-show');
+
         //Finger print routes
         Route::get('/attendanceDepartures', [AttendanceDepartureController::class, 'index'])->name('attendanceDepartures.index');
         Route::get('/attendanceDepartures/{id}/show', [AttendanceDepartureController::class, 'show'])->name('attendanceDepartures.show');
@@ -341,6 +349,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::put('/attendanceDepartures', [AttendanceDepartureController::class, 'update'])->name('attendanceDepartures.update');
         Route::post('/attendanceDepartures/print-search', [AttendanceDepartureController::class, 'printSearch'])->name('attendanceDepartures.print-search');
         Route::get('/attendanceDepartures/finger-print-details/{id}/{finance_monthly_calendar_id}', [AttendanceDepartureController::class, 'fingerPrintDetails'])->name('attendanceDepartures.finger-print-details');
+        Route::get('/attendanceDepartures/finger-print-details/{id}/{finance_monthly_calendar_id}/print', [AttendanceDepartureController::class, 'printFingerPrintDetails'])->name('attendanceDepartures.finger-print-details.print');
         Route::post('/attendanceDepartures/finger-print-details/load-grid', [AttendanceDepartureController::class, 'loadFingerPrintGrid'])->name('attendanceDepartures.finger-print-details.load-grid');
         Route::post('/attendanceDepartures/finger-print-details/save-row', [AttendanceDepartureController::class, 'saveFingerPrintRow'])->name('attendanceDepartures.finger-print-details.save-row');
         Route::post('/attendanceDepartures/finger-print-details/save-all', [AttendanceDepartureController::class, 'saveAllFingerPrintRows'])->name('attendanceDepartures.finger-print-details.save-all');

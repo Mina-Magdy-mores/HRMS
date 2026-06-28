@@ -43,6 +43,7 @@ class AdminPanelSettingRequest extends FormRequest
             'sanctions_value_fourth_absence' => 'sometimes|numeric|min:0',
             'after_mins_neglect' => 'sometimes|integer|min:0',
             'after_shift_max_extra_hours' => 'sometimes|integer|min:0',
+            'is_allowed_to_transfer_vacation' => 'required|integer|in:0,1',
         ];
     }
 
@@ -83,6 +84,9 @@ class AdminPanelSettingRequest extends FormRequest
             'after_shift_max_extra_hours.required' => 'ساعات إضافية بعد الشيفت لتقفيل البصمة مطلوب',
             'after_shift_max_extra_hours.integer' => 'ساعات إضافية بعد الشيفت لتقفيل البصمة يجب ان يكون رقم صحيح',
             'after_shift_max_extra_hours.min' => 'ساعات إضافية بعد الشيفت لتقفيل البصمة يجب الا يقل عن 0',
+            'is_allowed_to_transfer_vacation.required' => 'حقل هل يسمح بترحيل رصيد الإجازات مطلوب',
+            'is_allowed_to_transfer_vacation.integer' => 'حقل هل يسمح بترحيل رصيد الإجازات يجب ان يكون رقم',
+            'is_allowed_to_transfer_vacation.in' => 'حقل هل يسمح بترحيل رصيد الإجازات غير صحيح',
         ];
     }
 }

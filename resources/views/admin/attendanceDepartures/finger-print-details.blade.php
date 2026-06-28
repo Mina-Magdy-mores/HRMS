@@ -17,7 +17,7 @@
 <div class="container-fluid">
 
     <!-- Top Navigation & Actions Bar -->
-    <div class="card card-outline card-info shadow mb-4">
+    <div class="card card-outline card-info shadow mb-4 d-print-none">
             <div class="card-body py-3">
                 <div class="row align-items-center">
                 <div class="col-md-6">
@@ -41,7 +41,7 @@
     </div>
 
     <!-- Employee Info Block -->
-    <div class="card card-primary card-outline shadow mb-4">
+    <div class="card card-primary card-outline shadow mb-4 d-print-none">
         <div class="card-body">
             <div class="row align-items-center">
                 <!-- Employee Image -->
@@ -98,7 +98,7 @@
 
     <!-- Month Switcher & Statistics Card -->
     <div class="card card-primary card-outline shadow mb-4">
-        <div class="card-header py-3">
+        <div class="card-header py-3 d-print-none">
             <div class="row align-items-center">
                 <div class="col-md-6">
                     <h4 class="card-title text-primary font-weight-bold mb-0">
@@ -107,6 +107,9 @@
                     </h4>
                 </div>
                 <div class="col-md-6 text-right">
+                    <button type="button" id="btn_print_grid" class="btn btn-info btn-sm shadow-sm font-weight-bold mx-1">
+                        <i class="fas fa-print mr-1"></i> طباعة الجدول
+                    </button>
                     <button type="button" id="btn_reload_grid" class="btn btn-warning btn-sm shadow-sm font-weight-bold">
                         <i class="fas fa-sync-alt mr-1"></i> إعادة تحميل بصمة الشهر
                     </button>
@@ -114,7 +117,7 @@
             </div>
         </div>
         <div class="card-body">
-            <div class="row mb-3">
+            <div class="row mb-3 d-print-none">
                 <div class="col-md-4">
                     <div class="form-group mb-0">
                         <label for="select_finance_monthly_calendar" class="font-weight-bold text-secondary">اختر شهر سجل الراتب المالي:</label>
@@ -140,7 +143,7 @@
             </div>
 
             <!-- Fingerprint Upload Stats Panel -->
-            <div class="card border-0 shadow-sm mb-4 bg-light" id="fingerprint_stats_card" style="border-right: 5px solid #28a745 !important;">
+            <div class="card border-0 shadow-sm mb-4 bg-light d-print-none" id="fingerprint_stats_card" style="border-right: 5px solid #28a745 !important;">
                 <div class="card-body p-3">
                     <div class="row align-items-center">
                         <div class="col-md-6 mb-2 mb-md-0">
@@ -161,6 +164,7 @@
                     </div>
                 </div>
             </div>
+
 
             <!-- Day-by-Day Attendance Table Container -->
             <div id="grid_container">
@@ -388,6 +392,15 @@
         // Reload grid on reload button click
         $('#btn_reload_grid').on('click', function() {
             loadGrid();
+        });
+
+        // Print grid on print button click - opens dedicated print tab
+        $('#btn_print_grid').on('click', function() {
+            var calendarId = $('#select_finance_monthly_calendar').val();
+            var employeeId = '{{ $employee->id }}';
+            var url = '{{ route('admin.attendanceDepartures.finger-print-details.print', [':id', ':calendar_id']) }}';
+            url = url.replace(':id', employeeId).replace(':calendar_id', calendarId);
+            window.open(url, '_blank');
         });
 
         // Save row AJAX

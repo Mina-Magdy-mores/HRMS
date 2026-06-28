@@ -282,6 +282,22 @@
                             @include('admin.errors.errors', ['value' => 'first_balance_begin_vacation'])
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>هل يسمح بترحيل رصيد الإجازات؟</label>
+                            <select name="is_allowed_to_transfer_vacation"
+                                class="form-control editable-input {{ $errors->has('is_allowed_to_transfer_vacation') ? 'is-invalid' : '' }}"
+                                disabled>
+                                <option value="1"
+                                    {{ old('is_allowed_to_transfer_vacation', $general_settings->is_allowed_to_transfer_vacation) == 1 ? 'selected' : '' }}>
+                                    نعم</option>
+                                <option value="0"
+                                    {{ old('is_allowed_to_transfer_vacation', $general_settings->is_allowed_to_transfer_vacation) == 0 ? 'selected' : '' }}>
+                                    لا</option>
+                            </select>
+                            @include('admin.errors.errors', ['value' => 'is_allowed_to_transfer_vacation'])
+                        </div>
+                    </div>
                 </div>
 
                 <hr>

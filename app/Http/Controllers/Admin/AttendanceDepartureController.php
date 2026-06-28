@@ -130,6 +130,147 @@ class AttendanceDepartureController extends Controller
         ]);
     }
 
+    public function printFingerPrintDetails($id, $finance_monthly_calendar_id)
+    {
+        $company_id = Auth::user()->company_id;
+        $adminPanelSetting = AdminPanelSetting::where('company_id', $company_id)->first();
+        $systemData = [
+            'system_name' => $adminPanelSetting->company_name ?? '',
+            'photo'       => $adminPanelSetting->image ?? '',
+            'address'     => $adminPanelSetting->address ?? '',
+            'phone'       => $adminPanelSetting->phone ?? '',
+            'email'       => $adminPanelSetting->email ?? '',
+        ];
+
+        $financeMonthlyCalendar = FinanceMonthlyCalendar::with('month')
+            ->where('company_id', $company_id)
+            ->where('id', $finance_monthly_calendar_id)
+            ->first();
+
+        if (empty($financeMonthlyCalendar)) {
+            return redirect()->back()->with('error', 'عفوا غير قادر للوصول الى بيانات الشهر');
+        }
+
+        $employee = Employee::with(['job', 'branch', 'department'])
+            ->where('company_id', $company_id)
+            ->where('id', $id)
+            ->first();
+            
+        if (empty($employee)) {
+            return redirect()->back()->with('error', 'عفوا غير قادر للوصول الى بيانات الموظف');
+        }
+
+        // Fetch active occasions, deduction types, vacation types
+        $occasions = Occasion::where('company_id', $company_id)->where('status', 1)->get();
+        $deductionTypes = DeductionType::where('company_id', $company_id)->where('status', 1)->get();
+        $vacationTypes = VacationType::where('company_id', $company_id)->where('status', 1)->get();
+
+        // Get action counts
+        $actionCounts = AttendanceDepartureActionsExcel::where('employee_id', $id)
+            ->where('finance_monthly_calendar_id', $finance_monthly_calendar_id)
+            ->where('company_id', $company_id)
+            ->select(DB::raw('DATE(dateTimeAction) as action_date'), DB::raw('count(*) as total'))
+            ->groupBy(DB::raw('DATE(dateTimeAction)'))
+            ->pluck('total', 'action_date');
+
+        // Fetch all attendance records
+        $attendances = AttendanceDeparture::with('actions')->where([
+            'company_id' => $company_id,
+            'employee_id' => $id,
+            'finance_monthly_calendar_id' => $finance_monthly_calendar_id
+        ])->get()->sortBy(function ($att) {
+            return ($att->checkInDateTime !== null || $att->checkOutDateTime !== null) ? 1 : 0;
+        })->keyBy('day_of_finger_print');
+
+        // Generate days
+        $startDate = \Carbon\Carbon::parse($financeMonthlyCalendar->start_date_for_calculation);
+        $endDate = \Carbon\Carbon::parse($financeMonthlyCalendar->end_date_for_calculation);
+
+        $days = [];
+        for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+            $dateStr = $date->format('Y-m-d');
+            $attendance = $attendances->get($dateStr);
+            $days[] = [
+                'date' => $dateStr,
+                'day_name' => $date->locale('ar')->translatedFormat('l'),
+                'attendance' => $attendance,
+                'movements_count' => $actionCounts->get($dateStr, 0)
+            ];
+        }
+
+        // Calculate totals
+        $totals = [
+            'total_hours' => 0,
+            'overtime_hours' => 0,
+            'absence_hours' => 0,
+            'cutting_days' => 0,
+            'attendance_delay' => 0,
+            'early_departure' => 0,
+            'approved_attendance_delay_early_departure' => 0,
+            'vacation_summary' => '',
+            'occasion_summary' => '',
+        ];
+
+        $vacationCounts = [];
+        $occasionCounts = [];
+
+        foreach ($days as $day) {
+            $att = $day['attendance'];
+            if ($att) {
+                $totals['total_hours'] += (float)($att->total_hours ?? 0);
+                $totals['overtime_hours'] += (float)($att->overtime_hours ?? 0);
+                $totals['absence_hours'] += (float)($att->absence_hours ?? 0);
+                $totals['cutting_days'] += (float)($att->cutting_days ?? 0);
+                $totals['attendance_delay'] += (float)($att->attendance_delay ?? 0);
+                $totals['early_departure'] += (float)($att->early_departure ?? 0);
+                $totals['approved_attendance_delay_early_departure'] += (float)($att->approved_attendance_delay_early_departure ?? 0);
+
+                if (!empty($att->vacation_id) && $att->vacation_id > 0) {
+                    if (!isset($vacationCounts[$att->vacation_id])) {
+                        $vacationCounts[$att->vacation_id] = 0;
+                    }
+                    $vacationCounts[$att->vacation_id]++;
+                }
+
+                if (!empty($att->occasion_id) && $att->occasion_id > 0) {
+                    if (!isset($occasionCounts[$att->occasion_id])) {
+                        $occasionCounts[$att->occasion_id] = 0;
+                    }
+                    $occasionCounts[$att->occasion_id]++;
+                }
+            }
+        }
+
+        $vacationSummary = [];
+        foreach ($vacationCounts as $vacId => $count) {
+            $vt = $vacationTypes->firstWhere('id', $vacId);
+            if ($vt) {
+                $vacationSummary[] = $vt->name . ' (' . $count . ')';
+            }
+        }
+        $totals['vacation_summary'] = implode(' ، ', $vacationSummary);
+
+        $occasionSummary = [];
+        foreach ($occasionCounts as $occId => $count) {
+            $occ = $occasions->firstWhere('id', $occId);
+            if ($occ) {
+                $occasionSummary[] = $occ->name . ' (' . $count . ')';
+            }
+        }
+        $totals['occasion_summary'] = implode(' ، ', $occasionSummary);
+
+        return view('admin.attendanceDepartures.print_details', [
+            'financeMonthlyCalendar' => $financeMonthlyCalendar,
+            'employee' => $employee,
+            'days' => $days,
+            'totals' => $totals,
+            'occasions' => $occasions,
+            'deductionTypes' => $deductionTypes,
+            'vacationTypes' => $vacationTypes,
+            'systemData' => $systemData
+        ]);
+    }
+
     public function ajaxSearch(Request $request)
     {
         if ($request->ajax()) {
@@ -320,8 +461,6 @@ class AttendanceDepartureController extends Controller
                 }
 
                 $inserted_any = false;
-                $vacations_assigned_this_run = 0;
-                $absences_assigned_this_run = 0;
 
                 DB::transaction(function () use (
                     $startDateTemp,
@@ -334,10 +473,7 @@ class AttendanceDepartureController extends Controller
                     $mainSalaryEmployee,
                     $occasions,
                     $shift_hours,
-                    $adminSetting,
-                    &$inserted_any,
-                    &$vacations_assigned_this_run,
-                    &$absences_assigned_this_run
+                    &$inserted_any
                 ) {
                     for ($date = $startDateTemp->copy(); $date->lte($endDateTemp); $date->addDay()) {
                         $dateStr = $date->format('Y-m-d');
@@ -392,79 +528,9 @@ class AttendanceDepartureController extends Controller
                                 $data['absence_hours'] = 0;
                                 $data['notes'] = 'إجازة رسمية: ' . $matchedOccasion->name;
                             } else {
-                                // Check if employee is active for vacation and has vacation balance
-                                $has_vacation_balance = false;
-                                if ($employee->active_for_vacation == 1 && $employee->hire_date && $adminSetting) {
-                                    $hireDate = \Carbon\Carbon::parse($employee->hire_date);
-                                    $targetDate = \Carbon\Carbon::parse($dateStr);
-                                    $daysSinceHire = $hireDate->diffInDays($targetDate, false);
-
-                                    if ($daysSinceHire >= 0) {
-                                        $first_balance = (float)($adminSetting->first_balance_begin_vacation ?? 0);
-                                        $after_days = (float)($adminSetting->after_days_begin_vacation ?? 0);
-                                        $monthly_bal = (float)($adminSetting->monthly_vacation_balance ?? 0);
-
-                                        $accumulated = $first_balance;
-                                        if ($daysSinceHire >= $after_days) {
-                                            $monthsWorked = $hireDate->diffInMonths($targetDate);
-                                            $accumulated += ($monthsWorked * $monthly_bal);
-                                        }
-
-                                        $taken = AttendanceDeparture::where('employee_id', $employee->id)
-                                            ->where('company_id', $company_id)
-                                            ->where('day_of_finger_print', '!=', $dateStr) // Skip current date
-                                            ->where(function ($query) {
-                                                $query->where('vacation_id', '>', 0)
-                                                    ->orWhere(function ($q) {
-                                                        $q->where('absence_hours', '>', 0)
-                                                            ->where('cutting_days', 0);
-                                                    });
-                                            })
-                                            ->count();
-
-                                        $available_balance = $accumulated - $taken - $vacations_assigned_this_run;
-                                        if ($available_balance >= 1) {
-                                            $has_vacation_balance = true;
-                                        }
-                                    }
-                                }
-
-                                if ($has_vacation_balance) {
-                                    $data['absence_hours'] = $shift_hours;
-                                    $data['cutting_days'] = 0; // Paid absence deducted from vacation balance
-                                    $data['notes'] = 'غياب تلقائي (خصماً من رصيد الإجازات المتاح)';
-                                    $vacations_assigned_this_run++;
-                                } else {
-                                    // Calculate the absence counter to apply the sanctions from general settings
-                                    $existingAbsencesCount = AttendanceDeparture::where([
-                                        'employee_id' => $employee->id,
-                                        'company_id' => $company_id,
-                                        'finance_monthly_calendar_id' => $finance_monthly_calendar_id
-                                    ])->where('day_of_finger_print', '!=', $dateStr) // Skip current date
-                                        ->where('absence_hours', '>', 0)
-                                        ->where('cutting_days', '>', 0) // Only count unpaid absences
-                                        ->count();
-
-                                    $current_absence_number = $existingAbsencesCount + $absences_assigned_this_run + 1;
-
-                                    $cutting_days = 1.00;
-                                    if ($adminSetting) {
-                                        if ($current_absence_number == 1) {
-                                            $cutting_days = (float)($adminSetting->sanctions_value_first_absence ?? 1.00);
-                                        } elseif ($current_absence_number == 2) {
-                                            $cutting_days = (float)($adminSetting->sanctions_value_second_absence ?? 2.00);
-                                        } elseif ($current_absence_number == 3) {
-                                            $cutting_days = (float)($adminSetting->sanctions_value_third_absence ?? 3.00);
-                                        } else {
-                                            $cutting_days = (float)($adminSetting->sanctions_value_fourth_absence ?? 5.00);
-                                        }
-                                    }
-
-                                    $data['absence_hours'] = $shift_hours;
-                                    $data['cutting_days'] = $cutting_days;
-                                    $data['notes'] = 'غياب تلقائي (غياب رقم ' . $current_absence_number . ' - خصم ' . $cutting_days . ' يوم)';
-                                    $absences_assigned_this_run++;
-                                }
+                                $data['absence_hours'] = $shift_hours;
+                                $data['cutting_days'] = 0;
+                                $data['notes'] = 'غياب تلقائي';
                             }
 
                             if (!$attendance) {
@@ -476,13 +542,10 @@ class AttendanceDepartureController extends Controller
                         }
                     }
 
-                    if ($inserted_any && $mainSalaryEmployee) {
-                        $this->recalculate_main_salary($mainSalaryEmployee->id);
-                    }
                 });
 
+                // Refetch after inserts if any new records were added
                 if ($inserted_any) {
-                    // Refetch existing daily attendance records
                     $attendances = AttendanceDeparture::with('actions')->where([
                         'company_id' => $company_id,
                         'employee_id' => $employee_id,
@@ -533,7 +596,29 @@ class AttendanceDepartureController extends Controller
                 }
             }
 
-            if ($sync_needed) {
+            // =====================================================================
+            // إعادة الحساب الشاملة لأي شهر مفتوح
+            // يُشغَّل دائماً عند الضغط على الزرار بغض النظر عن التغييرات
+            // يضمن تحديث: الغيابات، التأخيرات، الانصراف المبكر، الخصومات، الراتب
+            // =====================================================================
+            if ($financeMonthlyCalendar->status == 1) {
+                AttendanceDeparture::recalculateEmployeeMonth($employee->id, $finance_monthly_calendar_id, $company_id);
+
+                if (isset($mainSalaryEmployee) && $mainSalaryEmployee) {
+                    $this->recalculate_main_salary($mainSalaryEmployee->id);
+                }
+
+                // Refetch latest data after full recalculation
+                $attendances = AttendanceDeparture::with('actions')->where([
+                    'company_id' => $company_id,
+                    'employee_id' => $employee_id,
+                    'finance_monthly_calendar_id' => $finance_monthly_calendar_id
+                ])->get()->sortBy(function ($att) {
+                    return ($att->checkInDateTime !== null || $att->checkOutDateTime !== null) ? 1 : 0;
+                })->keyBy('day_of_finger_print');
+
+            } elseif ($sync_needed) {
+                // للشهور المغلقة: فقط نحدث البيانات لو في تزامن
                 $attendances = AttendanceDeparture::with('actions')->where([
                     'company_id' => $company_id,
                     'employee_id' => $employee_id,
@@ -1114,301 +1199,7 @@ class AttendanceDepartureController extends Controller
 
     private function recalculateAttendanceDay($attendance, $employee, $company_id)
     {
-        $admin_panel_settings = getColsWhereRow(new AdminPanelSetting(), [
-            'after_minute_calculate_delay',
-            'after_minute_calculate_early_departure',
-            'after_minute_quarter_day_cut',
-            'after_days_half_day_cut',
-            'after_days_allday_day_cut',
-            'after_mins_neglect',
-            'sanctions_value_first_absence',
-            'sanctions_value_second_absence',
-            'sanctions_value_third_absence',
-            'sanctions_value_fourth_absence',
-            'first_balance_begin_vacation',
-            'after_days_begin_vacation',
-            'monthly_vacation_balance'
-        ], ['company_id' => $company_id]);
-
-        if (empty($admin_panel_settings)) {
-            $admin_panel_settings = (object)[
-                'after_minute_calculate_delay' => 15,
-                'after_minute_calculate_early_departure' => 15,
-                'after_minute_quarter_day_cut' => 3,
-                'after_days_half_day_cut' => 3,
-                'after_days_allday_day_cut' => 3,
-                'after_mins_neglect' => 0,
-                'sanctions_value_first_absence' => 1.00,
-                'sanctions_value_second_absence' => 2.00,
-                'sanctions_value_third_absence' => 3.00,
-                'sanctions_value_fourth_absence' => 5.00,
-                'first_balance_begin_vacation' => 0,
-                'after_days_begin_vacation' => 0,
-                'monthly_vacation_balance' => 0
-            ];
-        }
-
-        $shiftHours = null;
-        $shiftData = null;
-        if ($employee->fixed_shift == 1) {
-            $shiftData = ShiftsType::where('company_id', $company_id)->find($employee->shift_type_id);
-            if ($shiftData) {
-                $shiftHours = $shiftData->total_hours;
-            }
-        } else {
-            if ($employee->daily_work_hours > 0) {
-                $shiftHours = $employee->daily_work_hours;
-            }
-        }
-
-        $date = $attendance->day_of_finger_print;
-        $checkInDateTime = $attendance->checkInDateTime;
-        $checkOutDateTime = $attendance->checkOutDateTime;
-
-        $total_hours = 0;
-        $overtime_hours = 0;
-        $absence_hours = 0;
-        $attendance_delay = 0;
-        $early_departure = 0;
-        $cutting_days = 0;
-        $notes = $attendance->notes;
-
-        $is_vacation_or_holiday = ($attendance->vacation_id > 0 || $attendance->occasion_id > 0);
-
-        if ($checkInDateTime && $checkOutDateTime) {
-            $diffInSeconds = strtotime($checkOutDateTime) - strtotime($checkInDateTime);
-            $diffInHours = max(0, $diffInSeconds / 3600);
-            $total_hours = number_format($diffInHours, 2, '.', '');
-
-            if ($shiftHours !== null) {
-                if ($diffInHours < $shiftHours) {
-                    $overtime_hours = 0;
-                    $absence_hours = number_format($shiftHours - $diffInHours, 2, '.', '');
-                } else {
-                    $overtime_hours = number_format($diffInHours - $shiftHours, 2, '.', '');
-                    $absence_hours = 0;
-                }
-            }
-            if ($notes && str_contains($notes, 'غياب تلقائي')) {
-                $notes = 'تم التحديث يدوياً';
-            }
-        } else {
-            // One or both are missing
-            if ($is_vacation_or_holiday) {
-                $absence_hours = 0;
-                $cutting_days = 0;
-                $total_hours = 0;
-                $overtime_hours = 0;
-            } else {
-                if (!$checkInDateTime && !$checkOutDateTime) {
-                    // Full absence
-                    $absence_hours = $shiftHours !== null ? $shiftHours : 0;
-                    $total_hours = 0;
-                    $overtime_hours = 0;
-
-                    // Match occasion if any exists for this date
-                    $occasions = Occasion::where('company_id', $company_id)->where('status', 1)->get();
-                    $matchedOccasion = null;
-                    foreach ($occasions as $occ) {
-                        if ($date >= $occ->from_date && $date <= $occ->to_date) {
-                            $matchedOccasion = $occ;
-                            break;
-                        }
-                    }
-
-                    if ($matchedOccasion) {
-                        $attendance->occasion_id = $matchedOccasion->id;
-                        $absence_hours = 0;
-                        $cutting_days = 0;
-                        $notes = 'إجازة رسمية: ' . $matchedOccasion->name;
-                    } else {
-                        // Check if employee is active for vacation and has vacation balance
-                        $has_vacation_balance = false;
-                        if ($employee->active_for_vacation == 1 && $employee->hire_date) {
-                            $hireDate = \Carbon\Carbon::parse($employee->hire_date);
-                            $targetDate = \Carbon\Carbon::parse($date);
-                            $daysSinceHire = $hireDate->diffInDays($targetDate, false);
-
-                            if ($daysSinceHire >= 0) {
-                                $first_balance = (float)($admin_panel_settings->first_balance_begin_vacation ?? 0);
-                                $after_days = (float)($admin_panel_settings->after_days_begin_vacation ?? 0);
-                                $monthly_bal = (float)($admin_panel_settings->monthly_vacation_balance ?? 0);
-
-                                $accumulated = $first_balance;
-                                if ($daysSinceHire >= $after_days) {
-                                    $monthsWorked = $hireDate->diffInMonths($targetDate);
-                                    $accumulated += ($monthsWorked * $monthly_bal);
-                                }
-
-                                $taken = AttendanceDeparture::where('employee_id', $employee->id)
-                                    ->where('company_id', $company_id)
-                                    ->where('day_of_finger_print', '!=', $date)
-                                    ->where(function ($query) {
-                                        $query->where('vacation_id', '>', 0)
-                                            ->orWhere(function ($q) {
-                                                $q->where('absence_hours', '>', 0)
-                                                    ->where('cutting_days', 0);
-                                            });
-                                    })
-                                    ->count();
-
-                                $available_balance = $accumulated - $taken;
-                                if ($available_balance >= 1) {
-                                    $has_vacation_balance = true;
-                                }
-                            }
-                        }
-
-                        if ($has_vacation_balance) {
-                            $cutting_days = 0;
-                            $notes = 'غياب تلقائي (خصماً من رصيد الإجازات المتاح)';
-                        } else {
-                            $existingAbsencesCount = AttendanceDeparture::where([
-                                'employee_id' => $employee->id,
-                                'company_id' => $company_id,
-                                'finance_monthly_calendar_id' => $attendance->finance_monthly_calendar_id
-                            ])->where('id', '!=', $attendance->id)
-                              ->where('absence_hours', '>', 0)
-                              ->where('cutting_days', '>', 0)
-                              ->count();
-
-                            $current_absence_number = $existingAbsencesCount + 1;
-
-                            $cutting_days = 1.00;
-                            if ($current_absence_number == 1) {
-                                $cutting_days = (float)($admin_panel_settings->sanctions_value_first_absence ?? 1.00);
-                            } elseif ($current_absence_number == 2) {
-                                $cutting_days = (float)($admin_panel_settings->sanctions_value_second_absence ?? 2.00);
-                            } elseif ($current_absence_number == 3) {
-                                $cutting_days = (float)($admin_panel_settings->sanctions_value_third_absence ?? 3.00);
-                            } else {
-                                $cutting_days = (float)($admin_panel_settings->sanctions_value_fourth_absence ?? 5.00);
-                            }
-
-                            $notes = 'غياب تلقائي (غياب رقم ' . $current_absence_number . ' - خصم ' . $cutting_days . ' يوم)';
-                        }
-                    }
-                } else {
-                    // Only check-in or only check-out
-                    $absence_hours = $shiftHours !== null ? $shiftHours : 0;
-                    $total_hours = 0;
-                    $overtime_hours = 0;
-                    $cutting_days = 0;
-                    if ($notes && str_contains($notes, 'غياب تلقائي')) {
-                        $notes = 'حضور/انصراف ناقص';
-                    }
-                }
-            }
-        }
-
-        // Delay calculation (if checkInDateTime exists)
-        if ($checkInDateTime && $employee->fixed_shift == 1 && !empty($shiftData)) {
-            $shiftStartDateTime = $date . ' ' . $shiftData->start_time;
-            if (strtotime($checkInDateTime) > strtotime($shiftStartDateTime)) {
-                $diffInSeconds = strtotime($checkInDateTime) - strtotime($shiftStartDateTime);
-                $diffInMinutes = $diffInSeconds / 60;
-                $fromMinutesIntoDecimalNumber = number_format($diffInMinutes, 2, '.', '');
-                if ($fromMinutesIntoDecimalNumber >= $admin_panel_settings->after_minute_calculate_delay) {
-                    $attendance_delay = $fromMinutesIntoDecimalNumber;
-
-                    $counterCutQuarterDay = AttendanceDeparture::where([
-                        'company_id' => $company_id,
-                        'finance_monthly_calendar_id' => $attendance->finance_monthly_calendar_id,
-                        'employee_id' => $employee->id,
-                        'cutting_days' => .25
-                    ])->where('id', '!=', $attendance->id)->count();
-
-                    $counterCutHalfDay = AttendanceDeparture::where([
-                        'company_id' => $company_id,
-                        'finance_monthly_calendar_id' => $attendance->finance_monthly_calendar_id,
-                        'employee_id' => $employee->id,
-                        'cutting_days' => .5
-                    ])->where('id', '!=', $attendance->id)->count();
-
-                    $counterCutFullDay = AttendanceDeparture::where([
-                        'company_id' => $company_id,
-                        'finance_monthly_calendar_id' => $attendance->finance_monthly_calendar_id,
-                        'employee_id' => $employee->id,
-                        'cutting_days' => 1
-                    ])->where('id', '!=', $attendance->id)->count();
-
-                    if ($counterCutFullDay >= $admin_panel_settings->after_days_allday_day_cut) {
-                        $cutting_days = 1;
-                    } else {
-                        if ($counterCutHalfDay >= $admin_panel_settings->after_days_half_day_cut) {
-                            $cutting_days = .5;
-                        } else {
-                            if ($counterCutQuarterDay >= $admin_panel_settings->after_minute_quarter_day_cut) {
-                                $cutting_days = .25;
-                            } else {
-                                $cutting_days = 0;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // Early departure calculation (if checkOutDateTime exists)
-        if ($checkOutDateTime && $employee->fixed_shift == 1 && !empty($shiftData)) {
-            $shiftEndDate = $date;
-            if ($shiftData->end_time < $shiftData->start_time) {
-                $shiftEndDate = date('Y-m-d', strtotime($date . ' +1 day'));
-            }
-            $shiftEndDateTime = $shiftEndDate . ' ' . $shiftData->end_time;
-            if (strtotime($shiftEndDateTime) > strtotime($checkOutDateTime)) {
-                $diffInSeconds = strtotime($shiftEndDateTime) - strtotime($checkOutDateTime);
-                $diffInMinutes = $diffInSeconds / 60;
-                $fromMinutesIntoDecimalNumber = number_format($diffInMinutes, 2, '.', '');
-                if ($fromMinutesIntoDecimalNumber >= $admin_panel_settings->after_minute_calculate_early_departure) {
-                    $early_departure = $fromMinutesIntoDecimalNumber;
-
-                    $counterCutQuarterDay = AttendanceDeparture::where([
-                        'company_id' => $company_id,
-                        'finance_monthly_calendar_id' => $attendance->finance_monthly_calendar_id,
-                        'employee_id' => $employee->id,
-                        'cutting_days' => .25
-                    ])->where('id', '!=', $attendance->id)->count();
-
-                    $counterCutHalfDay = AttendanceDeparture::where([
-                        'company_id' => $company_id,
-                        'finance_monthly_calendar_id' => $attendance->finance_monthly_calendar_id,
-                        'employee_id' => $employee->id,
-                        'cutting_days' => .5
-                    ])->where('id', '!=', $attendance->id)->count();
-
-                    $counterCutFullDay = AttendanceDeparture::where([
-                        'company_id' => $company_id,
-                        'finance_monthly_calendar_id' => $attendance->finance_monthly_calendar_id,
-                        'employee_id' => $employee->id,
-                        'cutting_days' => 1
-                    ])->where('id', '!=', $attendance->id)->count();
-
-                    if ($counterCutFullDay >= $admin_panel_settings->after_days_allday_day_cut) {
-                        $cutting_days += 1;
-                    } else {
-                        if ($counterCutHalfDay >= $admin_panel_settings->after_days_half_day_cut) {
-                            $cutting_days += .5;
-                        } else {
-                            if ($counterCutQuarterDay >= $admin_panel_settings->after_minute_quarter_day_cut) {
-                                $cutting_days += .25;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // Update daily record
-        $attendance->update([
-            'total_hours' => $total_hours,
-            'overtime_hours' => $overtime_hours,
-            'absence_hours' => $absence_hours,
-            'attendance_delay' => $attendance_delay,
-            'early_departure' => $early_departure,
-            'cutting_days' => $cutting_days,
-            'notes' => $notes,
-        ]);
+        AttendanceDeparture::recalculateEmployeeMonth($employee->id, $attendance->finance_monthly_calendar_id, $company_id);
     }
 }
 

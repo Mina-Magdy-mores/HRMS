@@ -30,6 +30,7 @@ class AttendanceDepartureImport implements ToCollection
         $company_id = Auth::user()->company_id;
         $admin_panel_settings = AdminPanelSetting::select('*')
             ->where('id', $company_id)->first();
+        $processedEmployeeIds = [];
 
         // Sort rows chronologically by dateTimeAction to ensure correct processing order
         $sortedRows = $rows->filter(function($row) {
@@ -89,6 +90,7 @@ class AttendanceDepartureImport implements ToCollection
                 'employee_code' => $row[2]
             ]);
             if (!empty($employee)) {
+                $processedEmployeeIds[$employee['id']] = true;
                 $checkExisitsBefore = getColsWhereRow(new AttendanceDepartureActionsExcel(), ['id'], [
                     'company_id' => $company_id,
                     'finance_monthly_calendar_id' => $this->finance_monthly_calendar_id,
@@ -1030,6 +1032,12 @@ class AttendanceDepartureImport implements ToCollection
                         }
                     }
                 }
+            }
+        }
+
+        if (!empty($processedEmployeeIds)) {
+            foreach (array_keys($processedEmployeeIds) as $empId) {
+                AttendanceDeparture::recalculateEmployeeMonth($empId, $this->finance_monthly_calendar_id, $company_id);
             }
         }
     }

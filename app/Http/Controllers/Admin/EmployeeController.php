@@ -103,6 +103,36 @@ class EmployeeController extends Controller
         return view('admin.employees.modal_details', ['employee' => $employee, 'allowances' => $allowances]);
     }
 
+    public function show($id)
+    {
+        $company_id = Auth::user()->company_id;
+        $employee = Employee::with([
+            'bloodGroup',
+            'country',
+            'governorate',
+            'city',
+            'religion',
+            'qualification',
+            'job',
+            'department',
+            'nationality',
+            'shiftType',
+            'branch',
+            'militaryStatus',
+            'resignation',
+            'addedBy',
+            'updatedBy',
+            'drivingLicenseType',
+            'language',
+            'files',
+            'employeeFixedAllowances',
+            'employeeSalaryArchives'
+        ])->findOrFail($id);
+
+        $allowances = AllowanceType::select('id', 'name')->where('company_id', $company_id)->where('status', 1)->get();
+        return view('admin.employees.show', compact('employee', 'allowances'));
+    }
+
     /**
      * Show the form for creating a new resource.
      */

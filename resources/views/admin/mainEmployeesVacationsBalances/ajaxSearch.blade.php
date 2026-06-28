@@ -1,15 +1,8 @@
 @php
     $genderLabels = [1 => 'ذكر', 2 => 'أنثى'];
     $employmentStatusLabels = [
-        1 => '<span class="badge badge-success px-3 py-2"><i class="fas fa-check-circle"></i>
-    نشط</span>',
-        0 => '<span class="badge badge-danger px-3 py-2"><i class="fas fa-times-circle"></i> غير
-    نشط</span>',
-    ];
-    $yesNoLabels = [
-        0 => '<span class="badge badge-secondary">لا</span>',
-        1 => '<span
-    class="badge badge-success">نعم</span>',
+        1 => '<span class="badge badge-success px-3 py-2"><i class="fas fa-check-circle"></i> نشط</span>',
+        0 => '<span class="badge badge-danger px-3 py-2"><i class="fas fa-times-circle"></i> غير نشط</span>',
     ];
 @endphp
 <div class="table-responsive">
@@ -25,6 +18,7 @@
                 <th>الفرع</th>
                 <th>الصورة</th>
                 <th>الحالة الوظيفية</th>
+                <th>تفعيل رصيد الإجازات</th>
                 <th>الإجراءات</th>
             </tr>
         </thead>
@@ -49,36 +43,24 @@
                     </td>
                     <td>{!! $employmentStatusLabels[$employee->employment_status] ?? '---' !!}</td>
                     <td>
+                        @if ($employee->active_for_vacation == 1)
+                            <span class="badge badge-success px-3 py-2">مفعل</span>
+                        @else
+                            <span class="badge badge-danger px-3 py-2">غير مفعل</span>
+                        @endif
+                    </td>
+                    <td>
                         <div class="d-flex justify-content-center align-items-center gap-1">
-                            <button type="button" class="btn btn-sm btn-info m-1 show_employee_details"
-                                data-id="{{ $employee->id }}" title="عرض سريع">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <a href="{{ route('admin.employees.show', $employee->id) }}"
-                                class="btn btn-sm btn-primary m-1" title="عرض كامل">
-                                <i class="fas fa-id-card"></i>
+                            <a href="{{ route('admin.main-employees-vacations-balances.show', $employee->id) }}"
+                                class="btn btn-sm btn-info m-1" title="عرض تفاصيل رصيد الإجازات">
+                                <i class="fas fa-eye"></i> عرض
                             </a>
-                            <a href="{{ route('admin.employees.edit', $employee->id) }}"
-                                class="btn btn-sm btn-warning m-1" title="تعديل">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                            @if ($employee->mainSalaryEmployee->isEmpty() && $employee->mainSalaryEmployeePLoans->isEmpty())
-                                <form action="{{ route('admin.employees.destroy', $employee->id) }}" method="POST"
-                                    class="m-0">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger are_you_sure m-1"
-                                        title="حذف">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            @endif
                         </div>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="12">
+                    <td colspan="11">
                         <div class="alert alert-warning mb-0">
                             <i class="fas fa-exclamation-circle"></i>
                             لا توجد بيانات موظفين حالياً
@@ -87,7 +69,6 @@
                 </tr>
             @endforelse
         </tbody>
-
     </table>
 </div>
 {{-- Pagination --}}

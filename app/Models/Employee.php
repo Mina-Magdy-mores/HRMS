@@ -303,6 +303,10 @@ class Employee extends Model
     public function mainSalaryEmployee(){
         return $this->hasMany(MainSalaryEmployee::class, 'employee_id');
     }
+    public function mainEmployeesVacationsBalances()
+    {
+        return $this->hasMany(MainEmployeesVacationsBalances::class, 'employee_id');
+    }
     public function mainSalaryEmployeeDeductions(){
         return $this->hasMany(MainSalaryEmployeeDeduction::class, 'employee_id');
     }
