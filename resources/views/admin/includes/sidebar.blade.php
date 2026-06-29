@@ -185,7 +185,6 @@
                 </li>
                 <li
                     class="nav-item has-treeview  {{ request()->routeIs('admin.employees.*') ||
-                    request()->routeIs('admin.main-employees-vacations-balances.*') ||
                     request()->routeIs('admin.allowance-types.*') ||
                     request()->routeIs('admin.deduction-types.*') ||
                     request()->routeIs('admin.bonuses.*')
@@ -193,7 +192,6 @@
                         : '' }}">
                     <a href="#"
                         class="nav-link {{ request()->routeIs('admin.employees.*') ||
-                        request()->routeIs('admin.main-employees-vacations-balances.*') ||
                         request()->routeIs('admin.allowance-types.*') ||
                         request()->routeIs('admin.deduction-types.*') ||
                         request()->routeIs('admin.bonuses.*')
@@ -211,14 +209,6 @@
                                 class="nav-link @if (request()->routeIs('admin.employees.*')) active @endif">
                                 <i class="fas fa-users"></i>
                                 <p>بيانات الموظفين</p>
-                            </a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a href="{{ route('admin.main-employees-vacations-balances.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.main-employees-vacations-balances.*')) active @endif">
-                                <i class="fas fa-calendar-check"></i>
-                                <p>أرصدة إجازات الموظفين</p>
                             </a>
                         </li>
 
@@ -356,11 +346,13 @@
                 </li>
 
                                 <li
-                    class="nav-item has-treeview  {{ request()->routeIs('admin.attendanceDepartures.*') 
+                    class="nav-item has-treeview  {{ request()->routeIs('admin.attendanceDepartures.*') ||
+                    request()->routeIs('admin.main-employees-vacations-balances.*') 
                         ? 'menu-open'
                         : '' }}">
                     <a href="#"
-                        class="nav-link {{ request()->routeIs('admin.attendanceDepartures.*') 
+                        class="nav-link {{ request()->routeIs('admin.attendanceDepartures.*') ||
+                        request()->routeIs('admin.main-employees-vacations-balances.*')
                             ? 'active'
                             : '' }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -375,6 +367,14 @@
                                 class="nav-link @if (request()->routeIs('admin.attendanceDepartures.*')) active @endif ">
                                 <i class="fas fa-fingerprint"></i>
                                 <p>سجلات البصمات</p>
+                            </a>
+                        </li>
+
+                         <li class="nav-item">
+                            <a href="{{ route('admin.main-employees-vacations-balances.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-employees-vacations-balances.*')) active @endif">
+                                <i class="fas fa-calendar-check"></i>
+                                <p>أرصدة إجازات الموظفين</p>
                             </a>
                         </li>
                        

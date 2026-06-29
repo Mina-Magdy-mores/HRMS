@@ -44,6 +44,7 @@ class AdminPanelSettingRequest extends FormRequest
             'after_mins_neglect' => 'sometimes|integer|min:0',
             'after_shift_max_extra_hours' => 'sometimes|integer|min:0',
             'is_allowed_to_transfer_vacation' => 'required|integer|in:0,1',
+            'is_allowed_to_pull_annual_from_fingerprint' => 'required|integer|in:0,1',
         ];
     }
 
@@ -87,6 +88,9 @@ class AdminPanelSettingRequest extends FormRequest
             'is_allowed_to_transfer_vacation.required' => 'حقل هل يسمح بترحيل رصيد الإجازات مطلوب',
             'is_allowed_to_transfer_vacation.integer' => 'حقل هل يسمح بترحيل رصيد الإجازات يجب ان يكون رقم',
             'is_allowed_to_transfer_vacation.in' => 'حقل هل يسمح بترحيل رصيد الإجازات غير صحيح',
+            'is_allowed_to_pull_annual_from_fingerprint.required' => 'حقل هل يسمح بسحب الإجازات السنوية تلقائياً من البصمة مطلوب',
+            'is_allowed_to_pull_annual_from_fingerprint.integer' => 'حقل هل يسمح بسحب الإجازات السنوية تلقائياً من البصمة يجب أن يكون رقم صحيح',
+            'is_allowed_to_pull_annual_from_fingerprint.in' => 'حقل هل يسمح بسحب الإجازات السنوية تلقائياً من البصمة غير صحيح',
         ];
     }
 }

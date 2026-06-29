@@ -337,6 +337,8 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/main-employees-vacations-balances/search', [MainEmployeesVacationsBalancesController::class, 'search'])->name('main-employees-vacations-balances.search');
         Route::get('/main-employees-vacations-balances/{id}/show', [MainEmployeesVacationsBalancesController::class, 'show'])->name('main-employees-vacations-balances.show');
         Route::post('/main-employees-vacations-balances/{id}/ajax-search-show', [MainEmployeesVacationsBalancesController::class, 'ajaxSearchShow'])->name('main-employees-vacations-balances.ajax-search-show');
+        Route::get('/main-employees-vacations-balances/{id}/edit', [MainEmployeesVacationsBalancesController::class, 'edit'])->name('main-employees-vacations-balances.edit');
+        Route::put('/main-employees-vacations-balances/{id}', [MainEmployeesVacationsBalancesController::class, 'update'])->name('main-employees-vacations-balances.update');
 
         //Finger print routes
         Route::get('/attendanceDepartures', [AttendanceDepartureController::class, 'index'])->name('attendanceDepartures.index');

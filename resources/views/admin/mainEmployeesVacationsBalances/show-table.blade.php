@@ -13,6 +13,9 @@
                 <th>حالة الأرشفة</th>
                 <th>المضاف بواسطة</th>
                 <th>تاريخ الإضافة</th>
+                @if (isset($is_allowed_to_pull_annual_from_fingerprint) && $is_allowed_to_pull_annual_from_fingerprint == 0)
+                    <th>الإجراءات</th>
+                @endif
             </tr>
         </thead>
         <tbody>
@@ -53,10 +56,18 @@
                     </td>
                     <td>{{ optional($balance->addedBy)->name ?? '---' }}</td>
                     <td>{{ $balance->created_at->format('Y-m-d H:i') }}</td>
+                    @if (isset($is_allowed_to_pull_annual_from_fingerprint) && $is_allowed_to_pull_annual_from_fingerprint == 0)
+                        <td>
+                            <a href="{{ route('admin.main-employees-vacations-balances.edit', $balance->id) }}"
+                                class="btn btn-warning btn-xs shadow-sm">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </td>
+                    @endif
                 </tr>
             @empty
                 <tr>
-                    <td colspan="11">
+                    <td colspan="{{ (isset($is_allowed_to_pull_annual_from_fingerprint) && $is_allowed_to_pull_annual_from_fingerprint == 0) ? 12 : 11 }}">
                         <div class="alert alert-warning mb-0 text-center">
                             <i class="fas fa-exclamation-triangle"></i>
                             لا توجد سجلات أرصدة إجازات مضافة لهذا الموظف حتى الآن.

@@ -86,14 +86,7 @@
                         </div>
                     </div>
                 </div>
-                
-                <div class="row mt-2">
-                    <div class="col-md-12 text-right">
-                        <button type="submit" class="btn btn-success shadow-sm" id="print_button">
-                            <i class="fas fa-print mr-1"></i> طباعة البحث الحالي
-                        </button>
-                    </div>
-                </div>
+               
             </form>
         </div>
     </div>
@@ -283,9 +276,7 @@
                                                 @csrf
                                                 <input type="hidden" name="finance_monthly_calendar_id_search" value="{{ $financeMonthlyCalendar->id }}">
                                                 <input type="hidden" name="employee_id_search" value="{{ $employee->id }}">
-                                                <button type="submit" class="btn btn-sm btn-success mr-1" title="طباعة بصمة الموظف">
-                                                    <i class="fas fa-print mr-1"></i> طباعة
-                                                </button>
+                                              
                                             </form>
                                         </div>
                                     </td>

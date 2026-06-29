@@ -13,6 +13,40 @@
 
 @section('content')
     <div class="container-fluid">
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show text-left" role="alert">
+                <i class="fas fa-check-circle ml-2"></i>
+                {{ session('success') }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="left: 10px; right: auto;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show text-left" role="alert">
+                <i class="fas fa-times-circle ml-2"></i>
+                {{ session('error') }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="left: 10px; right: auto;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show text-left" role="alert">
+                <h5 class="alert-heading"><i class="fas fa-exclamation-circle ml-2"></i> خطأ في البيانات</h5>
+                <ul class="mb-0 mt-2">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="left: 10px; right: auto;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        @endif
+
         <!-- Employee Info Header Card -->
         <div class="card card-outline card-info shadow mb-4">
             <div class="card-body py-3">

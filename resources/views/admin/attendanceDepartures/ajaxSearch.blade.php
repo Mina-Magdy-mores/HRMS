@@ -61,9 +61,6 @@
                                 @csrf
                                 <input type="hidden" name="finance_monthly_calendar_id_search" value="{{ $financeMonthlyCalendar->id }}">
                                 <input type="hidden" name="employee_id_search" value="{{ $employee->id }}">
-                                <button type="submit" class="btn btn-sm btn-success mr-1" title="طباعة بصمة الموظف">
-                                    <i class="fas fa-print mr-1"></i> طباعة
-                                </button>
                             </form>
                         </div>
                     </td>

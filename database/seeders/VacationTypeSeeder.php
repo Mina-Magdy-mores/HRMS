@@ -28,6 +28,7 @@ class VacationTypeSeeder extends Seeder
             ['name' => 'إجازة بدون إذن'],
             ['name' => 'إجازة ميلاد'],
             ['name' => 'إجازة عيد ميلاد'],
+            ['name' => 'إجازة سنوية'],
         ];
 
         foreach ($vacationTypes as $type) {

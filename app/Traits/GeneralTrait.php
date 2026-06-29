@@ -14,6 +14,8 @@ use App\Models\MainSalaryEmployeeDeduction;
 use App\Models\MainSalaryEmployeeDeductionType;
 use App\Models\MainSalaryEmployeeLoan;
 use App\Models\MainSalaryEmployeePLoan;
+use App\Models\AdminPanelSetting;
+use App\Models\MainEmployeesVacationsBalances;
 use App\Models\MainSalaryEmployeePLoanInstallment;
 use Illuminate\Support\Facades\Auth;
 
@@ -159,6 +161,216 @@ trait GeneralTrait
 
                 $dataToUpdate['employee_net_salary'] = $main_salary_employee['employee_rollover_amount'] + ($dataToUpdate['total_benefits'] - $dataToUpdate['total_deductions']);
                 update($main_salary_employee, $dataToUpdate);
+            }
+        }
+    }
+
+    public function calculate_employees_vacations_balance($id)
+    {
+        $company_id = Auth::user()->company_id;
+        $employee = Employee::query()->where(['company_id' => $company_id, 'active_for_vacation' => 1, 'employment_status' => 1])->find($id);
+        $admin_panel_settings = getColsWhereRow(AdminPanelSetting::class, ['*'], ['company_id' => $company_id]);
+        if (!empty($employee) && !empty($admin_panel_settings)) {
+            $current_opened_month = getColsWhereRow(
+                FinanceMonthlyCalendar::class,
+                ['id', 'finance_yr', 'year_and_month'],
+                ['company_id' => $company_id, 'status' => 1]
+            );
+            if (!empty($current_opened_month)) {
+                $current_year = $current_opened_month->finance_yr;
+                if ($employee->vacation_formula == 0) {
+                    //first time to calculate the balance
+                    $hire_date = strtotime($employee->hire_date);
+                    $current_date = strtotime(date('Y-m-d'));
+                    $difference_in_days = round(($current_date - $hire_date) / (60 * 60 * 24));
+                    $activeDays = number_format($admin_panel_settings->after_days_begin_vacation) * 1;
+                    $dateofActiveFormula = date('Y-m-d', strtotime('+' . $activeDays . ' days', $hire_date));
+                    $hire_year = date('Y', $hire_date);
+                    if ($difference_in_days >= $admin_panel_settings->after_days_begin_vacation) {
+                        if ($hire_year == $current_year) {
+                            //employee hired in the current year
+                            $dataToInsert['current_month_balance'] = $admin_panel_settings->first_balance_begin_vacation;
+                            $dataToInsert['total_available_balance'] = $admin_panel_settings->first_balance_begin_vacation;
+                            $dataToInsert['remaining_net_balance'] = $admin_panel_settings->first_balance_begin_vacation;
+                        } else {
+                            //employee hired in the previous years
+                            $dataToInsert['current_month_balance'] = $admin_panel_settings->monthly_vacation_balance;
+                            $dataToInsert['total_available_balance'] = $admin_panel_settings->monthly_vacation_balance;
+                            $dataToInsert['remaining_net_balance'] = $admin_panel_settings->monthly_vacation_balance;
+                        }
+                        if ($difference_in_days <= 365) {
+                            $dataToInsert['year_and_month'] = date('Y-m', strtotime($dateofActiveFormula));
+                        } else {
+                            $dataToInsert['year_and_month'] = $current_year . '-01';
+                        }
+                        $dataToInsert['financial_year'] = $current_year;
+                        $dataToInsert['employee_id'] = $employee->id;
+                        $dataToInsert['company_id'] = $company_id;
+                        $dataToInsert['added_by'] = Auth::user()->id;
+                        $checkIfExsists = getColsWhereRow(
+                            MainEmployeesVacationsBalances::class,
+                            ['id'],
+                            ['employee_id' => $employee->id, 'financial_year' => $current_year, 'year_and_month' => $dataToInsert['year_and_month']]
+                        );
+                        if (empty($checkIfExsists)) {
+                            $flag = MainEmployeesVacationsBalances::create($dataToInsert);
+                            if ($flag) {
+                                $dataToUpdateInEmployee['vacation_formula'] = 1;
+                                $dataToUpdateInEmployee['updated_by'] = Auth::user()->id;
+                                update($employee, $dataToUpdateInEmployee);
+                            }
+                        }
+                    }
+                } else {
+                    //already has balance
+                    $last_added = get_cols_where_row_orderby(
+                        MainEmployeesVacationsBalances::class,
+                        ['id', 'current_month_balance', 'total_available_balance', 'remaining_net_balance', 'year_and_month', 'financial_year'],
+                        ['employee_id' => $employee->id, 'financial_year' => $current_year, 'company_id' => $company_id],
+                        'id',
+                        'desc'
+                    );
+                    $current_month = (int) date('m', strtotime($current_opened_month->year_and_month));
+                    if (!empty($last_added)) {
+                        if ($last_added->year_and_month != $current_opened_month->year_and_month) {
+                            $i = (int) date('m', strtotime($last_added->year_and_month));
+                            $i += 1;
+                            while ($i <= $current_month) {
+                                if ($i < 10) {
+                                    $dataToInsert['year_and_month'] = $current_year . '-0' . $i;
+                                } else {
+                                    $dataToInsert['year_and_month'] = $current_year . '-' . $i;
+                                }
+                                $dataToInsert['current_month_balance'] = $admin_panel_settings->monthly_vacation_balance;
+                                $dataToInsert['total_available_balance'] = $admin_panel_settings->monthly_vacation_balance;
+                                $dataToInsert['remaining_net_balance'] = $admin_panel_settings->monthly_vacation_balance;
+                                $dataToInsert['financial_year'] = $current_year;
+                                $dataToInsert['employee_id'] = $employee->id;
+                                $dataToInsert['company_id'] = $company_id;
+                                $dataToInsert['added_by'] = Auth::user()->id;
+                                $checkIfExsists = getColsWhereRow(
+                                    MainEmployeesVacationsBalances::class,
+                                    ['id'],
+                                    ['employee_id' => $employee->id, 'financial_year' => $current_year, 'year_and_month' => $dataToInsert['year_and_month']]
+                                );
+                                if (empty($checkIfExsists)) {
+                                    $flag = MainEmployeesVacationsBalances::create($dataToInsert);
+                                    if ($flag) {
+                                        //later
+                                    }
+                                }
+                                $i++;
+                            }
+                        }
+                    } else {
+
+                        $current_month = (int) date('m', strtotime($current_opened_month->year_and_month));
+                        if ($current_opened_month->year_and_month) {
+                            $firstMonthInOpenedYear = get_cols_where_row_orderby(
+                                FinanceMonthlyCalendar::class,
+                                ['id', 'year_and_month'],
+                                ['company_id' => $company_id, 'finance_yr' => $current_year, 'status' => 2],
+                                'id',
+                                'asc'
+                            );
+                            if (!empty($firstMonthInOpenedYear)) {
+                                $i = (int) date('m', strtotime($firstMonthInOpenedYear->year_and_month));
+                                while ($i <= $current_month) {
+                                    if ($i < 10) {
+                                        $dataToInsert['year_and_month'] = $current_year . '-0' . $i;
+                                    } else {
+                                        $dataToInsert['year_and_month'] = $current_year . '-' . $i;
+                                    }
+                                    $dataToInsert['current_month_balance'] = $admin_panel_settings->monthly_vacation_balance;
+                                    $dataToInsert['total_available_balance'] = $admin_panel_settings->monthly_vacation_balance;
+                                    $dataToInsert['remaining_net_balance'] = $admin_panel_settings->monthly_vacation_balance;
+                                    $dataToInsert['financial_year'] = $current_year;
+                                    $dataToInsert['employee_id'] = $employee->id;
+                                    $dataToInsert['company_id'] = $company_id;
+                                    $dataToInsert['added_by'] = Auth::user()->id;
+                                    $checkIfExsists = getColsWhereRow(
+                                        MainEmployeesVacationsBalances::class,
+                                        ['id'],
+                                        ['employee_id' => $employee->id, 'financial_year' => $current_year, 'year_and_month' => $dataToInsert['year_and_month']]
+                                    );
+                                    if (empty($checkIfExsists)) {
+                                        $flag = MainEmployeesVacationsBalances::create($dataToInsert);
+                                        if ($flag) {
+                                            //later
+                                        }
+                                    }
+                                    $i++;
+                                }
+                            }
+                        }
+                    }
+                }
+                $this->reupdate_vacation($id);
+            }
+        }
+    }
+    public function reupdate_vacation($id)
+    {
+        $company_id = Auth::user()->company_id;
+        $employee = Employee::query()->where(['company_id' => $company_id, 'active_for_vacation' => 1, 'employment_status' => 1])->find($id);
+        $admin_panel_settings = getColsWhereRow(AdminPanelSetting::class, ['*'], ['company_id' => $company_id]);
+        if (!empty($employee) && !empty($admin_panel_settings)) {
+            $current_opened_month = getColsWhereRow(
+                FinanceMonthlyCalendar::class,
+                ['id', 'finance_yr', 'year_and_month'],
+                ['company_id' => $company_id, 'status' => 1]
+            );
+            if (!empty($current_opened_month)) {
+                if ($employee->vacation_formula == 1) {
+                    if ($admin_panel_settings->is_allowed_to_transfer_vacation == 1) {
+                        $vacationBalance = get_cols_where(
+                            MainEmployeesVacationsBalances::class,
+                            ['id', 'spent_balance', 'remaining_net_balance', 'current_month_balance', 'carryover_from_previous_month', 'total_available_balance'],
+                            ['employee_id' => $employee->id, 'company_id' => $company_id],
+                            'id',
+                            'asc'
+                        );
+                    } else {
+                        $vacationBalance = get_cols_where(
+                            MainEmployeesVacationsBalances::class,
+                            ['id', 'spent_balance', 'remaining_net_balance', 'current_month_balance', 'carryover_from_previous_month', 'total_available_balance'],
+                            ['employee_id' => $employee->id, 'company_id' => $company_id, 'financial_year' => $current_opened_month->finance_yr],
+                            'id',
+                            'asc'
+                        );
+                    }
+
+                    if (!empty($vacationBalance)) {
+                        $previous_remaining_net_balance = null;
+                        foreach ($vacationBalance as $index => $balance) {
+                            if ($index === 0) {
+                                $previous_remaining_net_balance = $balance->remaining_net_balance;
+                                continue;
+                            }
+
+                            $carryover = $previous_remaining_net_balance;
+                            $total_available = $carryover + $balance->current_month_balance;
+                            $remaining_net = $total_available - $balance->spent_balance;
+
+                            if (
+                                $balance->carryover_from_previous_month != $carryover ||
+                                $balance->total_available_balance != $total_available ||
+                                $balance->remaining_net_balance != $remaining_net
+                            ) {
+
+                                $dataToUpdate = [
+                                    'carryover_from_previous_month' => $carryover,
+                                    'total_available_balance' => $total_available,
+                                    'remaining_net_balance' => $remaining_net
+                                ];
+
+                                update($balance, $dataToUpdate);
+                            }
+
+                            $previous_remaining_net_balance = $remaining_net;
+                        }
+                    }
+                }
             }
         }
     }

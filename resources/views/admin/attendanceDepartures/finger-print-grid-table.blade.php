@@ -162,8 +162,17 @@
                         <select class="form-control form-control-sm select-vacation" name="vacation_id" {{ !$is_row_editable ? 'disabled' : '' }}>
                             <option value="0" {{ $vacation_id == 0 ? 'selected' : '' }}>لا يوجد</option>
                             @foreach ($vacationTypes as $vt)
-                                <option value="{{ $vt->id }}" {{ $vacation_id == $vt->id ? 'selected' : '' }} data-is-official="{{ str_contains($vt->name, 'رسمية') ? 1 : 0 }}">
+                                <option @if($vt->id == 16 && (empty($adminPanelSetting) || $adminPanelSetting->is_allowed_to_pull_annual_from_fingerprint == 0 || $employee->active_for_vacation == 0 || $employee->vacation_formula == 0)) disabled style="color: #dc3545; background-color: #fdf2f2;" @endif value="{{ $vt->id }}" {{ $vacation_id == $vt->id ? 'selected' : '' }} data-is-official="{{ str_contains($vt->name, 'رسمية') ? 1 : 0 }}">
                                     {{ $vt->name }}
+                                    @if($vt->id == 16)
+                                        @if(empty($adminPanelSetting) || $adminPanelSetting->is_allowed_to_pull_annual_from_fingerprint == 0)
+                                             - (معطلة: سحب السنوية من البصمة غير مسموح)
+                                        @elseif($employee->active_for_vacation == 0)
+                                             - (معطلة: رصيد الإجازات غير نشط للموظف)
+                                        @elseif($employee->vacation_formula == 0) 
+                                             - (معطلة: طريقة احتساب الإجازة غير صحيحة للموظف)
+                                        @endif
+                                    @endif
                                 </option>
                             @endforeach
                         </select>

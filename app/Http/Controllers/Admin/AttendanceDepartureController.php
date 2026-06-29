@@ -16,6 +16,7 @@ use App\Models\AttendanceDepartureAction;
 use App\Models\AttendanceDepartureActionsExcel;
 use App\Models\MainSalaryEmployee;
 use App\Models\DeductionType;
+use App\Models\MainEmployeesVacationsBalances;
 use App\Models\Occasion;
 use App\Models\ShiftsType;
 use App\Models\VacationType;
@@ -155,7 +156,7 @@ class AttendanceDepartureController extends Controller
             ->where('company_id', $company_id)
             ->where('id', $id)
             ->first();
-            
+
         if (empty($employee)) {
             return redirect()->back()->with('error', 'عفوا غير قادر للوصول الى بيانات الموظف');
         }
@@ -386,7 +387,7 @@ class AttendanceDepartureController extends Controller
             $company_id = Auth::user()->company_id;
             $employee_id = $request->employee_id;
             $finance_monthly_calendar_id = $request->finance_monthly_calendar_id;
-
+            $adminPanelSetting = getColsWhereRow(AdminPanelSetting::class, ['id', 'is_allowed_to_pull_annual_from_fingerprint'], ['company_id' => $company_id]);
             $financeMonthlyCalendar = FinanceMonthlyCalendar::with('month')
                 ->where('company_id', $company_id)
                 ->where('id', $finance_monthly_calendar_id)
@@ -400,6 +401,7 @@ class AttendanceDepartureController extends Controller
                 ->where('company_id', $company_id)
                 ->where('id', $employee_id)
                 ->first();
+
 
             if (empty($employee)) {
                 return response()->json(['error' => 'عفوا غير قادر للوصول الى بيانات الموظف'], 404);
@@ -541,7 +543,6 @@ class AttendanceDepartureController extends Controller
                             $inserted_any = true;
                         }
                     }
-
                 });
 
                 // Refetch after inserts if any new records were added
@@ -616,7 +617,6 @@ class AttendanceDepartureController extends Controller
                 ])->get()->sortBy(function ($att) {
                     return ($att->checkInDateTime !== null || $att->checkOutDateTime !== null) ? 1 : 0;
                 })->keyBy('day_of_finger_print');
-
             } elseif ($sync_needed) {
                 // للشهور المغلقة: فقط نحدث البيانات لو في تزامن
                 $attendances = AttendanceDeparture::with('actions')->where([
@@ -707,6 +707,11 @@ class AttendanceDepartureController extends Controller
             }
             $totals['occasion_summary'] = implode(' ، ', $occasionSummary);
 
+            //Calculate Total monthly and annual vacation for the employee
+            $this->calculate_employees_vacations_balance($employee_id);
+            $this->calculate_employees_vacations_balance($employee_id);
+            $employee->refresh();
+
             // Return rendered HTML partial
             $html = view('admin.attendanceDepartures.finger-print-grid-table', compact(
                 'financeMonthlyCalendar',
@@ -716,7 +721,8 @@ class AttendanceDepartureController extends Controller
                 'deductionTypes',
                 'vacationTypes',
                 'is_editable',
-                'totals'
+                'totals',
+                'adminPanelSetting'
             ))->render();
 
             return response()->json([
@@ -795,15 +801,54 @@ class AttendanceDepartureController extends Controller
             ];
 
             if ($attendance) {
-                $attendance->update($data);
+                $flag = $attendance->update($data);
             } else {
                 $data['company_id'] = $company_id;
                 $data['added_by'] = Auth::id();
                 $data['main_salary_employee_id'] = $mainSalaryEmployee ? $mainSalaryEmployee->id : null;
 
-                AttendanceDeparture::create($data);
+                $flag = AttendanceDeparture::create($data);
             }
-
+            if ($flag) {
+                //إجازة سنوية == 16
+                if ($data['vacation_id'] == 16 || $attendance->vacation_id == 16) {
+                    $this->calculate_employees_vacations_balance($employee_id);
+                    $this->calculate_employees_vacations_balance($employee_id);
+                    $adminPanelSetting = AdminPanelSetting::select('is_allowed_to_pull_annual_from_fingerprint')
+                        ->where('company_id', $company_id)
+                        ->first();
+                    $employee = Employee::select(['id', 'name', 'vacation_formula', 'active_for_vacation'])
+                        ->where('company_id', $company_id)
+                        ->where('id', $employee_id)
+                        ->first();
+                    if (empty($employee) && $adminPanelSetting->is_allowed_to_pull_annual_from_fingerprint == 0) {
+                        return response()->json(['error' => 'عفوا الموظف غير مسموح له بسحب إجازة من البصمة']);
+                    }
+                    if ($employee && ($employee->vacation_formula == 0 || $employee->active_for_vacation == 0)) {
+                        return response()->json(['error' => 'عفوا الموظف غير مسموح له بأخذ إجازة سنوية']);
+                    }
+                    //start update
+                    $main_employees_vacations_balance = getColsWhereRow(
+                        MainEmployeesVacationsBalances::class,
+                        ['id', 'spent_balance'],
+                        [
+                            'company_id' => $company_id,
+                            'employee_id' => $employee_id,
+                            'year_and_month' => $attendance->year_and_month
+                        ]
+                    );
+                    if (!empty($main_employees_vacations_balance)) {
+                        $dataToUpdateVacation['spent_balance'] = get_count_where(
+                            AttendanceDeparture::class,
+                            ['vacation_id' => 16, 'company_id' => $company_id, 'employee_id' => $employee_id, 'year_and_month' => $attendance->year_and_month]
+                        );
+                        $flag2 = update($main_employees_vacations_balance, $dataToUpdateVacation);
+                        if ($flag2) {
+                            $this->reupdate_vacation($employee_id);
+                        }
+                    }
+                }
+            }
             if ($mainSalaryEmployee) {
                 $this->recalculate_main_salary($mainSalaryEmployee->id);
             }
@@ -980,7 +1025,7 @@ class AttendanceDepartureController extends Controller
                         ];
 
                         if ($attendance) {
-                            $attendance->update($data);
+                            $flag = $attendance->update($data);
                         } else {
                             $data['company_id'] = $company_id;
                             $data['employee_id'] = $employee_id;
@@ -992,7 +1037,47 @@ class AttendanceDepartureController extends Controller
                             $data['added_by'] = Auth::id();
                             $data['main_salary_employee_id'] = $mainSalaryEmployee ? $mainSalaryEmployee->id : null;
 
-                            AttendanceDeparture::create($data);
+                            $flag =  AttendanceDeparture::create($data);
+                        }
+                        if ($flag) {
+                            //إجازة سنوية == 16
+                            if ($data['vacation_id'] == 16 || $attendance->vacation_id == 16) {
+                                $this->calculate_employees_vacations_balance($employee_id);
+                                $this->calculate_employees_vacations_balance($employee_id);
+                                $adminPanelSetting = AdminPanelSetting::select('is_allowed_to_pull_annual_from_fingerprint')
+                                    ->where('company_id', $company_id)
+                                    ->first();
+                                $employee = Employee::select(['id', 'name', 'vacation_formula', 'active_for_vacation'])
+                                    ->where('company_id', $company_id)
+                                    ->where('id', $employee_id)
+                                    ->first();
+                                if (empty($employee) && $adminPanelSetting->is_allowed_to_pull_annual_from_fingerprint == 0) {
+                                    return response()->json(['error' => 'عفوا الموظف غير مسموح له بسحب إجازة من البصمة']);
+                                }
+                                if ($employee && ($employee->vacation_formula == 0 || $employee->active_for_vacation == 0)) {
+                                    return response()->json(['error' => 'عفوا الموظف غير مسموح له بأخذ إجازة سنوية']);
+                                }
+                                //start update
+                                $main_employees_vacations_balance = getColsWhereRow(
+                                    MainEmployeesVacationsBalances::class,
+                                    ['id', 'spent_balance'],
+                                    [
+                                        'company_id' => $company_id,
+                                        'employee_id' => $employee_id,
+                                        'year_and_month' => $attendance->year_and_month
+                                    ]
+                                );
+                                if (!empty($main_employees_vacations_balance)) {
+                                    $dataToUpdateVacation['spent_balance'] = get_count_where(
+                                        AttendanceDeparture::class,
+                                        ['vacation_id' => 16, 'company_id' => $company_id, 'employee_id' => $employee_id, 'year_and_month' => $attendance->year_and_month]
+                                    );
+                                    $flag2 = update($main_employees_vacations_balance, $dataToUpdateVacation);
+                                    if ($flag2) {
+                                        $this->reupdate_vacation($employee_id);
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -1202,4 +1287,3 @@ class AttendanceDepartureController extends Controller
         AttendanceDeparture::recalculateEmployeeMonth($employee->id, $attendance->finance_monthly_calendar_id, $company_id);
     }
 }
-

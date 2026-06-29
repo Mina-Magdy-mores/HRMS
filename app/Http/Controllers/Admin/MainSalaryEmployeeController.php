@@ -10,6 +10,8 @@ use App\Models\Employee;
 use App\Models\FinanceMonthlyCalendar;
 use App\Models\JobsCategory;
 use App\Models\MainSalaryEmployee;
+use App\Models\AttendanceDeparture;
+use App\Models\MainEmployeesVacationsBalances;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -956,12 +958,34 @@ class MainSalaryEmployeeController extends Controller
             }
 
             try {
-                return DB::transaction(function () use ($record, $disbursed_amount) {
+                return DB::transaction(function () use ($record, $disbursed_amount, $company_id, $financeMonthlyCalendar) {
                     $archiveData = [
                         'is_archived' => 1,
                         'archived_by' => Auth::id(),
                         'archived_at' => now(),
                     ];
+
+                    // 1. Archive Fingerprint Data (AttendanceDeparture) for this specific employee
+                    AttendanceDeparture::where('company_id', $company_id)
+                        ->where('employee_id', $record->employee_id)
+                        ->where('finance_monthly_calendar_id', $record->finance_monthly_calendar_id)
+                        ->update([
+                            'is_archived' => 1,
+                            'archived_by' => Auth::id(),
+                            'archived_at' => now(),
+                        ]);
+
+                    // 2. Archive Vacation Balances (MainEmployeesVacationsBalances) for this specific employee
+                    if ($financeMonthlyCalendar->year_and_month) {
+                        MainEmployeesVacationsBalances::where('company_id', $company_id)
+                            ->where('employee_id', $record->employee_id)
+                            ->where('year_and_month', $financeMonthlyCalendar->year_and_month)
+                            ->update([
+                                'is_archived' => 1,
+                                'archived_by' => Auth::id(),
+                                'archived_at' => now(),
+                            ]);
+                    }
 
                     $netSalary = (float)$record->employee_net_salary;
                     $absNetSalary = abs($netSalary);
@@ -1011,7 +1035,7 @@ class MainSalaryEmployeeController extends Controller
                     $record->mainSalaryEmployeeAllowances()->update($archiveData);
                     $record->mainSalaryEmployeePLoanInstallments()->update($archiveData);
 
-                    return response()->json(['status' => 'true', 'message' => 'تم أرشفة وتثبيت الراتب للموظف بنجاح']);
+                    return response()->json(['status' => 'true', 'message' => 'تم أرشفة وتثبيت الراتب للبصمات والإجازات للموظف بنجاح']);
                 });
             } catch (\Exception $e) {
                 return response()->json(['status' => 'false', 'message' => 'حدث خطأ أثناء الأرشفة: ' . $e->getMessage()]);
@@ -1047,63 +1071,94 @@ class MainSalaryEmployeeController extends Controller
             ]);
         }
 
-        // Get all unarchived records for this month
+        // Get all unarchived salary records for this month
         $records = MainSalaryEmployee::where('company_id', $company_id)
             ->where('finance_monthly_calendar_id', $calendar_id)
             ->where('is_archived', 0)
             ->get();
 
-        if ($records->isEmpty()) {
-            $financeMonthlyCalendar->status = 2; // closed/archived
-            $financeMonthlyCalendar->updated_by = Auth::id();
-            $financeMonthlyCalendar->save();
-            return response()->json(['status' => 'true', 'message' => 'تم إغلاق الشهر المالي بنجاح']);
-        }
-
         try {
-            DB::transaction(function () use ($records, $financeMonthlyCalendar) {
+            DB::transaction(function () use ($records, $financeMonthlyCalendar, $company_id, $calendar_id) {
                 $archiveData = [
                     'is_archived' => 1,
                     'archived_by' => Auth::id(),
                     'archived_at' => now(),
                 ];
 
-                foreach ($records as $record) {
-                    $net = (float)$record->employee_net_salary;
+                // 1. Archive Fingerprint Data (AttendanceDeparture) for this monthly calendar
+                AttendanceDeparture::where('company_id', $company_id)
+                    ->where('finance_monthly_calendar_id', $calendar_id)
+                    ->update([
+                        'is_archived' => 1,
+                        'archived_by' => Auth::id(),
+                        'archived_at' => now(),
+                    ]);
 
-                    if ($net >= 0) {
-                        $record->archive_status_type = $net == 0 ? 3 : 1; // 3 = صافي, 1 = دائن
-                        $record->archive_settlement_amount = $net;
-                        $record->employee_net_salary_after_close_for_roll_over = 0.00;
-                        $record->is_disbursed = $net > 0 ? 1 : 0;
-                    } else {
-                        $record->archive_status_type = 2; // 2 = مدين
-                        $record->archive_settlement_amount = 0.00;
-                        $record->employee_net_salary_after_close_for_roll_over = $net; // stores negative balance
-                        $record->is_disbursed = 0;
-                    }
-
-                    $record->is_archived = 1;
-                    $record->archived_by = Auth::id();
-                    $record->archived_at = now();
-                    $record->save();
-
-                    $record->mainSalaryEmployeeDeductions()->update($archiveData);
-                    $record->mainSalaryEmployeeAbsences()->update($archiveData);
-                    $record->mainSalaryEmployeeDeductionTypes()->update($archiveData);
-                    $record->mainSalaryEmployeeAdditions()->update($archiveData);
-                    $record->mainSalaryEmployeeLoans()->update($archiveData);
-                    $record->mainSalaryEmployeeBonuses()->update($archiveData);
-                    $record->mainSalaryEmployeeAllowances()->update($archiveData);
-                    $record->mainSalaryEmployeePLoanInstallments()->update($archiveData);
+                // 2. Archive Vacation Balances (MainEmployeesVacationsBalances) for this month
+                if ($financeMonthlyCalendar->year_and_month) {
+                    MainEmployeesVacationsBalances::where('company_id', $company_id)
+                        ->where('year_and_month', $financeMonthlyCalendar->year_and_month)
+                        ->update([
+                            'is_archived' => 1,
+                            'archived_by' => Auth::id(),
+                            'archived_at' => now(),
+                        ]);
                 }
 
+                // 3. Archive Salary Records (if any exist)
+                if (!$records->isEmpty()) {
+                    foreach ($records as $record) {
+                        $net = (float)$record->employee_net_salary;
+
+                        if ($net >= 0) {
+                            $record->archive_status_type = $net == 0 ? 3 : 1; // 3 = صافي, 1 = دائن
+                            $record->archive_settlement_amount = $net;
+                            $record->employee_net_salary_after_close_for_roll_over = 0.00;
+                            $record->is_disbursed = $net > 0 ? 1 : 0;
+                        } else {
+                            $record->archive_status_type = 2; // 2 = مدين
+                            $record->archive_settlement_amount = 0.00;
+                            $record->employee_net_salary_after_close_for_roll_over = $net; // stores negative balance
+                            $record->is_disbursed = 0;
+                        }
+
+                        $record->is_archived = 1;
+                        $record->archived_by = Auth::id();
+                        $record->archived_at = now();
+                        $record->save();
+
+                        $record->mainSalaryEmployeeDeductions()->update($archiveData);
+                        $record->mainSalaryEmployeeAbsences()->update($archiveData);
+                        $record->mainSalaryEmployeeDeductionTypes()->update($archiveData);
+                        $record->mainSalaryEmployeeAdditions()->update($archiveData);
+                        $record->mainSalaryEmployeeLoans()->update($archiveData);
+                        $record->mainSalaryEmployeeBonuses()->update($archiveData);
+                        $record->mainSalaryEmployeeAllowances()->update($archiveData);
+                        $record->mainSalaryEmployeePLoanInstallments()->update($archiveData);
+                    }
+                }
+
+                // 4. Update monthly calendar status to closed (2)
                 $financeMonthlyCalendar->status = 2; // closed/archived
                 $financeMonthlyCalendar->updated_by = Auth::id();
                 $financeMonthlyCalendar->save();
+
+                // 5. Check if all months of this year are closed. If so, close the financial year.
+                $unclosedMonthsCount = FinanceMonthlyCalendar::where('financeCalendar_id', $financeMonthlyCalendar->financeCalendar_id)
+                    ->where('status', '!=', 2)
+                    ->count();
+
+                if ($unclosedMonthsCount == 0) {
+                    $financeCalendar = $financeMonthlyCalendar->financeCalendar;
+                    if ($financeCalendar && $financeCalendar->status != 2) {
+                        $financeCalendar->status = 2; // closed/archived
+                        $financeCalendar->updated_by = Auth::id();
+                        $financeCalendar->save();
+                    }
+                }
             });
 
-            return response()->json(['status' => 'true', 'message' => 'تمت أرشفة وإغلاق الشهر المالي بالكامل بنجاح لكافة الموظفين']);
+            return response()->json(['status' => 'true', 'message' => 'تمت أرشفة وإغلاق الشهر المالي بالكامل بنجاح لكافة الموظفين والبصمات والإجازات المرتبطة']);
         } catch (\Exception $e) {
             return response()->json(['status' => 'false', 'message' => 'حدث خطأ أثناء أرشفة الشهر المالي: ' . $e->getMessage()]);
         }

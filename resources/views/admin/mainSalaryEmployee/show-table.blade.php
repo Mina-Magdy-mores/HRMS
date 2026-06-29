@@ -254,17 +254,22 @@
                         <div class="form-group w-100 mb-3">
                             <div class="row">
                                 <div class="col-md-4">
-                                    <button type="submit" class="btn btn-success btn-block shadow-sm" id="print_button">
+                                    <button type="submit" class="btn btn-success btn-block shadow-sm"
+                                        id="print_button">
                                         <i class="fas fa-print mr-1"></i> طباعة كشف الرواتب للبحث
                                     </button>
                                 </div>
                                 <div class="col-md-4">
-                                    <button type="submit" formaction="{{ route('admin.main-salary-employee.print-search-detailed') }}" class="btn btn-info btn-block shadow-sm" id="print_button_detailed">
+                                    <button type="submit"
+                                        formaction="{{ route('admin.main-salary-employee.print-search-detailed') }}"
+                                        class="btn btn-info btn-block shadow-sm" id="print_button_detailed">
                                         <i class="fas fa-file-invoice mr-1"></i> طباعة التفاصيل الكاملة للبحث
                                     </button>
                                 </div>
                                 <div class="col-md-4">
-                                    <a href="{{ route('admin.main-salary-employee.print-all-detailed', $financeMonthlyCalendar->id) }}" target="_blank" class="btn btn-primary btn-block shadow-sm" id="print_button_all_detailed">
+                                    <a href="{{ route('admin.main-salary-employee.print-all-detailed', $financeMonthlyCalendar->id) }}"
+                                        target="_blank" class="btn btn-primary btn-block shadow-sm"
+                                        id="print_button_all_detailed">
                                         <i class="fas fa-print mr-1"></i> طباعة كل الموظفين بالتفاصيل (للإدارة)
                                     </a>
                                 </div>
@@ -385,13 +390,11 @@
                                         <div class="d-flex ">
                                             <button class="btn btn-info btn-sm show-details shadow-sm m-2"
                                                 data-id="{{ $record->id }}"
-                                                data-employee-id="{{ $record->employee_id }}"
-                                                title="تفاصيل الراتب">
+                                                data-employee-id="{{ $record->employee_id }}" title="تفاصيل الراتب">
                                                 <i class="fas fa-eye"></i>
                                             </button>
                                             @if ($record->is_archived == 0 && $financeMonthlyCalendar->status == 1)
-                                                <button
-                                                    class="btn btn-primary btn-sm openArchiveModal m-2 shadow-sm"
+                                                <button class="btn btn-primary btn-sm openArchiveModal m-2 shadow-sm"
                                                     data-id="{{ $record->id }}"
                                                     data-employee-id="{{ $record->employee_id }}"
                                                     data-finance-monthly-calendar-id="{{ $record->finance_monthly_calendar_id }}"
@@ -606,20 +609,27 @@
                 </div>
 
                 <!-- Archive Details Section -->
-                <div id="archive_details_section" class="p-3 rounded mt-3 border border-warning shadow-sm" style="display: none; background-color: #fffbeb;">
+                <div id="archive_details_section" class="p-3 rounded mt-3 border border-warning shadow-sm"
+                    style="display: none; background-color: #fffbeb;">
                     <h6 class="text-warning font-weight-bold mb-3 text-right">
                         <i class="fas fa-archive mr-1"></i> بيانات إغلاق وأرشفة الراتب:
                     </h6>
                     <div class="row text-center">
                         <div class="col-md-6 border-right">
-                            <span class="text-muted d-block small mb-1" id="archive_settlement_label">المبلغ المسوى عند الأرشفة</span>
-                            <strong class="text-dark font-weight-bold" style="font-size: 1.25rem;"><span id="archive_settlement_val">0.00</span> <small class="text-muted" style="font-size: 11px;">ج.م</small></strong>
+                            <span class="text-muted d-block small mb-1" id="archive_settlement_label">المبلغ المسوى
+                                عند الأرشفة</span>
+                            <strong class="text-dark font-weight-bold" style="font-size: 1.25rem;"><span
+                                    id="archive_settlement_val">0.00</span> <small class="text-muted"
+                                    style="font-size: 11px;">ج.م</small></strong>
                         </div>
                         <div class="col-md-6">
                             <span class="text-muted d-block small mb-1">المبلغ المتبقي للترحيل للشهر القادم</span>
                             <div class="d-flex align-items-center justify-content-center">
-                                <span id="archive_next_rollover_badge" class="badge px-2 py-1 mr-2" style="font-size: 0.8rem;"></span>
-                                <strong class="text-primary font-weight-bold" style="font-size: 1.25rem;"><span id="archive_next_rollover_val">0.00</span> <small class="text-muted" style="font-size: 11px;">ج.م</small></strong>
+                                <span id="archive_next_rollover_badge" class="badge px-2 py-1 mr-2"
+                                    style="font-size: 0.8rem;"></span>
+                                <strong class="text-primary font-weight-bold" style="font-size: 1.25rem;"><span
+                                        id="archive_next_rollover_val">0.00</span> <small class="text-muted"
+                                        style="font-size: 11px;">ج.م</small></strong>
                             </div>
                         </div>
                     </div>
@@ -630,7 +640,8 @@
                     <i class="fas fa-print mr-1"></i> طباعة التفاصيل
                 </a>
                 @if ($financeMonthlyCalendar->status == 1)
-                    <button type="button" class="btn btn-warning openArchiveModal shadow-sm" id="details_modal_archive_btn" style="display: none;">
+                    <button type="button" class="btn btn-warning openArchiveModal shadow-sm"
+                        id="details_modal_archive_btn" style="display: none;">
                         <i class="fas fa-lock mr-1"></i> أرشفة الراتب
                     </button>
                 @endif
@@ -875,74 +886,104 @@
                             var data = response.data;
 
                             modal.find('#modal_employee_name').text(data.employee_name);
-                            modal.find('#modal_employee_code').text(data.employee ? data.employee.employee_code : '---');
-                            modal.find('#modal_employee_salary').text(parseFloat(data.employee_salary).toFixed(2));
+                            modal.find('#modal_employee_code').text(data.employee ? data
+                                .employee.employee_code : '---');
+                            modal.find('#modal_employee_salary').text(parseFloat(data
+                                .employee_salary).toFixed(2));
 
-                            modal.find('#detail_salary').text(parseFloat(data.employee_salary).toFixed(2));
-                            modal.find('#detail_motivation').text(parseFloat(data.motivation_amount).toFixed(2));
-                            modal.find('#detail_fixed_allowance').text(parseFloat(data.fixed_allowance).toFixed(2));
-                            modal.find('#detail_variable_allowance').text(parseFloat(data.employee_total_allowance).toFixed(2));
-                            modal.find('#detail_bonus').text(parseFloat(data.employee_total_bonus).toFixed(2));
-                            modal.find('#detail_additions').text(parseFloat(data.employee_additions_payment_total).toFixed(2));
-                            modal.find('#detail_total_benefits').text(parseFloat(data.total_benefits).toFixed(2));
+                            modal.find('#detail_salary').text(parseFloat(data.employee_salary)
+                                .toFixed(2));
+                            modal.find('#detail_motivation').text(parseFloat(data
+                                .motivation_amount).toFixed(2));
+                            modal.find('#detail_fixed_allowance').text(parseFloat(data
+                                .fixed_allowance).toFixed(2));
+                            modal.find('#detail_variable_allowance').text(parseFloat(data
+                                .employee_total_allowance).toFixed(2));
+                            modal.find('#detail_bonus').text(parseFloat(data
+                                .employee_total_bonus).toFixed(2));
+                            modal.find('#detail_additions').text(parseFloat(data
+                                .employee_additions_payment_total).toFixed(2));
+                            modal.find('#detail_total_benefits').text(parseFloat(data
+                                .total_benefits).toFixed(2));
 
-                            modal.find('#detail_social_insurance').text(parseFloat(data.social_insurance_amount).toFixed(2));
-                            modal.find('#detail_medical_insurance').text(parseFloat(data.medical_insurance_amount).toFixed(2));
-                            modal.find('#detail_absences').text(parseFloat(data.employee_absences_payment_total).toFixed(2));
-                            modal.find('#detail_deductions').text(parseFloat(data.employee_deductions_payment_total).toFixed(2));
-                            modal.find('#detail_penalty').text(parseFloat(data.employee_total_deduction_type).toFixed(2));
-                            modal.find('#detail_monthly_loan').text(parseFloat(data.monthly_loan_amount).toFixed(2));
-                            modal.find('#detail_permanent_loan').text(parseFloat(data.permanent_loan_amount).toFixed(2));
-                            modal.find('#detail_total_deductions').text(parseFloat(data.total_deductions).toFixed(2));
+                            modal.find('#detail_social_insurance').text(parseFloat(data
+                                .social_insurance_amount).toFixed(2));
+                            modal.find('#detail_medical_insurance').text(parseFloat(data
+                                .medical_insurance_amount).toFixed(2));
+                            modal.find('#detail_absences').text(parseFloat(data
+                                .employee_absences_payment_total).toFixed(2));
+                            modal.find('#detail_deductions').text(parseFloat(data
+                                .employee_deductions_payment_total).toFixed(2));
+                            modal.find('#detail_penalty').text(parseFloat(data
+                                .employee_total_deduction_type).toFixed(2));
+                            modal.find('#detail_monthly_loan').text(parseFloat(data
+                                .monthly_loan_amount).toFixed(2));
+                            modal.find('#detail_permanent_loan').text(parseFloat(data
+                                .permanent_loan_amount).toFixed(2));
+                            modal.find('#detail_total_deductions').text(parseFloat(data
+                                .total_deductions).toFixed(2));
 
-                            modal.find('#detail_rollover').text(parseFloat(data.employee_rollover_amount).toFixed(2));
-                            
+                            modal.find('#detail_rollover').text(parseFloat(data
+                                .employee_rollover_amount).toFixed(2));
+
                             if (data.is_archived == 1) {
-                                 modal.find('#archive_details_section').show();
-                                 modal.find('#details_modal_archive_btn').hide();
-                                 var settlementText = "";
-                                 if (data.archive_status_type == 1) {
-                                     settlementText = "المبلغ الذي تم صرفه للموظف عند الأرشفة:";
-                                 } else if (data.archive_status_type == 2) {
-                                     settlementText = "المبلغ الذي تم تحصيله من الموظف عند الأرشفة:";
-                                 } else {
-                                     settlementText = "المبلغ المسوى عند الأرشفة:";
-                                 }
-                                 modal.find('#archive_settlement_label').text(settlementText);
-                                 modal.find('#archive_settlement_val').text(parseFloat(data.archive_settlement_amount || 0).toFixed(2));
-                                 
-                                 var nextRollover = parseFloat(data.employee_net_salary_after_close_for_roll_over) || 0;
-                                 var absNextRollover = Math.abs(nextRollover);
-                                 modal.find('#archive_next_rollover_val').text(absNextRollover.toFixed(2));
-                                 
-                                 if (absNextRollover === 0) {
-                                     modal.find('#archive_next_rollover_badge')
-                                         .removeClass('badge-success badge-danger')
-                                         .addClass('badge-secondary')
-                                         .html('<i class="fas fa-check-circle mr-1"></i> صافي (تمت التسوية)');
-                                 } else if (nextRollover > 0) {
-                                     modal.find('#archive_next_rollover_badge')
-                                         .removeClass('badge-danger badge-secondary')
-                                         .addClass('badge-success')
-                                         .html('<i class="fas fa-arrow-down mr-1"></i> دائن (مستحق له مرحل)');
-                                 } else {
-                                     modal.find('#archive_next_rollover_badge')
-                                         .removeClass('badge-success badge-secondary')
-                                         .addClass('badge-danger')
-                                         .html('<i class="fas fa-arrow-up mr-1"></i> مدين (مستحق عليه مرحل)');
-                                 }
-                             } else {
-                                 modal.find('#archive_details_section').hide();
-                                 modal.find('#details_modal_archive_btn')
-                                     .data('id', data.id)
-                                     .data('employee-id', data.employee_id)
-                                     .data('finance-monthly-calendar-id', data.finance_monthly_calendar_id)
-                                     .attr('data-id', data.id)
-                                     .attr('data-employee-id', data.employee_id)
-                                     .attr('data-finance-monthly-calendar-id', data.finance_monthly_calendar_id)
-                                     .show();
-                             }
-                            
+                                modal.find('#archive_details_section').show();
+                                modal.find('#details_modal_archive_btn').hide();
+                                var settlementText = "";
+                                if (data.archive_status_type == 1) {
+                                    settlementText = "المبلغ الذي تم صرفه للموظف عند الأرشفة:";
+                                } else if (data.archive_status_type == 2) {
+                                    settlementText =
+                                        "المبلغ الذي تم تحصيله من الموظف عند الأرشفة:";
+                                } else {
+                                    settlementText = "المبلغ المسوى عند الأرشفة:";
+                                }
+                                modal.find('#archive_settlement_label').text(settlementText);
+                                modal.find('#archive_settlement_val').text(parseFloat(data
+                                    .archive_settlement_amount || 0).toFixed(2));
+
+                                var nextRollover = parseFloat(data
+                                    .employee_net_salary_after_close_for_roll_over) || 0;
+                                var absNextRollover = Math.abs(nextRollover);
+                                modal.find('#archive_next_rollover_val').text(absNextRollover
+                                    .toFixed(2));
+
+                                if (absNextRollover === 0) {
+                                    modal.find('#archive_next_rollover_badge')
+                                        .removeClass('badge-success badge-danger')
+                                        .addClass('badge-secondary')
+                                        .html(
+                                            '<i class="fas fa-check-circle mr-1"></i> صافي (تمت التسوية)'
+                                            );
+                                } else if (nextRollover > 0) {
+                                    modal.find('#archive_next_rollover_badge')
+                                        .removeClass('badge-danger badge-secondary')
+                                        .addClass('badge-success')
+                                        .html(
+                                            '<i class="fas fa-arrow-down mr-1"></i> دائن (مستحق له مرحل)'
+                                            );
+                                } else {
+                                    modal.find('#archive_next_rollover_badge')
+                                        .removeClass('badge-success badge-secondary')
+                                        .addClass('badge-danger')
+                                        .html(
+                                            '<i class="fas fa-arrow-up mr-1"></i> مدين (مستحق عليه مرحل)'
+                                            );
+                                }
+                            } else {
+                                modal.find('#archive_details_section').hide();
+                                modal.find('#details_modal_archive_btn')
+                                    .data('id', data.id)
+                                    .data('employee-id', data.employee_id)
+                                    .data('finance-monthly-calendar-id', data
+                                        .finance_monthly_calendar_id)
+                                    .attr('data-id', data.id)
+                                    .attr('data-employee-id', data.employee_id)
+                                    .attr('data-finance-monthly-calendar-id', data
+                                        .finance_monthly_calendar_id)
+                                    .show();
+                            }
+
                             var netSalary = parseFloat(data.employee_net_salary) || 0;
                             var absNetSalary = Math.abs(netSalary);
                             modal.find('#detail_net_salary').text(absNetSalary.toFixed(2));
@@ -951,21 +992,30 @@
                                 modal.find('#detail_net_salary_badge')
                                     .removeClass('badge-danger')
                                     .addClass('badge-success')
-                                    .html('<i class="fas fa-arrow-down mr-1"></i> دائن (مستحق له)');
+                                    .html(
+                                        '<i class="fas fa-arrow-down mr-1"></i> دائن (مستحق له)'
+                                        );
                             } else {
                                 modal.find('#detail_net_salary_badge')
                                     .removeClass('badge-success')
                                     .addClass('badge-danger')
-                                    .html('<i class="fas fa-arrow-up mr-1"></i> مدين (مستحق عليه)');
+                                    .html(
+                                        '<i class="fas fa-arrow-up mr-1"></i> مدين (مستحق عليه)'
+                                        );
                             }
 
-                            modal.find('#detail_additions_days').text(data.employee_additions_days_counter * 1);
-                            modal.find('#detail_absences_days').text(data.employee_absences_days_counter * 1);
-                            modal.find('#detail_deductions_days').text(data.employee_deductions_days_counter * 1);
-                            modal.find('#detail_penalty_days').text(data.employee_total_penalty_days * 1);
+                            modal.find('#detail_additions_days').text(data
+                                .employee_additions_days_counter * 1);
+                            modal.find('#detail_absences_days').text(data
+                                .employee_absences_days_counter * 1);
+                            modal.find('#detail_deductions_days').text(data
+                                .employee_deductions_days_counter * 1);
+                            modal.find('#detail_penalty_days').text(data
+                                .employee_total_penalty_days * 1);
 
                             var recordId = data.id;
-                            var printUrl = "{{ route('admin.main-salary-employee.print-details', ':id') }}";
+                            var printUrl =
+                                "{{ route('admin.main-salary-employee.print-details', ':id') }}";
                             printUrl = printUrl.replace(':id', recordId);
                             modal.find('#print_modal_details').attr('href', printUrl);
 
@@ -1211,8 +1261,13 @@
                     }
                 });
             });
-            
 
+            // Fix Bootstrap scroll lock issue for multi-modals
+            $(document).on('hidden.bs.modal', '.modal', function() {
+                if ($('.modal:visible').length) {
+                    $('body').addClass('modal-open');
+                }
+            });
 
         });
     </script>

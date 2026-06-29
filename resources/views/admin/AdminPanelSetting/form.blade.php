@@ -298,6 +298,22 @@
                             @include('admin.errors.errors', ['value' => 'is_allowed_to_transfer_vacation'])
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>هل يسمح بسحب الإجازات السنوية تلقائياً من البصمة؟</label>
+                            <select name="is_allowed_to_pull_annual_from_fingerprint"
+                                class="form-control editable-input {{ $errors->has('is_allowed_to_pull_annual_from_fingerprint') ? 'is-invalid' : '' }}"
+                                disabled>
+                                <option value="1"
+                                    {{ old('is_allowed_to_pull_annual_from_fingerprint', $general_settings->is_allowed_to_pull_annual_from_fingerprint) == 1 ? 'selected' : '' }}>
+                                    تلقائياً (نعم)</option>
+                                <option value="0"
+                                    {{ old('is_allowed_to_pull_annual_from_fingerprint', $general_settings->is_allowed_to_pull_annual_from_fingerprint) == 0 ? 'selected' : '' }}>
+                                    يدوياً (لا)</option>
+                            </select>
+                            @include('admin.errors.errors', ['value' => 'is_allowed_to_pull_annual_from_fingerprint'])
+                        </div>
+                    </div>
                 </div>
 
                 <hr>
