@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\MainEmployeesVacationsBalancesController;
 use App\Http\Controllers\Admin\MainSalaryEmployeeLoanController;
 use App\Http\Controllers\Admin\MainSalaryEmployeePLoanController;
 use App\Http\Controllers\Admin\MainSalaryRecordController;
+use App\Http\Controllers\Admin\MainEmployeeInvestigationController;
 use App\Http\Controllers\Admin\NationalityController;
 use App\Http\Controllers\Admin\OccasionController;
 use App\Http\Controllers\Admin\QualificationController;
@@ -279,6 +280,17 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/main-salary-employee-deduction-types/edit', [MainSalaryEmployeeDeductionTypeController::class, 'edit'])->name('main-salary-employee-deduction-types.edit');
         Route::put('/main-salary-employee-deduction-types', [MainSalaryEmployeeDeductionTypeController::class, 'update'])->name('main-salary-employee-deduction-types.update');
         Route::post('/main-salary-employee-deduction-types/print-search', [MainSalaryEmployeeDeductionTypeController::class, 'printSearch'])->name('main-salary-employee-deduction-types.print-search');
+
+        // MainEmployeeInvestigation routes
+        Route::get('/main-salary-employee-investigations', [MainEmployeeInvestigationController::class, 'index'])->name('main-salary-employee-investigations.index');
+        Route::get('/main-salary-employee-investigations/{id}/show', [MainEmployeeInvestigationController::class, 'show'])->name('main-salary-employee-investigations.show');
+        Route::post('/main-salary-employee-investigations/store', [MainEmployeeInvestigationController::class, 'store'])->name('main-salary-employee-investigations.store');
+        Route::post('/main-salary-employee-investigations/ajax-check', [MainEmployeeInvestigationController::class, 'ajaxCheck'])->name('main-salary-employee-investigations.ajax-check');
+        Route::post('/main-salary-employee-investigations/ajax-search', [MainEmployeeInvestigationController::class, 'ajaxSearch'])->name('main-salary-employee-investigations.ajax-search');
+        Route::post('/main-salary-employee-investigations/destroy', [MainEmployeeInvestigationController::class, 'destroy'])->name('main-salary-employee-investigations.destroy');
+        Route::post('/main-salary-employee-investigations/edit', [MainEmployeeInvestigationController::class, 'edit'])->name('main-salary-employee-investigations.edit');
+        Route::put('/main-salary-employee-investigations', [MainEmployeeInvestigationController::class, 'update'])->name('main-salary-employee-investigations.update');
+        Route::post('/main-salary-employee-investigations/print-search', [MainEmployeeInvestigationController::class, 'printSearch'])->name('main-salary-employee-investigations.print-search');
 
         // MainSalaryEmployeeBonus routes
         Route::get('/main-salary-employee-bonuses', [MainSalaryEmployeeBonusController::class, 'index'])->name('main-salary-employee-bonuses.index');

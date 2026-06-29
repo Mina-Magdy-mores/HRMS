@@ -299,7 +299,6 @@
                                 <p>أضافه الأيام اليدوي</p>
                             </a>
                         </li>
-
                         <li class="nav-item">
                             <a href="{{ route('admin.main-salary-employee-deduction-types.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-salary-employee-deduction-types.*')) active @endif ">
@@ -345,9 +344,11 @@
                     </ul>
                 </li>
 
-                                <li
+
+
+                <li
                     class="nav-item has-treeview  {{ request()->routeIs('admin.attendanceDepartures.*') ||
-                    request()->routeIs('admin.main-employees-vacations-balances.*') 
+                    request()->routeIs('admin.main-employees-vacations-balances.*')
                         ? 'menu-open'
                         : '' }}">
                     <a href="#"
@@ -357,7 +358,7 @@
                             : '' }}">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>
-                         الحضور والانصراف
+                            الحضور والانصراف
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
@@ -370,15 +371,24 @@
                             </a>
                         </li>
 
-                         <li class="nav-item">
+                        <li class="nav-item">
                             <a href="{{ route('admin.main-employees-vacations-balances.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-employees-vacations-balances.*')) active @endif">
                                 <i class="fas fa-calendar-check"></i>
                                 <p>أرصدة إجازات الموظفين</p>
                             </a>
                         </li>
-                       
+
                     </ul>
+                </li>
+
+                <li
+                    class="nav-item {{ request()->routeIs('admin.main-salary-employee-investigations.*') ? 'menu-open' : '' }}">
+                    <a href="{{ route('admin.main-salary-employee-investigations.index') }}"
+                        class="nav-link {{ request()->routeIs('admin.main-salary-employee-investigations.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-search"></i>
+                        <p>التحقيقات الإدارية</p>
+                    </a>
                 </li>
 
             </ul>
