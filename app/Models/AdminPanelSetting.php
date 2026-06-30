@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string $company_name
  * @property int $status واحد مفعل - صفر معطل
+ * @property int $is_active_system_monitoring هل المراقب للنظام مفعل ام لا
  * @property string|null $image
  * @property string $phone
  * @property string $address

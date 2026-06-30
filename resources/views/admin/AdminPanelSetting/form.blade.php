@@ -120,6 +120,22 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
+                            <label>حالة مراقب النظام</label>
+                            <select name="is_active_system_monitoring"
+                                class="form-control editable-input {{ $errors->has('is_active_system_monitoring') ? 'is-invalid' : '' }}"
+                                disabled>
+                                <option value="1"
+                                    {{ old('is_active_system_monitoring', $general_settings->is_active_system_monitoring) == 1 ? 'selected' : '' }}>
+                                    مفعل</option>
+                                <option value="0"
+                                    {{ old('is_active_system_monitoring', $general_settings->is_active_system_monitoring) == 0 ? 'selected' : '' }}>
+                                    معطل</option>
+                            </select>
+                            @include('admin.errors.errors', ['value' => 'is_active_system_monitoring'])
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
                             <label>البريد الإلكتروني</label>
                             <input type="text" name="email"
                                 class="form-control editable-input {{ $errors->has('email') ? 'is-invalid' : '' }}"

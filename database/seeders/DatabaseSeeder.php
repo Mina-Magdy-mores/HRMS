@@ -56,8 +56,8 @@ class DatabaseSeeder extends Seeder
             AllowanceTypeSeeder::class,
             DeductionTypeSeeder::class,
             BonusSeeder::class,
-
-
+            AlertModuleSeeder::class,
+            AlertMoveTypeSeeder::class,
         ]);
 
         $this->command->info('✅ All seeders completed successfully!');
