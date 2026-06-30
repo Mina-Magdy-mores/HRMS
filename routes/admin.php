@@ -35,6 +35,7 @@ use App\Http\Controllers\Admin\ReligionController;
 use App\Http\Controllers\Admin\ResignationController;
 use App\Http\Controllers\Admin\ShiftsTypeController;
 use App\Http\Controllers\Admin\VacationTypeController;
+use App\Http\Controllers\Admin\AdminProfileController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -54,6 +55,15 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::get('/general-settings', [AdminPanelSettingController::class, 'index'])->name('general-settings');
         Route::put('/general-settings/{adminPanelSetting}', [AdminPanelSettingController::class, 'update'])->name('general-settings.update');
         Route::get('/general-settings/downloadImage/{id}', [AdminPanelSettingController::class, 'downloadImage'])->name('general-settings.downloadImage');
+
+        // admin profiles routes
+        Route::get('/admin-profiles', [AdminProfileController::class, 'index'])->name('admin-profiles.index');
+        Route::get('/admin-profiles/create', [AdminProfileController::class, 'create'])->name('admin-profiles.create');
+        Route::post('/admin-profiles', [AdminProfileController::class, 'store'])->name('admin-profiles.store');
+        Route::get('/admin-profiles/{id}/edit', [AdminProfileController::class, 'edit'])->name('admin-profiles.edit');
+        Route::put('/admin-profiles/{id}', [AdminProfileController::class, 'update'])->name('admin-profiles.update');
+        Route::delete('/admin-profiles/{id}', [AdminProfileController::class, 'destroy'])->name('admin-profiles.destroy');
+        Route::get('/admin-profiles/{id}/archive', [AdminProfileController::class, 'archive'])->name('admin-profiles.archive');
 
         // finance calendar
         Route::resource('financeCalendars', FinanceCalendarController::class);

@@ -8,12 +8,17 @@
     </a>
 
     <!-- Sidebar -->
-    <div class="sidebar">
+        <div class="sidebar">
         <!-- Sidebar user panel (optional) -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
-                <img src="{{ asset('assets/dist/img/user2-160x160.jpg') }}" class="img-circle elevation-2"
-                    alt="User Image">
+                @if(auth()->user()->image)
+                    <img src="{{ asset('storage/' . auth()->user()->image) }}" class="img-circle elevation-2"
+                        alt="{{ auth()->user()->name }}" style="object-fit: cover; width:35px; height:35px;">
+                @else
+                    <img src="{{ asset('assets/dist/img/user2-160x160.jpg') }}" class="img-circle elevation-2"
+                        alt="User Image">
+                @endif
             </div>
             <div class="info">
                 <a href="{{ route('admin.dashboard') }}" class="d-block">{{ auth()->user()->name ?? 'Admin' }}</a>
@@ -380,6 +385,14 @@
                         </li>
 
                     </ul>
+                </li>
+
+                <li class="nav-item {{ request()->routeIs('admin.admin-profiles.*') ? 'menu-open' : '' }}">
+                    <a href="{{ route('admin.admin-profiles.index') }}"
+                        class="nav-link {{ request()->routeIs('admin.admin-profiles.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-users-cog"></i>
+                        <p>بروفايل الادمين</p>
+                    </a>
                 </li>
 
                 <li
