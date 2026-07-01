@@ -32,9 +32,12 @@ use App\Models\Admin;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Qualification whereUpdatedBy($value)
  * @mixin \Eloquent
  */
+use App\Traits\LogsActivity;
+
 #[Guarded([])]
 class Qualification extends Model
 {
+    use LogsActivity;
     public function addedBy()
     {
         return $this->belongsTo(Admin::class, 'added_by');

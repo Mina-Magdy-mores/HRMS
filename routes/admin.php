@@ -36,11 +36,12 @@ use App\Http\Controllers\Admin\ResignationController;
 use App\Http\Controllers\Admin\ShiftsTypeController;
 use App\Http\Controllers\Admin\VacationTypeController;
 use App\Http\Controllers\Admin\AdminProfileController;
+use App\Http\Controllers\Admin\AlertSystemMonitoringController;
 use Illuminate\Support\Facades\Route;
 
 
 if (!defined('PAGEINATION_COUNTER')) {
-    define('PAGEINATION_COUNTER', 3);
+    define('PAGEINATION_COUNTER', 10);
 }
 // Admin
 Route::prefix('/admin')->name('admin.')->group(function () {
@@ -380,6 +381,13 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/attendanceDepartures/finger-print-details/day-movements', [AttendanceDepartureController::class, 'getDayMovements'])->name('attendanceDepartures.finger-print-details.day-movements');
         Route::post('/attendanceDepartures/finger-print-details/update-day-movements', [AttendanceDepartureController::class, 'updateDayMovements'])->name('attendanceDepartures.finger-print-details.update-day-movements');
 
+        // System Monitoring routes
+        Route::get('/system-monitoring/self-logs', [AlertSystemMonitoringController::class, 'selfLogs'])->name('system-monitoring.self-logs');
+        Route::delete('/system-monitoring/self-logs/{id}', [AlertSystemMonitoringController::class, 'destroySelfLog'])->name('system-monitoring.destroy-self-log');
+        Route::get('/system-monitoring', [AlertSystemMonitoringController::class, 'index'])->name('system-monitoring.index');
+        Route::post('/system-monitoring/{id}/toggle-important', [AlertSystemMonitoringController::class, 'toggleImportant'])->name('system-monitoring.toggle-important');
+        Route::delete('/system-monitoring/{id}', [AlertSystemMonitoringController::class, 'destroy'])->name('system-monitoring.destroy');
+        Route::post('/system-monitoring/ajax-search', [AlertSystemMonitoringController::class, 'ajaxSearch'])->name('system-monitoring.ajax-search');
     });
 
     // guest routes

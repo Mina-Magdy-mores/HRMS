@@ -63,6 +63,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|FinanceMonthlyCalendar whereYearAndMonth($value)
  * @mixin \Eloquent
  */
+use App\Traits\LogsActivity;
+
 #[Fillable([
     'financeCalendar_id',
     'number_of_days',
@@ -80,6 +82,31 @@ use Illuminate\Database\Eloquent\Model;
 ])]
 class FinanceMonthlyCalendar extends Model
 {
+    use LogsActivity;
+
+    protected function getLogDisplayNameField()
+    {
+        return 'year_and_month';
+    }
+
+    public function getLogName($actionName)
+    {
+        return "{$actionName}: {$this->year_and_month}";
+    }
+
+    public function getLogActionName($defaultAction)
+    {
+        if ($defaultAction === 'تعديل') {
+            if ($this->isDirty('status')) {
+                if ($this->status == 1) {
+                    return 'فتح الشهر المالي';
+                } elseif ($this->status == 2) {
+                    return 'أرشفة الشهر المالي';
+                }
+            }
+        }
+        return $defaultAction;
+    }
     public function addedBy()
     {
         return $this->belongsTo(Admin::class, 'added_by');

@@ -53,9 +53,23 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeduction whereUpdatedBy($value)
  * @mixin \Eloquent
  */
+use App\Traits\LogsActivity;
+
 #[Guarded([])]
 class MainSalaryEmployeeDeduction extends Model
 {
+    use LogsActivity;
+
+    public function getLogName($actionName)
+    {
+        $employeeName = $this->getEmployeeName();
+        return "{$actionName} خصم مالي للموظف: {$employeeName}";
+    }
+
+    public function getLogEmployeeId()
+    {
+        return $this->employee_id;
+    }
         public function mainSalaryEmployee()
         {
             return $this->belongsTo(MainSalaryEmployee::class);

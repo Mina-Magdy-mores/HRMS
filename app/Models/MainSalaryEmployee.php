@@ -135,9 +135,37 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployee whereYearAndMonth($value)
  * @mixin \Eloquent
  */
+use App\Traits\LogsActivity;
+
 #[Guarded([])]
 class MainSalaryEmployee extends Model
 {
+    use LogsActivity;
+
+    protected function getLogDisplayNameField()
+    {
+        return 'employee_name';
+    }
+
+    public function getLogName($actionName)
+    {
+        return "{$actionName}: {$this->employee_name} ({$this->year_and_month})";
+    }
+
+    public function getLogActionName($defaultAction)
+    {
+        if ($defaultAction === 'تعديل') {
+            if ($this->isDirty('is_archived') && $this->is_archived == 1) {
+                return 'أرشفة راتب موظف';
+            }
+        }
+        return $defaultAction;
+    }
+
+    public function getLogEmployeeId()
+    {
+        return $this->employee_id;
+    }
     public function addedBy()
     {
         return $this->belongsTo(Admin::class, 'added_by');

@@ -63,9 +63,23 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeePLoan whereUpdatedBy($value)
  * @mixin \Eloquent
  */
+use App\Traits\LogsActivity;
+
 #[Guarded([])]
 class MainSalaryEmployeePLoan extends Model
 {
+    use LogsActivity;
+
+    public function getLogName($actionName)
+    {
+        $employeeName = $this->getEmployeeName();
+        return "{$actionName} سلفة مستديمة للموظف: {$employeeName}";
+    }
+
+    public function getLogEmployeeId()
+    {
+        return $this->employee_id;
+    }
     public function employee()
     {
         return $this->belongsTo(Employee::class, 'employee_id');

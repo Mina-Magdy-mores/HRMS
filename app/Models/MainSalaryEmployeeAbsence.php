@@ -51,9 +51,23 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeAbsence whereUpdatedBy($value)
  * @mixin \Eloquent
  */
+use App\Traits\LogsActivity;
+
 #[Guarded([])]
 class MainSalaryEmployeeAbsence extends Model
 {
+    use LogsActivity;
+
+    public function getLogName($actionName)
+    {
+        $employeeName = $this->getEmployeeName();
+        return "{$actionName} خصم غياب يدوي للموظف: {$employeeName}";
+    }
+
+    public function getLogEmployeeId()
+    {
+        return $this->employee_id;
+    }
     public function mainSalaryEmployee()
     {
         return $this->belongsTo(MainSalaryEmployee::class);

@@ -325,7 +325,7 @@ trait GeneralTrait
                     if ($admin_panel_settings->is_allowed_to_transfer_vacation == 1) {
                         $vacationBalance = get_cols_where(
                             MainEmployeesVacationsBalances::class,
-                            ['id', 'spent_balance', 'remaining_net_balance', 'current_month_balance', 'carryover_from_previous_month', 'total_available_balance'],
+                            ['id', 'employee_id', 'spent_balance', 'remaining_net_balance', 'current_month_balance', 'carryover_from_previous_month', 'total_available_balance'],
                             ['employee_id' => $employee->id, 'company_id' => $company_id],
                             'id',
                             'asc'
@@ -333,7 +333,7 @@ trait GeneralTrait
                     } else {
                         $vacationBalance = get_cols_where(
                             MainEmployeesVacationsBalances::class,
-                            ['id', 'spent_balance', 'remaining_net_balance', 'current_month_balance', 'carryover_from_previous_month', 'total_available_balance'],
+                            ['id', 'employee_id', 'spent_balance', 'remaining_net_balance', 'current_month_balance', 'carryover_from_previous_month', 'total_available_balance'],
                             ['employee_id' => $employee->id, 'company_id' => $company_id, 'financial_year' => $current_opened_month->finance_yr],
                             'id',
                             'asc'

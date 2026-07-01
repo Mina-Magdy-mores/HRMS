@@ -37,9 +37,19 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ShiftsType whereUpdatedBy($value)
  * @mixin \Eloquent
  */
+use App\Traits\LogsActivity;
+
 #[Fillable(['type', 'start_time', 'end_time', 'total_hours', 'status', 'company_id', 'created_by', 'updated_by'])]
 class ShiftsType extends Model
 {
+    use LogsActivity;
+
+    public function getLogName($actionName)
+    {
+        $types = [1 => 'صباحي', 2 => 'مسائي', 3 => 'يوم كامل'];
+        $typeName = $types[$this->type] ?? 'غير محدد';
+        return "{$actionName} شفت: {$typeName} (ساعات: {$this->total_hours})";
+    }
     public function createdBy()
     {
         return $this->belongsTo(Admin::class, 'created_by');

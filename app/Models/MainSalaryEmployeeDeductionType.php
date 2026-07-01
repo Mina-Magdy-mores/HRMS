@@ -52,9 +52,23 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MainSalaryEmployeeDeductionType whereUpdatedBy($value)
  * @mixin \Eloquent
  */
+use App\Traits\LogsActivity;
+
 #[Guarded([])]
 class MainSalaryEmployeeDeductionType extends Model
 {
+    use LogsActivity;
+
+    public function getLogName($actionName)
+    {
+        $employeeName = $this->getEmployeeName();
+        return "{$actionName} جزاء يدوي للموظف: {$employeeName}";
+    }
+
+    public function getLogEmployeeId()
+    {
+        return $this->employee_id;
+    }
     public function mainSalaryEmployee()
     {
         return $this->belongsTo(MainSalaryEmployee::class);

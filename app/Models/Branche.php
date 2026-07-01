@@ -40,9 +40,12 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Branche whereUpdatedBy($value)
  * @mixin \Eloquent
  */
+use App\Traits\LogsActivity;
+
 #[Fillable(['name', 'address', 'phone', 'email', 'status', 'created_by', 'updated_by', 'company_id'])]
 class Branche extends Model
 {
+    use LogsActivity;
     public function createdBy()
     {
         return $this->belongsTo(Admin::class, 'created_by');

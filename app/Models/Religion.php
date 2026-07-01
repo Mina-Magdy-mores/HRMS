@@ -31,9 +31,32 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Religion whereUpdatedBy($value)
  * @mixin \Eloquent
  */
+use App\Traits\LogsActivity;
+
 #[Guarded([])]
 class Religion extends Model
 {
+    use LogsActivity;
+
+    public function getModuleName()
+    {
+        return 'الأديان';
+    }
+
+    public function getLogName($actionName)
+    {
+        return "{$actionName} ديانة: {$this->name}";
+    }
+
+    public function getLogContent($actionName)
+    {
+        if ($actionName == 'تعديل') {
+            $oldName = $this->getOriginal('name');
+            return "تم تعديل اسم الديانة من: '{$oldName}' إلى: '{$this->name}'";
+        }
+        return "تم {$actionName} الديانة باسم: '{$this->name}'";
+    }
+
     public function addedBy()
     {
         return $this->belongsTo(Admin::class, 'added_by');

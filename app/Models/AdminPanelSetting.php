@@ -66,10 +66,17 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AdminPanelSetting whereUpdatedBy($value)
  * @mixin \Eloquent
  */
+use App\Traits\LogsActivity;
+
 #[Guarded([])]
 class AdminPanelSetting extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
+
+    protected function getLogDisplayNameField()
+    {
+        return 'company_name';
+    }
 
     public function addedBy()
     {
@@ -80,6 +87,4 @@ class AdminPanelSetting extends Model
     {
         return $this->belongsTo(Admin::class, 'updated_by');
     }
-    
-
 }

@@ -33,9 +33,12 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AllowanceType whereUpdatedBy($value)
  * @mixin \Eloquent
  */
+use App\Traits\LogsActivity;
+
 #[Guarded([])]
 class AllowanceType extends Model
 {
+    use LogsActivity;
 
 
     public function addedBy()

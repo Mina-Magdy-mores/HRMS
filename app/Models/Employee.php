@@ -219,6 +219,12 @@ use Illuminate\Database\Eloquent\Model;
 #[Guarded([])]
 class Employee extends Model
 {
+    use \App\Traits\LogsActivity;
+
+    public function getLogEmployeeId()
+    {
+        return $this->id;
+    }
 
 
     public function addedBy()
@@ -300,6 +306,7 @@ class Employee extends Model
     {
         return $this->hasMany(File::class, 'employee_id');
     }
+
     public function mainSalaryEmployee(){
         return $this->hasMany(MainSalaryEmployee::class, 'employee_id');
     }

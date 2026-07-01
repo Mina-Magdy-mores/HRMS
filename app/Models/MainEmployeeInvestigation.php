@@ -27,9 +27,23 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\FinanceMonthlyCalendar $financeMonthlyCalendar
  * @mixin \Eloquent
  */
+use App\Traits\LogsActivity;
+
 #[Guarded([])]
 class MainEmployeeInvestigation extends Model
 {
+    use LogsActivity;
+
+    public function getLogName($actionName)
+    {
+        $employeeName = $this->getEmployeeName();
+        return "{$actionName} تحقيق إداري للموظف: {$employeeName}";
+    }
+
+    public function getLogEmployeeId()
+    {
+        return $this->employee_id;
+    }
     public function employee()
     {
         return $this->belongsTo(Employee::class);

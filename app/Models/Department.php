@@ -37,9 +37,12 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Department whereUpdatedBy($value)
  * @mixin \Eloquent
  */
+use App\Traits\LogsActivity;
+
 #[Fillable(['name', 'number', 'description', 'company_id', 'status', 'created_by', 'updated_by'])]
 class Department extends Model
 {
+    use LogsActivity;
     public function createdBy()
     {
         return $this->belongsTo(Admin::class, 'created_by');

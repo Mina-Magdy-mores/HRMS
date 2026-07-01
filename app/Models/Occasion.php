@@ -35,10 +35,11 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Occasion whereUpdatedBy($value)
  * @mixin \Eloquent
  */
-#[Guarded([])]
+use App\Traits\LogsActivity;
 
 class Occasion extends Model
 {
+    use LogsActivity;
        public function addedBy()
     {
         return $this->belongsTo(Admin::class, 'added_by');

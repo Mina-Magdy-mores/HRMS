@@ -827,10 +827,9 @@ class AttendanceDepartureController extends Controller
                     if ($employee && ($employee->vacation_formula == 0 || $employee->active_for_vacation == 0)) {
                         return response()->json(['error' => 'عفوا الموظف غير مسموح له بأخذ إجازة سنوية']);
                     }
-                    //start update
                     $main_employees_vacations_balance = getColsWhereRow(
                         MainEmployeesVacationsBalances::class,
-                        ['id', 'spent_balance'],
+                        ['id', 'employee_id', 'spent_balance'],
                         [
                             'company_id' => $company_id,
                             'employee_id' => $employee_id,
@@ -1060,7 +1059,7 @@ class AttendanceDepartureController extends Controller
                                 //start update
                                 $main_employees_vacations_balance = getColsWhereRow(
                                     MainEmployeesVacationsBalances::class,
-                                    ['id', 'spent_balance'],
+                                    ['id', 'employee_id', 'spent_balance'],
                                     [
                                         'company_id' => $company_id,
                                         'employee_id' => $employee_id,

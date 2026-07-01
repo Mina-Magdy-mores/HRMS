@@ -7,11 +7,25 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
 
 use Carbon\Carbon;
+    
+use App\Traits\LogsActivity;
 
 #[Guarded([])]
 #[Table('attendances_departures')]
 class AttendanceDeparture extends Model
 {
+    use LogsActivity;
+
+    public function getLogName($actionName)
+    {
+        $employeeName = $this->getEmployeeName();
+        return "{$actionName} سجل بصمة للموظف: {$employeeName}";
+    }
+
+    public function getLogEmployeeId()
+    {
+        return $this->employee_id;
+    }
     public function financeMonthlyCalendar()
     {
         return $this->belongsTo(FinanceMonthlyCalendar::class);

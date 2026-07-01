@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\LogsActivity;
+
 #[Guarded([])]
 class VacationType extends Model
 {
+    use LogsActivity;
     public function addedBy()
     {
         return $this->belongsTo(Admin::class, 'added_by');

@@ -34,9 +34,12 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|City whereUpdatedBy($value)
  * @mixin \Eloquent
  */
+use App\Traits\LogsActivity;
+
 #[Guarded([])]
 class City extends Model
 {
+    use LogsActivity;
     public function addedBy()
     {
         return $this->belongsTo(Admin::class, 'added_by');

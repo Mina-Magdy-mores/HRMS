@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\LogsActivity;
 
 /**
  * @property int $id
@@ -50,6 +51,32 @@ use Illuminate\Database\Eloquent\Model;
 ])]
 class FinanceCalendar extends Model
 {
+    use LogsActivity;
+
+    protected function getLogDisplayNameField()
+    {
+        return 'finance_yr_desc';
+    }
+
+    public function getLogName($actionName)
+    {
+        return "{$actionName}: {$this->finance_yr_desc}";
+    }
+
+    public function getLogActionName($defaultAction)
+    {
+        if ($defaultAction === 'تعديل') {
+            if ($this->isDirty('status')) {
+                if ($this->status == 1) {
+                    return 'فتح السنة المالية';
+                } elseif ($this->status == 2) {
+                    return 'إغلاق السنة المالية';
+                }
+            }
+        }
+        return $defaultAction;
+    }
+
     public function addedBy()
     {
         return $this->belongsTo(Admin::class, 'added_by');
