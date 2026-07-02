@@ -50,6 +50,7 @@ use Illuminate\Database\Eloquent\Model;
  * @mixin \Eloquent
  */
 use App\Traits\LogsActivity;
+#[Guarded([])]
 
 class MainSalaryEmployeeLoan extends Model
 {

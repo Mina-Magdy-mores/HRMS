@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 use App\Traits\LogsActivity;
 
+#[Guarded([])]
 class DeductionType extends Model
 {
     use LogsActivity;

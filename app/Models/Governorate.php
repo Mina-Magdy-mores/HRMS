@@ -38,6 +38,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 use App\Traits\LogsActivity;
 
+#[Guarded([])]
 class Governorate extends Model
 {
     use LogsActivity;

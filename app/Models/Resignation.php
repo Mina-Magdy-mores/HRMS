@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 use App\Traits\LogsActivity;
 
+#[Guarded([])]
 class Resignation extends Model
 {
     use LogsActivity;
