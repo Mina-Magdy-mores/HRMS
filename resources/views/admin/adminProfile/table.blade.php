@@ -111,6 +111,7 @@
                             <th>الاسم</th>
                             <th>اسم المستخدم</th>
                             <th>البريد الإلكتروني</th>
+                            <th>الدور/الصلاحية</th>
                             <th>الهاتف</th>
                             <th>الرقم القومي</th>
                             <th>الجنس</th>
@@ -149,6 +150,14 @@
                                 {{ $admin->email }}
                                 @else
                                 <span class="text-muted">---</span>
+                                @endif
+                            </td>
+
+                            <td>
+                                @if($admin->is_master_admin)
+                                <span class="badge badge-danger">مدير ماستر</span>
+                                @else
+                                <span class="badge badge-info">{{ $admin->permissionRole->name ?? 'بدون صلاحية' }}</span>
                                 @endif
                             </td>
 

@@ -18,6 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'admin' => App\Http\Middleware\AdminMiddleware::class,
+            'master_admin' => App\Http\Middleware\CheckMasterAdmin::class,
+            'permission' => App\Http\Middleware\CheckPermission::class,
         ]);
         $middleware->redirectUsersTo(function (Request $request) {
             return route('admin.dashboard');

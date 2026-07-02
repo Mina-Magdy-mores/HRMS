@@ -8,7 +8,7 @@
     </a>
 
     <!-- Sidebar -->
-        <div class="sidebar">
+    <div class="sidebar">
         <!-- Sidebar user panel (optional) -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
@@ -31,6 +31,8 @@
                 data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
+                
+                @if(check_main_menu_permission('قائمة الضبط'))
                 <li
                     class="nav-item has-treeview  {{ request()->is('admin/general-settings*') ||
                     request()->routeIs('admin.financeCalendars.*') ||
@@ -76,6 +78,7 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
+                        @if(check_sub_menu_permission('الضبط العام'))
                         <li class="nav-item">
                             <a href="{{ route('admin.general-settings') }}"
                                 class="nav-link @if (request()->is('admin/general-settings*')) active @endif">
@@ -83,6 +86,8 @@
                                 <p>الضبط العام</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('السنوات المالية'))
                         <li class="nav-item">
                             <a href="{{ route('admin.financeCalendars.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.financeCalendars.*')) active @endif">
@@ -90,6 +95,8 @@
                                 <p>السنوات المالية</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('الفروع'))
                         <li class="nav-item">
                             <a href="{{ route('admin.branches.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.branches.*')) active @endif">
@@ -97,6 +104,8 @@
                                 <p>الفروع</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('أنواع الشفتات'))
                         <li class="nav-item">
                             <a href="{{ route('admin.shifts-types.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.shifts-types.*')) active @endif">
@@ -104,6 +113,8 @@
                                 <p>أنواع الشفتات</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('إدارات الموظفين'))
                         <li class="nav-item">
                             <a href="{{ route('admin.departments.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.departments.*')) active @endif">
@@ -111,6 +122,8 @@
                                 <p>إدارات الموظفين</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('تصنيفات الوظائف'))
                         <li class="nav-item">
                             <a href="{{ route('admin.jobCategories.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.jobCategories.*')) active @endif">
@@ -118,6 +131,8 @@
                                 <p>تصنيفات الوظائف</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('مؤهلات الموظفين'))
                         <li class="nav-item">
                             <a href="{{ route('admin.qualifications.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.qualifications.*')) active @endif">
@@ -125,6 +140,8 @@
                                 <p>مؤهلات الموظفين</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('المناسبات الرسمية'))
                         <li class="nav-item">
                             <a href="{{ route('admin.occasions.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.occasions.*')) active @endif">
@@ -132,6 +149,8 @@
                                 <p>المناسبات الرسمية</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('أنواع الإجازات'))
                         <li class="nav-item">
                             <a href="{{ route('admin.vacation-types.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.vacation-types.*')) active @endif">
@@ -139,6 +158,8 @@
                                 <p>أنواع الإجازات</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('انواع استقالات الموظفين'))
                         <li class="nav-item">
                             <a href="{{ route('admin.resignations.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.resignations.*')) active @endif">
@@ -146,6 +167,8 @@
                                 <p>انواع استقالات الموظفين</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('الجنسية'))
                         <li class="nav-item">
                             <a href="{{ route('admin.nationalities.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.nationalities.*')) active @endif">
@@ -153,6 +176,8 @@
                                 <p>الجنسية</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('الأديان'))
                         <li class="nav-item">
                             <a href="{{ route('admin.religions.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.religions.*')) active @endif">
@@ -160,6 +185,8 @@
                                 <p>الأديان</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('فصائل الدم'))
                         <li class="nav-item">
                             <a href="{{ route('admin.blood-groups.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.blood-groups.*')) active @endif">
@@ -167,6 +194,8 @@
                                 <p>فصائل الدم</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('الدول'))
                         <li class="nav-item">
                             <a href="{{ route('admin.countries.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.countries.*')) active @endif">
@@ -174,6 +203,8 @@
                                 <p>الدول</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('المحافظات'))
                         <li class="nav-item">
                             <a href="{{ route('admin.governorates.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.governorates.*')) active @endif">
@@ -181,6 +212,8 @@
                                 <p>المحافظات</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('المدن'))
                         <li class="nav-item">
                             <a href="{{ route('admin.cities.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.cities.*')) active @endif">
@@ -188,8 +221,12 @@
                                 <p>المدن</p>
                             </a>
                         </li>
+                        @endif
                     </ul>
                 </li>
+                @endif
+
+                @if(check_main_menu_permission('قائمة شئون الموظفين'))
                 <li
                     class="nav-item has-treeview  {{ request()->routeIs('admin.employees.*') ||
                     request()->routeIs('admin.allowance-types.*') ||
@@ -204,13 +241,14 @@
                         request()->routeIs('admin.bonuses.*')
                             ? 'active'
                             : '' }}">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <i class="nav-icon fas fa-users"></i>
                         <p>
                             قائمة شئون الموظفين
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
+                        @if(check_sub_menu_permission('بيانات الموظفين'))
                         <li class="nav-item">
                             <a href="{{ route('admin.employees.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.employees.*')) active @endif">
@@ -218,7 +256,8 @@
                                 <p>بيانات الموظفين</p>
                             </a>
                         </li>
-
+                        @endif
+                        @if(check_sub_menu_permission('انواع البدل للراتب'))
                         <li class="nav-item">
                             <a href="{{ route('admin.allowance-types.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.allowance-types.*')) active @endif">
@@ -226,7 +265,8 @@
                                 <p>انواع البدل للراتب</p>
                             </a>
                         </li>
-
+                        @endif
+                        @if(check_sub_menu_permission('انواع الخصم للراتب'))
                         <li class="nav-item">
                             <a href="{{ route('admin.deduction-types.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.deduction-types.*')) active @endif">
@@ -234,7 +274,8 @@
                                 <p>انواع الخصم للراتب</p>
                             </a>
                         </li>
-
+                        @endif
+                        @if(check_sub_menu_permission('انواع المكافآت للراتب'))
                         <li class="nav-item">
                             <a href="{{ route('admin.bonuses.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.bonuses.*')) active @endif">
@@ -242,9 +283,12 @@
                                 <p>انواع المكافآت للراتب</p>
                             </a>
                         </li>
-
+                        @endif
                     </ul>
                 </li>
+                @endif
+
+                @if(check_main_menu_permission('قائمة أجور الموظفين'))
                 <li
                     class="nav-item has-treeview  {{ request()->routeIs('admin.main-salary-records.*') ||
                     request()->routeIs('admin.main-salary-employee-deductions.*') ||
@@ -271,13 +315,14 @@
                         request()->routeIs('admin.main-salary-employee.*')
                             ? 'active'
                             : '' }}">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <i class="nav-icon fas fa-wallet"></i>
                         <p>
                             قائمة أجور الموظفين
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
+                        @if(check_sub_menu_permission('بيانات رواتب الموظفين'))
                         <li class="nav-item">
                             <a href="{{ route('admin.main-salary-records.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-salary-records.*')) active @endif ">
@@ -285,6 +330,8 @@
                                 <p>بيانات رواتب الموظفين</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('الجزاءات اليدويه'))
                         <li class="nav-item">
                             <a href="{{ route('admin.main-salary-employee-deductions.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-salary-employee-deductions.*')) active @endif ">
@@ -292,6 +339,8 @@
                                 <p>الجزاءات اليدويه</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('خصم الغياب اليدوي'))
                         <li class="nav-item">
                             <a href="{{ route('admin.main-salary-employee-absences.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-salary-employee-absences.*')) active @endif ">
@@ -299,6 +348,8 @@
                                 <p>خصم الغياب اليدوي</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('أضافه الأيام اليدوي'))
                         <li class="nav-item">
                             <a href="{{ route('admin.main-salary-employee-additions.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-salary-employee-additions.*')) active @endif ">
@@ -306,6 +357,8 @@
                                 <p>أضافه الأيام اليدوي</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('الخصومات المالية المسجلة'))
                         <li class="nav-item">
                             <a href="{{ route('admin.main-salary-employee-deduction-types.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-salary-employee-deduction-types.*')) active @endif ">
@@ -313,6 +366,8 @@
                                 <p>الخصومات المالية المسجلة</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('المكافئات المالية المسجلة'))
                         <li class="nav-item">
                             <a href="{{ route('admin.main-salary-employee-bonuses.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-salary-employee-bonuses.*')) active @endif ">
@@ -320,6 +375,8 @@
                                 <p>المكافئات المالية المسجلة</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('البدلات المالية المسجلة'))
                         <li class="nav-item">
                             <a href="{{ route('admin.main-salary-employee-allowances.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-salary-employee-allowances.*')) active @endif ">
@@ -327,6 +384,8 @@
                                 <p>البدلات المالية المسجلة</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('السلف الشهرية'))
                         <li class="nav-item">
                             <a href="{{ route('admin.main-salary-employee-loans.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-salary-employee-loans.*')) active @endif ">
@@ -334,6 +393,8 @@
                                 <p>السلف الشهرية</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('السلف المستديمة'))
                         <li class="nav-item">
                             <a href="{{ route('admin.main-salary-employee-ploans.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-salary-employee-ploans.*')) active @endif ">
@@ -341,6 +402,8 @@
                                 <p>السلف المستديمة</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('رواتب الموظفين مفصله'))
                         <li class="nav-item">
                             <a href="{{ route('admin.main-salary-employee.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-salary-employee.*')) active @endif ">
@@ -348,11 +411,12 @@
                                 <p>رواتب الموظفين مفصله</p>
                             </a>
                         </li>
+                        @endif
                     </ul>
                 </li>
+                @endif
 
-
-
+                @if(check_main_menu_permission('الحضور والانصراف'))
                 <li
                     class="nav-item has-treeview  {{ request()->routeIs('admin.attendanceDepartures.*') ||
                     request()->routeIs('admin.main-employees-vacations-balances.*')
@@ -363,13 +427,14 @@
                         request()->routeIs('admin.main-employees-vacations-balances.*')
                             ? 'active'
                             : '' }}">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <i class="nav-icon fas fa-fingerprint"></i>
                         <p>
                             الحضور والانصراف
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
+                        @if(check_sub_menu_permission('سجلات البصمات'))
                         <li class="nav-item">
                             <a href="{{ route('admin.attendanceDepartures.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.attendanceDepartures.*')) active @endif ">
@@ -377,7 +442,8 @@
                                 <p>سجلات البصمات</p>
                             </a>
                         </li>
-
+                        @endif
+                        @if(check_sub_menu_permission('أرصدة إجازات الموظفين'))
                         <li class="nav-item">
                             <a href="{{ route('admin.main-employees-vacations-balances.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.main-employees-vacations-balances.*')) active @endif">
@@ -385,27 +451,37 @@
                                 <p>أرصدة إجازات الموظفين</p>
                             </a>
                         </li>
-
+                        @endif
                     </ul>
                 </li>
+                @endif
 
-                <li class="nav-item {{ request()->routeIs('admin.admin-profiles.*') ? 'menu-open' : '' }}">
-                    <a href="{{ route('admin.admin-profiles.index') }}"
-                        class="nav-link {{ request()->routeIs('admin.admin-profiles.*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-users-cog text-secondary"></i>
-                        <p>بروفايل الادمين</p>
-                    </a>
-                </li>
-
+                @if(check_main_menu_permission('التحقيقات الإدارية'))
                 <li
-                    class="nav-item {{ request()->routeIs('admin.main-salary-employee-investigations.*') ? 'menu-open' : '' }}">
-                    <a href="{{ route('admin.main-salary-employee-investigations.index') }}"
+                    class="nav-item has-treeview {{ request()->routeIs('admin.main-salary-employee-investigations.*') ? 'menu-open' : '' }}">
+                    <a href="#"
                         class="nav-link {{ request()->routeIs('admin.main-salary-employee-investigations.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-search text-info"></i>
-                        <p>التحقيقات الإدارية</p>
+                        <p>
+                            التحقيقات الإدارية
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
                     </a>
+                    <ul class="nav nav-treeview">
+                        @if(check_sub_menu_permission('التحقيقات الإدارية'))
+                        <li class="nav-item">
+                            <a href="{{ route('admin.main-salary-employee-investigations.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-employee-investigations.*')) active @endif">
+                                <i class="fas fa-file-signature text-warning"></i>
+                                <p>التحقيقات الإدارية</p>
+                            </a>
+                        </li>
+                        @endif
+                    </ul>
                 </li>
+                @endif
 
+                @if(check_main_menu_permission('مراقبة النظام'))
                 <li class="nav-item has-treeview {{ request()->routeIs('admin.system-monitoring.*') ? 'menu-open' : '' }}">
                     <a href="#" class="nav-link {{ request()->routeIs('admin.system-monitoring.*') ? 'active' : '' }}">
                         <i class="nav-icon fas fa-desktop text-warning"></i>
@@ -415,6 +491,7 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
+                        @if(check_sub_menu_permission('سجلات النظام العامة'))
                         <li class="nav-item">
                             <a href="{{ route('admin.system-monitoring.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.system-monitoring.index')) active @endif">
@@ -422,6 +499,8 @@
                                 <p>سجلات النظام العامة</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('سجلات المراقبة الذاتية'))
                         <li class="nav-item">
                             <a href="{{ route('admin.system-monitoring.self-logs') }}"
                                 class="nav-link @if (request()->routeIs('admin.system-monitoring.self-logs')) active @endif">
@@ -429,8 +508,74 @@
                                 <p>سجلات المراقبة الذاتية</p>
                             </a>
                         </li>
+                        @endif
                     </ul>
                 </li>
+                @endif
+
+                <!-- قائمة الصلاحيات للماستر فقط -->
+                @if(auth()->user()->is_master_admin)
+                <li
+                    class="nav-item has-treeview {{ request()->routeIs('admin.admin-profiles.*') ||
+                    request()->routeIs('admin.permission-roles.*') ||
+                    request()->routeIs('admin.permission-main-menus.*') ||
+                    request()->routeIs('admin.permission-sub-menus.*') ||
+                    request()->routeIs('admin.permission-sub-menu-actions.*')
+                        ? 'menu-open'
+                        : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->routeIs('admin.admin-profiles.*') ||
+                        request()->routeIs('admin.permission-roles.*') ||
+                        request()->routeIs('admin.permission-main-menus.*') ||
+                        request()->routeIs('admin.permission-sub-menus.*') ||
+                        request()->routeIs('admin.permission-sub-menu-actions.*')
+                            ? 'active'
+                            : '' }}">
+                        <i class="nav-icon fas fa-shield-alt text-danger"></i>
+                        <p>
+                            الصلاحيات والأدوار
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.admin-profiles.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.admin-profiles.*')) active @endif">
+                                <i class="fas fa-users text-info"></i>
+                                <p>المستخدمين</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.permission-roles.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.permission-roles.*')) active @endif">
+                                <i class="fas fa-user-shield text-success"></i>
+                                <p>أدوار المستخدمين</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.permission-main-menus.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.permission-main-menus.*')) active @endif">
+                                <i class="fas fa-list text-warning"></i>
+                                <p>القوائم الرئيسية للصلاحيات</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.permission-sub-menus.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.permission-sub-menus.*')) active @endif">
+                                <i class="fas fa-list-ul text-primary"></i>
+                                <p>القوائم الفرعية للصلاحيات</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('admin.permission-sub-menu-actions.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.permission-sub-menu-actions.*')) active @endif">
+                                <i class="fas fa-running text-secondary"></i>
+                                <p>حركات القوائم الفرعية</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                @endif
 
             </ul>
         </nav>

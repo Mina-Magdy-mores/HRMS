@@ -23,6 +23,12 @@ class DatabaseSeeder extends Seeder
         $this->call([
                 // 1. الأول المدير (عشان added_by يبقى موجود)
             AdminSeeder::class,
+            
+            // بذور الصلاحيات والادوار
+            PermissionMainMenuSeeder::class,
+            PermissionSubMenuSeeder::class,
+            PermissionSubMenuActionSeeder::class,
+            PermissionRoleSeeder::class,
 
                 // 2. البيانات الأساسية (اللي عنده foreign key للمدير)
             BloodGroupSeeder::class,

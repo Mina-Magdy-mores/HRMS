@@ -21,6 +21,8 @@ class AdminSeeder extends Seeder
                 'company_id' => 1,
                 'added_by' => 1,
                 'updated_by' => 1,
+                'is_master_admin' => 1,
+                'permission_role_id' => null,
             ]
         );
 

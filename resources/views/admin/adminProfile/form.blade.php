@@ -197,6 +197,32 @@
                         </div>
                     </div>
 
+                    <!-- مدير رئيسي (ماستر) -->
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>مدير رئيسي (ماستر) <span class="text-danger">*</span></label>
+                            <select name="is_master_admin" id="is_master_admin" class="form-control {{ $errors->has('is_master_admin') ? 'is-invalid' : '' }}">
+                                <option value="0" {{ old('is_master_admin') == 0 ? 'selected' : '' }}>لا</option>
+                                <option value="1" {{ old('is_master_admin') == 1 ? 'selected' : '' }}>نعم (كامل الصلاحيات)</option>
+                            </select>
+                            @include('admin.errors.errors', ['value' => 'is_master_admin'])
+                        </div>
+                    </div>
+
+                    <!-- دور الصلاحية -->
+                    <div class="col-md-4" id="role_container">
+                        <div class="form-group">
+                            <label>دور الصلاحية</label>
+                            <select name="permission_role_id" class="form-control {{ $errors->has('permission_role_id') ? 'is-invalid' : '' }}">
+                                <option value="">اختر الدور</option>
+                                @foreach($roles as $role)
+                                    <option value="{{ $role->id }}" {{ old('permission_role_id') == $role->id ? 'selected' : '' }}>{{ $role->name }}</option>
+                                @endforeach
+                            </select>
+                            @include('admin.errors.errors', ['value' => 'permission_role_id'])
+                        </div>
+                    </div>
+
                     <div class="col-12 mt-2">
                         <h5 class="mb-4 text-primary">
                             <i class="fas fa-id-card"></i>
@@ -308,5 +334,17 @@
             reader.readAsDataURL(file);
         }
     });
+
+    const isMasterSelect = document.getElementById('is_master_admin');
+    const roleContainer = document.getElementById('role_container');
+    function toggleRoleSelect() {
+        if (isMasterSelect.value == '1') {
+            roleContainer.style.display = 'none';
+        } else {
+            roleContainer.style.display = 'block';
+        }
+    }
+    isMasterSelect.addEventListener('change', toggleRoleSelect);
+    toggleRoleSelect();
 </script>
 @endpush

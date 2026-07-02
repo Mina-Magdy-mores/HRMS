@@ -38,6 +38,8 @@ class AdminProfileRequest extends FormRequest
             'status'           => 'required|integer|in:0,1',
             'current_password' => 'nullable|string|required_with:password',
             'password'         => 'nullable|string|min:8|confirmed',
+            'is_master_admin'  => 'required|integer|in:0,1',
+            'permission_role_id'=> 'nullable|exists:permission_roles,id',
         ];
     }
 
@@ -67,6 +69,9 @@ class AdminProfileRequest extends FormRequest
             'current_password.required_with' => 'كلمة المرور الحالية مطلوبة عند تغيير كلمة المرور',
             'password.min'            => 'كلمة المرور لا تقل عن 8 أحرف',
             'password.confirmed'      => 'تأكيد كلمة المرور غير متطابق',
+            'is_master_admin.required' => 'تحديد نوع الحساب (مدير رئيسي) مطلوب',
+            'is_master_admin.in'       => 'قيمة نوع الحساب غير صحيحة',
+            'permission_role_id.exists'=> 'دور الصلاحية المختار غير موجود في سجلاتنا',
         ];
     }
 }

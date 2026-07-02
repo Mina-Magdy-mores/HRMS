@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AdminProfileRequest;
 use App\Models\Admin;
 use App\Models\AdminArchive;
+use App\Models\PermissionRole;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -20,7 +21,7 @@ class AdminProfileController extends Controller
     {
         $company_id = Auth::user()->company_id;
 
-        $admins = getColsWhereP(Admin::class, [], ['*'], ['company_id' => $company_id], 'id', 'asc', PAGEINATION_COUNTER);
+        $admins = getColsWhereP(Admin::class, ['permissionRole'], ['*'], ['company_id' => $company_id], 'id', 'asc', PAGEINATION_COUNTER);
 
         return view('admin.adminProfile.index', compact('admins'));
     }
@@ -30,7 +31,9 @@ class AdminProfileController extends Controller
      */
     public function create()
     {
-        return view('admin.adminProfile.create');
+        $company_id = Auth::user()->company_id;
+        $roles = get_cols_where(PermissionRole::class, ['id', 'name'], ['is_active' => 1, 'company_id' => $company_id]);
+        return view('admin.adminProfile.create', compact('roles'));
     }
 
     /**
@@ -47,6 +50,9 @@ class AdminProfileController extends Controller
 
         try {
             $validated = $request->validated();
+            if ($validated['is_master_admin'] == 1) {
+                $validated['permission_role_id'] = null;
+            }
             $validated['added_by']   = Auth::user()->id;
             $validated['updated_by'] = Auth::user()->id;
             $validated['company_id'] = $company_id;
@@ -87,7 +93,8 @@ class AdminProfileController extends Controller
             return redirect()->route('admin.admin-profiles.index')->with('error', 'هذا الأدمن غير موجود');
         }
 
-        return view('admin.adminProfile.update', compact('admin'));
+        $roles = get_cols_where(PermissionRole::class, ['id', 'name'], ['is_active' => 1, 'company_id' => $company_id]);
+        return view('admin.adminProfile.update', compact('admin', 'roles'));
     }
 
     /**
@@ -117,6 +124,9 @@ class AdminProfileController extends Controller
             $this->archiveAdmin($admin, 'update');
 
             $validated = $request->validated();
+            if ($validated['is_master_admin'] == 1) {
+                $validated['permission_role_id'] = null;
+            }
             $validated['updated_by'] = Auth::user()->id;
 
             // رفع الصورة

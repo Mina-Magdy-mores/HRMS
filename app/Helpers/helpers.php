@@ -110,3 +110,70 @@ function get_count_where($model = null, $where = array())
 {
     return $model::where($where)->count();
 }
+
+function check_permission($subMenuName, $actionName)
+{
+    $admin = auth('admin')->user();
+    if (!$admin) {
+        return false;
+    }
+    if ($admin->is_master_admin) {
+        return true;
+    }
+    if (!$admin->permission_role_id) {
+        return false;
+    }
+
+    return \Illuminate\Support\Facades\DB::table('permission_roles_sub_menues_actions')
+        ->join('permission_sub_menues_actions', 'permission_roles_sub_menues_actions.permission_sub_menu_action_id', '=', 'permission_sub_menues_actions.id')
+        ->join('permission_sub_menues', 'permission_sub_menues_actions.permission_sub_menu_id', '=', 'permission_sub_menues.id')
+        ->where('permission_roles_sub_menues_actions.permission_role_id', $admin->permission_role_id)
+        ->where('permission_sub_menues.name', $subMenuName)
+        ->where('permission_sub_menues_actions.name', $actionName)
+        ->where('permission_sub_menues.is_active', 1)
+        ->where('permission_sub_menues_actions.is_active', 1)
+        ->exists();
+}
+
+function check_main_menu_permission($mainMenuName)
+{
+    $admin = auth('admin')->user();
+    if (!$admin) {
+        return false;
+    }
+    if ($admin->is_master_admin) {
+        return true;
+    }
+    if (!$admin->permission_role_id) {
+        return false;
+    }
+
+    return \Illuminate\Support\Facades\DB::table('permission_roles_main_menues')
+        ->join('permission_main_menues', 'permission_roles_main_menues.permission_main_menu_id', '=', 'permission_main_menues.id')
+        ->where('permission_roles_main_menues.permission_role_id', $admin->permission_role_id)
+        ->where('permission_main_menues.name', $mainMenuName)
+        ->where('permission_main_menues.is_active', 1)
+        ->exists();
+}
+
+function check_sub_menu_permission($subMenuName)
+{
+    $admin = auth('admin')->user();
+    if (!$admin) {
+        return false;
+    }
+    if ($admin->is_master_admin) {
+        return true;
+    }
+    if (!$admin->permission_role_id) {
+        return false;
+    }
+
+    return \Illuminate\Support\Facades\DB::table('permission_roles_sub_menues')
+        ->join('permission_sub_menues', 'permission_roles_sub_menues.permission_sub_menu_id', '=', 'permission_sub_menues.id')
+        ->where('permission_roles_sub_menues.permission_role_id', $admin->permission_role_id)
+        ->where('permission_sub_menues.name', $subMenuName)
+        ->where('permission_sub_menues.is_active', 1)
+        ->exists();
+}
+
