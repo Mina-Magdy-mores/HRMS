@@ -185,6 +185,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Admin whereUsername($value)
  * @mixin \Eloquent
  */
+
 use App\Traits\LogsActivity;
 
 #[Fillable(['name', 'email', 'username', 'password', 'added_by', 'updated_by', 'status', 'date', 'created_at', 'updated_at', 'company_id', 'image', 'phone', 'address', 'birth_date', 'national_id', 'gender', 'bio'])]
