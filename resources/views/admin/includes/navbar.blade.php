@@ -8,6 +8,9 @@
         <a href="{{ route('admin.dashboard') }}" class="nav-link">الرئيسية</a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
+        <a href="{{ route('admin.profile.edit') }}" class="nav-link">الملف الشخصي</a>
+      </li>
+      <li class="nav-item d-none d-sm-inline-block">
         <a href="{{ route('admin.logout') }}" class="nav-link">تسجيل الخروج</a>
       </li>
     </ul>

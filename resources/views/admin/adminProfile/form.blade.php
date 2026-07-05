@@ -9,8 +9,8 @@
                     <i class="fas fa-user-plus"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">إضافة أدمن جديد</span>
-                    <span class="info-box-number">Admin</span>
+                    <span class="info-box-text">إضافة مستخدم جديد</span>
+                    <span class="info-box-number">المستخدمين</span>
                 </div>
             </div>
         </div>
@@ -64,7 +64,7 @@
 
             <h3 class="card-title">
                 <i class="fas fa-plus-circle"></i>
-                إضافة أدمن جديد
+                إضافة مستخدم جديد
             </h3>
 
             <div class="card-tools">

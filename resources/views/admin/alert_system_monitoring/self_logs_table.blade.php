@@ -53,13 +53,29 @@
                         </div>
                     </td>
                     <td>
-                        <form action="{{ route('admin.system-monitoring.destroy-self-log', $log->id) }}" method="POST" class="d-inline-block delete-self-log-form">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger shadow-sm delete-btn" title="حذف السجل" onclick="return confirm('هل أنت متأكد من حذف هذا السجل من المراقبة الذاتية؟')">
-                                <i class="fas fa-trash-alt"></i>
+                        <div class="d-flex justify-content-center align-items-center">
+                            <!-- View Detail Button -->
+                            <button type="button" class="btn btn-sm btn-info shadow-sm show-details-btn m-1" 
+                                    data-id="{{ $log->id }}"
+                                    data-action="{{ $log->action }}"
+                                    data-target-id="{{ $log->target_log_id }}"
+                                    data-admin="{{ optional($log->admin)->name ?? '---' }}"
+                                    data-target-name="{{ $log->target_log_name }}"
+                                    data-date="{{ $log->created_at ? $log->created_at->format('Y-m-d H:i:s') : '---' }}"
+                                    data-content="{{ $log->target_log_content }}"
+                                    title="عرض التفاصيل الكاملة">
+                                <i class="fas fa-eye"></i>
                             </button>
-                        </form>
+
+                            <!-- Delete Form -->
+                            <form action="{{ route('admin.system-monitoring.destroy-self-log', $log->id) }}" method="POST" class="m-0 delete-self-log-form">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger shadow-sm delete-btn m-1" title="حذف السجل" onclick="return confirm('هل أنت متأكد من حذف هذا السجل من المراقبة الذاتية؟')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
             @empty

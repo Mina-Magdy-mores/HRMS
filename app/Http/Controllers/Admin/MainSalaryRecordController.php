@@ -67,6 +67,9 @@ class MainSalaryRecordController extends Controller
                     $all_employees = get_cols_where(Employee::class, ['*'], ['company_id' => $company_id, 'employment_status' => 1], 'employee_code', 'asc');
                     if ($all_employees) {
                         foreach ($all_employees as $employee) {
+                            // احتساب أرصدة إجازات الموظف وتحديث الترحيل التلقائي وسد فجوات الشهور فور فتح الشهر المالي الجديد
+                            $this->calculate_employees_vacations_balance($employee->id);
+
                             $dataToInsert = [];
                             $dataToInsert['finance_monthly_calendar_id'] = $financeMonthlyCalendar->id;
                             $dataToInsert['employee_id'] = $employee->id;

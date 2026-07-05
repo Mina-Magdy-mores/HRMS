@@ -49,7 +49,7 @@
                     <i class="fas fa-clock"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">آخر أدمن تم إضافته</span>
+                    <span class="info-box-text">آخر مستخدم تم إضافته</span>
                     <span class="info-box-number">
                         {{ optional($admins->last())->name ?? '---' }}
                     </span>
@@ -66,13 +66,13 @@
 
             <h3 class="card-title">
                 <i class="fas fa-table"></i>
-                جدول بروفايل الادمين
+                جدول المستخدمين
             </h3>
 
             <div class="card-tools">
                 <a href="{{ route('admin.admin-profiles.create') }}" class="btn btn-primary btn-sm shadow-sm">
                     <i class="fas fa-plus-circle"></i>
-                    إضافة أدمن
+                    إضافة مستخدم جديد
                 </a>
             </div>
 

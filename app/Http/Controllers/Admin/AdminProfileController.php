@@ -74,7 +74,7 @@ class AdminProfileController extends Controller
 
             insert(Admin::class, $validated);
 
-            return redirect()->route('admin.admin-profiles.index')->with('success', 'تم إضافة الأدمن بنجاح');
+            return redirect()->route('admin.admin-profiles.index')->with('success', 'تم إضافة المستخدم بنجاح');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'حدث خطأ ما، برجاء المحاولة لاحقاً: ' . $e->getMessage())->withInput();
         }
@@ -90,7 +90,7 @@ class AdminProfileController extends Controller
         $admin = getColsWhereRow(Admin::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
 
         if (empty($admin)) {
-            return redirect()->route('admin.admin-profiles.index')->with('error', 'هذا الأدمن غير موجود');
+            return redirect()->route('admin.admin-profiles.index')->with('error', 'هذا المستخدم غير موجود');
         }
 
         $roles = get_cols_where(PermissionRole::class, ['id', 'name'], ['is_active' => 1, 'company_id' => $company_id]);
@@ -107,7 +107,7 @@ class AdminProfileController extends Controller
         $admin = getColsWhereRow(Admin::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
 
         if (empty($admin)) {
-            return redirect()->route('admin.admin-profiles.index')->with('error', 'هذا الأدمن غير موجود');
+            return redirect()->route('admin.admin-profiles.index')->with('error', 'هذا المستخدم غير موجود');
         }
 
         $checkIfExist = Admin::select('id')
@@ -154,7 +154,7 @@ class AdminProfileController extends Controller
 
             update($admin, $validated);
 
-            return redirect()->route('admin.admin-profiles.index')->with('success', 'تم تعديل بيانات الأدمن بنجاح');
+            return redirect()->route('admin.admin-profiles.index')->with('success', 'تم تعديل بيانات المستخدم بنجاح');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'حدث خطأ ما، برجاء المحاولة لاحقاً: ' . $e->getMessage())->withInput();
         }
@@ -170,7 +170,7 @@ class AdminProfileController extends Controller
         $admin = getColsWhereRow(Admin::class, ['id', 'name', 'username', 'image'], ['id' => $id, 'company_id' => $company_id]);
 
         if (empty($admin)) {
-            return redirect()->route('admin.admin-profiles.index')->with('error', 'هذا الأدمن غير موجود');
+            return redirect()->route('admin.admin-profiles.index')->with('error', 'هذا المستخدم غير موجود');
         }
 
         $archives = \App\Models\AdminArchive::with('archivedBy')
@@ -196,7 +196,7 @@ class AdminProfileController extends Controller
         $admin = getColsWhereRow(Admin::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
 
         if (empty($admin)) {
-            return redirect()->route('admin.admin-profiles.index')->with('error', 'هذا الأدمن غير موجود');
+            return redirect()->route('admin.admin-profiles.index')->with('error', 'هذا المستخدم غير موجود');
         }
 
         try {
@@ -210,7 +210,7 @@ class AdminProfileController extends Controller
 
             destroy($admin);
 
-            return redirect()->route('admin.admin-profiles.index')->with('success', 'تم حذف الأدمن بنجاح');
+            return redirect()->route('admin.admin-profiles.index')->with('success', 'تم حذف المستخدم بنجاح');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'حدث خطأ ما، برجاء المحاولة لاحقاً: ' . $e->getMessage());
         }

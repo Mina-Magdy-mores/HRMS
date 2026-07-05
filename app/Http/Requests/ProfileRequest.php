@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class AdminProfileRequest extends FormRequest
+class ProfileRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -17,14 +16,12 @@ class AdminProfileRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
-        $adminId = $this->route('id');
+        $adminId = auth()->id();
 
-        $rules = [
+        return [
             'name'             => 'required|string|max:255',
             'email'            => 'nullable|email|max:255|unique:admins,email,' . $adminId,
             'username'         => 'required|string|max:255|unique:admins,username,' . $adminId,
@@ -35,20 +32,9 @@ class AdminProfileRequest extends FormRequest
             'gender'           => 'nullable|in:male,female',
             'bio'              => 'nullable|string|max:1000',
             'image'            => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status'           => 'required|integer|in:0,1',
-            'is_master_admin'  => 'required|integer|in:0,1',
-            'permission_role_id'=> 'nullable|exists:permission_roles,id',
+            'current_password' => 'nullable|string|required_with:password',
+            'password'         => 'nullable|string|min:8|confirmed',
         ];
-
-        if ($this->isMethod('put') || $this->isMethod('patch')) {
-            $rules['current_password'] = 'nullable|string|required_with:password';
-            $rules['password']         = 'nullable|string|min:8|confirmed';
-        } else {
-            // عند الإضافة (store)
-            $rules['password']         = 'required|string|min:8|confirmed';
-        }
-
-        return $rules;
     }
 
     public function messages(): array
@@ -72,14 +58,9 @@ class AdminProfileRequest extends FormRequest
             'image.image'             => 'يجب أن يكون ملف صورة',
             'image.mimes'             => 'نوع الصورة يجب أن يكون jpeg أو png أو jpg أو gif',
             'image.max'               => 'حجم الصورة لا يزيد عن 2 ميجا',
-            'status.required'         => 'الحالة مطلوبة',
-            'status.in'               => 'الحالة يجب أن تكون مفعل أو معطل',
             'current_password.required_with' => 'كلمة المرور الحالية مطلوبة عند تغيير كلمة المرور',
             'password.min'            => 'كلمة المرور لا تقل عن 8 أحرف',
             'password.confirmed'      => 'تأكيد كلمة المرور غير متطابق',
-            'is_master_admin.required' => 'تحديد نوع الحساب (مدير رئيسي) مطلوب',
-            'is_master_admin.in'       => 'قيمة نوع الحساب غير صحيحة',
-            'permission_role_id.exists'=> 'دور الصلاحية المختار غير موجود في سجلاتنا',
         ];
     }
 }

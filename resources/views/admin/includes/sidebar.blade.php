@@ -12,16 +12,21 @@
         <!-- Sidebar user panel (optional) -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
-                @if(auth()->user()->image)
-                    <img src="{{ asset('storage/' . auth()->user()->image) }}" class="img-circle elevation-2"
-                        alt="{{ auth()->user()->name }}" style="object-fit: cover; width:35px; height:35px;">
-                @else
-                    <img src="{{ asset('assets/dist/img/user2-160x160.jpg') }}" class="img-circle elevation-2"
-                        alt="User Image">
-                @endif
+                <a href="{{ route('admin.profile.edit') }}">
+                    @if(auth()->user()->image)
+                        <img src="{{ asset('storage/' . auth()->user()->image) }}" class="img-circle elevation-2"
+                            alt="{{ auth()->user()->name }}" style="object-fit: cover; width:35px; height:35px;">
+                    @else
+                        <img src="{{ asset('assets/dist/img/user2-160x160.jpg') }}" class="img-circle elevation-2"
+                            alt="User Image">
+                    @endif
+                </a>
             </div>
             <div class="info">
-                <a href="{{ route('admin.dashboard') }}" class="d-block">{{ auth()->user()->name ?? 'Admin' }}</a>
+                <a href="{{ route('admin.profile.edit') }}" class="d-block font-weight-bold text-light" title="تعديل الملف الشخصي">
+                    {{ auth()->user()->name ?? 'Admin' }}
+                    <span class="d-block text-xs text-muted font-weight-normal"><i class="fas fa-cog text-xs mr-1"></i> تعديل البروفايل</span>
+                </a>
             </div>
         </div>
 
@@ -513,8 +518,8 @@
                 </li>
                 @endif
 
-                <!-- قائمة الصلاحيات للماستر فقط -->
-                @if(auth()->user()->is_master_admin)
+                <!-- الصلاحيات والأدوار -->
+                @if(check_main_menu_permission('الصلاحيات والادوار'))
                 <li
                     class="nav-item has-treeview {{ request()->routeIs('admin.admin-profiles.*') ||
                     request()->routeIs('admin.permission-roles.*') ||
@@ -538,6 +543,7 @@
                         </p>
                     </a>
                     <ul class="nav nav-treeview">
+                        @if(check_sub_menu_permission('المستخدمين'))
                         <li class="nav-item">
                             <a href="{{ route('admin.admin-profiles.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.admin-profiles.*')) active @endif">
@@ -545,6 +551,8 @@
                                 <p>المستخدمين</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('ادوار المستخدمين'))
                         <li class="nav-item">
                             <a href="{{ route('admin.permission-roles.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.permission-roles.*')) active @endif">
@@ -552,6 +560,8 @@
                                 <p>أدوار المستخدمين</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('القوائم الرئيسيه للصلاحيات'))
                         <li class="nav-item">
                             <a href="{{ route('admin.permission-main-menus.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.permission-main-menus.*')) active @endif">
@@ -559,6 +569,8 @@
                                 <p>القوائم الرئيسية للصلاحيات</p>
                             </a>
                         </li>
+                        @endif
+                        @if(check_sub_menu_permission('القوائم الفرعيه للصلاحيات'))
                         <li class="nav-item">
                             <a href="{{ route('admin.permission-sub-menus.index') }}"
                                 class="nav-link @if (request()->routeIs('admin.permission-sub-menus.*')) active @endif">
@@ -573,6 +585,7 @@
                                 <p>حركات القوائم الفرعية</p>
                             </a>
                         </li>
+                        @endif
                     </ul>
                 </li>
                 @endif

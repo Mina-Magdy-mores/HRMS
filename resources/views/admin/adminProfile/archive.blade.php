@@ -3,11 +3,11 @@
 @section('title', 'أرشيف - ' . $admin->name)
 @section('contentHeader')
     <i class="fas fa-history"></i>
-    بروفايل الادمين
+    المستخدمين
 @endsection
 
 @section('contentHeaderActiveLink')
-    <a href="{{ route('admin.admin-profiles.index') }}">بروفايل الادمين</a>
+    <a href="{{ route('admin.admin-profiles.index') }}">المستخدمين</a>
 @endsection
 @section('contentHeaderActive', 'الأرشيف')
 

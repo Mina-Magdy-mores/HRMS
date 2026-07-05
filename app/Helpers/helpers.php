@@ -124,15 +124,21 @@ function check_permission($subMenuName, $actionName)
         return false;
     }
 
-    return \Illuminate\Support\Facades\DB::table('permission_roles_sub_menues_actions')
-        ->join('permission_sub_menues_actions', 'permission_roles_sub_menues_actions.permission_sub_menu_action_id', '=', 'permission_sub_menues_actions.id')
-        ->join('permission_sub_menues', 'permission_sub_menues_actions.permission_sub_menu_id', '=', 'permission_sub_menues.id')
-        ->where('permission_roles_sub_menues_actions.permission_role_id', $admin->permission_role_id)
-        ->where('permission_sub_menues.name', $subMenuName)
-        ->where('permission_sub_menues_actions.name', $actionName)
-        ->where('permission_sub_menues.is_active', 1)
-        ->where('permission_sub_menues_actions.is_active', 1)
-        ->exists();
+    static $cachedActions = null;
+
+    if ($cachedActions === null) {
+        $cachedActions = \Illuminate\Support\Facades\DB::table('permission_roles_sub_menues_actions')
+            ->join('permission_sub_menues_actions', 'permission_roles_sub_menues_actions.permission_sub_menu_action_id', '=', 'permission_sub_menues_actions.id')
+            ->join('permission_sub_menues', 'permission_sub_menues_actions.permission_sub_menu_id', '=', 'permission_sub_menues.id')
+            ->where('permission_roles_sub_menues_actions.permission_role_id', $admin->permission_role_id)
+            ->where('permission_sub_menues.is_active', 1)
+            ->where('permission_sub_menues_actions.is_active', 1)
+            ->selectRaw("CONCAT(permission_sub_menues.name, ':', permission_sub_menues_actions.name) as perm_key")
+            ->pluck('perm_key')
+            ->toArray();
+    }
+
+    return in_array("$subMenuName:$actionName", $cachedActions);
 }
 
 function check_main_menu_permission($mainMenuName)
@@ -148,12 +154,18 @@ function check_main_menu_permission($mainMenuName)
         return false;
     }
 
-    return \Illuminate\Support\Facades\DB::table('permission_roles_main_menues')
-        ->join('permission_main_menues', 'permission_roles_main_menues.permission_main_menu_id', '=', 'permission_main_menues.id')
-        ->where('permission_roles_main_menues.permission_role_id', $admin->permission_role_id)
-        ->where('permission_main_menues.name', $mainMenuName)
-        ->where('permission_main_menues.is_active', 1)
-        ->exists();
+    static $cachedMainMenus = null;
+
+    if ($cachedMainMenus === null) {
+        $cachedMainMenus = \Illuminate\Support\Facades\DB::table('permission_roles_main_menues')
+            ->join('permission_main_menues', 'permission_roles_main_menues.permission_main_menu_id', '=', 'permission_main_menues.id')
+            ->where('permission_roles_main_menues.permission_role_id', $admin->permission_role_id)
+            ->where('permission_main_menues.is_active', 1)
+            ->pluck('permission_main_menues.name')
+            ->toArray();
+    }
+
+    return in_array($mainMenuName, $cachedMainMenus);
 }
 
 function check_sub_menu_permission($subMenuName)
@@ -169,11 +181,16 @@ function check_sub_menu_permission($subMenuName)
         return false;
     }
 
-    return \Illuminate\Support\Facades\DB::table('permission_roles_sub_menues')
-        ->join('permission_sub_menues', 'permission_roles_sub_menues.permission_sub_menu_id', '=', 'permission_sub_menues.id')
-        ->where('permission_roles_sub_menues.permission_role_id', $admin->permission_role_id)
-        ->where('permission_sub_menues.name', $subMenuName)
-        ->where('permission_sub_menues.is_active', 1)
-        ->exists();
-}
+    static $cachedSubMenus = null;
 
+    if ($cachedSubMenus === null) {
+        $cachedSubMenus = \Illuminate\Support\Facades\DB::table('permission_roles_sub_menues')
+            ->join('permission_sub_menues', 'permission_roles_sub_menues.permission_sub_menu_id', '=', 'permission_sub_menues.id')
+            ->where('permission_roles_sub_menues.permission_role_id', $admin->permission_role_id)
+            ->where('permission_sub_menues.is_active', 1)
+            ->pluck('permission_sub_menues.name')
+            ->toArray();
+    }
+
+    return in_array($subMenuName, $cachedSubMenus);
+}

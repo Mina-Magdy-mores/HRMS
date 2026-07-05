@@ -99,6 +99,57 @@
         </div>
     </div>
 </div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="selfLogDetailsModal" tabindex="-1" role="dialog" aria-labelledby="selfLogDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title font-weight-bold" id="selfLogDetailsModalLabel">
+                    <i class="fas fa-info-circle mr-2"></i> تفاصيل حركة المراقبة الذاتية الكاملة
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body bg-light">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small d-block mb-1">الإجراء</label>
+                        <span class="badge badge-danger px-3 py-2 font-weight-bold" id="modal-self-action">---</span>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="text-muted small d-block mb-1">معرف السجل المستهدف</label>
+                        <span class="badge badge-secondary px-3 py-2 font-weight-bold" id="modal-self-target-id">---</span>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="text-muted small d-block mb-1">المسؤول المنفذ</label>
+                        <h6 class="font-weight-bold text-dark mb-0" id="modal-self-admin">---</h6>
+                    </div>
+                </div>
+                <hr class="my-2">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small d-block mb-1">اسم السجل المستهدف</label>
+                        <h6 class="font-weight-bold text-secondary mb-0" id="modal-self-target-name">---</h6>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small d-block mb-1">تاريخ العملية</label>
+                        <h6 class="font-weight-bold text-secondary mb-0" id="modal-self-date">---</h6>
+                    </div>
+                </div>
+                <hr class="my-2">
+                <div class="mb-3">
+                    <label class="text-muted small d-block mb-1">التفاصيل الأصلية للحركة</label>
+                    <div class="bg-white border rounded p-3 text-dark font-weight-bold shadow-sm" id="modal-self-content" style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6;">---</div>
+                </div>
+            </div>
+            <div class="modal-footer bg-white py-2">
+                <button type="button" class="btn btn-secondary px-4" data-dismiss="modal">إغلاق</button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('js')
@@ -150,6 +201,19 @@
                     console.log('Error during pagination');
                 }
             });
+        });
+
+        // Show detailed self log modal
+        $(document).on('click', '.show-details-btn', function() {
+            var btn = $(this);
+            $('#modal-self-action').text(btn.data('action'));
+            $('#modal-self-target-id').text('#' + btn.data('target-id'));
+            $('#modal-self-admin').text(btn.data('admin'));
+            $('#modal-self-target-name').text(btn.data('target-name'));
+            $('#modal-self-date').text(btn.data('date'));
+            $('#modal-self-content').text(btn.data('content'));
+
+            $('#selfLogDetailsModal').modal('show');
         });
     });
 </script>

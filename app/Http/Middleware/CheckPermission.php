@@ -14,7 +14,10 @@ class CheckPermission
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['error' => 'عفواً، لا تملك الصلاحية للقيام بهذا الإجراء.'], 403);
             }
-            return redirect()->route('admin.dashboard')->with('error', 'عفواً، لا تملك الصلاحية للوصول لهذه الصفحة.');
+            if ($action === 'عرض') {
+                return redirect()->route('admin.dashboard')->with('error', 'عفواً، لا تملك الصلاحية للوصول لهذه الصفحة.');
+            }
+            return redirect()->back()->with('error', 'عفواً، لا تملك الصلاحية للقيام بهذا الإجراء.');
         }
 
         return $next($request);

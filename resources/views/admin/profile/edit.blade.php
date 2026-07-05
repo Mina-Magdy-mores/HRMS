@@ -1,16 +1,37 @@
+@extends('admin.layouts.admin')
+
+@section('title', 'الملف الشخصي')
+
+@section('contentHeader')
+    <i class="fas fa-user-circle"></i>
+    الملف الشخصي
+@endsection
+
+@section('contentHeaderActiveLink')
+    <a class="active" href="#">الملف الشخصي</a>
+@endsection
+@section('contentHeaderActive', 'تعديل')
+
+@section('content')
 <div class="container-fluid">
 
-    <!-- Info Boxes -->
+    <!-- Info Boxes for current status and settings (Read-only) -->
     <div class="row mb-4">
 
         <div class="col-lg-3 col-md-6 col-12">
             <div class="info-box shadow-sm">
                 <span class="info-box-icon bg-primary">
-                    <i class="fas fa-user-edit"></i>
+                    <i class="fas fa-user-shield"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">تعديل مستخدم</span>
-                    <span class="info-box-number">{{ $admin->name }}</span>
+                    <span class="info-box-text">نوع الحساب</span>
+                    <span class="info-box-number text-primary">
+                        @if($admin->is_master_admin == 1)
+                            مدير رئيسي (ماستر)
+                        @else
+                            {{ $admin->permissionRole->name ?? 'لا يوجد دور محدد' }}
+                        @endif
+                    </span>
                 </div>
             </div>
         </div>
@@ -38,12 +59,12 @@
         <div class="col-lg-3 col-md-6 col-12">
             <div class="info-box shadow-sm">
                 <span class="info-box-icon bg-warning">
-                    <i class="fas fa-user"></i>
+                    <i class="fas fa-id-badge"></i>
                 </span>
                 <div class="info-box-content">
-                    <span class="info-box-text">المستخدم الحالي</span>
-                    <span class="info-box-number">
-                        {{ auth()->user()->name }}
+                    <span class="info-box-text">اسم المستخدم</span>
+                    <span class="info-box-number text-warning">
+                        {{ $admin->username }}
                     </span>
                 </div>
             </div>
@@ -57,7 +78,7 @@
                 <div class="info-box-content">
                     <span class="info-box-text">كود الشركة</span>
                     <span class="info-box-number">
-                        {{ auth()->user()->company_id }}
+                        {{ $admin->company_id }}
                     </span>
                 </div>
             </div>
@@ -65,39 +86,43 @@
 
     </div>
 
-    <!-- Main Card -->
+    <!-- Main Profile Card -->
     <div class="card card-primary card-outline shadow">
 
         <div class="card-header">
-
             <h3 class="card-title">
-                <i class="fas fa-user-edit"></i>
-                تعديل بيانات مستخدم
+                <i class="fas fa-edit mr-1"></i>
+                تعديل بيانات الملف الشخصي
             </h3>
-
-            <div class="card-tools">
-                <a href="{{ route('admin.admin-profiles.index') }}" class="btn btn-sm btn-secondary shadow-sm">
-                    <i class="fas fa-arrow-right"></i>
-                    رجوع
-                </a>
-            </div>
-
         </div>
 
-        <form action="{{ route('admin.admin-profiles.update', $admin->id) }}" method="POST" enctype="multipart/form-data">
-
+        <form action="{{ route('admin.profile.update') }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
             <div class="card-body">
 
-                <!-- Validation Errors -->
+                <!-- Success & Error Alert system monitoring -->
+                @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show shadow-sm">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h5><i class="icon fas fa-check"></i> تم بنجاح!</h5>
+                    {{ session('success') }}
+                </div>
+                @endif
+
+                @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show shadow-sm">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h5><i class="icon fas fa-ban"></i> تنبيه!</h5>
+                    {{ session('error') }}
+                </div>
+                @endif
+
                 @if ($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show">
-                    <h5>
-                        <i class="fas fa-exclamation-circle"></i>
-                        يوجد أخطاء في البيانات
-                    </h5>
+                <div class="alert alert-danger alert-dismissible fade show shadow-sm">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h5><i class="icon fas fa-exclamation-triangle"></i> يوجد أخطاء في البيانات المدخلة</h5>
                     <ul class="mb-0 mt-2">
                         @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -106,48 +131,46 @@
                 </div>
                 @endif
 
-                @if (session('error'))
-                <div class="alert alert-danger alert-dismissible fade show">
-                    <i class="fas fa-times-circle"></i>
-                    {{ session('error') }}
-                </div>
-                @endif
-
-                <!-- بيانات الأدمن -->
+                <!-- بيانات الملف الشخصي -->
                 <div class="row">
 
                     <div class="col-12">
-                        <h5 class="mb-4 text-primary">
+                        <h5 class="mb-4 text-primary border-bottom pb-2">
                             <i class="fas fa-user-circle"></i>
-                            البيانات الأساسية
+                            البيانات الأساسية للمستخدم
                         </h5>
                     </div>
 
                     <!-- صورة الملف الشخصي -->
-                    <div class="col-md-12 mb-3">
-                        <div class="form-group text-center">
-                            <label>صورة الملف الشخصي</label>
+                    <div class="col-md-12 mb-4 text-center">
+                        <div class="form-group">
+                            <label class="d-block">صورة الملف الشخصي</label>
                             <div class="mt-2">
                                 @if($admin->image)
                                 <img id="imagePreview" src="{{ asset('storage/' . $admin->image) }}"
-                                    class="rounded-circle shadow mb-2"
-                                    width="100" height="100"
-                                    style="object-fit: cover; display:block; margin: 0 auto;">
+                                    class="rounded-circle shadow border-info"
+                                    width="120" height="120"
+                                    style="object-fit: cover; display:block; margin: 0 auto; border: 3px solid;">
                                 @else
-                                <img id="imagePreview" src="{{ asset('assets/img/user-default.png') }}"
-                                    class="rounded-circle shadow mb-2"
-                                    width="100" height="100"
-                                    style="object-fit: cover; display:block; margin: 0 auto;">
+                                <img id="imagePreview" src="{{ asset('assets/dist/img/user2-160x160.jpg') }}"
+                                    class="rounded-circle shadow border-secondary"
+                                    width="120" height="120"
+                                    style="object-fit: cover; display:block; margin: 0 auto; border: 3px solid;">
                                 @endif
-                                <input type="file" name="image" id="imageInput"
-                                    class="form-control mt-2 {{ $errors->has('image') ? 'is-invalid' : '' }}"
-                                    accept="image/*">
+                                <div class="d-flex justify-content-center mt-3">
+                                    <div class="custom-file" style="max-width: 300px;">
+                                        <input type="file" name="image" id="imageInput"
+                                            class="custom-file-input {{ $errors->has('image') ? 'is-invalid' : '' }}"
+                                            accept="image/*">
+                                        <label class="custom-file-label text-right" for="imageInput">اختر صورة جديدة</label>
+                                    </div>
+                                </div>
                                 @include('admin.errors.errors', ['value' => 'image'])
                             </div>
                         </div>
                     </div>
 
-                    <!-- الاسم -->
+                    <!-- الاسم الكامل -->
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>الاسم الكامل <span class="text-danger">*</span></label>
@@ -178,10 +201,10 @@
                     </div>
 
                     <!-- تغيير كلمة المرور -->
-                    <div class="col-12 mt-2">
-                        <h5 class="mb-3 text-warning">
+                    <div class="col-12 mt-4">
+                        <h5 class="mb-3 text-warning border-bottom pb-2">
                             <i class="fas fa-lock"></i>
-                            تغيير كلمة المرور <small class="text-muted" style="font-size:13px;">(اتركها فارغة إذا لا تريد التغيير)</small>
+                            أمن الحساب وتغيير كلمة المرور <small class="text-muted" style="font-size:13px;">(اترك الحقول فارغة لتجنب التغيير)</small>
                         </h5>
                     </div>
 
@@ -191,7 +214,7 @@
                             <label>كلمة المرور الحالية</label>
                             <input type="password" name="current_password"
                                 class="form-control {{ $errors->has('current_password') ? 'is-invalid' : '' }}"
-                                placeholder="أدخل كلمة المرور الحالية">
+                                placeholder="أدخل كلمة المرور الحالية لتأكيد التغيير">
                             @include('admin.errors.errors', ['value' => 'current_password'])
                         </div>
                     </div>
@@ -202,7 +225,7 @@
                             <label>كلمة المرور الجديدة</label>
                             <input type="password" name="password"
                                 class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}"
-                                placeholder="أدخل كلمة المرور الجديدة">
+                                placeholder="أدخل كلمة المرور الجديدة (8 خانات كحد أدنى)">
                             @include('admin.errors.errors', ['value' => 'password'])
                         </div>
                     </div>
@@ -217,49 +240,11 @@
                         </div>
                     </div>
 
-                    <!-- الحالة -->
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label>الحالة <span class="text-danger">*</span></label>
-                            <select name="status" class="form-control {{ $errors->has('status') ? 'is-invalid' : '' }}">
-                                <option disabled value="">اختر الحالة</option>
-                                <option value="1" {{ old('status', $admin->status) == 1 ? 'selected' : '' }}>مفعّل</option>
-                                <option value="0" {{ old('status', $admin->status) == 0 ? 'selected' : '' }}>معطّل</option>
-                            </select>
-                            @include('admin.errors.errors', ['value' => 'status'])
-                        </div>
-                    </div>
-
-                    <!-- مدير رئيسي (ماستر) -->
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label>مدير رئيسي (ماستر) <span class="text-danger">*</span></label>
-                            <select name="is_master_admin" id="is_master_admin" class="form-control {{ $errors->has('is_master_admin') ? 'is-invalid' : '' }}">
-                                <option value="0" {{ old('is_master_admin', $admin->is_master_admin) == 0 ? 'selected' : '' }}>لا</option>
-                                <option value="1" {{ old('is_master_admin', $admin->is_master_admin) == 1 ? 'selected' : '' }}>نعم (كامل الصلاحيات)</option>
-                            </select>
-                            @include('admin.errors.errors', ['value' => 'is_master_admin'])
-                        </div>
-                    </div>
-
-                    <!-- دور الصلاحية -->
-                    <div class="col-md-4" id="role_container">
-                        <div class="form-group">
-                            <label>دور الصلاحية</label>
-                            <select name="permission_role_id" class="form-control {{ $errors->has('permission_role_id') ? 'is-invalid' : '' }}">
-                                <option value="">اختر الدور</option>
-                                @foreach($roles as $role)
-                                    <option value="{{ $role->id }}" {{ old('permission_role_id', $admin->permission_role_id) == $role->id ? 'selected' : '' }}>{{ $role->name }}</option>
-                                @endforeach
-                            </select>
-                            @include('admin.errors.errors', ['value' => 'permission_role_id'])
-                        </div>
-                    </div>
-
-                    <div class="col-12 mt-2">
-                        <h5 class="mb-4 text-primary">
+                    <!-- البيانات الشخصية -->
+                    <div class="col-12 mt-4">
+                        <h5 class="mb-3 text-primary border-bottom pb-2">
                             <i class="fas fa-id-card"></i>
-                            البيانات الشخصية
+                            البيانات الشخصية والإضافية
                         </h5>
                     </div>
 
@@ -314,7 +299,7 @@
                             <label>العنوان</label>
                             <input type="text" name="address" value="{{ old('address', $admin->address) }}"
                                 class="form-control {{ $errors->has('address') ? 'is-invalid' : '' }}"
-                                placeholder="أدخل العنوان">
+                                placeholder="أدخل العنوان التفصيلي">
                             @include('admin.errors.errors', ['value' => 'address'])
                         </div>
                     </div>
@@ -325,7 +310,7 @@
                             <label>نبذة شخصية</label>
                             <textarea name="bio" rows="3"
                                 class="form-control {{ $errors->has('bio') ? 'is-invalid' : '' }}"
-                                placeholder="أدخل نبذة شخصية مختصرة">{{ old('bio', $admin->bio) }}</textarea>
+                                placeholder="اكتب نبذة شخصية مختصرة عنك...">{{ old('bio', $admin->bio) }}</textarea>
                             @include('admin.errors.errors', ['value' => 'bio'])
                         </div>
                     </div>
@@ -334,19 +319,12 @@
 
             </div>
 
-            <!-- Footer -->
+            <!-- Footer buttons -->
             <div class="card-footer text-left">
-
-                <button type="submit" class="btn btn-success shadow px-4">
-                    <i class="fas fa-save"></i>
-                    حفظ البيانات
+                <button type="submit" class="btn btn-success shadow px-5">
+                    <i class="fas fa-save mr-1"></i>
+                    حفظ التغييرات
                 </button>
-
-                <a href="{{ route('admin.admin-profiles.index') }}" class="btn btn-danger shadow px-4">
-                    <i class="fas fa-times-circle"></i>
-                    إلغاء
-                </a>
-
             </div>
 
         </form>
@@ -354,9 +332,11 @@
     </div>
 
 </div>
+@endsection
 
-@push('js')
+@section('js')
 <script>
+    // Live image upload preview
     document.getElementById('imageInput').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
@@ -365,19 +345,12 @@
                 document.getElementById('imagePreview').src = event.target.result;
             };
             reader.readAsDataURL(file);
+            
+            // Update label to filename
+            let fileName = file.name;
+            let nextSibling = e.target.nextElementSibling;
+            nextSibling.innerText = fileName;
         }
     });
-
-    const isMasterSelect = document.getElementById('is_master_admin');
-    const roleContainer = document.getElementById('role_container');
-    function toggleRoleSelect() {
-        if (isMasterSelect.value == '1') {
-            roleContainer.style.display = 'none';
-        } else {
-            roleContainer.style.display = 'block';
-        }
-    }
-    isMasterSelect.addEventListener('change', toggleRoleSelect);
-    toggleRoleSelect();
 </script>
-@endpush
+@endsection

@@ -15,7 +15,7 @@ class CheckMasterAdmin
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['error' => 'عفواً، هذا الإجراء متاح فقط لمدير النظام الرئيسي.'], 403);
             }
-            return redirect()->route('admin.dashboard')->with('error', 'عفواً، لا تملك الصلاحية للوصول لهذه الصفحة.');
+            return redirect()->back()->with('error', 'عفواً، هذا الإجراء متاح فقط لمدير النظام الرئيسي.');
         }
 
         return $next($request);

@@ -218,61 +218,64 @@ trait GeneralTrait
                                 $dataToUpdateInEmployee['vacation_formula'] = 1;
                                 $dataToUpdateInEmployee['updated_by'] = Auth::user()->id;
                                 update($employee, $dataToUpdateInEmployee);
+                                // استدعاء الدالة مجدداً بشكل تلقائي لتعبئة الشهور المتبقية والفجوات حتى تاريخ الشهر المالي المفتوح الحالي
+                                $this->calculate_employees_vacations_balance($employee->id);
                             }
                         }
                     }
                 } else {
                     //already has balance
+                    // جلب آخر سجل تمت إضافته للموظف عبر كافة السنوات المالية السابقة دون التقييد بالسنة الحالية فقط لسد الفجوات
                     $last_added = get_cols_where_row_orderby(
                         MainEmployeesVacationsBalances::class,
                         ['id', 'current_month_balance', 'total_available_balance', 'remaining_net_balance', 'year_and_month', 'financial_year'],
-                        ['employee_id' => $employee->id, 'financial_year' => $current_year, 'company_id' => $company_id],
+                        ['employee_id' => $employee->id, 'company_id' => $company_id],
                         'id',
                         'desc'
                     );
-                    $current_month = (int) date('m', strtotime($current_opened_month->year_and_month));
                     if (!empty($last_added)) {
                         if ($last_added->year_and_month != $current_opened_month->year_and_month) {
-                            $i = (int) date('m', strtotime($last_added->year_and_month));
-                            $i += 1;
-                            while ($i <= $current_month) {
-                                if ($i < 10) {
-                                    $dataToInsert['year_and_month'] = $current_year . '-0' . $i;
-                                } else {
-                                    $dataToInsert['year_and_month'] = $current_year . '-' . $i;
-                                }
-                                $dataToInsert['current_month_balance'] = $admin_panel_settings->monthly_vacation_balance;
-                                $dataToInsert['total_available_balance'] = $admin_panel_settings->monthly_vacation_balance;
-                                $dataToInsert['remaining_net_balance'] = $admin_panel_settings->monthly_vacation_balance;
-                                $dataToInsert['financial_year'] = $current_year;
-                                $dataToInsert['employee_id'] = $employee->id;
-                                $dataToInsert['company_id'] = $company_id;
-                                $dataToInsert['added_by'] = Auth::user()->id;
+                            // استخدام كائن تاريخ مرن للمرور على كافة الشهور المفقودة وتغذيتها تلقائياً بالترتيب الزمني الصحيح
+                            $start = new \DateTime($last_added->year_and_month . '-01');
+                            $start->modify('+1 month');
+                            $end = new \DateTime($current_opened_month->year_and_month . '-01');
+                            while ($start <= $end) {
+                                $yearMonthStr = $start->format('Y-m');
+                                $financialYear = $start->format('Y');
                                 $checkIfExsists = getColsWhereRow(
                                     MainEmployeesVacationsBalances::class,
                                     ['id'],
-                                    ['employee_id' => $employee->id, 'financial_year' => $current_year, 'year_and_month' => $dataToInsert['year_and_month']]
+                                    ['employee_id' => $employee->id, 'financial_year' => $financialYear, 'year_and_month' => $yearMonthStr]
                                 );
                                 if (empty($checkIfExsists)) {
-                                    $flag = MainEmployeesVacationsBalances::create($dataToInsert);
-                                    if ($flag) {
-                                        //later
-                                    }
+                                    $dataToInsert = [
+                                        'year_and_month' => $yearMonthStr,
+                                        'current_month_balance' => $admin_panel_settings->monthly_vacation_balance,
+                                        'total_available_balance' => $admin_panel_settings->monthly_vacation_balance,
+                                        'remaining_net_balance' => $admin_panel_settings->monthly_vacation_balance,
+                                        'financial_year' => $financialYear,
+                                        'employee_id' => $employee->id,
+                                        'company_id' => $company_id,
+                                        'added_by' => Auth::user()->id ?? 1
+                                    ];
+                                    MainEmployeesVacationsBalances::create($dataToInsert);
                                 }
-                                $i++;
+                                $start->modify('+1 month');
                             }
                         }
                     } else {
-
+                        // حالة احتياطية إذا لم يتوفر أي سجل رصيد مسبق
                         $current_month = (int) date('m', strtotime($current_opened_month->year_and_month));
                         if ($current_opened_month->year_and_month) {
-                            $firstMonthInOpenedYear = get_cols_where_row_orderby(
-                                FinanceMonthlyCalendar::class,
-                                ['id', 'year_and_month'],
-                                ['company_id' => $company_id, 'finance_yr' => $current_year, 'status' => 2],
-                                'id',
-                                'asc'
-                            );
+                            $firstMonthInOpenedYear = FinanceMonthlyCalendar::select(
+                                [
+                                    'id',
+                                    'year_and_month'
+                                ]
+                            )->where(
+                                ['company_id' => $company_id, 'finance_yr' => $current_year]
+                            )->where('status', '>', 0)
+                                ->orderBy('id', 'asc')->first();
                             if (!empty($firstMonthInOpenedYear)) {
                                 $i = (int) date('m', strtotime($firstMonthInOpenedYear->year_and_month));
                                 while ($i <= $current_month) {
@@ -287,17 +290,14 @@ trait GeneralTrait
                                     $dataToInsert['financial_year'] = $current_year;
                                     $dataToInsert['employee_id'] = $employee->id;
                                     $dataToInsert['company_id'] = $company_id;
-                                    $dataToInsert['added_by'] = Auth::user()->id;
+                                    $dataToInsert['added_by'] = Auth::user()->id ?? 1;
                                     $checkIfExsists = getColsWhereRow(
                                         MainEmployeesVacationsBalances::class,
                                         ['id'],
                                         ['employee_id' => $employee->id, 'financial_year' => $current_year, 'year_and_month' => $dataToInsert['year_and_month']]
                                     );
                                     if (empty($checkIfExsists)) {
-                                        $flag = MainEmployeesVacationsBalances::create($dataToInsert);
-                                        if ($flag) {
-                                            //later
-                                        }
+                                        MainEmployeesVacationsBalances::create($dataToInsert);
                                     }
                                     $i++;
                                 }
