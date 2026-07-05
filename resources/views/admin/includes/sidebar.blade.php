@@ -421,6 +421,71 @@
                 </li>
                 @endif
 
+                @if(check_main_menu_permission('قائمة التسويات'))
+                <li
+                    class="nav-item has-treeview  {{ request()->routeIs('admin.main-salary-employee-settlements.*') ||
+                        request()->routeIs('admin.salary-grant-types.*') ||
+                        request()->routeIs('admin.direct-bonuses.*') ||
+                        request()->routeIs('admin.direct-grants.*')
+                            ? 'menu-open'
+                            : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->routeIs('admin.main-salary-employee-settlements.*') ||
+                            request()->routeIs('admin.salary-grant-types.*') ||
+                            request()->routeIs('admin.direct-bonuses.*') ||
+                            request()->routeIs('admin.direct-grants.*')
+                                ? 'active'
+                                : '' }}">
+                        <i class="nav-icon fas fa-balance-scale"></i>
+                        <p>
+                            قائمة التسويات
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        @if(check_sub_menu_permission('تسويات رواتب الموظفين المؤرشفة'))
+                        <li class="nav-item">
+                            <a href="{{ route('admin.main-salary-employee-settlements.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.main-salary-employee-settlements.*')) active @endif ">
+                                <i class="fas fa-hand-holding-usd text-primary"></i>
+                                <p>تسويات رواتب الموظفين</p>
+                            </a>
+                        </li>
+                        @endif
+
+                        @if(check_sub_menu_permission('أنواع منح الرواتب'))
+                        <li class="nav-item">
+                            <a href="{{ route('admin.salary-grant-types.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.salary-grant-types.*')) active @endif ">
+                                <i class="fas fa-gift text-info"></i>
+                                <p>أنواع منح الرواتب</p>
+                            </a>
+                        </li>
+                        @endif
+
+                        @if(check_sub_menu_permission('المكافئات المباشرة'))
+                        <li class="nav-item">
+                            <a href="{{ route('admin.direct-bonuses.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.direct-bonuses.*')) active @endif ">
+                                <i class="fas fa-hand-holding-usd text-success"></i>
+                                <p>المكافئات المباشرة</p>
+                            </a>
+                        </li>
+                        @endif
+
+                        @if(check_sub_menu_permission('المنح المباشرة'))
+                        <li class="nav-item">
+                            <a href="{{ route('admin.direct-grants.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.direct-grants.*')) active @endif ">
+                                <i class="fas fa-hand-holding-usd text-warning"></i>
+                                <p>المنح المباشرة</p>
+                            </a>
+                        </li>
+                        @endif
+                    </ul>
+                </li>
+                @endif
+
                 @if(check_main_menu_permission('الحضور والانصراف'))
                 <li
                     class="nav-item has-treeview  {{ request()->routeIs('admin.attendanceDepartures.*') ||

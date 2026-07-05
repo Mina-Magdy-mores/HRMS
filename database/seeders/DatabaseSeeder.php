@@ -62,6 +62,7 @@ class DatabaseSeeder extends Seeder
             AllowanceTypeSeeder::class,
             DeductionTypeSeeder::class,
             BonusSeeder::class,
+            SalaryGrantTypeSeeder::class,
             AlertModuleSeeder::class,
             AlertMoveTypeSeeder::class,
         ]);

@@ -56,6 +56,7 @@ class PermissionSubMenuActionSeeder extends Seeder
             'السلف المستديمة',
             'سجلات البصمات',
             'التحقيقات الإدارية',
+            'تسويات رواتب الموظفين المؤرشفة',
         ];
 
         foreach ($subMenus as $subMenu) {
@@ -67,12 +68,18 @@ class PermissionSubMenuActionSeeder extends Seeder
             } elseif ($subMenu->name === 'بيانات رواتب الموظفين') {
                 $currentActions = [
                     'عرض',
+                    'إضافة',
+                    'تعديل',
+                    'حذف',
                     'أرشفة وإغلاق الشهر بالكامل لكافة الموظفين',
                     'فتح الشهر المالي'
                 ];
             } elseif ($subMenu->name === 'رواتب الموظفين مفصله') {
                 $currentActions = [
                     'عرض',
+                    'إضافة',
+                    'تعديل',
+                    'حذف',
                     'إضافة راتب للموظف',
                     'حذف سجل الراتب للموظف',
                     'إيقاف وتفعيل صرف الراتب',

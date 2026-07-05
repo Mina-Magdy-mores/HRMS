@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\MainSalaryEmployeeController;
 use App\Http\Controllers\Admin\MainEmployeesVacationsBalancesController;
 use App\Http\Controllers\Admin\MainSalaryEmployeeLoanController;
 use App\Http\Controllers\Admin\MainSalaryEmployeePLoanController;
+use App\Http\Controllers\Admin\MainSalaryEmployeeSettlementController;
 use App\Http\Controllers\Admin\MainSalaryRecordController;
 use App\Http\Controllers\Admin\MainEmployeeInvestigationController;
 use App\Http\Controllers\Admin\NationalityController;
@@ -42,6 +43,9 @@ use App\Http\Controllers\Admin\PermissionMainMenuController;
 use App\Http\Controllers\Admin\PermissionSubMenuController;
 use App\Http\Controllers\Admin\PermissionSubMenuActionController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\SalaryGrantTypeController;
+use App\Http\Controllers\Admin\DirectBonusController;
+use App\Http\Controllers\Admin\DirectGrantController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -286,6 +290,14 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::put('/bonuses/{id}', [BonusController::class, 'update'])->name('bonuses.update')->middleware('permission:انواع المكافآت للراتب,تعديل');
         Route::delete('/bonuses/{id}', [BonusController::class, 'destroy'])->name('bonuses.destroy')->middleware('permission:انواع المكافآت للراتب,حذف');
 
+        //SalaryGrantType routes
+        Route::get('/salary-grant-types', [SalaryGrantTypeController::class, 'index'])->name('salary-grant-types.index')->middleware('permission:أنواع منح الرواتب,عرض');
+        Route::get('/salary-grant-types/create', [SalaryGrantTypeController::class, 'create'])->name('salary-grant-types.create')->middleware('permission:أنواع منح الرواتب,إضافة');
+        Route::post('/salary-grant-types', [SalaryGrantTypeController::class, 'store'])->name('salary-grant-types.store')->middleware('permission:أنواع منح الرواتب,إضافة');
+        Route::get('/salary-grant-types/{id}/edit', [SalaryGrantTypeController::class, 'edit'])->name('salary-grant-types.edit')->middleware('permission:أنواع منح الرواتب,تعديل');
+        Route::put('/salary-grant-types/{id}', [SalaryGrantTypeController::class, 'update'])->name('salary-grant-types.update')->middleware('permission:أنواع منح الرواتب,تعديل');
+        Route::delete('/salary-grant-types/{id}', [SalaryGrantTypeController::class, 'destroy'])->name('salary-grant-types.destroy')->middleware('permission:أنواع منح الرواتب,حذف');
+
         //MainSalaryRecord routes
         Route::get('/main-salary-records', [MainSalaryRecordController::class, 'index'])->name('main-salary-records.index')->middleware('permission:بيانات رواتب الموظفين,عرض');
         Route::post('/main-salary-records/open-month/{id}', [MainSalaryRecordController::class, 'openMonth'])->name('main-salary-records.open-month')->middleware('permission:بيانات رواتب الموظفين,إضافة');
@@ -414,6 +426,34 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/main-salary-employee/archive', [MainSalaryEmployeeController::class, 'archive'])->name('main-salary-employee.archive')->middleware('permission:رواتب الموظفين مفصله,تعديل');
         Route::post('/main-salary-employee/archive-month', [MainSalaryEmployeeController::class, 'archiveMonth'])->name('main-salary-employee.archive-month')->middleware('permission:رواتب الموظفين مفصله,تعديل');
         Route::post('/main-salary-employee/recalculate_main_salary', [MainSalaryEmployeeController::class, 'recalculateMainSalary'])->name('main-salary-employee.recalculate_main_salary')->middleware('permission:رواتب الموظفين مفصله,إضافة');
+
+        // Main salary employee settlements routes
+        Route::get('/main-salary-employee-settlements', [MainSalaryEmployeeSettlementController::class, 'index'])->name('main-salary-employee-settlements.index')->middleware('permission:تسويات رواتب الموظفين المؤرشفة,عرض');
+        Route::get('/main-salary-employee-settlements/{id}/show', [MainSalaryEmployeeSettlementController::class, 'show'])->name('main-salary-employee-settlements.show')->middleware('permission:تسويات رواتب الموظفين المؤرشفة,عرض');
+        Route::post('/main-salary-employee-settlements/store', [MainSalaryEmployeeSettlementController::class, 'store'])->name('main-salary-employee-settlements.store')->middleware('permission:تسويات رواتب الموظفين المؤرشفة,إضافة');
+        Route::post('/main-salary-employee-settlements/edit', [MainSalaryEmployeeSettlementController::class, 'edit'])->name('main-salary-employee-settlements.edit')->middleware('permission:تسويات رواتب الموظفين المؤرشفة,تعديل');
+        Route::put('/main-salary-employee-settlements/update', [MainSalaryEmployeeSettlementController::class, 'update'])->name('main-salary-employee-settlements.update')->middleware('permission:تسويات رواتب الموظفين المؤرشفة,تعديل');
+        Route::post('/main-salary-employee-settlements/destroy', [MainSalaryEmployeeSettlementController::class, 'destroy'])->name('main-salary-employee-settlements.destroy')->middleware('permission:تسويات رواتب الموظفين المؤرشفة,حذف');
+        Route::post('/main-salary-employee-settlements/ajax-search', [MainSalaryEmployeeSettlementController::class, 'ajaxSearch'])->name('main-salary-employee-settlements.ajax-search')->middleware('permission:تسويات رواتب الموظفين المؤرشفة,عرض');
+        Route::post('/main-salary-employee-settlements/print-search', [MainSalaryEmployeeSettlementController::class, 'printSearch'])->name('main-salary-employee-settlements.print-search')->middleware('permission:تسويات رواتب الموظفين المؤرشفة,عرض');
+
+        // DirectBonus routes
+        Route::get('/direct-bonuses', [DirectBonusController::class, 'index'])->name('direct-bonuses.index')->middleware('permission:المكافئات المباشرة,عرض');
+        Route::get('/direct-bonuses/create', [DirectBonusController::class, 'create'])->name('direct-bonuses.create')->middleware('permission:المكافئات المباشرة,إضافة');
+        Route::post('/direct-bonuses', [DirectBonusController::class, 'store'])->name('direct-bonuses.store')->middleware('permission:المكافئات المباشرة,إضافة');
+        Route::get('/direct-bonuses/{id}/edit', [DirectBonusController::class, 'edit'])->name('direct-bonuses.edit')->middleware('permission:المكافئات المباشرة,تعديل');
+        Route::put('/direct-bonuses/{id}', [DirectBonusController::class, 'update'])->name('direct-bonuses.update')->middleware('permission:المكافئات المباشرة,تعديل');
+        Route::delete('/direct-bonuses/{id}', [DirectBonusController::class, 'destroy'])->name('direct-bonuses.destroy')->middleware('permission:المكافئات المباشرة,حذف');
+        Route::post('/direct-bonuses/ajax-search', [DirectBonusController::class, 'ajaxSearch'])->name('direct-bonuses.ajax-search')->middleware('permission:المكافئات المباشرة,عرض');
+
+        // DirectGrant routes
+        Route::get('/direct-grants', [DirectGrantController::class, 'index'])->name('direct-grants.index')->middleware('permission:المنح المباشرة,عرض');
+        Route::get('/direct-grants/create', [DirectGrantController::class, 'create'])->name('direct-grants.create')->middleware('permission:المنح المباشرة,إضافة');
+        Route::post('/direct-grants', [DirectGrantController::class, 'store'])->name('direct-grants.store')->middleware('permission:المنح المباشرة,إضافة');
+        Route::get('/direct-grants/{id}/edit', [DirectGrantController::class, 'edit'])->name('direct-grants.edit')->middleware('permission:المنح المباشرة,تعديل');
+        Route::put('/direct-grants/{id}', [DirectGrantController::class, 'update'])->name('direct-grants.update')->middleware('permission:المنح المباشرة,تعديل');
+        Route::delete('/direct-grants/{id}', [DirectGrantController::class, 'destroy'])->name('direct-grants.destroy')->middleware('permission:المنح المباشرة,حذف');
+        Route::post('/direct-grants/ajax-search', [DirectGrantController::class, 'ajaxSearch'])->name('direct-grants.ajax-search')->middleware('permission:المنح المباشرة,عرض');
 
         //Main employees vacations balances routes
         Route::get('/main-employees-vacations-balances', [MainEmployeesVacationsBalancesController::class, 'index'])->name('main-employees-vacations-balances.index')->middleware('permission:أرصدة إجازات الموظفين,عرض');
