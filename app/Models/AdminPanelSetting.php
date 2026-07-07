@@ -32,6 +32,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property numeric $sanctions_value_third_absence قيمه خصم الايام بعد ثالث مرة غياب بدون اذن
  * @property numeric $sanctions_value_fourth_absence قيمه خصم الايام بعد رابع مرة غياب بدون اذن
  * @property int $after_shift_max_extra_hours أقصى عدد ساعات عمل إضافية بعد انتهاء الشيفت لتقفيل البصمة كـانصراف
+ * @property int $is_allowed_to_pull_salary_variables_from_fingerprint هل يسمح بسحب متغيرات المرتب تلقائياً من البصمة
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Admin $addedBy

@@ -107,6 +107,11 @@
                     </h4>
                 </div>
                 <div class="col-md-6 text-right">
+                    @if ($financeMonthlyCalendar->status == 1)
+                        <button type="button" id="btn_pull_employee_variables_details" class="btn btn-danger btn-sm shadow-sm font-weight-bold mx-1" title="سحب متغيرات المرتب لهذا الموظف للشهر الحالي">
+                            <i class="fas fa-sync-alt mr-1"></i> سحب متغيرات المرتب
+                        </button>
+                    @endif
                     <button type="button" id="btn_print_grid" class="btn btn-info btn-sm shadow-sm font-weight-bold mx-1">
                         <i class="fas fa-print mr-1"></i> طباعة الجدول
                     </button>
@@ -632,6 +637,79 @@
                     alert(errMsg);
                 }
             });
+        });
+
+        // Pull variables for this employee (Collective inside details page)
+        $(document).on('click', '#btn_pull_employee_variables_details', function() {
+            var btn = $(this);
+            var employeeId = '{{ $employee->id }}';
+            var calendarId = $('#select_finance_monthly_calendar').val();
+            var originalHtml = btn.html();
+
+            if (confirm('هل أنت متأكد من سحب متغيرات البصمة لراتب هذا الموظف للشهر المالي المحدد؟')) {
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> جاري السحب...');
+                $.ajax({
+                    url: '{{ route('admin.attendanceDepartures.pull-variables-employee') }}',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        employee_id: employeeId,
+                        finance_monthly_calendar_id: calendarId
+                    },
+                    success: function(response) {
+                        btn.prop('disabled', false).html(originalHtml);
+                        if (response.status == 'true') {
+                            alert(response.message);
+                            loadGrid(); // Reload grid to see updated calculations/cutting days
+                        } else {
+                            alert('خطأ: ' + response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        btn.prop('disabled', false).html(originalHtml);
+                        alert('حدث خطأ أثناء الاتصال بالخادم، يرجى المحاولة مرة أخرى.');
+                    }
+                });
+            }
+        });
+
+        // Pull variables for a single day
+        $(document).on('click', '.btn-pull-day-variables', function() {
+            var btn = $(this);
+            var row = btn.closest('tr');
+            var date = row.data('date');
+            var employeeId = '{{ $employee->id }}';
+            var calendarId = $('#select_finance_monthly_calendar').val();
+            var originalHtml = btn.html();
+
+            if (confirm('هل أنت متأكد من إعادة احتساب وسحب متغيرات البصمة لهذا اليوم لراتب الموظف؟')) {
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+                $.ajax({
+                    url: '{{ route('admin.attendanceDepartures.pull-variables-day') }}',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        employee_id: employeeId,
+                        finance_monthly_calendar_id: calendarId,
+                        date: date
+                    },
+                    success: function(response) {
+                        btn.prop('disabled', false).html(originalHtml);
+                        if (response.status == 'true') {
+                            alert(response.message);
+                            loadGrid(); // Reload grid to update the views and values
+                        } else {
+                            alert('خطأ: ' + response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        btn.prop('disabled', false).html(originalHtml);
+                        alert('حدث خطأ أثناء الاتصال بالخادم، يرجى المحاولة مرة أخرى.');
+                    }
+                });
+            }
         });
     });
 

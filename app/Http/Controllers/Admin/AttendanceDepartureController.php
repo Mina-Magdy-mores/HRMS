@@ -71,6 +71,7 @@ class AttendanceDepartureController extends Controller
             $lastUploadedFingerPrint->load('addedBy');
         }
         $latestActionRecord = get_cols_where_row_orderby(new AttendanceDepartureActionsExcel(), ['id', 'dateTimeAction'], ['company_id' => $company_id, 'finance_monthly_calendar_id' => $id], 'dateTimeAction', 'DESC');
+        $adminPanelSetting = AdminPanelSetting::where('company_id', $company_id)->first();
 
         return view('admin.attendanceDepartures.show', [
             'financeMonthlyCalendar' => $financeMonthlyCalendar,
@@ -80,7 +81,8 @@ class AttendanceDepartureController extends Controller
             'departments' => $departments,
             'jobs' => $jobs,
             'lastUploadedFingerPrint' => $lastUploadedFingerPrint,
-            'latestActionRecord' => $latestActionRecord
+            'latestActionRecord' => $latestActionRecord,
+            'adminPanelSetting' => $adminPanelSetting
         ]);
     }
     public function fingerPrintDetails($id, $finance_monthly_calendar_id)
@@ -122,12 +124,15 @@ class AttendanceDepartureController extends Controller
             ->orderBy('month_id', 'desc')
             ->get();
 
+        $adminPanelSetting = AdminPanelSetting::where('company_id', $company_id)->first();
+
         return view('admin.attendanceDepartures.finger-print-details', [
             'financeMonthlyCalendar' => $financeMonthlyCalendar,
             'employee' => $employee,
             'fingerprintActions' => $fingerprintActions,
             'allFingerprintArchive' => $allFingerprintArchive,
             'financeMonthlyCalendars' => $financeMonthlyCalendars,
+            'adminPanelSetting' => $adminPanelSetting,
         ]);
     }
 
@@ -299,8 +304,9 @@ class AttendanceDepartureController extends Controller
 
             $employees = $query->orderBy('id', 'asc')->paginate(PAGEINATION_COUNTER);
             $financeMonthlyCalendar = FinanceMonthlyCalendar::findOrFail($request->finance_monthly_calendar_id);
+            $adminPanelSetting = AdminPanelSetting::where('company_id', $company_id)->first();
 
-            return view('admin.attendanceDepartures.ajaxSearch', compact('employees', 'financeMonthlyCalendar'));
+            return view('admin.attendanceDepartures.ajaxSearch', compact('employees', 'financeMonthlyCalendar', 'adminPanelSetting'));
         }
     }
 
@@ -374,6 +380,11 @@ class AttendanceDepartureController extends Controller
                 $lastUploadedFingerPrint->load('addedBy');
             }
             $latestActionRecord = get_cols_where_row_orderby(new AttendanceDepartureActionsExcel(), ['id', 'dateTimeAction'], ['company_id' => $company_id, 'finance_monthly_calendar_id' => $finance_monthly_calendar_id], 'dateTimeAction', 'DESC');
+
+            $adminSetting = AdminPanelSetting::where('company_id', $company_id)->first();
+            if ($adminSetting && $adminSetting->is_allowed_to_pull_salary_variables_from_fingerprint == 1) {
+                $this->pullFingerprintVariablesToSalaryForCalendar($finance_monthly_calendar_id, $company_id);
+            }
 
             return redirect()->back()->with('success', 'تم رفع البصمات بنجاح.')->with('lastUploadedFingerPrint', $lastUploadedFingerPrint)->with('latestActionRecord', $latestActionRecord);
         } catch (\Exception $e) {
@@ -604,6 +615,11 @@ class AttendanceDepartureController extends Controller
             // =====================================================================
             if ($financeMonthlyCalendar->status == 1) {
                 AttendanceDeparture::recalculateEmployeeMonth($employee->id, $finance_monthly_calendar_id, $company_id);
+
+                $adminSetting = AdminPanelSetting::where('company_id', $company_id)->first();
+                if ($adminSetting && $adminSetting->is_allowed_to_pull_salary_variables_from_fingerprint == 1) {
+                    $this->pullFingerprintVariablesToSalary($employee->id, $finance_monthly_calendar_id, $company_id);
+                }
 
                 if (isset($mainSalaryEmployee) && $mainSalaryEmployee) {
                     $this->recalculate_main_salary($mainSalaryEmployee->id);
@@ -849,6 +865,10 @@ class AttendanceDepartureController extends Controller
                 }
             }
             if ($mainSalaryEmployee) {
+                $adminSetting = AdminPanelSetting::where('company_id', $company_id)->first();
+                if ($adminSetting && $adminSetting->is_allowed_to_pull_salary_variables_from_fingerprint == 1) {
+                    $this->pullFingerprintVariablesToSalary($employee_id, $attendance->finance_monthly_calendar_id, $company_id);
+                }
                 $this->recalculate_main_salary($mainSalaryEmployee->id);
             }
 
@@ -1081,6 +1101,10 @@ class AttendanceDepartureController extends Controller
                     }
 
                     if ($mainSalaryEmployee) {
+                        $adminSetting = AdminPanelSetting::where('company_id', $company_id)->first();
+                        if ($adminSetting && $adminSetting->is_allowed_to_pull_salary_variables_from_fingerprint == 1) {
+                            $this->pullFingerprintVariablesToSalary($employee_id, $finance_monthly_calendar_id, $company_id);
+                        }
                         $this->recalculate_main_salary($mainSalaryEmployee->id);
                     }
                 });
@@ -1284,5 +1308,98 @@ class AttendanceDepartureController extends Controller
     private function recalculateAttendanceDay($attendance, $employee, $company_id)
     {
         AttendanceDeparture::recalculateEmployeeMonth($employee->id, $attendance->finance_monthly_calendar_id, $company_id);
+    }
+
+    public function pullVariablesEmployee(Request $request)
+    {
+        if ($request->ajax()) {
+            $company_id = Auth::user()->company_id;
+            $employee_id = $request->employee_id;
+            $finance_monthly_calendar_id = $request->finance_monthly_calendar_id;
+
+            $financeMonthlyCalendar = FinanceMonthlyCalendar::where('company_id', $company_id)
+                ->where('id', $finance_monthly_calendar_id)
+                ->first();
+
+            if (empty($financeMonthlyCalendar) || $financeMonthlyCalendar->status != 1) {
+                return response()->json(['status' => 'false', 'message' => 'عفوا، الشهر المالي مغلق أو غير موجود.']);
+            }
+
+            try {
+                $this->pullFingerprintVariablesToSalary($employee_id, $finance_monthly_calendar_id, $company_id);
+                return response()->json(['status' => 'true', 'message' => 'تم سحب المتغيرات واحتساب راتب الموظف بنجاح.']);
+            } catch (\Exception $e) {
+                return response()->json(['status' => 'false', 'message' => 'حدث خطأ: ' . $e->getMessage()]);
+            }
+        }
+    }
+
+    public function pullVariablesCalendar(Request $request)
+    {
+        if ($request->ajax()) {
+            $company_id = Auth::user()->company_id;
+            $finance_monthly_calendar_id = $request->finance_monthly_calendar_id;
+
+            $financeMonthlyCalendar = FinanceMonthlyCalendar::where('company_id', $company_id)
+                ->where('id', $finance_monthly_calendar_id)
+                ->first();
+
+            if (empty($financeMonthlyCalendar) || $financeMonthlyCalendar->status != 1) {
+                return response()->json(['status' => 'false', 'message' => 'عفوا، الشهر المالي مغلق أو غير موجود.']);
+            }
+
+            try {
+                $this->pullFingerprintVariablesToSalaryForCalendar($finance_monthly_calendar_id, $company_id);
+                return response()->json(['status' => 'true', 'message' => 'تم سحب المتغيرات واحتساب رواتب كل الموظفين بنجاح.']);
+            } catch (\Exception $e) {
+                return response()->json(['status' => 'false', 'message' => 'حدث خطأ: ' . $e->getMessage()]);
+            }
+        }
+    }
+
+    public function pullVariablesDay(Request $request)
+    {
+        if ($request->ajax()) {
+            $company_id = Auth::user()->company_id;
+            $employee_id = $request->employee_id;
+            $finance_monthly_calendar_id = $request->finance_monthly_calendar_id;
+            $date = $request->date;
+
+            $financeMonthlyCalendar = FinanceMonthlyCalendar::where('company_id', $company_id)
+                ->where('id', $finance_monthly_calendar_id)
+                ->first();
+
+            if (empty($financeMonthlyCalendar) || $financeMonthlyCalendar->status != 1) {
+                return response()->json(['status' => 'false', 'message' => 'عفوا، الشهر المالي مغلق أو غير موجود.']);
+            }
+
+            $employee = Employee::where('company_id', $company_id)->find($employee_id);
+            if (empty($employee)) {
+                return response()->json(['status' => 'false', 'message' => 'عفوا، الموظف غير موجود.']);
+            }
+
+            $attendance = AttendanceDeparture::where([
+                'company_id' => $company_id,
+                'employee_id' => $employee_id,
+                'finance_monthly_calendar_id' => $finance_monthly_calendar_id,
+                'day_of_finger_print' => $date
+            ])->first();
+
+            if (empty($attendance)) {
+                return response()->json(['status' => 'false', 'message' => 'عفوا، لا يوجد سجل حضور وانصراف لهذا اليوم.']);
+            }
+
+            try {
+                // 1. Recalculate the day (this re-runs recalculateEmployeeMonth for the day)
+                $this->recalculateAttendanceDay($attendance, $employee, $company_id);
+
+                // 2. Pull fingerprint variables to monthly salary
+                $this->pullFingerprintVariablesToSalary($employee_id, $finance_monthly_calendar_id, $company_id);
+
+                return response()->json(['status' => 'true', 'message' => 'تم إعادة احتساب اليوم وسحب المتغيرات بنجاح.']);
+            } catch (\Exception $e) {
+                return response()->json(['status' => 'false', 'message' => 'حدث خطأ: ' . $e->getMessage()]);
+            }
+        }
     }
 }

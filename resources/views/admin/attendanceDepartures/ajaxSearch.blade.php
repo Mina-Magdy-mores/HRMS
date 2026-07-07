@@ -57,6 +57,11 @@
                             <a href="#" class="btn btn-sm btn-info mr-1" title="تفاصيل البصمة">
                                 <i class="fas fa-eye mr-1"></i> التفاصيل
                             </a>
+                            @if ($financeMonthlyCalendar->status == 1)
+                                <button type="button" class="btn btn-sm btn-warning btn-pull-employee-variables mr-1" data-id="{{ $employee->id }}" title="سحب متغيرات المرتب للموظف">
+                                    <i class="fas fa-sync-alt mr-1"></i> سحب المتغيرات
+                                </button>
+                            @endif
                             <form action="{{ route('admin.attendanceDepartures.print-search') }}" method="POST" target="_blank" class="m-0">
                                 @csrf
                                 <input type="hidden" name="finance_monthly_calendar_id_search" value="{{ $financeMonthlyCalendar->id }}">

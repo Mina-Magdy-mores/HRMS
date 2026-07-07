@@ -97,6 +97,16 @@ class AttendanceDeparture extends Model
 
     public function recalculate($employee, $companyId, $settings, &$delayOrEarlyDaysSoFar, &$absenceDaysSoFar)
     {
+        if ($this->is_action_made_on_employee == '1') {
+            if ($this->absence_hours > 0 && $this->cutting_days > 0) {
+                $absenceDaysSoFar++;
+            }
+            if ($this->attendance_delay > 0 || $this->early_departure > 0) {
+                $delayOrEarlyDaysSoFar++;
+            }
+            return;
+        }
+
         if (empty($settings)) {
             $settings = AdminPanelSetting::where('company_id', $companyId)->first();
         }
@@ -116,6 +126,32 @@ class AttendanceDeparture extends Model
                 'after_days_begin_vacation' => 0,
                 'monthly_vacation_balance' => 0
             ];
+        }
+
+        // Auto-classify full absence days if no manual action was taken
+        if ($this->is_action_made_on_employee == '0' && ($this->vacation_id == 0 || $this->vacation_id == null)) {
+            if (!$this->checkInDateTime && !$this->checkOutDateTime) {
+                // Check if there is a matched occasion first
+                $date = $this->day_of_finger_print;
+                $occasions = Occasion::where('company_id', $companyId)->where('status', 1)->get();
+                $matchedOccasion = null;
+                foreach ($occasions as $occ) {
+                    if ($date >= $occ->from_date && $date <= $occ->to_date) {
+                        $matchedOccasion = $occ;
+                        break;
+                    }
+                }
+                
+                if (!$matchedOccasion) {
+                    $dayName = date('l', strtotime($date));
+                    if ($dayName === 'Friday' || $dayName === 'Saturday') {
+                        $this->vacation_id = 5; // راحة أسبوعية
+                    } else {
+                        $this->vacation_id = 13; // إجازة بدون إذن
+                    }
+                    $this->update(['vacation_id' => $this->vacation_id]);
+                }
+            }
         }
 
         $shiftHours = null;

@@ -45,6 +45,7 @@ class AdminPanelSettingRequest extends FormRequest
             'after_shift_max_extra_hours' => 'sometimes|integer|min:0',
             'is_allowed_to_transfer_vacation' => 'required|integer|in:0,1',
             'is_allowed_to_pull_annual_from_fingerprint' => 'required|integer|in:0,1',
+            'is_allowed_to_pull_salary_variables_from_fingerprint' => 'required|integer|in:0,1',
             'is_active_system_monitoring' => 'required|integer|in:0,1',
         ];
     }
@@ -92,6 +93,9 @@ class AdminPanelSettingRequest extends FormRequest
             'is_allowed_to_pull_annual_from_fingerprint.required' => 'حقل هل يسمح بسحب الإجازات السنوية تلقائياً من البصمة مطلوب',
             'is_allowed_to_pull_annual_from_fingerprint.integer' => 'حقل هل يسمح بسحب الإجازات السنوية تلقائياً من البصمة يجب أن يكون رقم صحيح',
             'is_allowed_to_pull_annual_from_fingerprint.in' => 'حقل هل يسمح بسحب الإجازات السنوية تلقائياً من البصمة غير صحيح',
+            'is_allowed_to_pull_salary_variables_from_fingerprint.required' => 'حقل هل يسمح بسحب متغيرات المرتب تلقائياً من البصمة مطلوب',
+            'is_allowed_to_pull_salary_variables_from_fingerprint.integer' => 'حقل هل يسمح بسحب متغيرات المرتب تلقائياً من البصمة يجب أن يكون رقم صحيح',
+            'is_allowed_to_pull_salary_variables_from_fingerprint.in' => 'حقل هل يسمح بسحب متغيرات المرتب تلقائياً من البصمة غير صحيح',
             'is_active_system_monitoring.required' => 'حقل حالة مراقب النظام مطلوب',
             'is_active_system_monitoring.integer' => 'حقل حالة مراقب النظام يجب ان يكون رقم',
             'is_active_system_monitoring.in' => 'حقل حالة مراقب النظام غير صحيح',

@@ -65,8 +65,8 @@
                     <th style="min-width: 100px; vertical-align: middle;">حركات اليوم</th>
                     <th style="min-width: 150px; vertical-align: middle;">المتغيرات</th>
                     <th style="min-width: 90px; vertical-align: middle;">ساعات العمل</th>
-                    <th style="min-width: 90px; vertical-align: middle;">الإضافي</th>
-                    <th style="min-width: 90px; vertical-align: middle;">الغياب</th>
+                    <th style="min-width: 125px; vertical-align: middle;">ساعات إضافية</th>
+                    <th style="min-width: 140px; vertical-align: middle;">ساعات لم يعمل بها</th>
                     <th style="min-width: 120px; vertical-align: middle;">خصم أيام</th>
                     <th style="min-width: 120px; vertical-align: middle;">نوع الإجازة</th>
                     <th style="min-width: 140px; vertical-align: middle;">إجازة رسمية</th>
@@ -226,6 +226,9 @@
                             @if (!$is_row_archived)
                                 <button type="button" class="btn btn-success btn-xs save-row-btn shadow-sm" title="حفظ هذا اليوم">
                                     <i class="fas fa-save"></i> حفظ
+                                </button>
+                                <button type="button" class="btn btn-warning btn-xs btn-pull-day-variables shadow-sm mt-1 d-block w-100" data-date="{{ $day['date'] }}" title="سحب متغيرات هذا اليوم">
+                                    <i class="fas fa-sync-alt"></i> سحب
                                 </button>
                             @else
                                 <span class="badge badge-secondary" title="اليوم مؤرشف"><i class="fas fa-lock"></i> مؤرشف</span>

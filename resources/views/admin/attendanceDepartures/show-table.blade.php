@@ -29,9 +29,13 @@
                 بحث في موظفي الشهر المالي
             </h3>
             @if ($financeMonthlyCalendar->status == 1)
-                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#uploadExcelModal">
-                    <i class="fas fa-upload"></i>
+                <button type="button" class="btn btn-success shadow-sm" data-toggle="modal" data-target="#uploadExcelModal">
+                    <i class="fas fa-upload mr-1"></i>
                     رفع ملف إكسل البصمة
+                </button>
+                <button type="button" id="btn-pull-all-variables" class="btn btn-primary shadow-sm mr-2" title="سحب متغيرات المرتب لجميع الموظفين">
+                    <i class="fas fa-sync-alt mr-1"></i>
+                    سحب متغيرات المرتب للكل
                 </button>
             @endif
         </div>
@@ -272,6 +276,11 @@
                                             <a href="{{ route('admin.attendanceDepartures.finger-print-details', ['id' => $employee->id, 'finance_monthly_calendar_id' => $financeMonthlyCalendar->id]) }}" class="btn btn-sm btn-info mr-1" title="تفاصيل البصمة">
                                                 <i class="fas fa-eye mr-1"></i> التفاصيل
                                             </a>
+                                            @if ($financeMonthlyCalendar->status == 1)
+                                                <button type="button" class="btn btn-sm btn-warning btn-pull-employee-variables mr-1" data-id="{{ $employee->id }}" title="سحب متغيرات المرتب للموظف">
+                                                    <i class="fas fa-sync-alt mr-1"></i> سحب المتغيرات
+                                                </button>
+                                            @endif
                                             <form action="{{ route('admin.attendanceDepartures.print-search') }}" method="POST" target="_blank" class="m-0">
                                                 @csrf
                                                 <input type="hidden" name="finance_monthly_calendar_id_search" value="{{ $financeMonthlyCalendar->id }}">
@@ -442,6 +451,70 @@
                         console.log('Error during pagination');
                     }
                 });
+            });
+
+            // Pull variables for a single employee
+            $(document).on('click', '.btn-pull-employee-variables', function() {
+                var btn = $(this);
+                var employee_id = btn.data('id');
+                var originalHtml = btn.html();
+
+                if (confirm('هل أنت متأكد من سحب متغيرات البصمة لراتب هذا الموظف للشهر المالي المفتوح؟')) {
+                    btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> جاري السحب...');
+                    $.ajax({
+                        url: '{{ route('admin.attendanceDepartures.pull-variables-employee') }}',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            employee_id: employee_id,
+                            finance_monthly_calendar_id: {{ $financeMonthlyCalendar->id }}
+                        },
+                        success: function(response) {
+                            btn.prop('disabled', false).html(originalHtml);
+                            if (response.status == 'true') {
+                                alert(response.message);
+                            } else {
+                                alert('خطأ: ' + response.message);
+                            }
+                        },
+                        error: function(xhr) {
+                            btn.prop('disabled', false).html(originalHtml);
+                            alert('حدث خطأ أثناء الاتصال بالخادم، يرجى المحاولة مرة أخرى.');
+                        }
+                    });
+                }
+            });
+
+            // Pull variables for all employees
+            $(document).on('click', '#btn-pull-all-variables', function() {
+                var btn = $(this);
+                var originalHtml = btn.html();
+
+                if (confirm('هل أنت متأكد من سحب متغيرات البصمة لجميع رواتب الموظفين للشهر المالي المفتوح؟ قد تستغرق هذه العملية بضع ثوانٍ.')) {
+                    btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> جاري سحب واحتساب الكل...');
+                    $.ajax({
+                        url: '{{ route('admin.attendanceDepartures.pull-variables-calendar') }}',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            finance_monthly_calendar_id: {{ $financeMonthlyCalendar->id }}
+                        },
+                        success: function(response) {
+                            btn.prop('disabled', false).html(originalHtml);
+                            if (response.status == 'true') {
+                                alert(response.message);
+                            } else {
+                                alert('خطأ: ' + response.message);
+                            }
+                        },
+                        error: function(xhr) {
+                            btn.prop('disabled', false).html(originalHtml);
+                            alert('حدث خطأ أثناء الاتصال بالخادم، يرجى المحاولة مرة أخرى.');
+                        }
+                    });
+                }
             });
         });
     </script>

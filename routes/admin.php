@@ -480,6 +480,9 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/attendanceDepartures/finger-print-details/save-all', [AttendanceDepartureController::class, 'saveAllFingerPrintRows'])->name('attendanceDepartures.finger-print-details.save-all')->middleware('permission:سجلات البصمات,إضافة');
         Route::post('/attendanceDepartures/finger-print-details/day-movements', [AttendanceDepartureController::class, 'getDayMovements'])->name('attendanceDepartures.finger-print-details.day-movements')->middleware('permission:سجلات البصمات,عرض');
         Route::post('/attendanceDepartures/finger-print-details/update-day-movements', [AttendanceDepartureController::class, 'updateDayMovements'])->name('attendanceDepartures.finger-print-details.update-day-movements')->middleware('permission:سجلات البصمات,تعديل');
+        Route::post('/attendanceDepartures/pull-variables-employee', [AttendanceDepartureController::class, 'pullVariablesEmployee'])->name('attendanceDepartures.pull-variables-employee')->middleware('permission:سجلات البصمات,تعديل');
+        Route::post('/attendanceDepartures/pull-variables-calendar', [AttendanceDepartureController::class, 'pullVariablesCalendar'])->name('attendanceDepartures.pull-variables-calendar')->middleware('permission:سجلات البصمات,تعديل');
+        Route::post('/attendanceDepartures/pull-variables-day', [AttendanceDepartureController::class, 'pullVariablesDay'])->name('attendanceDepartures.pull-variables-day')->middleware('permission:سجلات البصمات,تعديل');
 
         // System Monitoring routes
         Route::get('/system-monitoring/self-logs', [AlertSystemMonitoringController::class, 'selfLogs'])->name('system-monitoring.self-logs')->middleware('permission:سجلات المراقبة الذاتية,عرض');

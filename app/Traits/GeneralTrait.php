@@ -23,7 +23,8 @@ trait GeneralTrait
 {
     function recalculate_main_salary($main_salary_employee_id)
     {
-        $company_id = Auth::user()->company_id;
+        $authUser   = Auth::guard('admin')->user() ?? Auth::user();
+        $company_id = $authUser?->company_id;
         $main_salary_employee = getColsWhereRow(MainSalaryEmployee::class, ['*'], ['id' => $main_salary_employee_id, 'company_id' => $company_id, 'is_archived' => 0]);
 
         if (!empty($main_salary_employee)) {
@@ -374,4 +375,231 @@ trait GeneralTrait
             }
         }
     }
+
+    public function pullFingerprintVariablesToSalary($employee_id, $finance_monthly_calendar_id, $company_id)
+    {
+        // 1. Get MainSalaryEmployee record
+        $mainSalaryEmployee = MainSalaryEmployee::where([
+            'employee_id' => $employee_id,
+            'finance_monthly_calendar_id' => $finance_monthly_calendar_id,
+            'company_id' => $company_id,
+            'is_archived' => 0
+        ])->first();
+
+        if (empty($mainSalaryEmployee)) {
+            return;
+        }
+
+        // 2. Get Employee daily rate
+        $employee = Employee::where('company_id', $company_id)->find($employee_id);
+        if (empty($employee)) {
+            return;
+        }
+        $payment_per_day = $employee->payment_per_day ?? 0;
+
+        // 3. Delete existing automatically pulled records to avoid duplicate inserts
+        // For absences (is_auto = 1)
+        MainSalaryEmployeeAbsence::where([
+            'employee_id' => $employee_id,
+            'finance_monthly_calendar_id' => $finance_monthly_calendar_id,
+            'company_id' => $company_id,
+            'is_auto' => 1
+        ])->delete();
+
+        // For deductions (deduction_type = 2 (fingerprint), is_auto = 1)
+        MainSalaryEmployeeDeduction::where([
+            'employee_id' => $employee_id,
+            'finance_monthly_calendar_id' => $finance_monthly_calendar_id,
+            'company_id' => $company_id,
+            'deduction_type' => 2,
+            'is_auto' => 1
+        ])->delete();
+
+        $excludedVacationIds = [4, 5, 11, 12];
+
+        // 4. Column 1: Calculate Absences (absence_hours) for non-vacation days
+        $absenceRecords = \App\Models\AttendanceDeparture::where([
+            'employee_id' => $employee_id,
+            'finance_monthly_calendar_id' => $finance_monthly_calendar_id,
+            'company_id' => $company_id,
+            'occasion_id' => null
+        ])
+        ->where(function($q) {
+            $q->whereNull('vacation_id')
+              ->orWhere('vacation_id', 0);
+        })
+        ->whereNull('checkInDateTime')
+        ->whereNull('checkOutDateTime')
+        ->get();
+
+        $absenceDaysAmount = 0;
+        foreach ($absenceRecords as $rec) {
+            if ($rec->cutting_days > 0) {
+                $absenceDaysAmount += (float)$rec->cutting_days;
+            } else {
+                $shift = $rec->shift_hours > 0 ? (float)$rec->shift_hours : 8.0;
+                $absenceDaysAmount += (float)$rec->absence_hours / $shift;
+            }
+        }
+
+        // Column 3: Deductible vacations (vacation_id > 0 and not in excluded ones)
+        $deductibleVacations = \App\Models\AttendanceDeparture::where([
+            'employee_id' => $employee_id,
+            'finance_monthly_calendar_id' => $finance_monthly_calendar_id,
+            'company_id' => $company_id,
+        ])
+        ->where('vacation_id', '>', 0)
+        ->whereNotIn('vacation_id', $excludedVacationIds)
+        ->get();
+
+        // إجازات تُخصم من المرتب مباشرةً (عقوبات حقيقية): بدون إذن، بدون راتب
+        $salaryDeductibleVacationIds = [6, 13];
+
+        // إجازات تُخصم من رصيد الإجازات (لا تُنزّل كغياب في المرتب)
+        $balanceDeductibleGroups = [];
+        $salaryDeductibleGroups  = [];
+
+        foreach ($deductibleVacations as $dv) {
+            $days = $dv->cutting_days > 0 ? (float)$dv->cutting_days : 1.00;
+            if (in_array($dv->vacation_id, $salaryDeductibleVacationIds)) {
+                // تُخصم من المرتب
+                if (!isset($salaryDeductibleGroups[$dv->vacation_id])) {
+                    $salaryDeductibleGroups[$dv->vacation_id] = 0;
+                }
+                $salaryDeductibleGroups[$dv->vacation_id] += $days;
+            } else {
+                // تُخصم من رصيد الإجازات فقط — لا خصم مالي
+                if (!isset($balanceDeductibleGroups[$dv->vacation_id])) {
+                    $balanceDeductibleGroups[$dv->vacation_id] = 0;
+                }
+                $balanceDeductibleGroups[$dv->vacation_id] += $days;
+            }
+        }
+
+        // Column 2: Calculate delay / manual deduction days (cutting_days) on non-vacation days
+        $deductionDaysAmount = \App\Models\AttendanceDeparture::where([
+            'employee_id' => $employee_id,
+            'finance_monthly_calendar_id' => $finance_monthly_calendar_id,
+            'company_id' => $company_id
+        ])
+        ->where(function($q) {
+            $q->whereNull('vacation_id')
+              ->orWhere('vacation_id', 0);
+        })
+        ->where(function ($query) {
+            $query->whereNotNull('checkInDateTime')
+                  ->orWhereNotNull('checkOutDateTime');
+        })
+        ->sum('cutting_days');
+
+        // 6. Insert new variables if days_amount > 0
+        // Insert Column 1 (Standard Absences)
+        if ($absenceDaysAmount > 0) {
+            MainSalaryEmployeeAbsence::create([
+                'main_salary_employee_id' => $mainSalaryEmployee->id,
+                'employee_id' => $employee_id,
+                'finance_monthly_calendar_id' => $finance_monthly_calendar_id,
+                'days_amount' => $absenceDaysAmount,
+                'total' => $absenceDaysAmount * $payment_per_day,
+                'company_id' => $company_id,
+                'is_auto' => 1,
+                'status' => 1,
+                'added_by' => Auth::id() ?? 1,
+                'notes' => 'خصم غياب تلقائي من البصمة',
+            ]);
+        }
+
+        // Insert Column 3a (إجازات تُخصم من المرتب: بدون إذن، بدون راتب)
+        if (!empty($salaryDeductibleGroups)) {
+            $vacationTypes = \App\Models\VacationType::whereIn('id', array_keys($salaryDeductibleGroups))->get();
+
+            foreach ($salaryDeductibleGroups as $vacId => $daysAmount) {
+                if ($daysAmount > 0) {
+                    $vt = $vacationTypes->firstWhere('id', $vacId);
+                    $vacName = $vt ? $vt->name : 'إجازة';
+                    MainSalaryEmployeeAbsence::create([
+                        'main_salary_employee_id' => $mainSalaryEmployee->id,
+                        'employee_id' => $employee_id,
+                        'finance_monthly_calendar_id' => $finance_monthly_calendar_id,
+                        'days_amount' => $daysAmount,
+                        'total' => $daysAmount * $payment_per_day,
+                        'company_id' => $company_id,
+                        'is_auto' => 1,
+                        'status' => 1,
+                        'added_by' => Auth::id() ?? 1,
+                        'notes' => 'خصم ' . $vacName . ' تلقائي من البصمة',
+                    ]);
+                }
+            }
+        }
+
+        // إجازات الرصيد: تُخصم تلقائياً من سجل رصيد الإجازات السنوية
+        // (اعتيادية، سنوية، مرضية، زواج، وضع/أمومة، حج، عزاء، عيد ميلاد، ميلاد، وغيرها)
+        if (!empty($balanceDeductibleGroups)) {
+            // الحصول على سنة وشهر الراتب من التقويم المالي
+            $calendar = \App\Models\FinanceMonthlyCalendar::find($finance_monthly_calendar_id);
+            if ($calendar) {
+                $yearMonth = $calendar->year_and_month; // e.g. "2028-03"
+
+                // إيجاد سجل الرصيد لهذا الموظف في هذا الشهر
+                $balanceRecord = \App\Models\MainEmployeesVacationsBalances::where([
+                    'employee_id' => $employee_id,
+                    'year_and_month' => $yearMonth,
+                    'company_id' => $company_id,
+                ])->first();
+
+                if ($balanceRecord) {
+                    // حساب إجمالي الأيام المستهلكة من الرصيد
+                    $totalBalanceDays = 0;
+                    foreach ($balanceDeductibleGroups as $vacId => $daysAmount) {
+                        $totalBalanceDays += $daysAmount;
+                    }
+
+                    // تحديث الرصيد
+                    $newSpent     = (float)$balanceRecord->spent_balance + $totalBalanceDays;
+                    $newRemaining = (float)$balanceRecord->total_available_balance - $newSpent;
+
+                    $balanceRecord->update([
+                        'spent_balance'       => $newSpent,
+                        'remaining_net_balance' => max(0, $newRemaining),
+                    ]);
+                }
+            }
+        }
+
+
+        // Insert Column 2 (Deductions / Delay)
+        if ($deductionDaysAmount > 0) {
+            MainSalaryEmployeeDeduction::create([
+                'main_salary_employee_id' => $mainSalaryEmployee->id,
+                'employee_id' => $employee_id,
+                'finance_monthly_calendar_id' => $finance_monthly_calendar_id,
+                'deduction_type' => 2, // 2 = finger print deduction
+                'days_amount' => $deductionDaysAmount,
+                'total' => $deductionDaysAmount * $payment_per_day,
+                'company_id' => $company_id,
+                'is_auto' => 1,
+                'status' => 1,
+                'added_by' => Auth::id() ?? 1,
+                'notes' => 'خصم تأخير/انصراف مبكر تلقائي من البصمة',
+            ]);
+        }
+
+        // 7. Recalculate main salary after variables are updated
+        $this->recalculate_main_salary($mainSalaryEmployee->id);
+    }
+
+    public function pullFingerprintVariablesToSalaryForCalendar($finance_monthly_calendar_id, $company_id)
+    {
+        $activeSalaries = MainSalaryEmployee::where([
+            'finance_monthly_calendar_id' => $finance_monthly_calendar_id,
+            'company_id' => $company_id,
+            'is_archived' => 0
+        ])->get();
+
+        foreach ($activeSalaries as $salary) {
+            $this->pullFingerprintVariablesToSalary($salary->employee_id, $finance_monthly_calendar_id, $company_id);
+        }
+    }
 }
+
