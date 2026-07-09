@@ -162,15 +162,27 @@
                         <select class="form-control form-control-sm select-vacation" name="vacation_id" {{ !$is_row_editable ? 'disabled' : '' }}>
                             <option value="0" {{ $vacation_id == 0 ? 'selected' : '' }}>لا يوجد</option>
                             @foreach ($vacationTypes as $vt)
+                                @php
+                                    $disabledReason = '';
+                                    if ($vt->id == 16) {
+                                        if ($employee->active_for_vacation == 0) {
+                                            $disabledReason = ' - (معطلة: رصيد الإجازات غير نشط للموظف)';
+                                        } elseif ($employee->vacation_formula == 0) {
+                                            $hire_date = $employee->hire_date ? strtotime($employee->hire_date) : null;
+                                            $current_date = strtotime(date('Y-m-d'));
+                                            $difference_in_days = $hire_date ? round(($current_date - $hire_date) / (60 * 60 * 24)) : 0;
+                                            $after_days = $adminPanelSetting ? (float)$adminPanelSetting->after_days_begin_vacation : 0;
+                                            if ($hire_date && $difference_in_days < $after_days) {
+                                                $remaining = ceil($after_days - $difference_in_days);
+                                                $disabledReason = " - (معطلة: الموظف في فترة الانتظار - متبقي {$remaining} يوم على تفعيل الإجازة)";
+                                            } else {
+                                                $disabledReason = ' - (معطلة: لم يتم احتساب رصيد الإجازات للموظف بعد)';
+                                            }
+                                        }
+                                    }
+                                @endphp
                                 <option @if($vt->id == 16 && ($employee->active_for_vacation == 0 || $employee->vacation_formula == 0)) disabled style="color: #dc3545; background-color: #fdf2f2;" @endif value="{{ $vt->id }}" {{ $vacation_id == $vt->id ? 'selected' : '' }} data-is-official="{{ str_contains($vt->name, 'رسمية') ? 1 : 0 }}">
-                                    {{ $vt->name }}
-                                    @if($vt->id == 16)
-                                        @if($employee->active_for_vacation == 0)
-                                             - (معطلة: رصيد الإجازات غير نشط للموظف)
-                                        @elseif($employee->vacation_formula == 0)
-                                             - (معطلة: طريقة احتساب الإجازة غير صحيحة للموظف)
-                                        @endif
-                                    @endif
+                                    {{ $vt->name }}{{ $disabledReason }}
                                 </option>
                             @endforeach
                         </select>
