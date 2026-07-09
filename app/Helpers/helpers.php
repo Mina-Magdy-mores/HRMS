@@ -168,7 +168,7 @@ function check_main_menu_permission($mainMenuName)
         return true;
     }
     if ($admin->is_employee == 1) {
-        if (in_array($mainMenuName, ['قائمة شئون الموظفين', 'قائمة المهام', 'قائمة الطلبات'])) {
+        if (in_array($mainMenuName, ['الحضور والانصراف', 'قائمة المهام', 'قائمة الطلبات'])) {
             return true;
         }
     }
@@ -201,6 +201,11 @@ function check_sub_menu_permission($subMenuName)
     }
     if ($admin->is_master_admin) {
         return true;
+    }
+    if ($admin->is_employee == 1) {
+        if (in_array($subMenuName, ['سجلات البصمات', 'طلبات الموظفين'])) {
+            return true;
+        }
     }
     if (!$admin->permission_role_id) {
         return false;

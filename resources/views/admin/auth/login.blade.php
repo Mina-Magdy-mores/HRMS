@@ -82,6 +82,24 @@
                 </form>
             </div>
             <!-- /.login-card-body -->
+        
+        <div class="card mt-3">
+            <div class="card-header bg-info text-white text-center p-2" style="font-size: 15px;">
+                <strong>بيانات الدخول للتجربة (Demo Accounts)</strong>
+            </div>
+            <div class="card-body p-3 text-right" style="font-size: 14px; direction: rtl;">
+                <div class="mb-2">
+                    <strong>1. حساب مدير النظام (Admin):</strong><br>
+                    اسم المستخدم: <code class="bg-light px-1 font-weight-bold" style="font-size: 14px;">admin</code><br>
+                    كلمة المرور: <code class="bg-light px-1 font-weight-bold" style="font-size: 14px;">admin</code>
+                </div>
+                <hr class="my-2">
+                <div>
+                    <strong>2. حساب موظف (Employee Panel):</strong><br>
+                    اسم المستخدم: <code class="bg-light px-1 font-weight-bold" style="font-size: 14px;">ahmed</code><br>
+                    كلمة المرور: <code class="bg-light px-1 font-weight-bold" style="font-size: 14px;">password123</code>
+                </div>
+            </div>
         </div>
     </div>
     <!-- /.login-box -->
