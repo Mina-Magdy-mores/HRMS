@@ -143,6 +143,10 @@ trait LogsActivity
             \App\Models\Admin::class => 'بروفايل الادمين',
             \App\Models\MainEmployeeInvestigation::class => 'التحقيقات الإدارية',
             \App\Models\AlertSystemMonitoring::class => 'مراقبة النظام',
+            \App\Models\EmployeeTask::class => 'مهام الموظفين',
+            \App\Models\EmployeeRequestType::class => 'أنواع طلبات الموظفين',
+            \App\Models\EmployeeRequest::class => 'طلبات الموظفين',
+            \App\Models\EmployeeRequestComment::class => 'تعليقات طلبات الموظفين',
         ];
 
         return $map[static::class] ?? null;

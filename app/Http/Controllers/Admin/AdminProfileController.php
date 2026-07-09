@@ -33,7 +33,8 @@ class AdminProfileController extends Controller
     {
         $company_id = Auth::user()->company_id;
         $roles = get_cols_where(PermissionRole::class, ['id', 'name'], ['is_active' => 1, 'company_id' => $company_id]);
-        return view('admin.adminProfile.create', compact('roles'));
+        $employees = get_cols_where(\App\Models\Employee::class, ['id', 'name', 'employee_code', 'email', 'birth_date', 'gender', 'nationality_number', 'work_telephone', 'home_telephone', 'home_address', 'stable_address'], ['company_id' => $company_id]);
+        return view('admin.adminProfile.create', compact('roles', 'employees'));
     }
 
     /**
@@ -52,6 +53,13 @@ class AdminProfileController extends Controller
             $validated = $request->validated();
             if ($validated['is_master_admin'] == 1) {
                 $validated['permission_role_id'] = null;
+            }
+            if (empty($validated['is_employee']) || $validated['is_employee'] == 0) {
+                $validated['is_employee'] = 0;
+                $validated['employee_id'] = null;
+            }
+            if (!isset($validated['allow_login'])) {
+                $validated['allow_login'] = 1;
             }
             $validated['added_by']   = Auth::user()->id;
             $validated['updated_by'] = Auth::user()->id;
@@ -94,7 +102,8 @@ class AdminProfileController extends Controller
         }
 
         $roles = get_cols_where(PermissionRole::class, ['id', 'name'], ['is_active' => 1, 'company_id' => $company_id]);
-        return view('admin.adminProfile.update', compact('admin', 'roles'));
+        $employees = get_cols_where(\App\Models\Employee::class, ['id', 'name', 'employee_code', 'email', 'birth_date', 'gender', 'nationality_number', 'work_telephone', 'home_telephone', 'home_address', 'stable_address'], ['company_id' => $company_id]);
+        return view('admin.adminProfile.update', compact('admin', 'roles', 'employees'));
     }
 
     /**
@@ -126,6 +135,10 @@ class AdminProfileController extends Controller
             $validated = $request->validated();
             if ($validated['is_master_admin'] == 1) {
                 $validated['permission_role_id'] = null;
+            }
+            if (empty($validated['is_employee']) || $validated['is_employee'] == 0) {
+                $validated['is_employee'] = 0;
+                $validated['employee_id'] = null;
             }
             $validated['updated_by'] = Auth::user()->id;
 

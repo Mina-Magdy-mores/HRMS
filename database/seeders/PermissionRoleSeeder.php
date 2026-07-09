@@ -99,13 +99,13 @@ class PermissionRoleSeeder extends Seeder
 
     private function grantHrManagerPermissions(PermissionRole $role)
     {
-        $targetMainMenuNames = ['قائمة شئون الموظفين', 'الحضور والانصراف', 'التحقيقات الإدارية'];
+        $targetMainMenuNames = ['قائمة شئون الموظفين', 'الحضور والانصراف', 'التحقيقات الإدارية', 'قائمة المهام', 'قائمة الطلبات'];
         $this->grantSpecificMainMenus($role, $targetMainMenuNames);
     }
 
     private function grantHrSpecialistPermissions(PermissionRole $role)
     {
-        $targetMainMenuNames = ['قائمة شئون الموظفين', 'الحضور والانصراف'];
+        $targetMainMenuNames = ['قائمة شئون الموظفين', 'الحضور والانصراف', 'قائمة المهام', 'قائمة الطلبات'];
         $this->grantSpecificMainMenus($role, $targetMainMenuNames);
     }
 

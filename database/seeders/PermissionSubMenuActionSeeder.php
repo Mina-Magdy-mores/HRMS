@@ -115,6 +115,15 @@ class PermissionSubMenuActionSeeder extends Seeder
 
                 // Map other custom actions for specific submenus
                 switch ($subMenu->name) {
+                    case 'مهام الموظفين':
+                        $currentActions = ['عرض', 'إضافة', 'تعديل', 'حذف', 'أرشفة', 'رد الموظف'];
+                        break;
+                    case 'أنواع طلبات الموظفين':
+                        $currentActions = ['عرض', 'إضافة', 'تعديل', 'حذف'];
+                        break;
+                    case 'طلبات الموظفين':
+                        $currentActions = ['عرض', 'إضافة', 'تعديل', 'حذف', 'تغيير الحالة', 'أرشفة'];
+                        break;
                     case 'بيانات الموظفين':
                         $currentActions[] = 'أرشيف';
                         break;

@@ -535,35 +535,31 @@ trait GeneralTrait
 
         // إجازات الرصيد: تُخصم تلقائياً من سجل رصيد الإجازات السنوية
         // (اعتيادية، سنوية، مرضية، زواج، وضع/أمومة، حج، عزاء، عيد ميلاد، ميلاد، وغيرها)
-        if (!empty($balanceDeductibleGroups)) {
-            // الحصول على سنة وشهر الراتب من التقويم المالي
-            $calendar = \App\Models\FinanceMonthlyCalendar::find($finance_monthly_calendar_id);
-            if ($calendar) {
-                $yearMonth = $calendar->year_and_month; // e.g. "2028-03"
+        $calendar = \App\Models\FinanceMonthlyCalendar::find($finance_monthly_calendar_id);
+        if ($calendar) {
+            $yearMonth = $calendar->year_and_month; // e.g. "2028-03"
 
-                // إيجاد سجل الرصيد لهذا الموظف في هذا الشهر
-                $balanceRecord = \App\Models\MainEmployeesVacationsBalances::where([
-                    'employee_id' => $employee_id,
-                    'year_and_month' => $yearMonth,
-                    'company_id' => $company_id,
-                ])->first();
+            $balanceRecord = \App\Models\MainEmployeesVacationsBalances::where([
+                'employee_id'    => $employee_id,
+                'year_and_month' => $yearMonth,
+                'company_id'     => $company_id,
+            ])->first();
 
-                if ($balanceRecord) {
-                    // حساب إجمالي الأيام المستهلكة من الرصيد
-                    $totalBalanceDays = 0;
-                    foreach ($balanceDeductibleGroups as $vacId => $daysAmount) {
-                        $totalBalanceDays += $daysAmount;
-                    }
-
-                    // تحديث الرصيد
-                    $newSpent     = (float)$balanceRecord->spent_balance + $totalBalanceDays;
-                    $newRemaining = (float)$balanceRecord->total_available_balance - $newSpent;
-
-                    $balanceRecord->update([
-                        'spent_balance'       => $newSpent,
-                        'remaining_net_balance' => max(0, $newRemaining),
-                    ]);
+            if ($balanceRecord) {
+                // حساب إجمالي أيام الرصيد المستهلك من البصمة لهذا الشهر
+                // (نحسب القيمة من الصفر في كل سحب لتجنب التراكم)
+                $totalBalanceDays = 0;
+                foreach ($balanceDeductibleGroups as $vacId => $daysAmount) {
+                    $totalBalanceDays += $daysAmount;
                 }
+
+                // نضبط القيمة مباشرة بدلاً من الجمع على الموجود
+                $newRemaining = (float)$balanceRecord->total_available_balance - $totalBalanceDays;
+
+                $balanceRecord->update([
+                    'spent_balance'        => $totalBalanceDays,
+                    'remaining_net_balance' => max(0, $newRemaining),
+                ]);
             }
         }
 

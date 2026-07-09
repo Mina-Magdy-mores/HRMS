@@ -88,6 +88,10 @@ class AttendanceDepartureController extends Controller
     public function fingerPrintDetails($id, $finance_monthly_calendar_id)
     {
         $company_id = Auth::user()->company_id;
+        $currentUser = Auth::user();
+        if ($currentUser->is_employee == 1 && $id != $currentUser->employee_id) {
+            abort(403, 'غير مصرح لك بمشاهدة بصمة موظف آخر.');
+        }
         $financeMonthlyCalendar = FinanceMonthlyCalendar::with('month')
             ->where('company_id', $company_id)
             ->where('id', $finance_monthly_calendar_id)
@@ -397,6 +401,10 @@ class AttendanceDepartureController extends Controller
         if ($request->ajax()) {
             $company_id = Auth::user()->company_id;
             $employee_id = $request->employee_id;
+            $currentUser = Auth::user();
+            if ($currentUser->is_employee == 1 && $employee_id != $currentUser->employee_id) {
+                return response()->json(['error' => 'غير مصرح لك بمشاهدة بصمة موظف آخر.'], 403);
+            }
             $finance_monthly_calendar_id = $request->finance_monthly_calendar_id;
             $adminPanelSetting = getColsWhereRow(AdminPanelSetting::class, ['id', 'is_allowed_to_pull_annual_from_fingerprint'], ['company_id' => $company_id]);
             $financeMonthlyCalendar = FinanceMonthlyCalendar::with('month')
@@ -660,7 +668,7 @@ class AttendanceDepartureController extends Controller
                 ];
             }
 
-            $is_editable = (bool)$financeMonthlyCalendar;
+            $is_editable = (bool)$financeMonthlyCalendar && (Auth::user()->is_employee == 0);
 
             // Calculate totals
             $totals = [

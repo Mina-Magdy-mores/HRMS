@@ -65,6 +65,7 @@ class DatabaseSeeder extends Seeder
             SalaryGrantTypeSeeder::class,
             AlertModuleSeeder::class,
             AlertMoveTypeSeeder::class,
+            EmployeeRequestTypeSeeder::class,
         ]);
 
         $this->command->info('✅ All seeders completed successfully!');

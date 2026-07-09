@@ -10,6 +10,16 @@ class PermissionSubMenuSeeder extends Seeder
 {
     public function run(): void
     {
+        // تحديث معرفات القوائم الرئيسية السابقة للمهام والطلبات لمنع تكرار الحقول
+        $tasksMainMenu = PermissionMainMenu::where('name', 'قائمة المهام')->first();
+        if ($tasksMainMenu) {
+            PermissionSubMenu::where('name', 'مهام الموظفين')->update(['permission_main_menu_id' => $tasksMainMenu->id]);
+        }
+        $requestsMainMenu = PermissionMainMenu::where('name', 'قائمة الطلبات')->first();
+        if ($requestsMainMenu) {
+            PermissionSubMenu::whereIn('name', ['أنواع طلبات الموظفين', 'طلبات الموظفين'])->update(['permission_main_menu_id' => $requestsMainMenu->id]);
+        }
+
         $submenus = [
             'قائمة الضبط' => [
                 'الضبط العام',
@@ -35,6 +45,13 @@ class PermissionSubMenuSeeder extends Seeder
                 'انواع الخصم للراتب',
                 'انواع المكافآت للراتب',
             ],
+            'قائمة المهام' => [
+                'مهام الموظفين',
+            ],
+            'قائمة الطلبات' => [
+                'أنواع طلبات الموظفين',
+                'طلبات الموظفين',
+            ],
             'قائمة أجور الموظفين' => [
                 'بيانات رواتب الموظفين',
                 'الجزاءات اليدويه',
@@ -59,6 +76,9 @@ class PermissionSubMenuSeeder extends Seeder
                 'أنواع منح الرواتب',
                 'المكافئات المباشرة',
                 'المنح المباشرة',
+            ],
+            'المحادثات' => [
+                'المحادثات والدردشة',
             ],
             'مراقبة النظام' => [
                 'سجلات النظام العامة',

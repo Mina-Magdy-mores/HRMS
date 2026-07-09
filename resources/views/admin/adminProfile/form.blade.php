@@ -223,6 +223,54 @@
                         </div>
                     </div>
 
+                    <!-- هل هو موظف؟ -->
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>هل هو موظف؟ <span class="text-danger">*</span></label>
+                            <select name="is_employee" id="is_employee" class="form-control {{ $errors->has('is_employee') ? 'is-invalid' : '' }}">
+                                <option value="0" {{ old('is_employee') == 0 ? 'selected' : '' }}>لا (مستخدم لوحة التحكم)</option>
+                                <option value="1" {{ old('is_employee') == 1 ? 'selected' : '' }}>نعم (موظف في الشركة)</option>
+                            </select>
+                            @include('admin.errors.errors', ['value' => 'is_employee'])
+                        </div>
+                    </div>
+
+                    <!-- سماحية الدخول للموظف -->
+                    <div class="col-md-4" id="allow_login_container" style="display: none;">
+                        <div class="form-group">
+                            <label>سماحية الدخول إلى النظام <span class="text-danger">*</span></label>
+                            <select name="allow_login" class="form-control {{ $errors->has('allow_login') ? 'is-invalid' : '' }}">
+                                <option value="1" {{ old('allow_login', 1) == 1 ? 'selected' : '' }}>نعم (مسموح بالدخول)</option>
+                                <option value="0" {{ old('allow_login') === 0 || old('allow_login') === '0' ? 'selected' : '' }}>لا (حظر الدخول)</option>
+                            </select>
+                            @include('admin.errors.errors', ['value' => 'allow_login'])
+                        </div>
+                    </div>
+
+                    <!-- الموظف المرتبط -->
+                    <div class="col-md-4" id="employee_container" style="display: none;">
+                        <div class="form-group">
+                            <label>اختر الموظف <span class="text-danger">*</span></label>
+                            <select name="employee_id" id="employee_id" class="form-control {{ $errors->has('employee_id') ? 'is-invalid' : '' }}">
+                                <option value="">اختر الموظف</option>
+                                @foreach($employees as $emp)
+                                    <option value="{{ $emp->id }}" 
+                                        data-name="{{ $emp->name }}"
+                                        data-email="{{ $emp->email }}"
+                                        data-birth-date="{{ $emp->birth_date }}"
+                                        data-gender="{{ $emp->gender == 1 ? 'male' : ($emp->gender == 2 ? 'female' : '') }}"
+                                        data-national-id="{{ $emp->nationality_number }}"
+                                        data-phone="{{ $emp->work_telephone ?: $emp->home_telephone }}"
+                                        data-address="{{ $emp->home_address ?: $emp->stable_address }}"
+                                        {{ old('employee_id') == $emp->id ? 'selected' : '' }}>
+                                        {{ $emp->name }} (كود: {{ $emp->employee_code }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            @include('admin.errors.errors', ['value' => 'employee_id'])
+                        </div>
+                    </div>
+
                     <div class="col-12 mt-2">
                         <h5 class="mb-4 text-primary">
                             <i class="fas fa-id-card"></i>
@@ -346,5 +394,43 @@
     }
     isMasterSelect.addEventListener('change', toggleRoleSelect);
     toggleRoleSelect();
+
+    const isEmployeeSelect = document.getElementById('is_employee');
+    const employeeContainer = document.getElementById('employee_container');
+    const allowLoginContainer = document.getElementById('allow_login_container');
+    const employeeSelect = document.getElementById('employee_id');
+
+    function toggleEmployeeSelect() {
+        if (isEmployeeSelect.value == '1') {
+            employeeContainer.style.display = 'block';
+            allowLoginContainer.style.display = 'block';
+        } else {
+            employeeContainer.style.display = 'none';
+            allowLoginContainer.style.display = 'none';
+        }
+    }
+    isEmployeeSelect.addEventListener('change', toggleEmployeeSelect);
+    toggleEmployeeSelect();
+
+    employeeSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption && selectedOption.value !== "") {
+            const name = selectedOption.getAttribute('data-name') || '';
+            const email = selectedOption.getAttribute('data-email') || '';
+            const birthDate = selectedOption.getAttribute('data-birth-date') || '';
+            const gender = selectedOption.getAttribute('data-gender') || '';
+            const nationalId = selectedOption.getAttribute('data-national-id') || '';
+            const phone = selectedOption.getAttribute('data-phone') || '';
+            const address = selectedOption.getAttribute('data-address') || '';
+
+            document.querySelector('input[name="name"]').value = name;
+            document.querySelector('input[name="email"]').value = email;
+            document.querySelector('input[name="birth_date"]').value = birthDate;
+            document.querySelector('select[name="gender"]').value = gender;
+            document.querySelector('input[name="national_id"]').value = nationalId;
+            document.querySelector('input[name="phone"]').value = phone;
+            document.querySelector('input[name="address"]').value = address;
+        }
+    });
 </script>
 @endpush

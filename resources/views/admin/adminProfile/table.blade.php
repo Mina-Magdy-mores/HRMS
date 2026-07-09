@@ -115,6 +115,7 @@
                             <th>الهاتف</th>
                             <th>الرقم القومي</th>
                             <th>الجنس</th>
+                            <th>دخول النظام</th>
                             <th>الحالة</th>
                             <th>تاريخ الميلاد</th>
                             <th>تاريخ الإضافة</th>
@@ -159,6 +160,12 @@
                                 @else
                                 <span class="badge badge-info">{{ $admin->permissionRole->name ?? 'بدون صلاحية' }}</span>
                                 @endif
+                                @if($admin->is_employee && $admin->employee_id)
+                                <br>
+                                <span class="badge badge-success mt-1 shadow-sm" title="حساب موظف مرتبط">
+                                    <i class="fas fa-id-badge"></i> موظف: {{ $admin->employee->name ?? '---' }}
+                                </span>
+                                @endif
                             </td>
 
                             <td>
@@ -188,6 +195,24 @@
                                 </span>
                                 @else
                                 <span class="text-muted">---</span>
+                                @endif
+                            </td>
+
+                            <td>
+                                @if($admin->is_employee == 1)
+                                    @if($admin->allow_login == 1)
+                                    <span class="badge badge-success px-3 py-2">
+                                        <i class="fas fa-sign-in-alt"></i> مسموح بالدخول
+                                    </span>
+                                    @else
+                                    <span class="badge badge-danger px-3 py-2">
+                                        <i class="fas fa-ban"></i> حظر الدخول
+                                    </span>
+                                    @endif
+                                @else
+                                    <span class="badge badge-info px-3 py-2">
+                                        <i class="fas fa-user-shield"></i> مدير النظام
+                                    </span>
                                 @endif
                             </td>
 

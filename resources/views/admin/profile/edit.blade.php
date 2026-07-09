@@ -325,6 +325,10 @@
                     <i class="fas fa-save mr-1"></i>
                     حفظ التغييرات
                 </button>
+                <a href="{{ route('admin.dashboard') }}" class="btn btn-danger shadow px-5 mr-2">
+                    <i class="fas fa-times-circle mr-1"></i>
+                    إلغاء
+                </a>
             </div>
 
         </form>

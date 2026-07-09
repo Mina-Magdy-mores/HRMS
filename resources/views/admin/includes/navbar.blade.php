@@ -33,90 +33,77 @@
       <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">
           <i class="far fa-comments"></i>
-          <span class="badge badge-danger navbar-badge">3</span>
+          <span class="badge badge-danger navbar-badge d-none" id="navbar-unread-messages-badge">0</span>
         </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <a href="#" class="dropdown-item">
-            <!-- Message Start -->
-            <div class="media">
-              <img src="{{ asset('assets/dist/img/user1-128x128.jpg') }}" alt="User Avatar" class="img-size-50 mr-3 img-circle">
-              <div class="media-body">
-                <h3 class="dropdown-item-title">
-                  Brad Diesel
-                  <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">Call me whenever you can...</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-              </div>
-            </div>
-            <!-- Message End -->
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <!-- Message Start -->
-            <div class="media">
-              <img src="{{ asset('assets/dist/img/user8-128x128.jpg') }}" alt="User Avatar" class="img-size-50 img-circle mr-3">
-              <div class="media-body">
-                <h3 class="dropdown-item-title">
-                  John Pierce
-                  <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">I got your message bro</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-              </div>
-            </div>
-            <!-- Message End -->
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <!-- Message Start -->
-            <div class="media">
-              <img src="{{ asset('assets/dist/img/user3-128x128.jpg') }}" alt="User Avatar" class="img-size-50 img-circle mr-3">
-              <div class="media-body">
-                <h3 class="dropdown-item-title">
-                  Nora Silvester
-                  <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>
-                </h3>
-                <p class="text-sm">The subject goes here</p>
-                <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>
-              </div>
-            </div>
-            <!-- Message End -->
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right text-right" id="navbar-unread-messages-dropdown">
+          <!-- Loaded dynamically via AJAX -->
+          <div class="dropdown-header text-center py-3">
+              <i class="fas fa-spinner fa-spin mr-1"></i> جاري تحميل الرسائل...
+          </div>
         </div>
       </li>
-      <!-- Notifications Dropdown Menu -->
+      <!-- Notifications Dropdown Menu (Employee Requests) -->
+      @if(auth()->user()->is_employee == 0)
       <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">
-          <i class="far fa-bell"></i>
-          <span class="badge badge-warning navbar-badge">15</span>
+          <i class="fas fa-file-signature"></i>
+          @if(isset($pendingRequestsCount) && $pendingRequestsCount > 0)
+            <span class="badge badge-danger navbar-badge">{{ $pendingRequestsCount }}</span>
+          @endif
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <span class="dropdown-header">15 Notifications</span>
+          <span class="dropdown-header">
+            @if(isset($pendingRequestsCount) && $pendingRequestsCount > 0)
+              لديك {{ $pendingRequestsCount }} طلب معلق جديد
+            @else
+              لا توجد طلبات معلقة جديدة
+            @endif
+          </span>
+          @if(isset($pendingRequests) && $pendingRequests->isNotEmpty())
+            @foreach($pendingRequests as $pReq)
+              <div class="dropdown-divider"></div>
+              <a href="{{ route('admin.employee-requests.show', $pReq->id) }}" class="dropdown-item">
+                <i class="fas fa-file-alt mr-2 text-info"></i>
+                <span class="text-truncate d-inline-block" style="max-width: 160px; vertical-align: middle;">{{ $pReq->title }}</span>
+                <span class="float-right text-muted text-xs">{{ $pReq->created_at ? $pReq->created_at->diffForHumans(null, true) : '' }}</span>
+              </a>
+            @endforeach
+          @endif
           <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-envelope mr-2"></i> 4 new messages
-            <span class="float-right text-muted text-sm">3 mins</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-users mr-2"></i> 8 friend requests
-            <span class="float-right text-muted text-sm">12 hours</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fas fa-file mr-2"></i> 3 new reports
-            <span class="float-right text-muted text-sm">2 days</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+          <a href="{{ route('admin.employee-requests.index') }}" class="dropdown-item dropdown-footer">عرض كافة الطلبات</a>
         </div>
       </li>
+      @endif
       <li class="nav-item">
         <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#"><i
             class="fas fa-th-large"></i></a>
       </li>
     </ul>
   </nav>
+
+<script>
+    function loadNavbarUnreadCount() {
+        if (typeof jQuery === 'undefined') return;
+        jQuery.ajax({
+            url: '{{ route("admin.chats.unreadCount") }}',
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                var badge = jQuery('#navbar-unread-messages-badge');
+                if (response.unread_count > 0) {
+                    badge.removeClass('d-none').text(response.unread_count);
+                } else {
+                    badge.addClass('d-none').text('0');
+                }
+                jQuery('#navbar-unread-messages-dropdown').html(response.html);
+            }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Run once on load
+        setTimeout(loadNavbarUnreadCount, 500);
+        // Poll every 12 seconds
+        setInterval(loadNavbarUnreadCount, 12000);
+    });
+</script>

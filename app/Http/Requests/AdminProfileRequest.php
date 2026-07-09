@@ -38,6 +38,9 @@ class AdminProfileRequest extends FormRequest
             'status'           => 'required|integer|in:0,1',
             'is_master_admin'  => 'required|integer|in:0,1',
             'permission_role_id'=> 'nullable|exists:permission_roles,id',
+            'is_employee'      => 'nullable|integer|in:0,1',
+            'employee_id'      => 'nullable|exists:employees,id',
+            'allow_login'      => 'nullable|integer|in:0,1',
         ];
 
         if ($this->isMethod('put') || $this->isMethod('patch')) {
@@ -80,6 +83,7 @@ class AdminProfileRequest extends FormRequest
             'is_master_admin.required' => 'تحديد نوع الحساب (مدير رئيسي) مطلوب',
             'is_master_admin.in'       => 'قيمة نوع الحساب غير صحيحة',
             'permission_role_id.exists'=> 'دور الصلاحية المختار غير موجود في سجلاتنا',
+            'allow_login.in'           => 'قيمة سماحية دخول النظام غير صحيحة',
         ];
     }
 }

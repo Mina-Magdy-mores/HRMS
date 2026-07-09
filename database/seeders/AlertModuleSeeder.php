@@ -50,6 +50,9 @@ class AlertModuleSeeder extends Seeder
             ['name' => 'أنواع منح الرواتب'],
             ['name' => 'المكافئات المباشرة'],
             ['name' => 'المنح المباشرة'],
+            ['name' => 'مهام الموظفين'],
+            ['name' => 'أنواع طلبات الموظفين'],
+            ['name' => 'طلبات الموظفين'],
         ];
 
         foreach ($modules as $module) {

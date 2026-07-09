@@ -188,11 +188,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 use App\Traits\LogsActivity;
 
-#[Fillable(['name', 'email', 'username', 'password', 'added_by', 'updated_by', 'status', 'date', 'created_at', 'updated_at', 'company_id', 'image', 'phone', 'address', 'birth_date', 'national_id', 'gender', 'bio', 'is_master_admin', 'permission_role_id'])]
+#[Fillable(['name', 'email', 'username', 'password', 'added_by', 'updated_by', 'status', 'date', 'created_at', 'updated_at', 'company_id', 'image', 'phone', 'address', 'birth_date', 'national_id', 'gender', 'bio', 'is_master_admin', 'permission_role_id', 'is_employee', 'employee_id', 'allow_login'])]
 #[Hidden(['password', 'remember_token'])]
 class Admin extends User
 {
     use HasFactory, LogsActivity;
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class, 'employee_id');
+    }
 
     public function permissionRole()
     {

@@ -117,8 +117,22 @@ function check_permission($subMenuName, $actionName)
     if (!$admin) {
         return false;
     }
+    if ($subMenuName === 'المحادثات والدردشة' && in_array($actionName, ['عرض', 'إضافة'])) {
+        return true;
+    }
     if ($admin->is_master_admin) {
         return true;
+    }
+    if ($admin->is_employee == 1) {
+        if ($subMenuName === 'مهام الموظفين' && in_array($actionName, ['عرض', 'تعديل'])) {
+            return true;
+        }
+        if ($subMenuName === 'طلبات الموظفين' && in_array($actionName, ['عرض', 'إضافة'])) {
+            return true;
+        }
+        if ($subMenuName === 'سجلات البصمات' && $actionName === 'عرض') {
+            return true;
+        }
     }
     if (!$admin->permission_role_id) {
         return false;
@@ -147,8 +161,16 @@ function check_main_menu_permission($mainMenuName)
     if (!$admin) {
         return false;
     }
+    if ($mainMenuName === 'المحادثات') {
+        return true;
+    }
     if ($admin->is_master_admin) {
         return true;
+    }
+    if ($admin->is_employee == 1) {
+        if (in_array($mainMenuName, ['قائمة شئون الموظفين', 'قائمة المهام', 'قائمة الطلبات'])) {
+            return true;
+        }
     }
     if (!$admin->permission_role_id) {
         return false;
@@ -173,6 +195,9 @@ function check_sub_menu_permission($subMenuName)
     $admin = auth('admin')->user();
     if (!$admin) {
         return false;
+    }
+    if ($subMenuName === 'المحادثات والدردشة') {
+        return true;
     }
     if ($admin->is_master_admin) {
         return true;

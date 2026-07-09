@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AttendanceDepartureController;
+use App\Http\Controllers\Admin\ChatController;
 use App\Http\Controllers\Admin\AdminPanelSettingController;
 use App\Http\Controllers\Admin\AllowanceTypeController;
 use App\Http\Controllers\Admin\BloodGroupController;
@@ -46,6 +47,10 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SalaryGrantTypeController;
 use App\Http\Controllers\Admin\DirectBonusController;
 use App\Http\Controllers\Admin\DirectGrantController;
+use App\Http\Controllers\Admin\EmployeeTaskController;
+use App\Http\Controllers\Admin\EmployeeDashboardController;
+use App\Http\Controllers\Admin\EmployeeRequestTypeController;
+use App\Http\Controllers\Admin\EmployeeRequestController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -248,6 +253,7 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::delete('/cities/{id}', [CityController::class, 'destroy'])->name('cities.destroy')->middleware('permission:المدن,حذف');
 
         //employees routs
+        Route::get('/employee-dashboard', [EmployeeDashboardController::class, 'index'])->name('employee-dashboard.index');
         Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index')->middleware('permission:بيانات الموظفين,عرض');
         Route::get('/employees/{id}/details', [EmployeeController::class, 'getDetails'])->name('employees.details')->middleware('permission:بيانات الموظفين,عرض');
         Route::get('/employees/{id}/show', [EmployeeController::class, 'show'])->name('employees.show')->middleware('permission:بيانات الموظفين,عرض');
@@ -289,6 +295,19 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::get('/bonuses/{id}/edit', [BonusController::class, 'edit'])->name('bonuses.edit')->middleware('permission:انواع المكافآت للراتب,تعديل');
         Route::put('/bonuses/{id}', [BonusController::class, 'update'])->name('bonuses.update')->middleware('permission:انواع المكافآت للراتب,تعديل');
         Route::delete('/bonuses/{id}', [BonusController::class, 'destroy'])->name('bonuses.destroy')->middleware('permission:انواع المكافآت للراتب,حذف');
+
+        // EmployeeTasks routes
+        Route::get('/employee-tasks', [EmployeeTaskController::class, 'index'])->name('employee-tasks.index')->middleware('permission:مهام الموظفين,عرض');
+        Route::get('/employee-tasks/create', [EmployeeTaskController::class, 'create'])->name('employee-tasks.create')->middleware('permission:مهام الموظفين,إضافة');
+        Route::post('/employee-tasks', [EmployeeTaskController::class, 'store'])->name('employee-tasks.store')->middleware('permission:مهام الموظفين,إضافة');
+        Route::get('/employee-tasks/{id}/edit', [EmployeeTaskController::class, 'edit'])->name('employee-tasks.edit')->middleware('permission:مهام الموظفين,تعديل');
+        Route::put('/employee-tasks/{id}', [EmployeeTaskController::class, 'update'])->name('employee-tasks.update')->middleware('permission:مهام الموظفين,تعديل');
+        Route::get('/employee-tasks/{id}/archive', [EmployeeTaskController::class, 'archive'])->name('employee-tasks.archive')->middleware('permission:مهام الموظفين,أرشفة');
+        Route::get('/employee-tasks/{id}/toggle-status', [EmployeeTaskController::class, 'toggleStatus'])->name('employee-tasks.toggle-status')->middleware('permission:مهام الموظفين,تعديل');
+        Route::delete('/employee-tasks/{id}', [EmployeeTaskController::class, 'destroy'])->name('employee-tasks.destroy')->middleware('permission:مهام الموظفين,حذف');
+        Route::post('/employee-tasks/{id}/reply', [EmployeeTaskController::class, 'reply'])->name('employee-tasks.reply')->middleware('permission:مهام الموظفين,تعديل');
+        Route::get('/employee-tasks/{id}/show', [EmployeeTaskController::class, 'show'])->name('employee-tasks.show')->middleware('permission:مهام الموظفين,عرض');
+        Route::post('/employee-tasks/{id}/comment', [EmployeeTaskController::class, 'comment'])->name('employee-tasks.comment')->middleware('permission:مهام الموظفين,عرض');
 
         //SalaryGrantType routes
         Route::get('/salary-grant-types', [SalaryGrantTypeController::class, 'index'])->name('salary-grant-types.index')->middleware('permission:أنواع منح الرواتب,عرض');
@@ -445,7 +464,22 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::put('/direct-bonuses/{id}', [DirectBonusController::class, 'update'])->name('direct-bonuses.update')->middleware('permission:المكافئات المباشرة,تعديل');
         Route::delete('/direct-bonuses/{id}', [DirectBonusController::class, 'destroy'])->name('direct-bonuses.destroy')->middleware('permission:المكافئات المباشرة,حذف');
         Route::post('/direct-bonuses/ajax-search', [DirectBonusController::class, 'ajaxSearch'])->name('direct-bonuses.ajax-search')->middleware('permission:المكافئات المباشرة,عرض');
+        // EmployeeRequestTypes routes
+        Route::get('/employee-request-types', [EmployeeRequestTypeController::class, 'index'])->name('employee-request-types.index')->middleware('permission:أنواع طلبات الموظفين,عرض');
+        Route::get('/employee-request-types/create', [EmployeeRequestTypeController::class, 'create'])->name('employee-request-types.create')->middleware('permission:أنواع طلبات الموظفين,إضافة');
+        Route::post('/employee-request-types', [EmployeeRequestTypeController::class, 'store'])->name('employee-request-types.store')->middleware('permission:أنواع طلبات الموظفين,إضافة');
+        Route::get('/employee-request-types/{id}/edit', [EmployeeRequestTypeController::class, 'edit'])->name('employee-request-types.edit')->middleware('permission:أنواع طلبات الموظفين,تعديل');
+        Route::put('/employee-request-types/{id}', [EmployeeRequestTypeController::class, 'update'])->name('employee-request-types.update')->middleware('permission:أنواع طلبات الموظفين,تعديل');
+        Route::delete('/employee-request-types/{id}', [EmployeeRequestTypeController::class, 'destroy'])->name('employee-request-types.destroy')->middleware('permission:أنواع طلبات الموظفين,حذف');
 
+        // EmployeeRequests routes
+        Route::get('/employee-requests', [EmployeeRequestController::class, 'index'])->name('employee-requests.index')->middleware('permission:طلبات الموظفين,عرض');
+        Route::get('/employee-requests/create', [EmployeeRequestController::class, 'create'])->name('employee-requests.create')->middleware('permission:طلبات الموظفين,إضافة');
+        Route::post('/employee-requests', [EmployeeRequestController::class, 'store'])->name('employee-requests.store')->middleware('permission:طلبات الموظفين,إضافة');
+        Route::get('/employee-requests/{id}/show', [EmployeeRequestController::class, 'show'])->name('employee-requests.show')->middleware('permission:طلبات الموظفين,عرض');
+        Route::post('/employee-requests/{id}/comment', [EmployeeRequestController::class, 'comment'])->name('employee-requests.comment')->middleware('permission:طلبات الموظفين,عرض');
+        Route::post('/employee-requests/{id}/change-status', [EmployeeRequestController::class, 'changeStatus'])->name('employee-requests.change-status')->middleware('permission:طلبات الموظفين,تغيير الحالة');
+        Route::post('/employee-requests/{id}/archive', [EmployeeRequestController::class, 'archive'])->name('employee-requests.archive')->middleware('permission:طلبات الموظفين,أرشفة');
         // DirectGrant routes
         Route::get('/direct-grants', [DirectGrantController::class, 'index'])->name('direct-grants.index')->middleware('permission:المنح المباشرة,عرض');
         Route::get('/direct-grants/create', [DirectGrantController::class, 'create'])->name('direct-grants.create')->middleware('permission:المنح المباشرة,إضافة');
@@ -491,6 +525,12 @@ Route::prefix('/admin')->name('admin.')->group(function () {
         Route::post('/system-monitoring/{id}/toggle-important', [AlertSystemMonitoringController::class, 'toggleImportant'])->name('system-monitoring.toggle-important')->middleware('permission:سجلات النظام العامة,تعديل');
         Route::delete('/system-monitoring/{id}', [AlertSystemMonitoringController::class, 'destroy'])->name('system-monitoring.destroy')->middleware('permission:سجلات النظام العامة,حذف');
         Route::post('/system-monitoring/ajax-search', [AlertSystemMonitoringController::class, 'ajaxSearch'])->name('system-monitoring.ajax-search')->middleware('permission:سجلات النظام العامة,عرض');
+
+        // Chats/Messages System routes
+        Route::get('/chats', [ChatController::class, 'index'])->name('chats.index')->middleware('permission:المحادثات والدردشة,عرض');
+        Route::get('/chats/history/{receiver_id}', [ChatController::class, 'history'])->name('chats.history')->middleware('permission:المحادثات والدردشة,عرض');
+        Route::post('/chats/send', [ChatController::class, 'sendMessage'])->name('chats.send')->middleware('permission:المحادثات والدردشة,إضافة');
+        Route::get('/chats/unread-count', [ChatController::class, 'unreadCount'])->name('chats.unreadCount')->middleware('permission:المحادثات والدردشة,عرض');
     });
 
     // guest routes
