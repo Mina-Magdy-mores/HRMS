@@ -15,7 +15,13 @@ class FinanceCalendarSeeder extends Seeder
                 'finance_yr_desc' => 'السنة المالية 2026',
                 'start_date' => '2026-01-01',
                 'end_date' => '2026-12-31',
-            ]
+            ],
+            [
+                'finance_yr' => 2027,
+                'finance_yr_desc' => 'السنة المالية 2027',
+                'start_date' => '2027-01-01',
+                'end_date' => '2027-12-31',
+            ],
         ];
 
         foreach ($financeCalendars as $calendar) {
