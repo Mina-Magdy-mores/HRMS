@@ -6,51 +6,39 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\EmployeeTaskRequest;
 use App\Models\EmployeeTask;
 use App\Models\Employee;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Services\HR\EmployeeTaskService;
 
 class EmployeeTaskController extends Controller
 {
+    protected $service;
+
+    public function __construct(EmployeeTaskService $service)
+    {
+        $this->service = $service;
+    }
+
     /**
      * Display a listing of the tasks.
      */
     public function index(Request $request)
     {
         $company_id = Auth::user()->company_id;
-        
         $currentUser = Auth::user();
         $showArchived = $request->get('show_archived', 0);
         $employeeId   = $request->get('employee_id');
         $isCompleted  = $request->get('is_completed');
 
-        $where = [
-            'company_id'  => $company_id,
-            'is_archived' => $showArchived,
+        $filters = [
+            'show_archived' => $showArchived,
+            'employee_id' => ($currentUser->is_employee == 1) ? $currentUser->employee_id : $employeeId,
+            'is_completed' => $isCompleted
         ];
 
-        if ($currentUser->is_employee == 1) {
-            $where['employee_id'] = $currentUser->employee_id;
-        } else {
-            if ($employeeId !== null && $employeeId !== '') {
-                $where['employee_id'] = $employeeId;
-            }
-        }
+        $tasks = $this->service->getFilteredTasks($filters);
 
-        if ($isCompleted !== null && $isCompleted !== '') {
-            $where['is_completed'] = $isCompleted;
-        }
-
-        $tasks = getColsWhereP(
-            EmployeeTask::class, 
-            ['employee', 'addedBy', 'updatedBy'], 
-            ['*'], 
-            $where, 
-            'id', 
-            'desc', 
-            PAGEINATION_COUNTER
-        );
-
-        // Calculate accurate counts for the 3 states
+        // Calculate counts
         $notStartedQuery = EmployeeTask::where('company_id', $company_id)->where('is_archived', $showArchived);
         $inProgressQuery = EmployeeTask::where('company_id', $company_id)->where('is_archived', $showArchived);
         $completedQuery  = EmployeeTask::where('company_id', $company_id)->where('is_archived', $showArchived);
@@ -95,15 +83,10 @@ class EmployeeTaskController extends Controller
             return redirect()->route('admin.employee-tasks.index')->with('error', 'غير مصرح لك بالقيام بهذا الإجراء');
         }
         try {
-            $company_id = Auth::user()->company_id;
             $validated = $request->validated();
-            
-            $validated['company_id']  = $company_id;
-            $validated['added_by']    = Auth::id();
-            $validated['updated_by']  = Auth::id();
             $validated['is_archived'] = 0;
 
-            insert(EmployeeTask::class, $validated);
+            $this->service->create($validated);
 
             return redirect()->route('admin.employee-tasks.index')->with('success', 'تم إضافة المهمة بنجاح');
         } catch (\Exception $e) {
@@ -120,7 +103,7 @@ class EmployeeTaskController extends Controller
             return redirect()->route('admin.employee-tasks.index')->with('error', 'غير مصرح لك بالقيام بهذا الإجراء');
         }
         $company_id = Auth::user()->company_id;
-        $task = getColsWhereRow(EmployeeTask::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
+        $task = $this->service->getById($id);
         
         if (!$task) {
             return redirect()->route('admin.employee-tasks.index')->with('error', 'المهمة المطلوبة غير موجودة');
@@ -139,17 +122,12 @@ class EmployeeTaskController extends Controller
             return redirect()->route('admin.employee-tasks.index')->with('error', 'غير مصرح لك بالقيام بهذا الإجراء');
         }
         try {
-            $company_id = Auth::user()->company_id;
-            $task = getColsWhereRow(EmployeeTask::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            
-            if (!$task) {
+            if (!$this->service->getById($id)) {
                 return redirect()->route('admin.employee-tasks.index')->with('error', 'المهمة المطلوبة غير موجودة');
             }
 
             $validated = $request->validated();
-            $validated['updated_by'] = Auth::id();
-
-            update($task, $validated);
+            $this->service->update($id, $validated);
 
             return redirect()->route('admin.employee-tasks.index')->with('success', 'تم تحديث المهمة بنجاح');
         } catch (\Exception $e) {
@@ -166,20 +144,7 @@ class EmployeeTaskController extends Controller
             return redirect()->route('admin.employee-tasks.index')->with('error', 'غير مصرح لك بالقيام بهذا الإجراء');
         }
         try {
-            $company_id = Auth::user()->company_id;
-            $task = getColsWhereRow(EmployeeTask::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            
-            if (!$task) {
-                return redirect()->route('admin.employee-tasks.index')->with('error', 'المهمة المطلوبة غير موجودة');
-            }
-
-            update($task, [
-                'is_archived' => 1,
-                'archived_by' => Auth::id(),
-                'archived_at' => now(),
-                'updated_by'  => Auth::id(),
-            ]);
-
+            $this->service->archiveTask($id, Auth::id());
             return redirect()->route('admin.employee-tasks.index')->with('success', 'تم أرشفة المهمة بنجاح');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'حدث خطأ ما أثناء الأرشفة: ' . $e->getMessage());
@@ -192,25 +157,8 @@ class EmployeeTaskController extends Controller
     public function toggleStatus($id)
     {
         try {
-            $company_id = Auth::user()->company_id;
             $currentUser = Auth::user();
-            $task = getColsWhereRow(EmployeeTask::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            
-            if (!$task) {
-                return redirect()->route('admin.employee-tasks.index')->with('error', 'المهمة المطلوبة غير موجودة');
-            }
-
-            // Security: check if employee owns the task
-            if ($currentUser->is_employee == 1 && $task->employee_id != $currentUser->employee_id) {
-                return redirect()->route('admin.employee-tasks.index')->with('error', 'غير مصرح لك بتغيير حالة هذه المهمة');
-            }
-
-            $newStatus = ($task->is_completed + 1) % 3;
-            
-            update($task, [
-                'is_completed' => $newStatus,
-                'updated_by'   => Auth::id(),
-            ]);
+            $this->service->toggleTaskStatus($id, Auth::id(), $currentUser->is_employee == 1, $currentUser->employee_id);
 
             return redirect()->back()->with('success', 'تم تغيير حالة المهمة بنجاح');
         } catch (\Exception $e) {
@@ -227,14 +175,11 @@ class EmployeeTaskController extends Controller
             return redirect()->route('admin.employee-tasks.index')->with('error', 'غير مصرح لك بالقيام بهذا الإجراء');
         }
         try {
-            $company_id = Auth::user()->company_id;
-            $task = getColsWhereRow(EmployeeTask::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            
-            if (!$task) {
+            if (!$this->service->getById($id)) {
                 return redirect()->route('admin.employee-tasks.index')->with('error', 'المهمة المطلوبة غير موجودة');
             }
 
-            destroy($task);
+            $this->service->delete($id);
 
             return redirect()->route('admin.employee-tasks.index')->with('success', 'تم حذف المهمة بنجاح');
         } catch (\Exception $e) {
@@ -255,25 +200,8 @@ class EmployeeTaskController extends Controller
         ]);
 
         try {
-            $company_id = Auth::user()->company_id;
             $currentUser = Auth::user();
-
-            $task = getColsWhereRow(EmployeeTask::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            
-            if (!$task) {
-                return redirect()->route('admin.employee-tasks.index')->with('error', 'المهمة المطلوبة غير موجودة');
-            }
-
-            // Security: check if employee owns the task
-            if ($currentUser->is_employee == 1 && $task->employee_id != $currentUser->employee_id) {
-                return redirect()->route('admin.employee-tasks.index')->with('error', 'غير مصرح لك بالرد على هذه المهمة');
-            }
-
-            update($task, [
-                'employee_reply' => $request->employee_reply,
-                'employee_replied_at' => now(),
-                'updated_by' => Auth::id(),
-            ]);
+            $this->service->replyToTask($id, $request->employee_reply, Auth::id(), $currentUser->employee_id);
 
             return redirect()->back()->with('success', 'تم حفظ الرد بنجاح');
         } catch (\Exception $e) {
@@ -318,10 +246,8 @@ class EmployeeTaskController extends Controller
         ]);
 
         try {
-            $company_id = Auth::user()->company_id;
             $currentUser = Auth::user();
-
-            $task = getColsWhereRow(EmployeeTask::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
+            $task = $this->service->getById($id);
             if (!$task) {
                 return redirect()->route('admin.employee-tasks.index')->with('error', 'المهمة المطلوبة غير موجودة');
             }

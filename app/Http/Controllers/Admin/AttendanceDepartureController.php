@@ -25,10 +25,27 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Services\Attendance\AttendanceService;
+use App\Services\Finance\SalaryService;
+use App\Services\HR\VacationService;
 
 class AttendanceDepartureController extends Controller
 {
     use GeneralTrait;
+
+    protected $attendanceService;
+    protected $salaryService;
+    protected $vacationService;
+
+    public function __construct(
+        AttendanceService $attendanceService,
+        SalaryService $salaryService,
+        VacationService $vacationService
+    ) {
+        $this->attendanceService = $attendanceService;
+        $this->salaryService = $salaryService;
+        $this->vacationService = $vacationService;
+    }
     public function index()
     {
         $company_id = Auth::user()->company_id;
@@ -377,18 +394,13 @@ class AttendanceDepartureController extends Controller
         }
 
         try {
-            Excel::import(new AttendanceDepartureImport($financeMonthlyCalendar), $request->file('excel_file'));
+            $this->attendanceService->importFingerprint($financeMonthlyCalendar, $request->file('excel_file'));
 
             $lastUploadedFingerPrint = get_cols_where_row_orderby(new AttendanceDepartureActionsExcel(), ['id', 'created_at', 'added_by'], ['company_id' => $company_id, 'finance_monthly_calendar_id' => $finance_monthly_calendar_id], 'id', 'DESC');
             if ($lastUploadedFingerPrint) {
                 $lastUploadedFingerPrint->load('addedBy');
             }
             $latestActionRecord = get_cols_where_row_orderby(new AttendanceDepartureActionsExcel(), ['id', 'dateTimeAction'], ['company_id' => $company_id, 'finance_monthly_calendar_id' => $finance_monthly_calendar_id], 'dateTimeAction', 'DESC');
-
-            $adminSetting = AdminPanelSetting::where('company_id', $company_id)->first();
-            if ($adminSetting && $adminSetting->is_allowed_to_pull_salary_variables_from_fingerprint == 1) {
-                $this->pullFingerprintVariablesToSalaryForCalendar($finance_monthly_calendar_id, $company_id);
-            }
 
             return redirect()->back()->with('success', 'تم رفع البصمات بنجاح.')->with('lastUploadedFingerPrint', $lastUploadedFingerPrint)->with('latestActionRecord', $latestActionRecord);
         } catch (\Exception $e) {
@@ -622,15 +634,15 @@ class AttendanceDepartureController extends Controller
             // يضمن تحديث: الغيابات، التأخيرات، الانصراف المبكر، الخصومات، الراتب
             // =====================================================================
             if ($financeMonthlyCalendar->status == 1) {
-                AttendanceDeparture::recalculateEmployeeMonth($employee->id, $finance_monthly_calendar_id, $company_id);
+                $this->attendanceService->recalculateEmployeeMonth($employee->id, $finance_monthly_calendar_id, $company_id);
 
                 $adminSetting = AdminPanelSetting::where('company_id', $company_id)->first();
                 if ($adminSetting && $adminSetting->is_allowed_to_pull_salary_variables_from_fingerprint == 1) {
-                    $this->pullFingerprintVariablesToSalary($employee->id, $finance_monthly_calendar_id, $company_id);
+                    $this->salaryService->pullFingerprintVariablesToSalary($employee->id, $finance_monthly_calendar_id, $company_id);
                 }
 
                 if (isset($mainSalaryEmployee) && $mainSalaryEmployee) {
-                    $this->recalculate_main_salary($mainSalaryEmployee->id);
+                    $this->salaryService->recalculateMainSalary($mainSalaryEmployee->id);
                 }
 
                 // Refetch latest data after full recalculation
@@ -732,8 +744,8 @@ class AttendanceDepartureController extends Controller
             $totals['occasion_summary'] = implode(' ، ', $occasionSummary);
 
             //Calculate Total monthly and annual vacation for the employee
-            $this->calculate_employees_vacations_balance($employee_id);
-            $this->calculate_employees_vacations_balance($employee_id);
+            $this->vacationService->calculateEmployeesVacationsBalance($employee_id);
+            $this->vacationService->calculateEmployeesVacationsBalance($employee_id);
             $employee->refresh();
 
             // Return rendered HTML partial
@@ -836,8 +848,8 @@ class AttendanceDepartureController extends Controller
             if ($flag) {
                 //إجازة سنوية == 16
                 if ($data['vacation_id'] == 16 || $attendance->vacation_id == 16) {
-                    $this->calculate_employees_vacations_balance($employee_id);
-                    $this->calculate_employees_vacations_balance($employee_id);
+                    $this->vacationService->calculateEmployeesVacationsBalance($employee_id);
+                    $this->vacationService->calculateEmployeesVacationsBalance($employee_id);
                     $adminPanelSetting = AdminPanelSetting::select('is_allowed_to_pull_annual_from_fingerprint')
                         ->where('company_id', $company_id)
                         ->first();
@@ -867,7 +879,7 @@ class AttendanceDepartureController extends Controller
                         );
                         $flag2 = update($main_employees_vacations_balance, $dataToUpdateVacation);
                         if ($flag2) {
-                            $this->reupdate_vacation($employee_id);
+                            $this->vacationService->reupdateVacation($employee_id);
                         }
                     }
                 }
@@ -875,9 +887,9 @@ class AttendanceDepartureController extends Controller
             if ($mainSalaryEmployee) {
                 $adminSetting = AdminPanelSetting::where('company_id', $company_id)->first();
                 if ($adminSetting && $adminSetting->is_allowed_to_pull_salary_variables_from_fingerprint == 1) {
-                    $this->pullFingerprintVariablesToSalary($employee_id, $attendance->finance_monthly_calendar_id, $company_id);
+                    $this->salaryService->pullFingerprintVariablesToSalary($employee_id, $attendance->finance_monthly_calendar_id, $company_id);
                 }
-                $this->recalculate_main_salary($mainSalaryEmployee->id);
+                $this->salaryService->recalculateMainSalary($mainSalaryEmployee->id);
             }
 
             return response()->json(['success' => 'تم حفظ التعديلات بنجاح']);

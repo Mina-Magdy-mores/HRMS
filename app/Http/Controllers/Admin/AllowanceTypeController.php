@@ -6,78 +6,74 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AllowanceTypeRequest;
 use App\Http\Requests\AllowanceTypeUpdateRequest;
 use App\Models\AllowanceType;
+use App\Services\HR\AllowanceTypeService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AllowanceTypeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected $service;
+
+    public function __construct(AllowanceTypeService $service)
     {
-        $company_id = Auth::user()->company_id;
-        $allowanceTypes = getColsWhereP(AllowanceType::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id]);
-        $allowanceTypes->getCollection()->loadCount(['employeeFixedAllowances', 'mainSalaryEmployeeAllowances']);
-        return view('admin.allowanceType.index', ['allowanceTypes' => $allowanceTypes]);
+        $this->service = $service;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function index()
+    {
+        $items = $this->service->getPaginated([0=>'addedBy',1=>'updatedBy',]);
+        $items->getCollection()->loadCount([0=>'employeeFixedAllowances',1=>'mainSalaryEmployeeAllowances',]);
+        return view('admin.allowanceType.index', ['allowanceTypes' => $items]);
+    }
+
     public function create()
     {
+        $company_id = Auth::user()->company_id;
         return view('admin.allowanceType.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(AllowanceTypeRequest $request)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $checkIf = getColsWhereRow(AllowanceType::class, ['id'], ['company_id' => $company_id, 'name' => $request->name]);
-            if ($checkIf) {
+            if ($this->service->checkExists(['name' => $request->name])) {
                 return redirect()->back()->with('error', 'النوع موجودة بالفعل')->withInput();
             }
 
             $validated = $request->validated();
-            $validated['added_by'] = Auth::id();
-            $validated['company_id'] = $company_id;
-            insert(AllowanceType::class, $validated);
+            $this->service->create($validated);
 
             return redirect()->route('admin.allowance-types.index')->with('success', 'تم إنشاء النوع بنجاح');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'حدث خطأ أثناء إنشاء النوع ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء إنشاء النوع ' . $e->getMessage())->withInput();
         }
     }
 
     public function edit($id)
     {
         $company_id = Auth::user()->company_id;
-        $allowanceType = getColsWhereRow(AllowanceType::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-        if (!$allowanceType) {
-            return redirect()->route('admin.allowance-types.index')->with('error', 'النوع غير موجود');
+        $item = $this->service->getById($id);
+        if (!$item) {
+            return redirect()->route('admin.allowance-types.index')->with('error', 'النوع غير موجودة');
         }
-        return view('admin.allowanceType.update', ['allowanceType' => $allowanceType]);
+        return view('admin.allowanceType.update', ['allowanceType' => $item]);
     }
 
     public function update(AllowanceTypeUpdateRequest $request, $id)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $allowanceType = getColsWhereRow(AllowanceType::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            if (!$allowanceType) {
-                return redirect()->route('admin.allowance-types.index')->with('error', 'النوع غير موجود');
+            if (!$this->service->getById($id)) {
+                return redirect()->route('admin.allowance-types.index')->with('error', 'النوع غير موجودة');
+            }
+
+            if ($this->service->checkExists(['name' => $request->name], $id)) {
+                return redirect()->back()->with('error', 'النوع موجودة بالفعل')->withInput();
             }
 
             $validated = $request->validated();
-            $validated['updated_by'] = Auth::id();
-            $validated['company_id'] = $company_id;
-            update($allowanceType, $validated);
+            $this->service->update($id, $validated);
 
             return redirect()->route('admin.allowance-types.index')->with('success', 'تم تحديث النوع بنجاح');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث النوع ' . $e->getMessage())->withInput();
         }
     }
@@ -85,15 +81,15 @@ class AllowanceTypeController extends Controller
     public function destroy($id)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $allowanceType = getColsWhereRow(AllowanceType::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            if (!$allowanceType) {
-                return redirect()->route('admin.allowance-types.index')->with('error', 'النوع غير موجود');
+            $item = $this->service->getById($id);
+            if (!$item) {
+                return redirect()->route('admin.allowance-types.index')->with('error', 'النوع غير موجودة');
             }
-            if ($allowanceType->employeeFixedAllowances()->exists() || $allowanceType->mainSalaryEmployeeAllowances()->exists()) {
+
+            if ($item->employeeFixedAllowances()->exists() || $item->mainSalaryEmployeeAllowances()->exists()) {
                 return redirect()->route('admin.allowance-types.index')->with('error', 'لا يمكن حذف هذا البدل لارتباطه بموظفين أو بسجلات رواتب');
             }
-            destroy($allowanceType);
+            $this->service->delete($id);
             return redirect()->route('admin.allowance-types.index')->with('success', 'تم حذف النوع بنجاح');
         } catch (\Throwable $e) {
             return redirect()->back()->with('error', 'حدث خطأ أثناء حذف النوع ' . $e->getMessage());

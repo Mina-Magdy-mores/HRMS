@@ -5,18 +5,25 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ShiftTypeRequest;
 use App\Models\ShiftsType;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Services\HR\ShiftsTypeService;
 
 class ShiftsTypeController extends Controller
 {
+    protected $service;
+
+    public function __construct(ShiftsTypeService $service)
+    {
+        $this->service = $service;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $company_id = Auth::user()->company_id;
-        $shiftsTypes = getColsWhereP(ShiftsType::class, ['createdBy', 'updatedBy'], ['*'], ['company_id' => $company_id], 'id', 'asc', PAGEINATION_COUNTER);
+        $shiftsTypes = $this->service->getPaginated(['createdBy', 'updatedBy'], ['*'], [], 'id', 'asc', PAGEINATION_COUNTER);
         $shiftsTypes->getCollection()->loadCount('employees');
         return view('admin.shifts-types.index', ['shiftsTypes' => $shiftsTypes]);
     }
@@ -35,19 +42,16 @@ class ShiftsTypeController extends Controller
     public function store(ShiftTypeRequest $request)
     {
         try {
-
             $validated = $request->validated();
-    
-            $validated['company_id'] = Auth::user()->company_id;
             unset($validated['status']);
-            $checkIfExist = getColsWhereRow(ShiftsType::class, ['id'], $validated);
-            if (!empty($checkIfExist)) {
+            
+            if ($this->service->checkExists($validated)) {
                 return redirect()->back()->with('error', 'هذا النوع موجود بالفعل')->withInput();
             }
+            
             $validated['status'] = $request->status;
-            $validated['created_by'] = Auth::user()->id;
-            $validated['updated_by'] = Auth::user()->id;
-            insert(ShiftsType::class, $validated);
+            $this->service->create($validated);
+            
             return redirect()->route('admin.shifts-types.index')->with('success', 'تم اضافة النوع بنجاح');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'حدث خطا ما برجاء المحاوله لاحقا '  . $e->getMessage())->withInput();
@@ -92,6 +96,7 @@ class ShiftsTypeController extends Controller
                 [$field1, $operator1, $value1],
                 [$field2, $operator2, $value2],
                 [$field3, $operator3, $value3],
+                ['company_id', '=', $company_id]
             ];
             $shiftsTypes = getColsWhereP(ShiftsType::class, ['createdBy', 'updatedBy'], ['*'], $where, 'id', 'asc', PAGEINATION_COUNTER);
             $shiftsTypes->getCollection()->loadCount('employees');
@@ -104,8 +109,7 @@ class ShiftsTypeController extends Controller
      */
     public function edit($id)
     {
-        $campany_id = Auth::user()->company_id;
-        $shiftsType = getColsWhereRow(ShiftsType::class, ['*'], ['id' => $id, 'company_id' => $campany_id]);
+        $shiftsType = $this->service->getById($id);
         if (empty($shiftsType)) {
             return redirect()->route('admin.shifts-types.index')->with('error', 'هذا النوع غير موجود');
         }
@@ -117,22 +121,21 @@ class ShiftsTypeController extends Controller
      */
     public function update(ShiftTypeRequest $request, $id)
     {
-        $campany_id = Auth::user()->company_id;
-        $shiftsType = getColsWhereRow(ShiftsType::class, ['*'], ['id' => $id, 'company_id' => $campany_id]);
+        $shiftsType = $this->service->getById($id);
         if (empty($shiftsType)) {
             return redirect()->route('admin.shifts-types.index')->with('error', 'هذا النوع غير موجود');
         }
         try {
             $validated = $request->validated();
-            $validated['company_id'] = Auth::user()->company_id;
             unset($validated['status']);
-            $checkIfExist = getColsWhereRow(ShiftsType::class, ['id'], $validated);
+            
+            $checkIfExist = $this->service->checkExists($validated);
             if (!empty($checkIfExist) && $checkIfExist->id != $shiftsType->id) {
                 return redirect()->back()->with('error', 'هذا النوع موجود بالفعل')->withInput();
             }
+            
             $validated['status'] = $request->status;
-            $validated['updated_by'] = Auth::user()->id;
-            update($shiftsType, $validated);
+            $this->service->update($id, $validated);
             
             // تحديث ساعات العمل اليومية لجميع الموظفين المرتبطين بهذا الشفت ولديهم شيفت ثابت
             $shiftsType->employees()
@@ -150,8 +153,7 @@ class ShiftsTypeController extends Controller
      */
     public function destroy($id)
     {
-        $campany_id = Auth::user()->company_id;
-        $shiftsType = getColsWhereRow(ShiftsType::class, ['*'], ['id' => $id, 'company_id' => $campany_id]);
+        $shiftsType = $this->service->getById($id);
         if (empty($shiftsType)) {
             return redirect()->route('admin.shifts-types.index')->with('error', 'هذا النوع غير موجود');
         }
@@ -159,7 +161,7 @@ class ShiftsTypeController extends Controller
             return redirect()->route('admin.shifts-types.index')->with('error', 'لا يمكن حذف هذا الشفت لوجود موظفين مرتبطة به');
         }
         try {
-            destroy($shiftsType);
+            $this->service->delete($id);
             return redirect()->route('admin.shifts-types.index')->with('success', 'تم حذف النوع بنجاح');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'حدث خطا ما برجاء المحاوله لاحقا ' . $e->getMessage());

@@ -12,10 +12,18 @@ use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\HR\InvestigationService;
 
 class MainEmployeeInvestigationController extends Controller
 {
     use GeneralTrait;
+
+    protected $service;
+
+    public function __construct(InvestigationService $service)
+    {
+        $this->service = $service;
+    }
 
     /**
      * Display a listing of the resource (list of finance months).
@@ -165,23 +173,15 @@ class MainEmployeeInvestigationController extends Controller
 
             if (!empty($financeMonthlyCalendar) && !empty($mainSalaryEmployee)) {
                 try {
-                    return DB::transaction(function () use ($request, $company_id) {
-                        $dataToInsert = [
-                            'employee_id'                 => $request->employee_id,
-                            'finance_monthly_calendar_id' => $request->finance_monthly_calendar_id,
-                            'description'                 => $request->description,
-                            'company_id'                  => $company_id,
-                            'is_auto'                     => 0,
-                            'added_by'                    => Auth::user()->id,
-                            'notes'                       => $request->notes ?: null,
-                        ];
-                        $insertData = insert(MainEmployeeInvestigation::class, $dataToInsert);
-                        if ($insertData) {
-                            return response()->json(['status' => 'true', 'message' => 'تم إضافة التحقيق الإداري بنجاح']);
-                        } else {
-                            return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم إضافة التحقيق الإداري']);
-                        }
-                    });
+                    $dataToInsert = [
+                        'employee_id'                 => $request->employee_id,
+                        'finance_monthly_calendar_id' => $request->finance_monthly_calendar_id,
+                        'description'                 => $request->description,
+                        'is_auto'                     => 0,
+                        'notes'                       => $request->notes ?: null,
+                    ];
+                    $this->service->storeInvestigation($dataToInsert);
+                    return response()->json(['status' => 'true', 'message' => 'تم إضافة التحقيق الإداري بنجاح']);
                 } catch (\Exception $e) {
                     return response()->json(['status' => 'false', 'message' => 'عفوا حدث خطأ ' . $e->getMessage()]);
                 }
@@ -263,31 +263,11 @@ class MainEmployeeInvestigationController extends Controller
     public function destroy(Request $request)
     {
         if ($request->ajax()) {
-            $company_id = Auth::user()->company_id;
-
-            $financeMonthlyCalendar = getColsWhereRow(
-                FinanceMonthlyCalendar::class,
-                ['id'],
-                ['company_id' => $company_id, 'id' => $request->finance_monthly_calendar_id, 'status' => 1]
-            );
-            if (empty($financeMonthlyCalendar)) {
-                return response()->json(['status' => 'false', 'message' => 'عفوا غير قادر للوصول الى بيانات الشهر']);
-            }
-
-            $investigation = getColsWhereRow(
-                MainEmployeeInvestigation::class,
-                ['id'],
-                ['company_id' => $company_id, 'id' => $request->id, 'is_archived' => 0]
-            );
-            if (empty($investigation)) {
-                return response()->json(['status' => 'false', 'message' => 'عفوا غير قادر للوصول الى بيانات التحقيق أو أنه مؤرشف']);
-            }
-
-            $destroy = destroy($investigation);
-            if ($destroy) {
+            try {
+                $this->service->destroyInvestigation($request->id);
                 return response()->json(['status' => 'true', 'message' => 'تم حذف التحقيق الإداري بنجاح']);
-            } else {
-                return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم حذف التحقيق الإداري']);
+            } catch (\Exception $e) {
+                return response()->json(['status' => 'false', 'message' => $e->getMessage()]);
             }
         }
     }
@@ -328,40 +308,13 @@ class MainEmployeeInvestigationController extends Controller
     public function update(Request $request)
     {
         if ($request->ajax()) {
-            $company_id = Auth::user()->company_id;
-
-            $financeMonthlyCalendar = getColsWhereRow(
-                FinanceMonthlyCalendar::class,
-                ['id'],
-                ['company_id' => $company_id, 'id' => $request->finance_monthly_calendar_id, 'status' => 1]
-            );
-            if (empty($financeMonthlyCalendar)) {
-                return response()->json(['status' => 'false', 'message' => 'عفوا غير قادر للوصول الى بيانات الشهر']);
-            }
-
-            $investigation = getColsWhereRow(
-                MainEmployeeInvestigation::class,
-                ['*'],
-                ['company_id' => $company_id, 'id' => $request->id]
-            );
-            if (empty($investigation)) {
-                return response()->json(['status' => 'false', 'message' => 'عفوا غير قادر للوصول الى بيانات التحقيق']);
-            }
-
             try {
-                return DB::transaction(function () use ($request, $investigation) {
-                    $dataToUpdate = [
-                        'description' => $request->description,
-                        'notes'       => $request->notes ?: null,
-                        'updated_by'  => Auth::user()->id,
-                    ];
-                    $updateData = update($investigation, $dataToUpdate);
-                    if ($updateData) {
-                        return response()->json(['status' => 'true', 'message' => 'تم تعديل التحقيق الإداري بنجاح']);
-                    } else {
-                        return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم تعديل التحقيق الإداري']);
-                    }
-                });
+                $dataToUpdate = [
+                    'description' => $request->description,
+                    'notes'       => $request->notes ?: null,
+                ];
+                $this->service->updateInvestigation($request->id, $dataToUpdate);
+                return response()->json(['status' => 'true', 'message' => 'تم تعديل التحقيق الإداري بنجاح']);
             } catch (\Exception $e) {
                 return response()->json(['status' => 'false', 'message' => 'عفوا حدث خطأ ' . $e->getMessage()]);
             }

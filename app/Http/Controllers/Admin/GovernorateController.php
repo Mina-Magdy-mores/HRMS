@@ -4,41 +4,43 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GovernorateRequest;
-use App\Models\Country;
 use App\Models\Governorate;
+use App\Services\HR\GovernorateService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class GovernorateController extends Controller
 {
+    protected $service;
+
+    public function __construct(GovernorateService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index()
     {
-        $company_id = Auth::user()->company_id;
-        $governorates = getColsWhereP(Governorate::class, ['addedBy', 'updatedBy', 'country'], ['*'], ['company_id' => $company_id]);
-        $governorates->getCollection()->loadCount('employees');
-        return view('admin.governorate.index', ['governorates' => $governorates]);
+        $items = $this->service->getPaginated([0=>'addedBy',1=>'updatedBy',2=>'addedBy',3=>'updatedBy',4=>'country',]);
+        $items->getCollection()->loadCount([0=>'cities',]);
+        return view('admin.governorate.index', ['governorates' => $items]);
     }
 
     public function create()
     {
         $company_id = Auth::user()->company_id;
-        $countries = get_cols_where(Country::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1]);
+        $countries = get_cols_where(\App\Models\Country::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1]);
         return view('admin.governorate.create', compact('countries'));
     }
 
     public function store(GovernorateRequest $request)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $checkIf = getColsWhereRow(Governorate::class, ['id'], ['company_id' => $company_id, 'name' => $request->name]);
-            if ($checkIf) {
+            if ($this->service->checkExists(['name' => $request->name])) {
                 return redirect()->back()->with('error', 'المحافظة موجودة بالفعل')->withInput();
             }
 
             $validated = $request->validated();
-            $validated['added_by'] = Auth::id();
-            $validated['updated_by'] = Auth::id();
-            $validated['company_id'] = $company_id;
-            insert(Governorate::class, $validated);
+            $this->service->create($validated);
 
             return redirect()->route('admin.governorates.index')->with('success', 'تم إنشاء المحافظة بنجاح');
         } catch (\Throwable $e) {
@@ -49,35 +51,27 @@ class GovernorateController extends Controller
     public function edit($id)
     {
         $company_id = Auth::user()->company_id;
-        $governorate = getColsWhereRow(Governorate::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-        if (!$governorate) {
+        $item = $this->service->getById($id);
+        if (!$item) {
             return redirect()->route('admin.governorates.index')->with('error', 'المحافظة غير موجودة');
         }
-        $countries = get_cols_where(Country::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1]);
-        return view('admin.governorate.update', compact('governorate', 'countries'));
+        $countries = get_cols_where(\App\Models\Country::class, ['id', 'name'], ['company_id' => $company_id, 'status' => 1]);
+        return view('admin.governorate.update', ['governorate' => $item], compact('countries'));
     }
 
     public function update(GovernorateRequest $request, $id)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $governorate = getColsWhereRow(Governorate::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            if (!$governorate) {
+            if (!$this->service->getById($id)) {
                 return redirect()->route('admin.governorates.index')->with('error', 'المحافظة غير موجودة');
             }
 
-            $checkIf = Governorate::select('id')
-                ->where(['company_id' => $company_id, 'name' => $request->name])
-                ->where('id', '!=', $id)
-                ->first();
-            if ($checkIf) {
+            if ($this->service->checkExists(['name' => $request->name], $id)) {
                 return redirect()->back()->with('error', 'المحافظة موجودة بالفعل')->withInput();
             }
 
             $validated = $request->validated();
-            $validated['updated_by'] = Auth::id();
-            $validated['company_id'] = $company_id;
-            update($governorate, $validated);
+            $this->service->update($id, $validated);
 
             return redirect()->route('admin.governorates.index')->with('success', 'تم تحديث المحافظة بنجاح');
         } catch (\Throwable $e) {
@@ -88,15 +82,15 @@ class GovernorateController extends Controller
     public function destroy($id)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $governorate = getColsWhereRow(Governorate::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            if (!$governorate) {
+            $item = $this->service->getById($id);
+            if (!$item) {
                 return redirect()->route('admin.governorates.index')->with('error', 'المحافظة غير موجودة');
             }
-            if ($governorate->employees()->exists()) {
-                return redirect()->route('admin.governorates.index')->with('error', 'لا يمكن حذف هذه المحافظة لوجود موظفين مرتبطة بها');
+
+            if ($item->cities()->exists()) {
+                return redirect()->route('admin.governorates.index')->with('error', 'لا يمكن حذف هذه المحافظة لوجود مدن مرتبطة بها');
             }
-            destroy($governorate);
+            $this->service->delete($id);
             return redirect()->route('admin.governorates.index')->with('success', 'تم حذف المحافظة بنجاح');
         } catch (\Throwable $e) {
             return redirect()->back()->with('error', 'حدث خطأ أثناء حذف المحافظة ' . $e->getMessage());

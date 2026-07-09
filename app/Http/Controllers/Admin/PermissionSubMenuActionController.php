@@ -4,147 +4,94 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PermissionSubMenuActionRequest;
-use App\Models\PermissionSubMenu;
 use App\Models\PermissionSubMenuAction;
+use App\Services\HR\PermissionSubMenuActionService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class PermissionSubMenuActionController extends Controller
 {
+    protected $service;
+
+    public function __construct(PermissionSubMenuActionService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index()
     {
-        $actions = PermissionSubMenuAction::with(['subMenu.mainMenu'])
-            ->join('permission_sub_menues', 'permission_sub_menues.id', '=', 'permission_sub_menues_actions.permission_sub_menu_id')
-            ->orderBy('permission_sub_menues.permission_main_menu_id', 'asc')
-            ->orderBy('permission_sub_menues_actions.permission_sub_menu_id', 'asc')
-            ->orderBy('permission_sub_menues_actions.id', 'asc')
-            ->select('permission_sub_menues_actions.*')
-            ->get();
-
-        return view('admin.permission_sub_menu_actions.index', compact('actions'));
+        $items = $this->service->getAll(['*'], [], 'id', 'asc');
+        $items->load(['subMenu.mainMenu', 'addedBy', 'updatedBy']);
+        
+        return view('admin.permission_sub_menu_actions.index', ['actions' => $items]);
     }
 
     public function create()
     {
-        $subMenus = PermissionSubMenu::with('mainMenu')->get();
+        $company_id = Auth::user()->company_id;
+        $subMenus = get_cols_where(\App\Models\PermissionSubMenu::class, ['id', 'name'], ['company_id' => $company_id, 'is_active' => 1]);
         return view('admin.permission_sub_menu_actions.create', compact('subMenus'));
     }
 
     public function store(PermissionSubMenuActionRequest $request)
     {
         try {
-            DB::beginTransaction();
-
-            $subMenuId = $request->permission_sub_menu_id;
-            $isActive = $request->is_active;
-            $addedBy = auth()->user()->id;
-
-            $insertedCount = 0;
-            $duplicateCount = 0;
-
-            // 1. Process checked standard action names
-            $names = $request->input('names', []);
-            foreach ($names as $name) {
-                $name = trim($name);
-                if ($name !== '') {
-                    $exists = PermissionSubMenuAction::where('permission_sub_menu_id', $subMenuId)
-                        ->where('name', $name)
-                        ->exists();
-
-                    if (!$exists) {
-                        PermissionSubMenuAction::create([
-                            'permission_sub_menu_id' => $subMenuId,
-                            'name' => $name,
-                            'is_active' => $isActive,
-                            'added_by' => $addedBy,
-                        ]);
-                        $insertedCount++;
-                    } else {
-                        $duplicateCount++;
-                    }
-                }
+            if ($this->service->checkExists(['name' => $request->name])) {
+                return redirect()->back()->with('error', 'الإجراء موجود بالفعل')->withInput();
             }
 
-            // 2. Process custom action names separated by commas
-            if ($request->filled('custom_names')) {
-                $customNames = explode(',', $request->custom_names);
-                foreach ($customNames as $name) {
-                    $name = trim($name);
-                    if ($name !== '') {
-                        $exists = PermissionSubMenuAction::where('permission_sub_menu_id', $subMenuId)
-                            ->where('name', $name)
-                            ->exists();
+            $validated = $request->validated();
+            $this->service->create($validated);
 
-                        if (!$exists) {
-                            PermissionSubMenuAction::create([
-                                'permission_sub_menu_id' => $subMenuId,
-                                'name' => $name,
-                                'is_active' => $isActive,
-                                'added_by' => $addedBy,
-                            ]);
-                            $insertedCount++;
-                        } else {
-                            $duplicateCount++;
-                        }
-                    }
-                }
-            }
-
-            DB::commit();
-
-            $msg = "تم إضافة عدد {$insertedCount} حركات بنجاح.";
-            if ($duplicateCount > 0) {
-                $msg .= " (تم تجاهل عدد {$duplicateCount} حركات لأنها مسجلة بالفعل)";
-            }
-
-            return redirect()->route('admin.permission-sub-menu-actions.index')->with('success', $msg);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'حدث خطأ ما: ' . $e->getMessage())->withInput();
+            return redirect()->route('admin.permission-sub-menu-actions.index')->with('success', 'تم إنشاء الإجراء بنجاح');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء إنشاء الإجراء ' . $e->getMessage())->withInput();
         }
     }
 
     public function edit($id)
     {
-        $action = PermissionSubMenuAction::findOrFail($id);
-        $subMenus = PermissionSubMenu::with('mainMenu')->get();
-        return view('admin.permission_sub_menu_actions.edit', compact('action', 'subMenus'));
+        $company_id = Auth::user()->company_id;
+        $item = $this->service->getById($id);
+        if (!$item) {
+            return redirect()->route('admin.permission-sub-menu-actions.index')->with('error', 'الإجراء غير موجود');
+        }
+        $subMenus = get_cols_where(\App\Models\PermissionSubMenu::class, ['id', 'name'], ['company_id' => $company_id, 'is_active' => 1]);
+        return view('admin.permission_sub_menu_actions.update', ['action' => $item], compact('subMenus'));
     }
 
     public function update(PermissionSubMenuActionRequest $request, $id)
     {
         try {
-            DB::beginTransaction();
+            if (!$this->service->getById($id)) {
+                return redirect()->route('admin.permission-sub-menu-actions.index')->with('error', 'الإجراء غير موجود');
+            }
 
-            $action = PermissionSubMenuAction::findOrFail($id);
-            $action->update([
-                'permission_sub_menu_id' => $request->permission_sub_menu_id,
-                'name' => $request->name,
-                'is_active' => $request->is_active,
-                'updated_by' => auth()->user()->id,
-            ]);
+            if ($this->service->checkExists(['name' => $request->name], $id)) {
+                return redirect()->back()->with('error', 'الإجراء موجود بالفعل')->withInput();
+            }
 
-            DB::commit();
-            return redirect()->route('admin.permission-sub-menu-actions.index')->with('success', 'تم تعديل الحركة بنجاح');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'حدث خطأ ما: ' . $e->getMessage())->withInput();
+            $validated = $request->validated();
+            $this->service->update($id, $validated);
+
+            return redirect()->route('admin.permission-sub-menu-actions.index')->with('success', 'تم تحديث الإجراء بنجاح');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث الإجراء ' . $e->getMessage())->withInput();
         }
     }
 
     public function destroy($id)
     {
         try {
-            DB::beginTransaction();
+            $item = $this->service->getById($id);
+            if (!$item) {
+                return redirect()->route('admin.permission-sub-menu-actions.index')->with('error', 'الإجراء غير موجود');
+            }
 
-            $action = PermissionSubMenuAction::findOrFail($id);
-            $action->delete();
-
-            DB::commit();
-            return redirect()->route('admin.permission-sub-menu-actions.index')->with('success', 'تم حذف الحركة بنجاح');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'حدث خطأ ما أثناء الحذف: ' . $e->getMessage());
+            $this->service->delete($id);
+            return redirect()->route('admin.permission-sub-menu-actions.index')->with('success', 'تم حذف الإجراء بنجاح');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء حذف الإجراء ' . $e->getMessage());
         }
     }
 }

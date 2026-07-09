@@ -14,10 +14,19 @@ use App\Models\FinanceCalendar;
 use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Services\HR\VacationBalanceService;
 
 class MainEmployeesVacationsBalancesController extends Controller
 {
     use GeneralTrait;
+
+    protected $service;
+
+    public function __construct(VacationBalanceService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index()
     {
         $company_id = Auth::user()->company_id;
@@ -195,12 +204,11 @@ class MainEmployeesVacationsBalancesController extends Controller
         $adminPanelSetting = AdminPanelSetting::select('is_allowed_to_pull_annual_from_fingerprint')
             ->where('company_id', $company_id)->first();
 
-
         $is_allowed_to_pull_annual_from_fingerprint = $adminPanelSetting->is_allowed_to_pull_annual_from_fingerprint;
 
         //Calculate Total monthly and annual vacation for the employee
-        $this->calculate_employees_vacations_balance($id);
-        $this->calculate_employees_vacations_balance($id);
+        $this->service->calculateBalance($id);
+        $this->service->calculateBalance($id);
 
         $vacationBalances = MainEmployeesVacationsBalances::with(['addedBy', 'updatedBy', 'archivedBy'])
             ->where('employee_id', $id)
@@ -256,11 +264,10 @@ class MainEmployeesVacationsBalancesController extends Controller
             return redirect()->back()->with('error', 'تعديل الأرصدة يدوياً غير متاح نظراً لضبط النظام');
         }
 
-        $balance = MainEmployeesVacationsBalances::where('company_id', $company_id)->find($id);
+        $balance = $this->service->getById($id);
         if (empty($balance)) {
             return redirect()->back()->with('error', 'السجل غير موجود');
         }
-
 
         $employee = Employee::where('company_id', $company_id)->find($balance->employee_id);
 
@@ -280,12 +287,10 @@ class MainEmployeesVacationsBalancesController extends Controller
             return redirect()->back()->with('error', 'تعديل الأرصدة يدوياً غير متاح نظراً لضبط النظام');
         }
 
-
-        $balance = MainEmployeesVacationsBalances::where('company_id', $company_id)->find($id);
+        $balance = $this->service->getById($id);
         if (empty($balance)) {
             return redirect()->back()->with('error', 'السجل غير موجود');
         }
-
 
         $request->validate([
             'carryover_from_previous_month' => 'required|numeric|min:0',
@@ -307,20 +312,20 @@ class MainEmployeesVacationsBalancesController extends Controller
         $total_available = $carryover + $current;
         $remaining_net = $total_available - $spent;
 
-        $dataToUpdate = [
-            'carryover_from_previous_month' => $carryover,
-            'current_month_balance' => $current,
-            'spent_balance' => $spent,
-            'total_available_balance' => $total_available,
-            'remaining_net_balance' => $remaining_net,
-            'updated_by' => Auth::user()->id,
-        ];
-        update($balance, $dataToUpdate);
+        try {
+            $dataToUpdate = [
+                'carryover_from_previous_month' => $carryover,
+                'current_month_balance' => $current,
+                'spent_balance' => $spent,
+                'total_available_balance' => $total_available,
+                'remaining_net_balance' => $remaining_net,
+            ];
+            $this->service->updateBalance($id, $dataToUpdate);
 
-        // Propagate updates to subsequent months
-        $this->reupdate_vacation($balance->employee_id);
-
-        return redirect()->route('admin.main-employees-vacations-balances.show', $balance->employee_id)
-            ->with('success', 'تم تعديل رصيد الإجازات وتحديث الشهور التالية بنجاح');
+            return redirect()->route('admin.main-employees-vacations-balances.show', $balance->employee_id)
+                ->with('success', 'تم تعديل رصيد الإجازات وتحديث الشهور التالية بنجاح');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'حدث خطأ: ' . $e->getMessage());
+        }
     }
 }

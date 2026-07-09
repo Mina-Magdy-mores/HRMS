@@ -8,11 +8,19 @@ use App\Models\Employee;
 use App\Models\EmployeeRequest;
 use App\Models\EmployeeRequestComment;
 use App\Models\EmployeeRequestType;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Services\HR\EmployeeRequestService;
 
 class EmployeeRequestController extends Controller
 {
+    protected $service;
+
+    public function __construct(EmployeeRequestService $service)
+    {
+        $this->service = $service;
+    }
+
     /**
      * Display a listing of employee requests.
      */
@@ -88,7 +96,6 @@ class EmployeeRequestController extends Controller
     public function store(EmployeeRequestRequest $request)
     {
         try {
-            $company_id = Auth::user()->company_id;
             $currentUser = Auth::user();
             $validated = $request->validated();
 
@@ -103,13 +110,10 @@ class EmployeeRequestController extends Controller
             }
 
             $validated['employee_id'] = $employeeId;
-            $validated['company_id']  = $company_id;
             $validated['status']      = 0; // pending
             $validated['is_archived']  = 0;
-            $validated['added_by']    = Auth::id();
-            $validated['updated_by']  = Auth::id();
 
-            insert(EmployeeRequest::class, $validated);
+            $this->service->create($validated);
 
             return redirect()->route('admin.employee-requests.index')->with('success', 'تم تقديم طلبك بنجاح');
         } catch (\Exception $e) {
@@ -125,7 +129,6 @@ class EmployeeRequestController extends Controller
         $company_id = Auth::user()->company_id;
         $currentUser = Auth::user();
 
-        // Load relations
         $requestObj = EmployeeRequest::with(['employee', 'type', 'comments.admin'])
             ->where('id', $id)
             ->where('company_id', $company_id)
@@ -155,26 +158,17 @@ class EmployeeRequestController extends Controller
         ]);
 
         try {
-            $company_id = Auth::user()->company_id;
             $currentUser = Auth::user();
-
-            $requestObj = getColsWhereRow(EmployeeRequest::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
+            $requestObj = $this->service->getById($id);
             if (!$requestObj) {
                 return redirect()->route('admin.employee-requests.index')->with('error', 'الطلب المطلوب غير موجود');
             }
 
-            // Security check: Employees can only comment on their own requests
             if ($currentUser->is_employee == 1 && $requestObj->employee_id != $currentUser->employee_id) {
                 abort(403);
             }
 
-            $commentData = [
-                'employee_request_id' => $id,
-                'admin_id'            => Auth::id(),
-                'comment'             => $request->comment,
-            ];
-
-            insert(EmployeeRequestComment::class, $commentData);
+            $this->service->addComment($id, $request->comment, Auth::id());
 
             return redirect()->back()->with('success', 'تم إضافة تعليقك بنجاح');
         } catch (\Exception $e) {
@@ -197,21 +191,7 @@ class EmployeeRequestController extends Controller
         ]);
 
         try {
-            $company_id = Auth::user()->company_id;
-            $requestObj = getColsWhereRow(EmployeeRequest::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            
-            if (!$requestObj) {
-                return redirect()->route('admin.employee-requests.index')->with('error', 'الطلب المطلوب غير موجود');
-            }
-
-            $requestObj->status = $request->status;
-            $requestObj->updated_by = Auth::id();
-            
-            update($requestObj, [
-                'status' => $request->status,
-                'updated_by' => Auth::id()
-            ]);
-
+            $this->service->toggleStatus($id, $request->status, Auth::id());
             return redirect()->back()->with('success', 'تم تغيير حالة الطلب بنجاح');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'حدث خطأ أثناء تعديل حالة الطلب: ' . $e->getMessage());
@@ -229,20 +209,7 @@ class EmployeeRequestController extends Controller
         }
 
         try {
-            $company_id = Auth::user()->company_id;
-            $requestObj = getColsWhereRow(EmployeeRequest::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            
-            if (!$requestObj) {
-                return redirect()->route('admin.employee-requests.index')->with('error', 'الطلب المطلوب غير موجود');
-            }
-
-            update($requestObj, [
-                'is_archived' => 1,
-                'archived_by' => Auth::id(),
-                'archived_at' => now(),
-                'updated_by'  => Auth::id()
-            ]);
-
+            $this->service->archiveRequest($id, Auth::id());
             return redirect()->route('admin.employee-requests.index')->with('success', 'تم نقل الطلب إلى الأرشيف بنجاح');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'حدث خطأ أثناء أرشفة الطلب: ' . $e->getMessage());

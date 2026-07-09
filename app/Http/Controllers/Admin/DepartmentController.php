@@ -5,110 +5,93 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DepartmentRequest;
 use App\Models\Department;
-use Auth;
+use App\Services\HR\DepartmentService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DepartmentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected $service;
+
+    public function __construct(DepartmentService $service)
     {
-        $company_id = Auth::user()->company_id;
-        $departments = getColsWhereP(Department::class, ['createdBy', 'updatedBy'], ['*'], ['company_id' => $company_id], 'id', 'asc', PAGEINATION_COUNTER);
-        $departments->getCollection()->loadCount('employees');
-        return view('admin.departments.index', compact('departments'));
+        $this->service = $service;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function index()
+    {
+        $items = $this->service->getPaginated([0=>'createdBy',1=>'updatedBy',]);
+        $items->getCollection()->loadCount([0=>'employees',]);
+        return view('admin.departments.index', ['departments' => $items]);
+    }
+
     public function create()
     {
+        $company_id = Auth::user()->company_id;
         return view('admin.departments.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(DepartmentRequest $request)
     {
         try {
-            $company_id = Auth::user()->company_id;
-
-            $checkIfExist = getColsWhereRow(Department::class, ['id'], ['name' => $request->name, 'company_id' => $company_id]);
-            if ($checkIfExist) {
-                return redirect()->back()->with('error', 'اسم القسم مكرر')->withInput();
+            if ($this->service->checkExists(['name' => $request->name])) {
+                return redirect()->back()->with('error', 'القسم موجودة بالفعل')->withInput();
             }
+
             $validated = $request->validated();
-            $validated['created_by'] = Auth::user()->id;
-            $validated['updated_by'] = Auth::user()->id;
-            $validated['company_id'] = $company_id;
-            insert(Department::class, $validated);
-            return redirect()->route('admin.departments.index')->with('success', 'Department created successfully');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'حدث خطا ما برجاء المحاوله لاحقا ' . $e->getMessage())->withInput();
+            $this->service->create($validated);
+
+            return redirect()->route('admin.departments.index')->with('success', 'تم إنشاء القسم بنجاح');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء إنشاء القسم ' . $e->getMessage())->withInput();
         }
     }
 
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit($id)
     {
         $company_id = Auth::user()->company_id;
-        $department = getColsWhereRow(Department::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-        if (!$department) {
-            return redirect()->route('admin.departments.index')->with('error', 'القسم غير موجود');
+        $item = $this->service->getById($id);
+        if (!$item) {
+            return redirect()->route('admin.departments.index')->with('error', 'القسم غير موجودة');
         }
-        return view('admin.departments.update', compact('department'));
+        return view('admin.departments.update', ['department' => $item]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(DepartmentRequest $request, $id)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $department = getColsWhereRow(Department::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            if (!$department) {
-                return redirect()->route('admin.departments.index')->with('error', 'القسم غير موجود');
+            if (!$this->service->getById($id)) {
+                return redirect()->route('admin.departments.index')->with('error', 'القسم غير موجودة');
             }
-            $checkIfNameExists = Department::select('id')->where('company_id', $company_id)->where('name', $request->name)->where('id', '!=', $id)->first();
-            if ($checkIfNameExists) {
-                return redirect()->back()->with('error', 'اسم القسم مكرر')->withInput();
+
+            if ($this->service->checkExists(['name' => $request->name], $id)) {
+                return redirect()->back()->with('error', 'القسم موجودة بالفعل')->withInput();
             }
+
             $validated = $request->validated();
-            $validated['updated_by'] = Auth::user()->id;
-            update($department, $validated);
-            return redirect()->route('admin.departments.index')->with('success', 'Department updated successfully');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'حدث خطا ما برجاء المحاوله لاحقا ' . $e->getMessage())->withInput();
+            $this->service->update($id, $validated);
+
+            return redirect()->route('admin.departments.index')->with('success', 'تم تحديث القسم بنجاح');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث القسم ' . $e->getMessage())->withInput();
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy($id)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $department = getColsWhereRow(Department::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            if (!$department) {
-                return redirect()->route('admin.departments.index')->with('error', 'القسم غير موجود');
+            $item = $this->service->getById($id);
+            if (!$item) {
+                return redirect()->route('admin.departments.index')->with('error', 'القسم غير موجودة');
             }
-            if ($department->employees()->exists()) {
-                return redirect()->route('admin.departments.index')->with('error', 'لا يمكن حذف القسم لوجود موظفين مرتبطة به');
+
+            if ($item->employees()->exists()) {
+                return redirect()->route('admin.departments.index')->with('error', 'لا يمكن حذف هذا القسم لوجود موظفين مرتبطة به');
             }
-            destroy($department);
-            return redirect()->route('admin.departments.index')->with('success', 'Department deleted successfully');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'حدث خطا ما برجاء المحاوله لاحقا ' . $e->getMessage())->withInput();
+            $this->service->delete($id);
+            return redirect()->route('admin.departments.index')->with('success', 'تم حذف القسم بنجاح');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء حذف القسم ' . $e->getMessage());
         }
     }
-
 }

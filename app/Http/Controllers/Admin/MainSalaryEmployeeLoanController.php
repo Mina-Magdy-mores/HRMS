@@ -11,11 +11,18 @@ use App\Models\FinanceMonthlyCalendar;
 use App\Models\MainSalaryEmployee;
 use App\Traits\GeneralTrait;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use App\Services\Finance\LoanService;
 
 class MainSalaryEmployeeLoanController extends Controller
 {
-            use GeneralTrait;
+    use GeneralTrait;
+
+    protected $service;
+
+    public function __construct(LoanService $service)
+    {
+        $this->service = $service;
+    }
 
     /**
      * Display a listing of the resource.
@@ -55,26 +62,17 @@ class MainSalaryEmployeeLoanController extends Controller
             $mainSalaryEmployee = getColsWhereRow(MainSalaryEmployee::class, ['id'], ['company_id' => $company_id, 'employee_id' => $request->employee_id, 'finance_monthly_calendar_id' => $request->finance_monthly_calendar_id, 'is_archived' => 0]);
             if (!empty($financeMonthlyCalendars) && !empty($mainSalaryEmployee)) {
                 try {
-                    return DB::transaction(function () use ($request, $company_id, $mainSalaryEmployee) {
-                        $dataToInsert = [
-                            'main_salary_employee_id' => $mainSalaryEmployee['id'],
-                            'employee_id'             => $request->employee_id,
-                            'finance_monthly_calendar_id' => $request->finance_monthly_calendar_id,
-                            'amount'                  => $request->amount,
-                            'company_id'              => $company_id,
-                            'is_auto'                 => 0,
-                            'status'                  => 1,
-                            'added_by'                => Auth::user()->id,
-                            'notes'                   => $request->notes ?: 'سلفة مؤقتة مضافة تلقائياً',
-                        ];
-                        $insertData = insert(MainSalaryEmployeeLoan::class, $dataToInsert);
-                        if ($insertData) {
-                              $this->recalculate_main_salary($mainSalaryEmployee['id']);
-                            return response()->json(['status' => 'true', 'message' => 'تم اضافة السلفة بنجاح']);
-                        } else {
-                            return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم اضافة السلفة']);
-                        }
-                    });
+                    $dataToInsert = [
+                        'main_salary_employee_id' => $mainSalaryEmployee['id'],
+                        'employee_id'             => $request->employee_id,
+                        'finance_monthly_calendar_id' => $request->finance_monthly_calendar_id,
+                        'amount'                  => $request->amount,
+                        'is_auto'                 => 0,
+                        'status'                  => 1,
+                        'notes'                   => $request->notes ?: 'سلفة مؤقتة مضافة تلقائياً',
+                    ];
+                    $this->service->createLoan($dataToInsert);
+                    return response()->json(['status' => 'true', 'message' => 'تم اضافة السلفة بنجاح']);
                 } catch (\Exception $e) {
                     return response()->json(['status' => 'false', 'message' => 'عفوا حدث خطأ ' . $e->getMessage()]);
                 }
@@ -189,25 +187,11 @@ class MainSalaryEmployeeLoanController extends Controller
     public function destroy(Request $request)
     {
         if ($request->ajax()) {
-            $company_id = Auth::user()->company_id;
-            $financeMonthlyCalendars = getColsWhereRow(FinanceMonthlyCalendar::class, ['id'], ['company_id' => $company_id, 'id' => $request->finance_monthly_calendar_id, 'status' => 1]);
-            if (empty($financeMonthlyCalendars)) {
-                return response()->json(['status' => 'false', 'message' => 'عفوا غير قادر للوصول الى بيانات الشهر']);
-            }
-            $mainSalaryEmployee = getColsWhereRow(MainSalaryEmployee::class, ['id'], ['company_id' => $company_id, 'id' => $request->main_salary_employee_id, 'is_archived' => 0]);
-            if (empty($mainSalaryEmployee)) {
-                return response()->json(['status' => 'false', 'message' => 'عفوا غير قادر للوصول الى بيانات الموظف']);
-            }
-            $mainSalaryEmployeeLoans = getColsWhereRow(MainSalaryEmployeeLoan::class, ['id'], ['company_id' => $company_id, 'id' => $request->id, 'is_archived' => 0]);
-            if (empty($mainSalaryEmployeeLoans)) {
-                return response()->json(['status' => 'false', 'message' => 'عفوا غير قادر للوصول الى بيانات السلفة']);
-            }
-            $destroy = destroy($mainSalaryEmployeeLoans);
-            if ($destroy) {
-                $this->recalculate_main_salary($mainSalaryEmployee['id']);
+            try {
+                $this->service->deleteLoan($request->id);
                 return response()->json(['status' => 'true', 'message' => 'تم حذف السلفة بنجاح']);
-            } else {
-                return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم حذف السلفة']);
+            } catch (\Exception $e) {
+                return response()->json(['status' => 'false', 'message' => $e->getMessage()]);
             }
         }
     }
@@ -244,35 +228,13 @@ class MainSalaryEmployeeLoanController extends Controller
     public function update(Request $request)
     {
         if ($request->ajax()) {
-            $company_id = Auth::user()->company_id;
-            $financeMonthlyCalendars = getColsWhereRow(FinanceMonthlyCalendar::class, ['id'], ['company_id' => $company_id, 'id' => $request->finance_monthly_calendar_id, 'status' => 1]);
-            if (empty($financeMonthlyCalendars)) {
-                return response()->json(['status' => 'false', 'message' => 'عفوا غير قادر للوصول الى بيانات الشهر']);
-            }
-            $mainSalaryEmployee = getColsWhereRow(MainSalaryEmployee::class, ['id'], ['company_id' => $company_id, 'id' => $request->main_salary_employee_id, 'is_archived' => 0]);
-            if (empty($mainSalaryEmployee)) {
-                return response()->json(['status' => 'false', 'message' => 'عفوا غير قادر للوصول الى بيانات الموظف']);
-            }
-            $mainSalaryEmployeeLoan = getColsWhereRow(MainSalaryEmployeeLoan::class, ['*'], ['company_id' => $company_id, 'id' => $request->id]);
-            if (empty($mainSalaryEmployeeLoan)) {
-                return response()->json(['status' => 'false', 'message' => 'عفوا غير قادر للوصول الى بيانات السلفة']);
-            }
-
             try {
-                return DB::transaction(function () use ($request, $mainSalaryEmployeeLoan,$mainSalaryEmployee) {
-                    $dataToUpdate = [
-                        'amount'     => $request->amount,
-                        'notes'      => $request->notes ?: 'تم تعديل السلفة المؤقتة تلقائياً',
-                        'updated_by' => Auth::user()->id,
-                    ];
-                    $updateData = update($mainSalaryEmployeeLoan, $dataToUpdate);
-                    if ($updateData) {
-                        $this->recalculate_main_salary($mainSalaryEmployee['id']);
-                        return response()->json(['status' => 'true', 'message' => 'تم تعديل السلفة بنجاح']);
-                    } else {
-                        return response()->json(['status' => 'false', 'message' => 'عفوا لم يتم تعديل السلفة']);
-                    }
-                });
+                $dataToUpdate = [
+                    'amount'     => $request->amount,
+                    'notes'      => $request->notes ?: 'تم تعديل السلفة المؤقتة تلقائياً',
+                ];
+                $this->service->updateLoan($request->id, $dataToUpdate);
+                return response()->json(['status' => 'true', 'message' => 'تم تعديل السلفة بنجاح']);
             } catch (\Exception $e) {
                 return response()->json(['status' => 'false', 'message' => 'عفوا حدث خطأ ' . $e->getMessage()]);
             }

@@ -498,9 +498,23 @@
                                                 </td>
                                                 <td>
                                                     @if($sal->is_disbursed == 1)
-                                                        <span class="badge badge-success px-3 py-2"><i class="fas fa-check-circle"></i> تم الصرف</span>
+                                                        <span class="badge badge-success px-3 py-2">
+                                                            <i class="fas fa-check-circle mr-1"></i> تم الصرف
+                                                        </span>
+                                                    @elseif($sal->is_archived == 1)
+                                                        @if($sal->employee_net_salary < 0)
+                                                            <span class="badge badge-danger px-3 py-2">
+                                                                <i class="fas fa-arrow-circle-down mr-1"></i> مرحل (مدين)
+                                                            </span>
+                                                        @else
+                                                            <span class="badge badge-info px-3 py-2 text-white">
+                                                                <i class="fas fa-archive mr-1"></i> معتمد / لم يصرف
+                                                            </span>
+                                                        @endif
                                                     @else
-                                                        <span class="badge badge-warning px-3 py-2 text-white">قيد المراجعة / معتمد</span>
+                                                        <span class="badge badge-warning px-3 py-2 text-white">
+                                                            <i class="fas fa-hourglass-half mr-1"></i> قيد المراجعة
+                                                        </span>
                                                     @endif
                                                 </td>
                                             </tr>

@@ -9,10 +9,17 @@ use App\Models\FinanceMonthlyCalendar;
 use App\Models\MainSalaryEmployee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use App\Services\Finance\SettlementService;
 
 class MainSalaryEmployeeSettlementController extends Controller
 {
+    protected $service;
+
+    public function __construct(SettlementService $service)
+    {
+        $this->service = $service;
+    }
+
     /**
      * Display a listing of the months.
      */
@@ -20,7 +27,6 @@ class MainSalaryEmployeeSettlementController extends Controller
     {
         $company_id = Auth::user()->company_id;
         
-        // Load the finance calendar months using the helper or raw query
         $financeMonthlyCalendars = get_cols_where_order2_with(
             FinanceMonthlyCalendar::class,
             ['financeCalendar'],
@@ -104,7 +110,6 @@ class MainSalaryEmployeeSettlementController extends Controller
 
             $financeMonthlyCalendar = getColsWhereRow(FinanceMonthlyCalendar::class, ['id'], ['company_id' => $company_id, 'id' => $request->finance_monthly_calendar_id]);
             
-            // Check if there is an archived salary record for the employee in this month
             $mainSalaryEmployee = getColsWhereRow(MainSalaryEmployee::class, ['id', 'is_archived'], [
                 'company_id' => $company_id,
                 'employee_id' => $request->employee_id,
@@ -120,7 +125,6 @@ class MainSalaryEmployeeSettlementController extends Controller
                 return response()->json(['status' => 'false', 'message' => 'عفواً، لا توجد تفاصيل راتب مؤرشف لهذا الموظف في هذا الشهر المالي لعمل تسوية له.']);
             }
 
-            // Check if settlement already exists for this employee in this month
             $exists = MainSalaryEmployeeSettlement::where('company_id', $company_id)
                 ->where('finance_monthly_calendar_id', $request->finance_monthly_calendar_id)
                 ->where('employee_id', $request->employee_id)
@@ -131,101 +135,80 @@ class MainSalaryEmployeeSettlementController extends Controller
             }
 
             try {
-                return DB::transaction(function () use ($request, $company_id) {
-                    $employee_per_day_salary = (float)$request->employee_per_day_salary;
+                $employee_per_day_salary = (float)$request->employee_per_day_salary;
+                
+                $working_days_number = (float)$request->input('working_days_number', 0);
+                $working_days_amount = $working_days_number * $employee_per_day_salary;
+
+                $extra_working_days_number = (float)$request->input('extra_working_days_number', 0);
+                $extra_working_days_amount = $extra_working_days_number * $employee_per_day_salary;
+
+                $absent_days_back_number = (float)$request->input('absent_days_back_number', 0);
+                $absent_days_back_amount = $absent_days_back_number * $employee_per_day_salary;
+
+                $deducted_days_restored_number = (float)$request->input('deducted_days_restored_number', 0);
+                $deducted_days_restored_amount = $deducted_days_restored_number * $employee_per_day_salary;
+
+                $different_in_salary_amount = (float)$request->input('different_in_salary_amount', 0);
+                $bonus_amount = (float)$request->input('bonus_amount', 0);
+                $allowance_amount = (float)$request->input('allowance_amount', 0);
+
+                $total_addition = $working_days_amount + $extra_working_days_amount + $absent_days_back_amount + $deducted_days_restored_amount + $different_in_salary_amount + $bonus_amount + $allowance_amount;
+
+                $absent_days_number = (float)$request->input('absent_days_number', 0);
+                $absent_days_amount = $absent_days_number * $employee_per_day_salary;
+
+                $deducted_days_number = (float)$request->input('deducted_days_number', 0);
+                $deducted_days_amount = $deducted_days_number * $employee_per_day_salary;
+
+                $salary_deduction_amount = (float)$request->input('salary_deduction_amount', 0);
+                $others_salary_deduction_amount = (float)$request->input('others_salary_deduction_amount', 0);
+                $medical_insurance_deduction_amount = (float)$request->input('medical_insurance_deduction_amount', 0);
+                $monthly_loan_deduction_amount = (float)$request->input('monthly_loan_deduction_amount', 0);
+                $permanent_loan_deduction_amount = (float)$request->input('permanent_loan_deduction_amount', 0);
+                $penalty_deduction_amount = (float)$request->input('penalty_deduction_amount', 0);
+
+                $total_deduction = $absent_days_amount + $deducted_days_amount + $salary_deduction_amount + $others_salary_deduction_amount + $medical_insurance_deduction_amount + $monthly_loan_deduction_amount + $permanent_loan_deduction_amount + $penalty_deduction_amount;
+
+                $final_total_amount = $total_addition - $total_deduction;
+
+                $dataToInsert = [
+                    'finance_monthly_calendar_id' => $request->finance_monthly_calendar_id,
+                    'employee_id' => $request->employee_id,
+                    'employee_per_day_salary' => $employee_per_day_salary,
                     
-                    // Additions
-                    $working_days_number = (float)$request->input('working_days_number', 0);
-                    $working_days_amount = $working_days_number * $employee_per_day_salary;
+                    'working_days_number' => $working_days_number,
+                    'working_days_amount' => $working_days_amount,
+                    'extra_working_days_number' => $extra_working_days_number,
+                    'extra_working_days_amount' => $extra_working_days_amount,
+                    'absent_days_back_number' => $absent_days_back_number,
+                    'absent_days_back_amount' => $absent_days_back_amount,
+                    'deducted_days_restored_number' => $deducted_days_restored_number,
+                    'deducted_days_restored_amount' => $deducted_days_restored_amount,
+                    'different_in_salary_amount' => $different_in_salary_amount,
+                    'bonus_amount' => $bonus_amount,
+                    'allowance_amount' => $allowance_amount,
+                    'total_amount_for_addition' => $total_addition,
 
-                    $extra_working_days_number = (float)$request->input('extra_working_days_number', 0);
-                    $extra_working_days_amount = $extra_working_days_number * $employee_per_day_salary;
+                    'absent_days_number' => $absent_days_number,
+                    'absent_days_amount' => $absent_days_amount,
+                    'deducted_days_number' => $deducted_days_number,
+                    'deducted_days_amount' => $deducted_days_amount,
+                    'salary_deduction_amount' => $salary_deduction_amount,
+                    'others_salary_deduction_amount' => $others_salary_deduction_amount,
+                    'medical_insurance_deduction_amount' => $medical_insurance_deduction_amount,
+                    'monthly_loan_deduction_amount' => $monthly_loan_deduction_amount,
+                    'permanent_loan_deduction_amount' => $permanent_loan_deduction_amount,
+                    'penalty_deduction_amount' => $penalty_deduction_amount,
+                    'total_amount_for_deduction' => $total_deduction,
 
-                    $absent_days_back_number = (float)$request->input('absent_days_back_number', 0);
-                    $absent_days_back_amount = $absent_days_back_number * $employee_per_day_salary;
+                    'final_total_amount' => $final_total_amount,
+                    'notes' => $request->notes ?: 'تسوية رواتب مؤرشفة',
+                ];
 
-                    $deducted_days_restored_number = (float)$request->input('deducted_days_restored_number', 0);
-                    $deducted_days_restored_amount = $deducted_days_restored_number * $employee_per_day_salary;
+                $this->service->createSettlement($dataToInsert);
 
-                    $different_in_salary_amount = (float)$request->input('different_in_salary_amount', 0);
-                    $bonus_amount = (float)$request->input('bonus_amount', 0);
-                    $allowance_amount = (float)$request->input('allowance_amount', 0);
-
-                    $total_addition = $working_days_amount + $extra_working_days_amount + $absent_days_back_amount + $deducted_days_restored_amount + $different_in_salary_amount + $bonus_amount + $allowance_amount;
-
-                    // Deductions
-                    $absent_days_number = (float)$request->input('absent_days_number', 0);
-                    $absent_days_amount = $absent_days_number * $employee_per_day_salary;
-
-                    $deducted_days_number = (float)$request->input('deducted_days_number', 0);
-                    $deducted_days_amount = $deducted_days_number * $employee_per_day_salary;
-
-                    $salary_deduction_amount = (float)$request->input('salary_deduction_amount', 0);
-                    $others_salary_deduction_amount = (float)$request->input('others_salary_deduction_amount', 0);
-                    $medical_insurance_deduction_amount = (float)$request->input('medical_insurance_deduction_amount', 0);
-                    $monthly_loan_deduction_amount = (float)$request->input('monthly_loan_deduction_amount', 0);
-                    $permanent_loan_deduction_amount = (float)$request->input('permanent_loan_deduction_amount', 0);
-                    $penalty_deduction_amount = (float)$request->input('penalty_deduction_amount', 0);
-
-                    $total_deduction = $absent_days_amount + $deducted_days_amount + $salary_deduction_amount + $others_salary_deduction_amount + $medical_insurance_deduction_amount + $monthly_loan_deduction_amount + $permanent_loan_deduction_amount + $penalty_deduction_amount;
-
-                    $final_total_amount = $total_addition - $total_deduction;
-
-                    $dataToInsert = [
-                        'finance_monthly_calendar_id' => $request->finance_monthly_calendar_id,
-                        'employee_id' => $request->employee_id,
-                        'employee_per_day_salary' => $employee_per_day_salary,
-                        
-                        'working_days_number' => $working_days_number,
-                        'working_days_amount' => $working_days_amount,
-                        'extra_working_days_number' => $extra_working_days_number,
-                        'extra_working_days_amount' => $extra_working_days_amount,
-                        'absent_days_back_number' => $absent_days_back_number,
-                        'absent_days_back_amount' => $absent_days_back_amount,
-                        'deducted_days_restored_number' => $deducted_days_restored_number,
-                        'deducted_days_restored_amount' => $deducted_days_restored_amount,
-                        'different_in_salary_amount' => $different_in_salary_amount,
-                        'bonus_amount' => $bonus_amount,
-                        'allowance_amount' => $allowance_amount,
-                        'total_amount_for_addition' => $total_addition,
-
-                        'absent_days_number' => $absent_days_number,
-                        'absent_days_amount' => $absent_days_amount,
-                        'deducted_days_number' => $deducted_days_number,
-                        'deducted_days_amount' => $deducted_days_amount,
-                        'salary_deduction_amount' => $salary_deduction_amount,
-                        'others_salary_deduction_amount' => $others_salary_deduction_amount,
-                        'medical_insurance_deduction_amount' => $medical_insurance_deduction_amount,
-                        'monthly_loan_deduction_amount' => $monthly_loan_deduction_amount,
-                        'permanent_loan_deduction_amount' => $permanent_loan_deduction_amount,
-                        'penalty_deduction_amount' => $penalty_deduction_amount,
-                        'total_amount_for_deduction' => $total_deduction,
-
-                        'final_total_amount' => $final_total_amount,
-                        
-                        'company_id' => $company_id,
-                        'added_by' => Auth::id(),
-                        'notes' => $request->notes ?: 'تسوية رواتب مؤرشفة',
-                    ];
-
-                    $insertData = MainSalaryEmployeeSettlement::create($dataToInsert);
-
-                    if ($insertData) {
-                        // Reflect changes on the archived MainSalaryEmployee record
-                        $this->updateArchivedSalary(
-                            $request->employee_id,
-                            $request->finance_monthly_calendar_id,
-                            $company_id,
-                            $total_addition,
-                            $total_deduction,
-                            $final_total_amount
-                        );
-
-                        return response()->json(['status' => 'true', 'message' => 'تم إضافة تسوية الراتب وتطبيقها بنجاح.']);
-                    }
-
-                    return response()->json(['status' => 'false', 'message' => 'عفواً، فشل إضافة التسوية.']);
-                });
+                return response()->json(['status' => 'true', 'message' => 'تم إضافة تسوية الراتب وتطبيقها بنجاح.']);
             } catch (\Exception $e) {
                 return response()->json(['status' => 'false', 'message' => 'عفواً، حدث خطأ: ' . $e->getMessage()]);
             }
@@ -271,94 +254,76 @@ class MainSalaryEmployeeSettlementController extends Controller
             }
 
             try {
-                return DB::transaction(function () use ($request, $settlement, $company_id) {
-                    $employee_per_day_salary = (float)$settlement->employee_per_day_salary;
+                $employee_per_day_salary = (float)$settlement->employee_per_day_salary;
 
-                    // Calculate new addition & deduction totals
-                    $working_days_number = (float)$request->input('working_days_number', 0);
-                    $working_days_amount = $working_days_number * $employee_per_day_salary;
+                $working_days_number = (float)$request->input('working_days_number', 0);
+                $working_days_amount = $working_days_number * $employee_per_day_salary;
 
-                    $extra_working_days_number = (float)$request->input('extra_working_days_number', 0);
-                    $extra_working_days_amount = $extra_working_days_number * $employee_per_day_salary;
+                $extra_working_days_number = (float)$request->input('extra_working_days_number', 0);
+                $extra_working_days_amount = $extra_working_days_number * $employee_per_day_salary;
 
-                    $absent_days_back_number = (float)$request->input('absent_days_back_number', 0);
-                    $absent_days_back_amount = $absent_days_back_number * $employee_per_day_salary;
+                $absent_days_back_number = (float)$request->input('absent_days_back_number', 0);
+                $absent_days_back_amount = $absent_days_back_number * $employee_per_day_salary;
 
-                    $deducted_days_restored_number = (float)$request->input('deducted_days_restored_number', 0);
-                    $deducted_days_restored_amount = $deducted_days_restored_number * $employee_per_day_salary;
+                $deducted_days_restored_number = (float)$request->input('deducted_days_restored_number', 0);
+                $deducted_days_restored_amount = $deducted_days_restored_number * $employee_per_day_salary;
 
-                    $different_in_salary_amount = (float)$request->input('different_in_salary_amount', 0);
-                    $bonus_amount = (float)$request->input('bonus_amount', 0);
-                    $allowance_amount = (float)$request->input('allowance_amount', 0);
+                $different_in_salary_amount = (float)$request->input('different_in_salary_amount', 0);
+                $bonus_amount = (float)$request->input('bonus_amount', 0);
+                $allowance_amount = (float)$request->input('allowance_amount', 0);
 
-                    $new_total_addition = $working_days_amount + $extra_working_days_amount + $absent_days_back_amount + $deducted_days_restored_amount + $different_in_salary_amount + $bonus_amount + $allowance_amount;
+                $new_total_addition = $working_days_amount + $extra_working_days_amount + $absent_days_back_amount + $deducted_days_restored_amount + $different_in_salary_amount + $bonus_amount + $allowance_amount;
 
-                    $absent_days_number = (float)$request->input('absent_days_number', 0);
-                    $absent_days_amount = $absent_days_number * $employee_per_day_salary;
+                $absent_days_number = (float)$request->input('absent_days_number', 0);
+                $absent_days_amount = $absent_days_number * $employee_per_day_salary;
 
-                    $deducted_days_number = (float)$request->input('deducted_days_number', 0);
-                    $deducted_days_amount = $deducted_days_number * $employee_per_day_salary;
+                $deducted_days_number = (float)$request->input('deducted_days_number', 0);
+                $deducted_days_amount = $deducted_days_number * $employee_per_day_salary;
 
-                    $salary_deduction_amount = (float)$request->input('salary_deduction_amount', 0);
-                    $others_salary_deduction_amount = (float)$request->input('others_salary_deduction_amount', 0);
-                    $medical_insurance_deduction_amount = (float)$request->input('medical_insurance_deduction_amount', 0);
-                    $monthly_loan_deduction_amount = (float)$request->input('monthly_loan_deduction_amount', 0);
-                    $permanent_loan_deduction_amount = (float)$request->input('permanent_loan_deduction_amount', 0);
-                    $penalty_deduction_amount = (float)$request->input('penalty_deduction_amount', 0);
+                $salary_deduction_amount = (float)$request->input('salary_deduction_amount', 0);
+                $others_salary_deduction_amount = (float)$request->input('others_salary_deduction_amount', 0);
+                $medical_insurance_deduction_amount = (float)$request->input('medical_insurance_deduction_amount', 0);
+                $monthly_loan_deduction_amount = (float)$request->input('monthly_loan_deduction_amount', 0);
+                $permanent_loan_deduction_amount = (float)$request->input('permanent_loan_deduction_amount', 0);
+                $penalty_deduction_amount = (float)$request->input('penalty_deduction_amount', 0);
 
-                    $new_total_deduction = $absent_days_amount + $deducted_days_amount + $salary_deduction_amount + $others_salary_deduction_amount + $medical_insurance_deduction_amount + $monthly_loan_deduction_amount + $permanent_loan_deduction_amount + $penalty_deduction_amount;
+                $new_total_deduction = $absent_days_amount + $deducted_days_amount + $salary_deduction_amount + $others_salary_deduction_amount + $medical_insurance_deduction_amount + $monthly_loan_deduction_amount + $permanent_loan_deduction_amount + $penalty_deduction_amount;
 
-                    $new_final_total_amount = $new_total_addition - $new_total_deduction;
+                $new_final_total_amount = $new_total_addition - $new_total_deduction;
 
-                    // Calculate Delta for archived salary updates
-                    $deltaAddition = $new_total_addition - $settlement->total_amount_for_addition;
-                    $deltaDeduction = $new_total_deduction - $settlement->total_amount_for_deduction;
-                    $deltaFinal = $new_final_total_amount - $settlement->final_total_amount;
+                $dataToUpdate = [
+                    'working_days_number' => $working_days_number,
+                    'working_days_amount' => $working_days_amount,
+                    'extra_working_days_number' => $extra_working_days_number,
+                    'extra_working_days_amount' => $extra_working_days_amount,
+                    'absent_days_back_number' => $absent_days_back_number,
+                    'absent_days_back_amount' => $absent_days_back_amount,
+                    'deducted_days_restored_number' => $deducted_days_restored_number,
+                    'deducted_days_restored_amount' => $deducted_days_restored_amount,
+                    'different_in_salary_amount' => $different_in_salary_amount,
+                    'bonus_amount' => $bonus_amount,
+                    'allowance_amount' => $allowance_amount,
+                    'total_amount_for_addition' => $new_total_addition,
 
-                    // Update settlement record
-                    $settlement->update([
-                        'working_days_number' => $working_days_number,
-                        'working_days_amount' => $working_days_amount,
-                        'extra_working_days_number' => $extra_working_days_number,
-                        'extra_working_days_amount' => $extra_working_days_amount,
-                        'absent_days_back_number' => $absent_days_back_number,
-                        'absent_days_back_amount' => $absent_days_back_amount,
-                        'deducted_days_restored_number' => $deducted_days_restored_number,
-                        'deducted_days_restored_amount' => $deducted_days_restored_amount,
-                        'different_in_salary_amount' => $different_in_salary_amount,
-                        'bonus_amount' => $bonus_amount,
-                        'allowance_amount' => $allowance_amount,
-                        'total_amount_for_addition' => $new_total_addition,
+                    'absent_days_number' => $absent_days_number,
+                    'absent_days_amount' => $absent_days_amount,
+                    'deducted_days_number' => $deducted_days_number,
+                    'deducted_days_amount' => $deducted_days_amount,
+                    'salary_deduction_amount' => $salary_deduction_amount,
+                    'others_salary_deduction_amount' => $others_salary_deduction_amount,
+                    'medical_insurance_deduction_amount' => $medical_insurance_deduction_amount,
+                    'monthly_loan_deduction_amount' => $monthly_loan_deduction_amount,
+                    'permanent_loan_deduction_amount' => $permanent_loan_deduction_amount,
+                    'penalty_deduction_amount' => $penalty_deduction_amount,
+                    'total_amount_for_deduction' => $new_total_deduction,
 
-                        'absent_days_number' => $absent_days_number,
-                        'absent_days_amount' => $absent_days_amount,
-                        'deducted_days_number' => $deducted_days_number,
-                        'deducted_days_amount' => $deducted_days_amount,
-                        'salary_deduction_amount' => $salary_deduction_amount,
-                        'others_salary_deduction_amount' => $others_salary_deduction_amount,
-                        'medical_insurance_deduction_amount' => $medical_insurance_deduction_amount,
-                        'monthly_loan_deduction_amount' => $monthly_loan_deduction_amount,
-                        'permanent_loan_deduction_amount' => $permanent_loan_deduction_amount,
-                        'penalty_deduction_amount' => $penalty_deduction_amount,
-                        'total_amount_for_deduction' => $new_total_deduction,
+                    'final_total_amount' => $new_final_total_amount,
+                    'notes' => $request->notes,
+                ];
 
-                        'final_total_amount' => $new_final_total_amount,
-                        'notes' => $request->notes,
-                        'updated_by' => Auth::id(),
-                    ]);
+                $this->service->updateSettlement($request->id, $dataToUpdate);
 
-                    // Apply delta values to archived salary
-                    $this->updateArchivedSalary(
-                        $settlement->employee_id,
-                        $settlement->finance_monthly_calendar_id,
-                        $company_id,
-                        $deltaAddition,
-                        $deltaDeduction,
-                        $deltaFinal
-                    );
-
-                    return response()->json(['status' => 'true', 'message' => 'تم تحديث تسوية الراتب وتعديل الأثر المالي بنجاح.']);
-                });
+                return response()->json(['status' => 'true', 'message' => 'تم تحديث تسوية الراتب وتعديل الأثر المالي بنجاح.']);
             } catch (\Exception $e) {
                 return response()->json(['status' => 'false', 'message' => 'عفواً، حدث خطأ أثناء التحديث: ' . $e->getMessage()]);
             }
@@ -371,37 +336,9 @@ class MainSalaryEmployeeSettlementController extends Controller
     public function destroy(Request $request)
     {
         if ($request->ajax()) {
-            $company_id = Auth::user()->company_id;
-            $settlement = MainSalaryEmployeeSettlement::where('company_id', $company_id)
-                ->where('id', $request->id)
-                ->first();
-
-            if (empty($settlement)) {
-                return response()->json(['status' => 'false', 'message' => 'عفواً، السجل غير موجود.']);
-            }
-
             try {
-                return DB::transaction(function () use ($settlement, $company_id) {
-                    // Delas are negative of current totals
-                    $deltaAddition = -$settlement->total_amount_for_addition;
-                    $deltaDeduction = -$settlement->total_amount_for_deduction;
-                    $deltaFinal = -$settlement->final_total_amount;
-
-                    // Remove settlement
-                    $settlement->delete();
-
-                    // Apply reverse values to archived salary
-                    $this->updateArchivedSalary(
-                        $settlement->employee_id,
-                        $settlement->finance_monthly_calendar_id,
-                        $company_id,
-                        $deltaAddition,
-                        $deltaDeduction,
-                        $deltaFinal
-                    );
-
-                    return response()->json(['status' => 'true', 'message' => 'تم حذف تسوية الراتب وعكس أثرها المالي بنجاح.']);
-                });
+                $this->service->deleteSettlement($request->id);
+                return response()->json(['status' => 'true', 'message' => 'تم حذف تسوية الراتب وعكس أثرها المالي بنجاح.']);
             } catch (\Exception $e) {
                 return response()->json(['status' => 'false', 'message' => 'عفواً، حدث خطأ أثناء الحذف: ' . $e->getMessage()]);
             }
@@ -519,45 +456,5 @@ class MainSalaryEmployeeSettlementController extends Controller
             'financeMonthlyCalendar' => $financeMonthlyCalendar,
             'mainSalaryEmployeeSettlements' => $mainSalaryEmployeeSettlements
         ]);
-    }
-
-    /**
-     * Apply delta to the archived salary.
-     */
-    private function updateArchivedSalary($employee_id, $finance_monthly_calendar_id, $company_id, $deltaAddition, $deltaDeduction, $deltaFinal)
-    {
-        $mainSalary = MainSalaryEmployee::where('employee_id', $employee_id)
-            ->where('finance_monthly_calendar_id', $finance_monthly_calendar_id)
-            ->where('company_id', $company_id)
-            ->where('is_archived', 1)
-            ->first();
-
-        if ($mainSalary) {
-            $mainSalary->total_benefits += $deltaAddition;
-            $mainSalary->total_deductions += $deltaDeduction;
-            $mainSalary->employee_net_salary += $deltaFinal;
-            
-            // Adjust the payout amount for the archived salary
-            $mainSalary->archive_settlement_amount += $deltaFinal;
-
-            // Update status type based on new net salary
-            $net = (float)$mainSalary->employee_net_salary;
-            if ($net > 0) {
-                $mainSalary->archive_status_type = 1; // دائن
-            } elseif ($net < 0) {
-                $mainSalary->archive_status_type = 2; // مدين
-            } else {
-                $mainSalary->archive_status_type = 3; // صافي
-            }
-
-            // Adjust is_disbursed
-            if ($net >= 0 && $mainSalary->archive_settlement_amount > 0) {
-                $mainSalary->is_disbursed = 1;
-            } else {
-                $mainSalary->is_disbursed = 0;
-            }
-
-            $mainSalary->save();
-        }
     }
 }

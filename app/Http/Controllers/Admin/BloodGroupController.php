@@ -5,37 +5,41 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BloodGroupRequest;
 use App\Models\BloodGroup;
+use App\Services\HR\BloodGroupService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class BloodGroupController extends Controller
 {
+    protected $service;
+
+    public function __construct(BloodGroupService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index()
     {
-        $company_id = Auth::user()->company_id;
-        $bloodGroups = getColsWhereP(BloodGroup::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id]);
-        $bloodGroups->getCollection()->loadCount('employees');
-        return view('admin.blood_group.index', ['bloodGroups' => $bloodGroups]);
+        $items = $this->service->getPaginated([0=>'addedBy',1=>'updatedBy',]);
+        $items->getCollection()->loadCount([0=>'employees',]);
+        return view('admin.blood_group.index', ['bloodGroups' => $items]);
     }
 
     public function create()
     {
+        $company_id = Auth::user()->company_id;
         return view('admin.blood_group.create');
     }
 
     public function store(BloodGroupRequest $request)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $checkIf = getColsWhereRow(BloodGroup::class, ['id'], ['company_id' => $company_id, 'name' => $request->name]);
-            if ($checkIf) {
+            if ($this->service->checkExists(['name' => $request->name])) {
                 return redirect()->back()->with('error', 'فصيلة الدم موجودة بالفعل')->withInput();
             }
 
             $validated = $request->validated();
-            $validated['added_by'] = Auth::id();
-            $validated['updated_by'] = Auth::id();
-            $validated['company_id'] = $company_id;
-            insert(BloodGroup::class, $validated);
+            $this->service->create($validated);
 
             return redirect()->route('admin.blood-groups.index')->with('success', 'تم إنشاء فصيلة الدم بنجاح');
         } catch (\Throwable $e) {
@@ -46,34 +50,26 @@ class BloodGroupController extends Controller
     public function edit($id)
     {
         $company_id = Auth::user()->company_id;
-        $bloodGroup = getColsWhereRow(BloodGroup::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-        if (!$bloodGroup) {
+        $item = $this->service->getById($id);
+        if (!$item) {
             return redirect()->route('admin.blood-groups.index')->with('error', 'فصيلة الدم غير موجودة');
         }
-        return view('admin.blood_group.update', ['bloodGroup' => $bloodGroup]);
+        return view('admin.blood_group.update', ['bloodGroup' => $item]);
     }
 
     public function update(BloodGroupRequest $request, $id)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $bloodGroup = getColsWhereRow(BloodGroup::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            if (!$bloodGroup) {
+            if (!$this->service->getById($id)) {
                 return redirect()->route('admin.blood-groups.index')->with('error', 'فصيلة الدم غير موجودة');
             }
 
-            $checkIf = BloodGroup::select('id')
-                ->where(['company_id' => $company_id, 'name' => $request->name])
-                ->where('id', '!=', $id)
-                ->first();
-            if ($checkIf) {
+            if ($this->service->checkExists(['name' => $request->name], $id)) {
                 return redirect()->back()->with('error', 'فصيلة الدم موجودة بالفعل')->withInput();
             }
 
             $validated = $request->validated();
-            $validated['updated_by'] = Auth::id();
-            $validated['company_id'] = $company_id;
-            update($bloodGroup, $validated);
+            $this->service->update($id, $validated);
 
             return redirect()->route('admin.blood-groups.index')->with('success', 'تم تحديث فصيلة الدم بنجاح');
         } catch (\Throwable $e) {
@@ -84,15 +80,15 @@ class BloodGroupController extends Controller
     public function destroy($id)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $bloodGroup = getColsWhereRow(BloodGroup::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            if (!$bloodGroup) {
+            $item = $this->service->getById($id);
+            if (!$item) {
                 return redirect()->route('admin.blood-groups.index')->with('error', 'فصيلة الدم غير موجودة');
             }
-            if ($bloodGroup->employees()->exists()) {
+
+            if ($item->employees()->exists()) {
                 return redirect()->route('admin.blood-groups.index')->with('error', 'لا يمكن حذف فصيلة الدم لوجود موظفين مرتبطة بها');
             }
-            destroy($bloodGroup);
+            $this->service->delete($id);
             return redirect()->route('admin.blood-groups.index')->with('success', 'تم حذف فصيلة الدم بنجاح');
         } catch (\Throwable $e) {
             return redirect()->back()->with('error', 'حدث خطأ أثناء حذف فصيلة الدم ' . $e->getMessage());

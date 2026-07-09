@@ -5,97 +5,93 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ResignationRequest;
 use App\Models\Resignation;
+use App\Services\HR\ResignationService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ResignationController extends Controller
 {
+    protected $service;
+
+    public function __construct(ResignationService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index()
     {
-        $company_id = Auth::user()->company_id;
-        $resignations = getColsWhereP(Resignation::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id]);
-        $resignations->getCollection()->loadCount('employees');
-        return view('admin.resignations.index', ['resignations' => $resignations]);
+        $items = $this->service->getPaginated([0=>'addedBy',1=>'updatedBy',]);
+        $items->getCollection()->loadCount([0=>'employees',]);
+        return view('admin.resignations.index', ['resignations' => $items]);
     }
 
     public function create()
     {
+        $company_id = Auth::user()->company_id;
         return view('admin.resignations.create');
     }
 
     public function store(ResignationRequest $request)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $checkIf = getColsWhereRow(Resignation::class, ['id'], ['company_id' => $company_id, 'name' => $request->name]);
-            if ($checkIf) {
-                return redirect()->back()->with('error', 'الاستقالة موجودة بالفعل')->withInput();
+            if ($this->service->checkExists(['name' => $request->name])) {
+                return redirect()->back()->with('error', 'نوع نهاية الخدمة موجودة بالفعل')->withInput();
             }
 
             $validated = $request->validated();
-            $validated['added_by'] = Auth::id();
-            $validated['updated_by'] = Auth::id();
-            $validated['company_id'] = $company_id;
-            insert(Resignation::class, $validated);
+            $this->service->create($validated);
 
-            return redirect()->route('admin.resignations.index')->with('success', 'تم إنشاء الاستقالة بنجاح');
+            return redirect()->route('admin.resignations.index')->with('success', 'تم إنشاء نوع نهاية الخدمة بنجاح');
         } catch (\Throwable $e) {
-            return redirect()->back()->with('error', 'حدث خطأ أثناء إنشاء الاستقالة ' . $e->getMessage())->withInput();
+            return redirect()->back()->with('error', 'حدث خطأ أثناء إنشاء نوع نهاية الخدمة ' . $e->getMessage())->withInput();
         }
     }
 
     public function edit($id)
     {
         $company_id = Auth::user()->company_id;
-        $resignation = getColsWhereRow(Resignation::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-        if (!$resignation) {
-            return redirect()->route('admin.resignations.index')->with('error', 'الاستقالة غير موجودة');
+        $item = $this->service->getById($id);
+        if (!$item) {
+            return redirect()->route('admin.resignations.index')->with('error', 'نوع نهاية الخدمة غير موجودة');
         }
-        return view('admin.resignations.update', ['resignation' => $resignation]);
+        return view('admin.resignations.update', ['resignation' => $item]);
     }
 
     public function update(ResignationRequest $request, $id)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $resignation = getColsWhereRow(Resignation::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            if (!$resignation) {
-                return redirect()->route('admin.resignations.index')->with('error', 'الاستقالة غير موجودة');
+            if (!$this->service->getById($id)) {
+                return redirect()->route('admin.resignations.index')->with('error', 'نوع نهاية الخدمة غير موجودة');
             }
 
-            $checkIf = Resignation::select('id')
-                ->where(['company_id' => $company_id, 'name' => $request->name])
-                ->where('id', '!=', $id)
-                ->first();
-            if ($checkIf) {
-                return redirect()->back()->with('error', 'الاستقالة موجودة بالفعل')->withInput();
+            if ($this->service->checkExists(['name' => $request->name], $id)) {
+                return redirect()->back()->with('error', 'نوع نهاية الخدمة موجودة بالفعل')->withInput();
             }
 
             $validated = $request->validated();
-            $validated['updated_by'] = Auth::id();
-            $validated['company_id'] = $company_id;
-            update($resignation, $validated);
+            $this->service->update($id, $validated);
 
-            return redirect()->route('admin.resignations.index')->with('success', 'تم تحديث الاستقالة بنجاح');
+            return redirect()->route('admin.resignations.index')->with('success', 'تم تحديث نوع نهاية الخدمة بنجاح');
         } catch (\Throwable $e) {
-            return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث الاستقالة ' . $e->getMessage());
+            return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث نوع نهاية الخدمة ' . $e->getMessage())->withInput();
         }
     }
 
     public function destroy($id)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $resignation = getColsWhereRow(Resignation::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            if (!$resignation) {
-                return redirect()->route('admin.resignations.index')->with('error', 'الاستقالة غير موجودة');
+            $item = $this->service->getById($id);
+            if (!$item) {
+                return redirect()->route('admin.resignations.index')->with('error', 'نوع نهاية الخدمة غير موجودة');
             }
-            if ($resignation->employees()->exists()) {
-                return redirect()->route('admin.resignations.index')->with('error', 'لا يمكن حذف هذه الاستقالة لوجود موظفين مرتبطة بها');
+
+            if ($item->employees()->exists()) {
+                return redirect()->route('admin.resignations.index')->with('error', 'لا يمكن حذف هذا البند لوجود موظفين مرتبطة به');
             }
-            destroy($resignation);
-            return redirect()->route('admin.resignations.index')->with('success', 'تم حذف الاستقالة بنجاح');
+            $this->service->delete($id);
+            return redirect()->route('admin.resignations.index')->with('success', 'تم حذف نوع نهاية الخدمة بنجاح');
         } catch (\Throwable $e) {
-            return redirect()->back()->with('error', 'حدث خطأ أثناء حذف الاستقالة ' . $e->getMessage());
+            return redirect()->back()->with('error', 'حدث خطأ أثناء حذف نوع نهاية الخدمة ' . $e->getMessage());
         }
     }
 }

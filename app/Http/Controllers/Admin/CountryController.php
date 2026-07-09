@@ -5,37 +5,41 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CountryRequest;
 use App\Models\Country;
+use App\Services\HR\CountryService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CountryController extends Controller
 {
+    protected $service;
+
+    public function __construct(CountryService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index()
     {
-        $company_id = Auth::user()->company_id;
-        $countries = getColsWhereP(Country::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id]);
-        $countries->getCollection()->loadCount('employees');
-        return view('admin.country.index', ['countries' => $countries]);
+        $items = $this->service->getPaginated([0=>'addedBy',1=>'updatedBy',]);
+        $items->getCollection()->loadCount([0=>'governorates',]);
+        return view('admin.country.index', ['countries' => $items]);
     }
 
     public function create()
     {
+        $company_id = Auth::user()->company_id;
         return view('admin.country.create');
     }
 
     public function store(CountryRequest $request)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $checkIf = getColsWhereRow(Country::class, ['id'], ['company_id' => $company_id, 'name' => $request->name]);
-            if ($checkIf) {
+            if ($this->service->checkExists(['name' => $request->name])) {
                 return redirect()->back()->with('error', 'الدولة موجودة بالفعل')->withInput();
             }
 
             $validated = $request->validated();
-            $validated['added_by'] = Auth::id();
-            $validated['updated_by'] = Auth::id();
-            $validated['company_id'] = $company_id;
-            insert(Country::class, $validated);
+            $this->service->create($validated);
 
             return redirect()->route('admin.countries.index')->with('success', 'تم إنشاء الدولة بنجاح');
         } catch (\Throwable $e) {
@@ -46,34 +50,26 @@ class CountryController extends Controller
     public function edit($id)
     {
         $company_id = Auth::user()->company_id;
-        $country = getColsWhereRow(Country::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-        if (!$country) {
+        $item = $this->service->getById($id);
+        if (!$item) {
             return redirect()->route('admin.countries.index')->with('error', 'الدولة غير موجودة');
         }
-        return view('admin.country.update', ['country' => $country]);
+        return view('admin.country.update', ['country' => $item]);
     }
 
     public function update(CountryRequest $request, $id)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $country = getColsWhereRow(Country::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            if (!$country) {
+            if (!$this->service->getById($id)) {
                 return redirect()->route('admin.countries.index')->with('error', 'الدولة غير موجودة');
             }
 
-            $checkIf = Country::select('id')
-                ->where(['company_id' => $company_id, 'name' => $request->name])
-                ->where('id', '!=', $id)
-                ->first();
-            if ($checkIf) {
+            if ($this->service->checkExists(['name' => $request->name], $id)) {
                 return redirect()->back()->with('error', 'الدولة موجودة بالفعل')->withInput();
             }
 
             $validated = $request->validated();
-            $validated['updated_by'] = Auth::id();
-            $validated['company_id'] = $company_id;
-            update($country, $validated);
+            $this->service->update($id, $validated);
 
             return redirect()->route('admin.countries.index')->with('success', 'تم تحديث الدولة بنجاح');
         } catch (\Throwable $e) {
@@ -84,15 +80,15 @@ class CountryController extends Controller
     public function destroy($id)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $country = getColsWhereRow(Country::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            if (!$country) {
+            $item = $this->service->getById($id);
+            if (!$item) {
                 return redirect()->route('admin.countries.index')->with('error', 'الدولة غير موجودة');
             }
-            if ($country->employees()->exists()) {
-                return redirect()->route('admin.countries.index')->with('error', 'لا يمكن حذف هذه الدولة لوجود موظفين مرتبطة بها');
+
+            if ($item->governorates()->exists()) {
+                return redirect()->route('admin.countries.index')->with('error', 'لا يمكن حذف هذه الدولة لوجود محافظات مرتبطة بها');
             }
-            destroy($country);
+            $this->service->delete($id);
             return redirect()->route('admin.countries.index')->with('success', 'تم حذف الدولة بنجاح');
         } catch (\Throwable $e) {
             return redirect()->back()->with('error', 'حدث خطأ أثناء حذف الدولة ' . $e->getMessage());

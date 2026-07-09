@@ -4,71 +4,75 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SalaryGrantTypeRequest;
-use App\Http\Requests\SalaryGrantTypeUpdateRequest;
 use App\Models\SalaryGrantType;
+use App\Services\HR\SalaryGrantTypeService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class SalaryGrantTypeController extends Controller
 {
+    protected $service;
+
+    public function __construct(SalaryGrantTypeService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index()
     {
-        $company_id = Auth::user()->company_id;
-        $salaryGrantTypes = getColsWhereP(SalaryGrantType::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id]);
-        $salaryGrantTypes->getCollection()->loadCount('directGrants');
-        return view('admin.salaryGrantType.index', ['salaryGrantTypes' => $salaryGrantTypes]);
+        $items = $this->service->getPaginated([0=>'addedBy',1=>'updatedBy',]);
+        $items->getCollection()->loadCount([0=>'directGrants',]);
+        return view('admin.salaryGrantType.index', ['salaryGrantTypes' => $items]);
     }
 
     public function create()
     {
+        $company_id = Auth::user()->company_id;
         return view('admin.salaryGrantType.create');
     }
 
     public function store(SalaryGrantTypeRequest $request)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $checkIf = getColsWhereRow(SalaryGrantType::class, ['id'], ['company_id' => $company_id, 'name' => $request->name]);
-            if ($checkIf) {
-                return redirect()->back()->with('error', 'المنحة موجودة بالفعل')->withInput();
+            if ($this->service->checkExists(['name' => $request->name])) {
+                return redirect()->back()->with('error', 'نوع المنحة موجود بالفعل')->withInput();
             }
 
             $validated = $request->validated();
-            $validated['added_by'] = Auth::id();
-            $validated['company_id'] = $company_id;
-            insert(SalaryGrantType::class, $validated);
+            $this->service->create($validated);
 
             return redirect()->route('admin.salary-grant-types.index')->with('success', 'تم إنشاء نوع المنحة بنجاح');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'حدث خطأ أثناء إنشاء نوع المنحة ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء إنشاء نوع المنحة ' . $e->getMessage())->withInput();
         }
     }
 
     public function edit($id)
     {
         $company_id = Auth::user()->company_id;
-        $salaryGrantType = getColsWhereRow(SalaryGrantType::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-        if (!$salaryGrantType) {
+        $item = $this->service->getById($id);
+        if (!$item) {
             return redirect()->route('admin.salary-grant-types.index')->with('error', 'نوع المنحة غير موجود');
         }
-        return view('admin.salaryGrantType.update', ['salaryGrantType' => $salaryGrantType]);
+        return view('admin.salaryGrantType.update', ['salaryGrantType' => $item]);
     }
 
-    public function update(SalaryGrantTypeUpdateRequest $request, $id)
+    public function update(SalaryGrantTypeRequest $request, $id)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $salaryGrantType = getColsWhereRow(SalaryGrantType::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            if (!$salaryGrantType) {
+            if (!$this->service->getById($id)) {
                 return redirect()->route('admin.salary-grant-types.index')->with('error', 'نوع المنحة غير موجود');
             }
 
+            if ($this->service->checkExists(['name' => $request->name], $id)) {
+                return redirect()->back()->with('error', 'نوع المنحة موجود بالفعل')->withInput();
+            }
+
             $validated = $request->validated();
-            $validated['updated_by'] = Auth::id();
-            $validated['company_id'] = $company_id;
-            update($salaryGrantType, $validated);
+            $this->service->update($id, $validated);
 
             return redirect()->route('admin.salary-grant-types.index')->with('success', 'تم تحديث نوع المنحة بنجاح');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث نوع المنحة ' . $e->getMessage())->withInput();
         }
     }
@@ -76,15 +80,15 @@ class SalaryGrantTypeController extends Controller
     public function destroy($id)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $salaryGrantType = getColsWhereRow(SalaryGrantType::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            if (!$salaryGrantType) {
+            $item = $this->service->getById($id);
+            if (!$item) {
                 return redirect()->route('admin.salary-grant-types.index')->with('error', 'نوع المنحة غير موجود');
             }
-            if ($salaryGrantType->directGrants()->exists()) {
+
+            if ($item->directGrants()->exists()) {
                 return redirect()->route('admin.salary-grant-types.index')->with('error', 'لا يمكن حذف هذا النوع لارتباطه بمنح مسجلة لموظفين');
             }
-            destroy($salaryGrantType);
+            $this->service->delete($id);
             return redirect()->route('admin.salary-grant-types.index')->with('success', 'تم حذف نوع المنحة بنجاح');
         } catch (\Throwable $e) {
             return redirect()->back()->with('error', 'حدث خطأ أثناء حذف نوع المنحة ' . $e->getMessage());

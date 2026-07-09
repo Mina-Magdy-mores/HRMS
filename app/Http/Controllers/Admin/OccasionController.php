@@ -3,42 +3,46 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\OccasionRequest;
+use App\Http\Requests\OccasionsRequest;
 use App\Models\Occasion;
-use Illuminate\Support\Carbon;
+use App\Services\HR\OccasionService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class OccasionController extends Controller
 {
+    protected $service;
+
+    public function __construct(OccasionService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index()
     {
-        $company_id = Auth::user()->company_id;
-        $occasions = getColsWhereP(Occasion::class, ['addedBy', 'updatedBy'], ['*'], ['company_id' => $company_id]);
-        return view('admin.occasion.index', ['occasions' => $occasions]);
+        $items = $this->service->getPaginated([0=>'addedBy',1=>'updatedBy',]);
+        
+        return view('admin.occasion.index', ['occasions' => $items]);
     }
 
     public function create()
     {
+        $company_id = Auth::user()->company_id;
         return view('admin.occasion.create');
     }
 
-    public function store(OccasionRequest $request)
+    public function store(OccasionsRequest $request)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $checkIf = getColsWhereRow(Occasion::class, ['id'], ['company_id' => $company_id, 'name' => $request->name]);
-            if ($checkIf) {
+            if ($this->service->checkExists(['name' => $request->name])) {
                 return redirect()->back()->with('error', 'المناسبة موجودة بالفعل')->withInput();
             }
 
             $validated = $request->validated();
-            $validated['added_by'] = Auth::id();
-            $validated['updated_by'] = Auth::id();
-            $validated['company_id'] = $company_id;
-            insert(Occasion::class, $validated);
+            $this->service->create($validated);
 
             return redirect()->route('admin.occasions.index')->with('success', 'تم إنشاء المناسبة بنجاح');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return redirect()->back()->with('error', 'حدث خطأ أثناء إنشاء المناسبة ' . $e->getMessage())->withInput();
         }
     }
@@ -46,38 +50,29 @@ class OccasionController extends Controller
     public function edit($id)
     {
         $company_id = Auth::user()->company_id;
-        $occasion = getColsWhereRow(Occasion::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-        if (!$occasion) {
+        $item = $this->service->getById($id);
+        if (!$item) {
             return redirect()->route('admin.occasions.index')->with('error', 'المناسبة غير موجودة');
         }
-
-        return view('admin.occasion.update', ['occasion' => $occasion]);
+        return view('admin.occasion.update', ['occasion' => $item]);
     }
 
-    public function update(OccasionRequest $request, $id)
+    public function update(OccasionsRequest $request, $id)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $occasion = getColsWhereRow(Occasion::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            if (!$occasion) {
+            if (!$this->service->getById($id)) {
                 return redirect()->route('admin.occasions.index')->with('error', 'المناسبة غير موجودة');
             }
 
-            $checkIf = Occasion::select('id')
-                ->where(['company_id' => $company_id, 'name' => $request->name])
-                ->where('id', '!=', $id)
-                ->first();
-            if ($checkIf) {
+            if ($this->service->checkExists(['name' => $request->name], $id)) {
                 return redirect()->back()->with('error', 'المناسبة موجودة بالفعل')->withInput();
             }
 
             $validated = $request->validated();
-            $validated['updated_by'] = Auth::id();
-            $validated['company_id'] = $company_id;
-            update($occasion, $validated);
+            $this->service->update($id, $validated);
 
             return redirect()->route('admin.occasions.index')->with('success', 'تم تحديث المناسبة بنجاح');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث المناسبة ' . $e->getMessage())->withInput();
         }
     }
@@ -85,14 +80,14 @@ class OccasionController extends Controller
     public function destroy($id)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $occasion = getColsWhereRow(Occasion::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            if (!$occasion) {
+            $item = $this->service->getById($id);
+            if (!$item) {
                 return redirect()->route('admin.occasions.index')->with('error', 'المناسبة غير موجودة');
             }
-            destroy($occasion);
+
+            $this->service->delete($id);
             return redirect()->route('admin.occasions.index')->with('success', 'تم حذف المناسبة بنجاح');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return redirect()->back()->with('error', 'حدث خطأ أثناء حذف المناسبة ' . $e->getMessage());
         }
     }

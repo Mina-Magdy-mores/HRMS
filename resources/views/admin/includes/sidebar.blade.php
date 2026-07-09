@@ -76,7 +76,7 @@
                         request()->routeIs('admin.cities.*')
                             ? 'active'
                             : '' }}">
-                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <i class="nav-icon fas fa-tachometer-alt text-warning"></i>
                         <p>
                             قائمة الضبط
                             <i class="right fas fa-angle-left"></i>
@@ -236,21 +236,70 @@
                     class="nav-item has-treeview  {{ request()->routeIs('admin.employees.*') ||
                     request()->routeIs('admin.allowance-types.*') ||
                     request()->routeIs('admin.deduction-types.*') ||
-                    request()->routeIs('admin.bonuses.*') ||
-                    (request()->routeIs('admin.employee-dashboard.*') && request()->get('tab') != 'tasks')
+                    request()->routeIs('admin.bonuses.*')
                         ? 'menu-open'
                         : '' }}">
                     <a href="#"
                         class="nav-link {{ request()->routeIs('admin.employees.*') ||
                         request()->routeIs('admin.allowance-types.*') ||
                         request()->routeIs('admin.deduction-types.*') ||
-                        request()->routeIs('admin.bonuses.*') ||
-                        (request()->routeIs('admin.employee-dashboard.*') && request()->get('tab') != 'tasks')
+                        request()->routeIs('admin.bonuses.*')
                             ? 'active'
                             : '' }}">
-                        <i class="nav-icon fas fa-users"></i>
+                        <i class="nav-icon fas fa-users text-primary"></i>
                         <p>
                             قائمة شئون الموظفين
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        @if(check_sub_menu_permission('بيانات الموظفين'))
+                        <li class="nav-item">
+                            <a href="{{ route('admin.employees.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.employees.*')) active @endif">
+                                <i class="fas fa-users text-primary"></i>
+                                <p>بيانات الموظفين</p>
+                            </a>
+                        </li>
+                        @endif
+                        @if(check_sub_menu_permission('انواع البدل للراتب'))
+                        <li class="nav-item">
+                            <a href="{{ route('admin.allowance-types.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.allowance-types.*')) active @endif">
+                                <i class="fas fa-hand-holding-usd text-success"></i>
+                                <p>انواع البدل للراتب</p>
+                            </a>
+                        </li>
+                        @endif
+                        @if(check_sub_menu_permission('انواع الخصم للراتب'))
+                        <li class="nav-item">
+                            <a href="{{ route('admin.deduction-types.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.deduction-types.*')) active @endif">
+                                <i class="fas fa-file-invoice-dollar text-danger"></i>
+                                <p>انواع الخصم للراتب</p>
+                            </a>
+                        </li>
+                        @endif
+                        @if(check_sub_menu_permission('انواع المكافآت للراتب'))
+                        <li class="nav-item">
+                            <a href="{{ route('admin.bonuses.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.bonuses.*')) active @endif">
+                                <i class="fas fa-award text-warning"></i>
+                                <p>انواع المكافآت للراتب</p>
+                            </a>
+                        </li>
+                        @endif
+                    </ul>
+                </li>
+                @endif
+
+                <li
+                    class="nav-item has-treeview {{ request()->routeIs('admin.employee-dashboard.*') && request()->get('tab') != 'tasks' ? 'menu-open' : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->routeIs('admin.employee-dashboard.*') && request()->get('tab') != 'tasks' ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-user-circle text-info"></i>
+                        <p>
+                            ملف الموظف التفصيلي
                             <i class="right fas fa-angle-left"></i>
                         </p>
                     </a>
@@ -297,136 +346,9 @@
                                 <p>أرشيف رواتب الموظف</p>
                             </a>
                         </li>
-                        @if(check_sub_menu_permission('بيانات الموظفين'))
-                        <li class="nav-item">
-                            <a href="{{ route('admin.employees.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.employees.*')) active @endif">
-                                <i class="fas fa-users text-primary"></i>
-                                <p>بيانات الموظفين</p>
-                            </a>
-                        </li>
-                        @endif
-                        @if(check_sub_menu_permission('انواع البدل للراتب'))
-                        <li class="nav-item">
-                            <a href="{{ route('admin.allowance-types.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.allowance-types.*')) active @endif">
-                                <i class="fas fa-hand-holding-usd text-success"></i>
-                                <p>انواع البدل للراتب</p>
-                            </a>
-                        </li>
-                        @endif
-                        @if(check_sub_menu_permission('انواع الخصم للراتب'))
-                        <li class="nav-item">
-                            <a href="{{ route('admin.deduction-types.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.deduction-types.*')) active @endif">
-                                <i class="fas fa-file-invoice-dollar text-danger"></i>
-                                <p>انواع الخصم للراتب</p>
-                            </a>
-                        </li>
-                        @endif
-                        @if(check_sub_menu_permission('انواع المكافآت للراتب'))
-                        <li class="nav-item">
-                            <a href="{{ route('admin.bonuses.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.bonuses.*')) active @endif">
-                                <i class="fas fa-award text-warning"></i>
-                                <p>انواع المكافآت للراتب</p>
-                            </a>
-                        </li>
-                        @endif
                     </ul>
                 </li>
-                @endif
 
-                @if(check_main_menu_permission('قائمة المهام'))
-                <li
-                    class="nav-item has-treeview {{ request()->routeIs('admin.employee-tasks.*') || (request()->routeIs('admin.employee-dashboard.*') && request()->get('tab') == 'tasks') ? 'menu-open' : '' }}">
-                    <a href="#"
-                        class="nav-link {{ request()->routeIs('admin.employee-tasks.*') || (request()->routeIs('admin.employee-dashboard.*') && request()->get('tab') == 'tasks') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-tasks text-info"></i>
-                        <p>
-                            قائمة المهام
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        @if(auth('admin')->user()->is_employee == 1)
-                        <li class="nav-item">
-                            <a href="{{ route('admin.employee-dashboard.index', ['tab' => 'tasks']) }}"
-                                class="nav-link @if (request()->routeIs('admin.employee-dashboard.*') && request()->get('tab') == 'tasks') active @endif">
-                                <i class="fas fa-tasks text-warning"></i>
-                                <p>مهام الموظف</p>
-                            </a>
-                        </li>
-                        @endif
-                        @if(auth('admin')->user()->is_employee == 0 && check_sub_menu_permission('مهام الموظفين'))
-                        <li class="nav-item">
-                            <a href="{{ route('admin.employee-tasks.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.employee-tasks.*')) active @endif">
-                                <i class="fas fa-tasks text-info"></i>
-                                <p>مهام الموظفين</p>
-                            </a>
-                        </li>
-                        @endif
-                    </ul>
-                </li>
-                @endif
-
-                @if(check_main_menu_permission('قائمة الطلبات'))
-                <li
-                    class="nav-item has-treeview {{ request()->routeIs('admin.employee-requests.*') || request()->routeIs('admin.employee-request-types.*') ? 'menu-open' : '' }}">
-                    <a href="#"
-                        class="nav-link {{ request()->routeIs('admin.employee-requests.*') || request()->routeIs('admin.employee-request-types.*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-file-signature text-success"></i>
-                        <p>
-                            قائمة الطلبات
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        @if(check_sub_menu_permission('أنواع طلبات الموظفين'))
-                        <li class="nav-item">
-                            <a href="{{ route('admin.employee-request-types.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.employee-request-types.*')) active @endif">
-                                <i class="fas fa-list-ul text-warning"></i>
-                                <p>أنواع طلبات الموظفين</p>
-                            </a>
-                        </li>
-                        @endif
-                        @if(auth('admin')->user()->is_employee == 1 || check_sub_menu_permission('طلبات الموظفين'))
-                        <li class="nav-item">
-                            <a href="{{ route('admin.employee-requests.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.employee-requests.*')) active @endif">
-                                <i class="fas fa-file-signature text-success"></i>
-                                <p>طلبات الموظفين</p>
-                            </a>
-                        </li>
-                        @endif
-                    </ul>
-                </li>
-                @endif
-
-                @if(check_main_menu_permission('المحادثات'))
-                <li
-                    class="nav-item has-treeview {{ request()->routeIs('admin.chats.*') ? 'menu-open' : '' }}">
-                    <a href="#"
-                        class="nav-link {{ request()->routeIs('admin.chats.*') ? 'active' : '' }}">
-                        <i class="nav-icon fas fa-comments text-primary"></i>
-                        <p>
-                            المحادثات
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{{ route('admin.chats.index') }}"
-                                class="nav-link @if (request()->routeIs('admin.chats.*')) active @endif">
-                                <i class="fas fa-comment-dots text-info"></i>
-                                <p>المحادثات والدردشة</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                @endif
 
                 @if(check_main_menu_permission('قائمة أجور الموظفين'))
                 <li
@@ -455,7 +377,7 @@
                         request()->routeIs('admin.main-salary-employee.*')
                             ? 'active'
                             : '' }}">
-                        <i class="nav-icon fas fa-wallet"></i>
+                        <i class="nav-icon fas fa-wallet text-success"></i>
                         <p>
                             قائمة أجور الموظفين
                             <i class="right fas fa-angle-left"></i>
@@ -571,7 +493,7 @@
                             request()->routeIs('admin.direct-grants.*')
                                 ? 'active'
                                 : '' }}">
-                        <i class="nav-icon fas fa-balance-scale"></i>
+                        <i class="nav-icon fas fa-balance-scale text-info"></i>
                         <p>
                             قائمة التسويات
                             <i class="right fas fa-angle-left"></i>
@@ -632,7 +554,7 @@
                         request()->routeIs('admin.main-employees-vacations-balances.*')
                             ? 'active'
                             : '' }}">
-                        <i class="nav-icon fas fa-fingerprint"></i>
+                        <i class="nav-icon fas fa-fingerprint text-danger"></i>
                         <p>
                             الحضور والانصراف
                             <i class="right fas fa-angle-left"></i>
@@ -786,6 +708,97 @@
                             </a>
                         </li>
                         @endif
+                    </ul>
+                </li>
+                @endif
+
+                @if(check_main_menu_permission('قائمة المهام'))
+                <li
+                    class="nav-item has-treeview {{ request()->routeIs('admin.employee-tasks.*') || (request()->routeIs('admin.employee-dashboard.*') && request()->get('tab') == 'tasks') ? 'menu-open' : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->routeIs('admin.employee-tasks.*') || (request()->routeIs('admin.employee-dashboard.*') && request()->get('tab') == 'tasks') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-tasks text-info"></i>
+                        <p>
+                            قائمة المهام
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        @if(auth('admin')->user()->is_employee == 1)
+                        <li class="nav-item">
+                            <a href="{{ route('admin.employee-dashboard.index', ['tab' => 'tasks']) }}"
+                                class="nav-link @if (request()->routeIs('admin.employee-dashboard.*') && request()->get('tab') == 'tasks') active @endif">
+                                <i class="fas fa-tasks text-warning"></i>
+                                <p>مهام الموظف</p>
+                            </a>
+                        </li>
+                        @endif
+                        @if(auth('admin')->user()->is_employee == 0 && check_sub_menu_permission('مهام الموظفين'))
+                        <li class="nav-item">
+                            <a href="{{ route('admin.employee-tasks.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.employee-tasks.*')) active @endif">
+                                <i class="fas fa-tasks text-info"></i>
+                                <p>مهام الموظفين</p>
+                            </a>
+                        </li>
+                        @endif
+                    </ul>
+                </li>
+                @endif
+
+                @if(check_main_menu_permission('قائمة الطلبات'))
+                <li
+                    class="nav-item has-treeview {{ request()->routeIs('admin.employee-requests.*') || request()->routeIs('admin.employee-request-types.*') ? 'menu-open' : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->routeIs('admin.employee-requests.*') || request()->routeIs('admin.employee-request-types.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-file-signature text-success"></i>
+                        <p>
+                            قائمة الطلبات
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        @if(check_sub_menu_permission('أنواع طلبات الموظفين'))
+                        <li class="nav-item">
+                            <a href="{{ route('admin.employee-request-types.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.employee-request-types.*')) active @endif">
+                                <i class="fas fa-list-ul text-warning"></i>
+                                <p>أنواع طلبات الموظفين</p>
+                            </a>
+                        </li>
+                        @endif
+                        @if(auth('admin')->user()->is_employee == 1 || check_sub_menu_permission('طلبات الموظفين'))
+                        <li class="nav-item">
+                            <a href="{{ route('admin.employee-requests.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.employee-requests.*')) active @endif">
+                                <i class="fas fa-file-signature text-success"></i>
+                                <p>طلبات الموظفين</p>
+                            </a>
+                        </li>
+                        @endif
+                    </ul>
+                </li>
+                @endif
+
+                @if(check_main_menu_permission('المحادثات'))
+                <li
+                    class="nav-item has-treeview {{ request()->routeIs('admin.chats.*') ? 'menu-open' : '' }}">
+                    <a href="#"
+                        class="nav-link {{ request()->routeIs('admin.chats.*') ? 'active' : '' }}">
+                        <i class="nav-icon fas fa-comments text-primary"></i>
+                        <p>
+                            المحادثات
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('admin.chats.index') }}"
+                                class="nav-link @if (request()->routeIs('admin.chats.*')) active @endif">
+                                <i class="fas fa-comment-dots text-info"></i>
+                                <p>المحادثات والدردشة</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 @endif

@@ -5,88 +5,93 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BrancheRequest;
 use App\Models\Branche;
-use Auth;
+use App\Services\HR\BrancheService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BrancheController extends Controller
 {
+    protected $service;
+
+    public function __construct(BrancheService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index()
     {
-        $company_id = Auth::user()->company_id;
-
-        $branches = getColsWhereP(Branche::class, ['updatedBy', 'createdBy'], ['*'], ['company_id' => $company_id], 'id', 'asc', PAGEINATION_COUNTER);
-        $branches->getCollection()->loadCount('employees');
-        return view('admin.branches.index', compact('branches'));
+        $items = $this->service->getPaginated([0=>'createdBy',1=>'updatedBy',]);
+        $items->getCollection()->loadCount([0=>'employees',]);
+        return view('admin.branches.index', ['branches' => $items]);
     }
+
     public function create()
     {
+        $company_id = Auth::user()->company_id;
         return view('admin.branches.create');
     }
+
     public function store(BrancheRequest $request)
     {
-        $company_id = Auth::user()->company_id;
-        $checkIfExist = getColsWhereRow(Branche::class, ['id'], ['name' => $request->name, 'company_id' => $company_id]);
-        if (!empty($checkIfExist)) {
-            return redirect()->back()->with('error', 'اسم الفرع موجود مسبقا')->withInput();
-        }
         try {
+            if ($this->service->checkExists(['name' => $request->name])) {
+                return redirect()->back()->with('error', 'الفرع موجودة بالفعل')->withInput();
+            }
+
             $validated = $request->validated();
-            $validated['created_by'] = Auth::user()->id;
-            $validated['updated_by'] = Auth::user()->id;
-            $validated['company_id'] = $company_id;
-            insert(Branche::class, $validated);
-            return redirect()->route('admin.branches.index')->with('success', 'تم اضافة الفرع بنجاح');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'حدث خطا ما برجاء المحاوله لاحقا ' . $e->getMessage())->withInput();
+            $this->service->create($validated);
+
+            return redirect()->route('admin.branches.index')->with('success', 'تم إنشاء الفرع بنجاح');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء إنشاء الفرع ' . $e->getMessage())->withInput();
         }
     }
+
     public function edit($id)
     {
         $company_id = Auth::user()->company_id;
-        $branche = getColsWhereRow(Branche::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-        if (empty($branche)) {
-            return redirect()->route('admin.branches.index')->with('error', 'هذا الفرع غير موجود');
+        $item = $this->service->getById($id);
+        if (!$item) {
+            return redirect()->route('admin.branches.index')->with('error', 'الفرع غير موجودة');
         }
-        return view('admin.branches.update', compact('branche'));
+        return view('admin.branches.update', ['branch' => $item]);
     }
+
     public function update(BrancheRequest $request, $id)
     {
-        $company_id = Auth::user()->company_id;
-        $branche = getColsWhereRow(Branche::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-        if (empty($branche)) {
-            return redirect()->route('admin.branches.index')->with('error', 'هذا الفرع غير موجود');
-        }
-        $checkIfExist = Branche::select('id')
-            ->where(['company_id' => $company_id, 'name' => $request->name])
-            ->where('id', '!=', $id)
-            ->first();
-        if ($checkIfExist) {
-            return redirect()->back()->with('error', 'اسم الفرع موجود مسبقا')->withInput();
-        }
         try {
+            if (!$this->service->getById($id)) {
+                return redirect()->route('admin.branches.index')->with('error', 'الفرع غير موجودة');
+            }
+
+            if ($this->service->checkExists(['name' => $request->name], $id)) {
+                return redirect()->back()->with('error', 'الفرع موجودة بالفعل')->withInput();
+            }
+
             $validated = $request->validated();
-            $validated['updated_by'] = Auth::user()->id;
-            update($branche, $validated);
-            return redirect()->route('admin.branches.index')->with('success', 'تم تعديل الفرع بنجاح');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'حدث خطا ما برجاء المحاوله لاحقا ' . $e->getMessage())->withInput();
+            $this->service->update($id, $validated);
+
+            return redirect()->route('admin.branches.index')->with('success', 'تم تحديث الفرع بنجاح');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث الفرع ' . $e->getMessage())->withInput();
         }
     }
+
     public function destroy($id)
     {
-        $company_id = Auth::user()->company_id;
-        $branche = getColsWhereRow(Branche::class, ['id'], ['id' => $id, 'company_id' => $company_id]);
-        if (empty($branche)) {
-            return redirect()->route('admin.branches.index')->with('error', 'هذا الفرع غير موجود');
-        }
-        if ($branche->employees()->exists()) {
-            return redirect()->route('admin.branches.index')->with('error', 'لا يمكن حذف هذا الفرع لوجود موظفين');
-        }
         try {
-            destroy($branche);
+            $item = $this->service->getById($id);
+            if (!$item) {
+                return redirect()->route('admin.branches.index')->with('error', 'الفرع غير موجودة');
+            }
+
+            if ($item->employees()->exists()) {
+                return redirect()->route('admin.branches.index')->with('error', 'لا يمكن حذف هذا الفرع لوجود موظفين مرتبطة به');
+            }
+            $this->service->delete($id);
             return redirect()->route('admin.branches.index')->with('success', 'تم حذف الفرع بنجاح');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'حدث خطا ما برجاء المحاوله لاحقا ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء حذف الفرع ' . $e->getMessage());
         }
     }
 }

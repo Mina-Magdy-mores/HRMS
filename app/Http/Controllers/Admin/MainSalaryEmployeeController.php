@@ -16,10 +16,18 @@ use App\Traits\GeneralTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\Finance\SalaryService;
 
 class MainSalaryEmployeeController extends Controller
 {
     use GeneralTrait;
+
+    protected $salaryService;
+
+    public function __construct(SalaryService $salaryService)
+    {
+        $this->salaryService = $salaryService;
+    }
     public function index()
     {
         $company_id = Auth::user()->company_id;
@@ -178,7 +186,7 @@ class MainSalaryEmployeeController extends Controller
 
                     $insert = insert(MainSalaryEmployee::class, $dataToInsert, true);
                     if (!empty($insert)) {
-                        $this->recalculate_main_salary($insert->id);
+                        $this->salaryService->recalculateMainSalary($insert->id);
                         return response()->json(['status' => 'true', 'message' => 'تم إضافة سجل الراتب للموظف بنجاح']);
                     } else {
                         return response()->json(['status' => 'false', 'message' => 'عفوا، حدث خطأ أثناء إضافة السجل المالي']);
@@ -924,7 +932,7 @@ class MainSalaryEmployeeController extends Controller
             if (empty($record)) {
                 return response()->json(['status' => 'false', 'message' => 'عفواً، السجل غير موجود']);
             }
-            $this->recalculate_main_salary($id);
+            $this->salaryService->recalculateMainSalary($id);
             $record = $record->fresh();
 
             $html = view('admin.mainSalaryEmployee.openArchiveModal', [
@@ -1185,7 +1193,7 @@ class MainSalaryEmployeeController extends Controller
                             'data' => $record
                         ]);
                     } else {
-                        $this->recalculate_main_salary($id);
+                        $this->salaryService->recalculateMainSalary($id);
                         $record = MainSalaryEmployee::with('employee')->findOrFail($id);
                         return response()->json([
                             'status' => 'true',

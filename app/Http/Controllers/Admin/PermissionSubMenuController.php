@@ -4,108 +4,95 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PermissionSubMenuRequest;
-use App\Models\PermissionMainMenu;
 use App\Models\PermissionSubMenu;
-use App\Models\PermissionSubMenuAction;
+use App\Services\HR\PermissionSubMenuService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class PermissionSubMenuController extends Controller
 {
+    protected $service;
+
+    public function __construct(PermissionSubMenuService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index()
     {
-        $submenus = PermissionSubMenu::with('mainMenu')
-            ->orderBy('permission_main_menu_id', 'asc')
-            ->orderBy('id', 'asc')
-            ->get();
-        return view('admin.permission_sub_menus.index', compact('submenus'));
+        $items = $this->service->getAll(['*'], [], 'permission_main_menu_id', 'asc');
+        $items->load(['mainMenu', 'addedBy', 'updatedBy']);
+        
+        return view('admin.permission_sub_menus.index', ['submenus' => $items]);
     }
 
     public function create()
     {
-        $mainMenus = get_cols_where(PermissionMainMenu::class, ['id', 'name'], ['is_active' => 1]);
+        $company_id = Auth::user()->company_id;
+        $mainMenus = get_cols_where(\App\Models\PermissionMainMenu::class, ['id', 'name'], ['company_id' => $company_id, 'is_active' => 1]);
         return view('admin.permission_sub_menus.create', compact('mainMenus'));
     }
 
     public function store(PermissionSubMenuRequest $request)
     {
         try {
-            DB::beginTransaction();
-
-            $validated = $request->validated();
-            $validated['added_by'] = Auth::id();
-            $validated['updated_by'] = Auth::id();
-
-            $subMenu = insert(PermissionSubMenu::class, $validated, true);
-
-            // Automatically seed default actions for this submenu
-            $defaultActions = ['عرض', 'إضافة', 'تعديل', 'حذف'];
-            foreach ($defaultActions as $action) {
-                PermissionSubMenuAction::create([
-                    'permission_sub_menu_id' => $subMenu->id,
-                    'name' => $action,
-                    'is_active' => 1,
-                    'added_by' => Auth::id(),
-                    'updated_by' => Auth::id(),
-                ]);
+            if ($this->service->checkExists(['name' => $request->name])) {
+                return redirect()->back()->with('error', 'القائمة الفرعية موجودة بالفعل')->withInput();
             }
 
-            DB::commit();
-            return redirect()->route('admin.permission-sub-menus.index')->with('success', 'تم إضافة القائمة الفرعية مع حركاتها الافتراضية بنجاح');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'حدث خطأ ما: ' . $e->getMessage())->withInput();
+            $validated = $request->validated();
+            $this->service->create($validated);
+
+            return redirect()->route('admin.permission-sub-menus.index')->with('success', 'تم إنشاء القائمة الفرعية بنجاح');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء إنشاء القائمة الفرعية ' . $e->getMessage())->withInput();
         }
     }
 
     public function edit($id)
     {
-        $submenu = getColsWhereRow(PermissionSubMenu::class, ['*'], ['id' => $id]);
-        if (!$submenu) {
-            return redirect()->route('admin.permission-sub-menus.index')->with('error', 'هذه القائمة غير موجودة');
+        $company_id = Auth::user()->company_id;
+        $item = $this->service->getById($id);
+        if (!$item) {
+            return redirect()->route('admin.permission-sub-menus.index')->with('error', 'القائمة الفرعية غير موجودة');
         }
-
-        $mainMenus = get_cols_where(PermissionMainMenu::class, ['id', 'name'], ['is_active' => 1]);
-        return view('admin.permission_sub_menus.update', compact('submenu', 'mainMenus'));
+        $mainMenus = get_cols_where(\App\Models\PermissionMainMenu::class, ['id', 'name'], ['company_id' => $company_id, 'is_active' => 1]);
+        return view('admin.permission_sub_menus.update', ['menu' => $item], compact('mainMenus'));
     }
 
     public function update(PermissionSubMenuRequest $request, $id)
     {
-        $submenu = getColsWhereRow(PermissionSubMenu::class, ['*'], ['id' => $id]);
-        if (!$submenu) {
-            return redirect()->route('admin.permission-sub-menus.index')->with('error', 'هذه القائمة غير موجودة');
-        }
-
         try {
+            if (!$this->service->getById($id)) {
+                return redirect()->route('admin.permission-sub-menus.index')->with('error', 'القائمة الفرعية غير موجودة');
+            }
+
+            if ($this->service->checkExists(['name' => $request->name], $id)) {
+                return redirect()->back()->with('error', 'القائمة الفرعية موجودة بالفعل')->withInput();
+            }
+
             $validated = $request->validated();
-            $validated['updated_by'] = Auth::id();
+            $this->service->update($id, $validated);
 
-            update($submenu, $validated);
-
-            return redirect()->route('admin.permission-sub-menus.index')->with('success', 'تم تعديل القائمة الفرعية بنجاح');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'حدث خطأ ما: ' . $e->getMessage())->withInput();
+            return redirect()->route('admin.permission-sub-menus.index')->with('success', 'تم تحديث القائمة الفرعية بنجاح');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث القائمة الفرعية ' . $e->getMessage())->withInput();
         }
     }
 
     public function destroy($id)
     {
-        $submenu = getColsWhereRow(PermissionSubMenu::class, ['*'], ['id' => $id]);
-        if (!$submenu) {
-            return redirect()->route('admin.permission-sub-menus.index')->with('error', 'هذه القائمة غير موجودة');
-        }
-
         try {
-            DB::beginTransaction();
+            $item = $this->service->getById($id);
+            if (!$item) {
+                return redirect()->route('admin.permission-sub-menus.index')->with('error', 'القائمة الفرعية غير موجودة');
+            }
 
-            // Associations delete cascades automatically because of the foreign key constraint cascadeOnDelete
-            destroy($submenu);
 
-            DB::commit();
-            return redirect()->route('admin.permission-sub-menus.index')->with('success', 'تم حذف القائمة الفرعية وحركاتها بنجاح');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'حدث خطأ ما أثناء الحذف: ' . $e->getMessage());
+            $this->service->delete($id);
+            return redirect()->route('admin.permission-sub-menus.index')->with('success', 'تم حذف القائمة الفرعية بنجاح');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء حذف القائمة الفرعية ' . $e->getMessage());
         }
     }
 }

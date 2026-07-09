@@ -5,81 +5,91 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PermissionMainMenuRequest;
 use App\Models\PermissionMainMenu;
+use App\Services\HR\PermissionMainMenuService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class PermissionMainMenuController extends Controller
 {
+    protected $service;
+
+    public function __construct(PermissionMainMenuService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index()
     {
-        $menus = getColsWhereP(PermissionMainMenu::class, [], ['*'], [], 'id', 'asc', PAGEINATION_COUNTER);
-        $menus->getCollection()->loadCount('subMenus');
-        return view('admin.permission_main_menus.index', compact('menus'));
+        $items = $this->service->getPaginated([0=>'addedBy',1=>'updatedBy',]);
+        
+        return view('admin.permission_main_menus.index', ['menus' => $items]);
     }
 
     public function create()
     {
+        $company_id = Auth::user()->company_id;
         return view('admin.permission_main_menus.create');
     }
 
     public function store(PermissionMainMenuRequest $request)
     {
         try {
+            if ($this->service->checkExists(['name' => $request->name])) {
+                return redirect()->back()->with('error', 'القائمة الرئيسية موجودة بالفعل')->withInput();
+            }
+
             $validated = $request->validated();
-            $validated['added_by'] = Auth::id();
-            $validated['updated_by'] = Auth::id();
+            $this->service->create($validated);
 
-            insert(PermissionMainMenu::class, $validated);
-
-            return redirect()->route('admin.permission-main-menus.index')->with('success', 'تم إضافة القائمة الرئيسية بنجاح');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'حدث خطأ ما: ' . $e->getMessage())->withInput();
+            return redirect()->route('admin.permission-main-menus.index')->with('success', 'تم إنشاء القائمة الرئيسية بنجاح');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء إنشاء القائمة الرئيسية ' . $e->getMessage())->withInput();
         }
     }
 
     public function edit($id)
     {
-        $menu = getColsWhereRow(PermissionMainMenu::class, ['*'], ['id' => $id]);
-        if (!$menu) {
-            return redirect()->route('admin.permission-main-menus.index')->with('error', 'هذه القائمة غير موجودة');
+        $company_id = Auth::user()->company_id;
+        $item = $this->service->getById($id);
+        if (!$item) {
+            return redirect()->route('admin.permission-main-menus.index')->with('error', 'القائمة الرئيسية غير موجودة');
         }
-        return view('admin.permission_main_menus.update', compact('menu'));
+        return view('admin.permission_main_menus.update', ['menu' => $item]);
     }
 
     public function update(PermissionMainMenuRequest $request, $id)
     {
-        $menu = getColsWhereRow(PermissionMainMenu::class, ['*'], ['id' => $id]);
-        if (!$menu) {
-            return redirect()->route('admin.permission-main-menus.index')->with('error', 'هذه القائمة غير موجودة');
-        }
-
         try {
+            if (!$this->service->getById($id)) {
+                return redirect()->route('admin.permission-main-menus.index')->with('error', 'القائمة الرئيسية غير موجودة');
+            }
+
+            if ($this->service->checkExists(['name' => $request->name], $id)) {
+                return redirect()->back()->with('error', 'القائمة الرئيسية موجودة بالفعل')->withInput();
+            }
+
             $validated = $request->validated();
-            $validated['updated_by'] = Auth::id();
+            $this->service->update($id, $validated);
 
-            update($menu, $validated);
-
-            return redirect()->route('admin.permission-main-menus.index')->with('success', 'تم تعديل القائمة الرئيسية بنجاح');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'حدث خطأ ما: ' . $e->getMessage())->withInput();
+            return redirect()->route('admin.permission-main-menus.index')->with('success', 'تم تحديث القائمة الرئيسية بنجاح');
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث القائمة الرئيسية ' . $e->getMessage())->withInput();
         }
     }
 
     public function destroy($id)
     {
-        $menu = getColsWhereRow(PermissionMainMenu::class, ['*'], ['id' => $id]);
-        if (!$menu) {
-            return redirect()->route('admin.permission-main-menus.index')->with('error', 'هذه القائمة غير موجودة');
-        }
-
-        if ($menu->subMenus()->exists()) {
-            return redirect()->route('admin.permission-main-menus.index')->with('error', 'لا يمكن حذف القائمة لوجود قوائم فرعية مرتبطة بها.');
-        }
-
         try {
-            destroy($menu);
+            $item = $this->service->getById($id);
+            if (!$item) {
+                return redirect()->route('admin.permission-main-menus.index')->with('error', 'القائمة الرئيسية غير موجودة');
+            }
+
+
+            $this->service->delete($id);
             return redirect()->route('admin.permission-main-menus.index')->with('success', 'تم حذف القائمة الرئيسية بنجاح');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'حدث خطأ ما أثناء الحذف: ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'حدث خطأ أثناء حذف القائمة الرئيسية ' . $e->getMessage());
         }
     }
 }

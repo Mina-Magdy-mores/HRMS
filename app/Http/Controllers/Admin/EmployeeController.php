@@ -32,10 +32,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Services\HR\EmployeeService;
 
 class EmployeeController extends Controller
 {
     use GeneralTrait;
+
+    protected $employeeService;
+
+    public function __construct(EmployeeService $employeeService)
+    {
+        $this->employeeService = $employeeService;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -181,54 +189,23 @@ class EmployeeController extends Controller
     public function store(EmployeeRequest $request)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $checkIfExist = getColsWhereRow(Employee::class, ['id'], ['company_id' => $company_id, 'name' => $request->name]);
-            if (!empty($checkIfExist)) {
-                return redirect()->back()->with(['error' => 'هذا الموظف موجود بالفعل'])->withInput();
+            $data = $request->validated();
+            if ($request->hasFile('image')) {
+                $data['image_file'] = $request->file('image');
             }
-            $last_employee = get_cols_where_row_orderby(Employee::class, ['employee_code'], ['company_id' => $company_id], 'employee_code', 'desc');
-            if (!empty($last_employee)) {
-                $employee_code = $last_employee->employee_code + 1;
-            } else {
-                $employee_code = 1;
+            if ($request->hasFile('cv')) {
+                $data['cv_file'] = $request->file('cv');
             }
-            $validatedData = $request->validated();
-            if ($request->salary !== null && $request->salary !== '') {
-                if ($request->salary > 0) {
-                    $validatedData['payment_per_day'] = $request->salary / 30; // Assuming 30 days in a month
-                } else {
-                    $validatedData['payment_per_day'] = 0;
-                }
-            } else {
-                $validatedData['payment_per_day'] = null;
-            }
-            if ($request->has('image')) {
-                $validatedData['image'] = uploadImage('employees/profile', $request->file('image'));
-            }
-            if ($request->has('cv')) {
-                $validatedData['cv'] = uploadImage('employees/cv', $request->file('cv'));
-            }
-            $validatedData['hire_date_day_month_year'] = $request->hire_date;
-            $validatedData['employee_code'] = $employee_code;
-            $validatedData['company_id'] = $company_id;
-            $validatedData['added_by'] = Auth::id();
-            if ($request->fixed_shift == 1) {
-                $shiftData = getColsWhereRow(ShiftsType::class, ['total_hours'], ['company_id' => $company_id, 'id' => $request->shift_type_id]);
-                if (!empty($shiftData)) {
-                    $validatedData['daily_work_hours'] = $shiftData['total_hours'];
-                } else {
-                    return redirect()->back()->with(['error' => 'عفواا لم يتم تحديد الشفت '])->withInput();
-                }
-            } else {
-                $validatedData['shift_type_id'] = null;
-            }
-            $flag = insert(Employee::class, $validatedData);
-            if ($flag) {
-                return redirect()->route('admin.employees.index')->with(['success' => 'تم إضافة الموظف بنجاح']);
-            }
-            return redirect()->back()->with(['error' => 'حدث خطأ أثناء إضافة الموظف'])->withInput();
+            $data['hire_date'] = $request->hire_date;
+            $data['salary'] = $request->salary;
+            $data['fixed_shift'] = $request->fixed_shift;
+            $data['shift_type_id'] = $request->shift_type_id;
+
+            $this->employeeService->createEmployee($data);
+
+            return redirect()->route('admin.employees.index')->with(['success' => 'تم إضافة الموظف بنجاح']);
         } catch (\Exception $e) {
-            return redirect()->back()->with(['error' => 'عفوا حدث خطأ ما ' . $e->getMessage()])->withInput();
+            return redirect()->back()->with(['error' => $e->getMessage()])->withInput();
         }
     }
 
@@ -286,78 +263,23 @@ class EmployeeController extends Controller
     public function update(EmployeeUpdateRequest $request, $id)
     {
         try {
-            $company_id = Auth::user()->company_id;
-            $employee = getColsWhereRow(Employee::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-            if (!$employee) {
-                return redirect()->route('admin.employees.index')->with(['error' => 'الموظف غير موجود']);
-            }
-            $validatedData = $request->validated();
-            $validatedData['company_id'] = $company_id;
-            $validatedData['updated_by'] = Auth::id();
-            if ($request->has('salary')) {
-                if ($request->salary !== null && $request->salary !== '') {
-                    if ($request->salary > 0) {
-                        $validatedData['payment_per_day'] = $request->salary / 30;
-                    } else {
-                        $validatedData['payment_per_day'] = 0;
-                    }
-                } else {
-                    $validatedData['payment_per_day'] = null;
-                }
-            }
+            $data = $request->validated();
             if ($request->hasFile('image')) {
-                if (!empty($employee->image)) {
-                    Storage::delete($employee->image);
-                }
-
-                $validatedData['image'] = uploadImage(
-                    'employees/profile',
-                    $request->file('image')
-                );
+                $data['image_file'] = $request->file('image');
             }
             if ($request->hasFile('cv')) {
-                if (!empty($employee->cv) && Storage::exists($employee->cv)) {
-                    Storage::delete($employee->cv);
-                }
-                $validatedData['cv'] = uploadImage('employees/cv', $request->file('cv'));
+                $data['cv_file'] = $request->file('cv');
             }
+            $data['salary'] = $request->salary;
+            $data['fixed_shift'] = $request->fixed_shift;
+            $data['shift_type_id'] = $request->shift_type_id;
+            $data['fixed_allowance'] = $request->fixed_allowance;
 
-            DB::transaction(function () use ($employee, $validatedData, $id, $company_id, $request) {
-                $oldSalary = $employee->salary;
-                $isSalaryChanged = !empty($oldSalary) && !empty($request->salary) && $request->salary != $oldSalary;
-                if ($request->fixed_shift == 1) {
-                    $shiftData = getColsWhereRow(ShiftsType::class, ['total_hours'], ['company_id' => $company_id, 'id' => $request->shift_type_id]);
-                    if (!empty($shiftData)) {
-                        $validatedData['daily_work_hours'] = $shiftData['total_hours'];
-                    } else {
-                        return redirect()->back()->with(['error' => 'عفواا لم يتم تحديد الشفت '])->withInput();
-                    }
-                } else {
-                    $validatedData['shift_type_id'] = null;
-                }
-                $flag = $employee->update($validatedData);
-                if ($flag) {
-                    if ($isSalaryChanged) {
-                        insert(EmployeeSalaryArchive::class, [
-                            'employee_id' => $id,
-                            'amount' => $oldSalary,
-                            'company_id' => $company_id,
-                            'added_by' => Auth::id(),
-                            'updated_by' => Auth::id(),
-                        ]);
-                    }
-                    if ($validatedData['fixed_allowance'] == 0) {
-                        EmployeeFixedAllowance::where('employee_id', $id)->where('company_id', $company_id)->delete();
-                    }
-                    $main_salary_employee = getColsWhereRow(MainSalaryEmployee::class, ['id'], ['employee_id' => $id, 'company_id' => $company_id, 'is_archived' => 0]);
-                    if (!empty($main_salary_employee)) {
-                        $this->recalculate_main_salary($main_salary_employee->id);
-                    }
-                }
-            });
+            $this->employeeService->updateEmployee($id, $data);
+
             return redirect()->route('admin.employees.index')->with(['success' => 'تم تحديث بيانات الموظف بنجاح']);
         } catch (\Exception $e) {
-            return redirect()->back()->with(['error' => 'حدث خطأ أثناء تحديث بيانات الموظف ' . $e->getMessage()])->withInput();
+            return redirect()->back()->with(['error' => $e->getMessage()])->withInput();
         }
     }
 
@@ -366,30 +288,12 @@ class EmployeeController extends Controller
      */
     public function destroy($id)
     {
-        $company_id = Auth::user()->company_id;
-        $employee = getColsWhereRow(Employee::class, ['*'], ['id' => $id, 'company_id' => $company_id]);
-        if (!$employee) {
-            return redirect()->route('admin.employees.index')->with(['error' => 'الموظف غير موجود']);
+        try {
+            $this->employeeService->deleteEmployee($id);
+            return redirect()->route('admin.employees.index')->with(['success' => 'تم حذف الموظف بنجاح']);
+        } catch (\Exception $e) {
+            return redirect()->route('admin.employees.index')->with(['error' => $e->getMessage()]);
         }
-        if ($employee->employment_status == 1) {
-            return redirect()->route('admin.employees.index')->with(['error' => 'لا يمكن حذف الموظف لأنه لديه حالة توظيف نشطة']);
-        }
-        if ($employee->mainSalaryEmployee->count() > 0) {
-            return redirect()->route('admin.employees.index')->with(['error' => 'لا يمكن حذف الموظف لأنه لديه بيانات رواتب']);
-        }
-        if ($employee->mainSalaryEmployeePLoans->count() > 0) {
-            return redirect()->route('admin.employees.index')->with(['error' => 'لا يمكن حذف الموظف لأنه لديه بيانات سلف']);
-        }
-        DB::transaction(function () use ($employee) {
-            if (!empty($employee->image)) {
-                Storage::delete($employee->image);
-            }
-            if (!empty($employee->cv)) {
-                Storage::delete($employee->cv);
-            }
-            $employee->delete();
-        });
-        return redirect()->route('admin.employees.index')->with(['success' => 'تم حذف الموظف بنجاح']);
     }
 
     public function getGovernorateList(Request $request)
