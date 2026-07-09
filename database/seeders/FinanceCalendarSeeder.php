@@ -28,7 +28,7 @@ class FinanceCalendarSeeder extends Seeder
                     'finance_yr_desc' => $calendar['finance_yr_desc'],
                     'start_date' => $calendar['start_date'],
                     'end_date' => $calendar['end_date'],
-                    'status' => 0,
+                    'status' => 1,
                     'company_id' => 1,
                     'added_by' => 1,
                     'updated_by' => 1,

@@ -66,6 +66,17 @@ class DatabaseSeeder extends Seeder
             AlertModuleSeeder::class,
             AlertMoveTypeSeeder::class,
             EmployeeRequestTypeSeeder::class,
+            
+            // 5. البيانات التشغيلية والتجريبية الجديدة للموظفين والرواتب
+            EmployeeFixedAllowanceSeeder::class,
+            MainEmployeesVacationsBalancesSeeder::class,
+            AttendanceDepartureSeeder::class,
+            EmployeeTaskSeeder::class,
+            EmployeeRequestSeeder::class,
+            MainEmployeeInvestigationSeeder::class,
+            EmployeeMessageSeeder::class,
+            MainSalaryEmployeeSeeder::class,
+            AlertSystemMonitoringSeeder::class,
         ]);
 
         $this->command->info('✅ All seeders completed successfully!');

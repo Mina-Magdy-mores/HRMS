@@ -24,6 +24,33 @@ class EmployeeSeeder extends Seeder
 {
     public function run(): void
     {
+        // ===================== تنظيف البيانات المتعارضة لمنع الأخطاء =====================
+        \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+        
+        $testEmails = [
+            'ahmed.mohamed@elnour.com', 'sara.mahmoud@elnour.com', 'mohamed.khaled@elnour.com',
+            'nasma.ahmed@elnour.com', 'khaled.hassan@elnour.com', 'fatma.mahmoud@elnour.com',
+            'amr.sameh@elnour.com', 'mona.samir@elnour.com', 'tarek.abdullah@elnour.com',
+            'heba.mohamed@elnour.com'
+        ];
+        $testCodes = [1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010];
+        $testFingerprints = ['FP1001', 'FP1002', 'FP1003', 'FP1004', 'FP1005', 'FP1006', 'FP1007', 'FP1008', 'FP1009', 'FP1010'];
+
+        // Delete related admins
+        \App\Models\Admin::where('is_employee', 1)
+            ->where(function($query) use ($testEmails, $testCodes) {
+                $query->whereIn('email', $testEmails)
+                    ->orWhereIn('username', ['ahmed', 'sara', 'mohamed', 'nasma', 'khaled', 'fatma', 'amr', 'mona', 'tarek', 'heba']);
+            })->delete();
+
+        // Delete conflicting employees
+        Employee::whereIn('email', $testEmails)
+            ->orWhereIn('employee_code', $testCodes)
+            ->orWhereIn('fingerprint_code', $testFingerprints)
+            ->delete();
+
+        \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+
         // ===================== جلب الـ IDs من الجداول المرتبطة =====================
 
         $bloodGroups = BloodGroup::where('company_id', 1)->pluck('id', 'name')->toArray();
@@ -860,10 +887,33 @@ class EmployeeSeeder extends Seeder
         foreach ($employees as $employee) {
             $employee['added_by'] = 1;
             $employee['updated_by'] = 1;
-            Employee::updateOrCreate(
+            $empRecord = Employee::updateOrCreate(
                 ['employee_code' => $employee['employee_code'], 'company_id' => 1],
                 $employee
             );
+
+            // Create admin login account for some employees (e.g. Ahmed and Sara)
+            if (in_array($empRecord->employee_code, [1001, 1002])) {
+                $username = $empRecord->employee_code == 1001 ? 'ahmed' : 'sara';
+                \App\Models\Admin::updateOrCreate(
+                    ['email' => $empRecord->email],
+                    [
+                        'name' => $empRecord->name,
+                        'username' => $username,
+                        'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+                        'status' => 1,
+                        'date' => date('Y-m-d H:i:s'),
+                        'company_id' => 1,
+                        'added_by' => 1,
+                        'updated_by' => 1,
+                        'is_master_admin' => 0,
+                        'is_employee' => 1,
+                        'employee_id' => $empRecord->id,
+                        'allow_login' => 1,
+                        'permission_role_id' => null,
+                    ]
+                );
+            }
         }
 
         $this->command->info('✅ Employees seeded: ' . count($employees) . ' records');

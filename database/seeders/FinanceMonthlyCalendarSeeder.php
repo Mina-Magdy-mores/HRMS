@@ -34,8 +34,12 @@ class FinanceMonthlyCalendarSeeder extends Seeder
                 $startDateForCalculation = $startDate;
                 $endDateForCalculation = $endDate;
 
-                // الشهر الحالي فقط مفعل
-                $isCurrentMonth = ($year == date('Y') && $monthNumber == date('m'));
+                // الشهور السابقة تؤرشف والشهور الحالية والمستقبلية تكون معلقة للفتح
+                $currentMonthNumber = (int)date('m');
+                $status = 0;
+                if ($year == date('Y') && $monthNumber < $currentMonthNumber) {
+                    $status = 2; // مؤرشف
+                }
 
                 $monthlyCalendars[] = [
                     'financeCalendar_id' => $financeYear->id,
@@ -45,7 +49,7 @@ class FinanceMonthlyCalendarSeeder extends Seeder
                     'month_id' => $month->id,
                     'start_date' => $startDate,
                     'end_date' => $endDate,
-                    'status' => $isCurrentMonth ? 1 : 0,
+                    'status' => $status,
                     'start_date_for_calculation' => $startDateForCalculation,
                     'end_date_for_calculation' => $endDateForCalculation,
                     'company_id' => 1,
