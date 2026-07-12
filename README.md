@@ -38,6 +38,7 @@ An enterprise-grade, multi-tenant SaaS Human Resources Management System (HRMS) 
 
 ## 📁 Core Repository Directory Blueprint
 
+```text
 app/
 ├── Helpers/                  # Global core helpers & Static permission caching
 ├── Http/Controllers/         # Lightweight MVC thin controllers
