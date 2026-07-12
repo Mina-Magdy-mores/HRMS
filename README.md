@@ -1,4 +1,4 @@
-<img width="985" height="807" alt="image" src="https://github.com/user-attachments/assets/6d8e1140-5cb3-466a-8a83-175edbbf67d1" /># 🏢 HRMS – Enterprise-Grade Human Resources Management System
+# 🏢 HRMS – Enterprise-Grade Human Resources Management System
 
 [![Live Demo](https://img.shields.io/badge/Live_Demo-Laravel_Cloud-FF2D20?style=for-the-badge&logo=laravel)](https://hrms-production-5wyakl.laravel.cloud/admin/login)
 [![Laravel Framework](https://img.shields.io/badge/Laravel-v13.7-FF2D20?style=for-the-badge&logo=laravel)](https://laravel.com/)
