@@ -50,6 +50,7 @@ database/
 ├── seeders/                  # Role & core environment configurations metadata
 └── factories/                # High-fidelity data modeling seed structures
 
+
 ---
 
 ## 🛠️ Tech Stack & Core Dependencies
