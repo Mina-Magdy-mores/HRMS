@@ -53,6 +53,7 @@ database/
 
 ---
 
+
 ## 🛠️ Tech Stack & Core Dependencies
 
 * **Framework Engine:** Laravel Framework v13.7 & PHP v8.4
